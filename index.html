@@ -1618,7 +1618,7 @@
   </div>
 
 </div><!-- /.osint-adv-grid -->
-  WARWATCH // 戰爭預測情報中心 &nbsp;|&nbsp; 資料來源：Polymarket · Bulletin of Atomic Scientists · Pentagon Pizza Report · @PenPizzaReport · 各開源情報平台 &nbsp;|&nbsp; 僅供資訊參考，不構成任何建議 &nbsp;|&nbsp; <!-- updated dynamically -->
+  WARWATCH // 戰爭預測情報中心 &nbsp;|&nbsp; 資料來源：Polymarket · pizzint.watch · adsb.fi · NASA FIRMS / EONET &nbsp;|&nbsp; 僅供資訊參考，不構成任何建議 &nbsp;|&nbsp; <span id="last-update-ts" style="color:var(--text-dim)">⏳ 等待後端資料…</span>
 </footer>
 
 <script>
@@ -2020,11 +2020,25 @@ async function fetchRealPizzaData() {
       console.warn('[WARWATCH] data.json has no aviation field');
     }
 
+    // 同步渲染 FIRMS 衛星火點
+    if (json.firms) {
+      try { renderFirms(json.firms, json.eonet); }
+      catch(err) { console.warn('[WARWATCH] renderFirms error:', err.message); }
+    }
+
     htmlWpiRender();
+
+    // Footer status indicator (在頁尾顯示「上次成功更新」)
+    const tsEl = document.getElementById('last-update-ts');
+    if (tsEl && json.updated_at) {
+      const dt = new Date(json.updated_at);
+      tsEl.textContent = '✅ 後端資料最後更新：' + dt.toLocaleString('zh-TW');
+    }
 
     console.log('[WARWATCH] data refreshed @', json.updated_at,
                 '| pizza_idx', json.pizza_index,
-                '| AVI total', json.aviation?.summary?.total ?? 'n/a');
+                '| AVI total', json.aviation?.summary?.total ?? 'n/a',
+                '| FIRMS', json.firms?.total_24h ?? 'n/a');
   } catch (e) {
     console.warn('[WARWATCH] data fetch failed, using simulated:', e.message);
     simulateLiveUpdate();
@@ -2328,34 +2342,81 @@ async function fetchPolymarketLive() {
   } catch(e){console.warn('Polymarket fetch failed');}
 }
 
-async function fetchFirmsEvents() {
-  try {
-    const url='https://api.allorigins.win/get?url='+encodeURIComponent('https://eonet.gsfc.nasa.gov/api/v3/events?status=open&days=1&limit=100');
-    const res=await fetch(url,{signal:AbortSignal.timeout(12000)});
-    const data=JSON.parse((await res.json()).contents);
-    const events=(data.events||[]);
-    const count=events.length;
-    const countEl=document.getElementById('firms-count');
-    if (countEl&&count>0){countEl.textContent=count; countEl.style.color='#ff4444';}
-    const delta=count>100?'+20%':count>70?'+10%':count>40?'+2%':'0%';
-    const deltaEl=document.getElementById('firms-delta');
-    if (deltaEl){deltaEl.textContent=delta; deltaEl.style.color=delta.startsWith('+')?'#ff4444':'#00ff88';}
-    HTML_WPI_STATE.firms={fire_delta:delta};
-    // 更新 live feed
-    const feed=document.getElementById('firms-feed');
-    if (feed&&events.length){
-      const typeIcon={Wildfires:'🔥',Volcanoes:'🌋',SevereStorms:'⚡',SeaLakeIce:'❄️',Earthquakes:'🌊'};
-      feed.innerHTML=events.slice(0,6).map(ev=>{
-        const cat=ev.categories?.[0]?.title||'event';
-        const icon=typeIcon[cat]||'⚡';
-        const region=ev.title||'未知區域';
-        const time=ev.geometries?.[0]?.date?new Date(ev.geometries[0].date).toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'}):'--:--';
-        return `<div class="feed-item fire"><div class="feed-time">${time}</div><div><div class="feed-text">${icon} <strong>${region}</strong> — ${cat}</div></div></div>`;
-      }).join('');
+// FIRMS 渲染：data 由 fetchRealPizzaData 從 data/data.json 抓回後傳入
+// data = { total_24h, high_conf_count, delta_pct, by_region, conflict_hotspots, ... }
+function renderFirms(firms, eonetEvents) {
+  const countEl = document.getElementById('firms-count');
+  const deltaEl = document.getElementById('firms-delta');
+  const feed    = document.getElementById('firms-feed');
+
+  if (!firms || typeof firms.total_24h !== 'number') {
+    if (countEl) countEl.textContent = '--';
+    if (deltaEl) deltaEl.textContent = '--';
+    return;
+  }
+
+  const total = firms.total_24h;
+  const delta = firms.delta_pct || '0%';
+  const deltaUp = delta.startsWith('+') && delta !== '+0%';
+
+  if (countEl) {
+    countEl.textContent = total.toLocaleString();
+    countEl.style.color = total > 7500 ? '#ff4444' : total > 5500 ? '#ffaa00' : 'var(--accent)';
+  }
+  if (deltaEl) {
+    deltaEl.textContent = delta;
+    deltaEl.style.color = deltaUp ? '#ff4444' : delta.startsWith('-') ? '#00ff88' : 'var(--text-dim)';
+  }
+
+  HTML_WPI_STATE.firms = { fire_delta: delta };
+
+  // Live feed: prefer conflict-zone hotspots from FIRMS, fallback to EONET events
+  if (feed) {
+    const items = [];
+
+    const hotspots = (firms.conflict_hotspots || []).slice(0, 6);
+    for (const h of hotspots) {
+      const time = h.acq_time
+        ? `${h.acq_time.slice(0,2)}:${h.acq_time.slice(2,4)}`
+        : '--:--';
+      const flag = {
+        ukraine:'🇺🇦', russia:'🇷🇺', israel:'🇮🇱', lebanon:'🇱🇧',
+        syria:'🇸🇾', iran:'🇮🇷', iraq:'🇮🇶', yemen:'🇾🇪',
+        gaza:'🟥', taiwan:'🇹🇼', korea:'🇰🇷'
+      }[h.region] || '🔥';
+      items.push(`<div class="feed-item fire">
+        <div class="feed-time">${time}Z</div>
+        <div><div class="feed-text">${flag} <strong>${escapeHtml(h.region)}</strong> — 衛星火點 FRP ${h.frp.toFixed(0)} (信心度 ${h.conf}%)</div></div>
+      </div>`);
     }
-    htmlWpiRender();
-  } catch(e){console.warn('FIRMS/EONET fetch failed');}
+
+    // Pad with EONET events if fewer than 6 hotspots
+    if (items.length < 6 && Array.isArray(eonetEvents)) {
+      const typeIcon = {Wildfires:'🔥',Volcanoes:'🌋','Severe Storms':'⚡','Sea and Lake Ice':'❄️',Earthquakes:'🌊'};
+      for (const ev of eonetEvents) {
+        if (items.length >= 6) break;
+        const icon = typeIcon[ev.category] || '⚡';
+        const time = ev.date ? new Date(ev.date).toISOString().substring(11,16) : '--:--';
+        items.push(`<div class="feed-item fire">
+          <div class="feed-time">${time}Z</div>
+          <div><div class="feed-text">${icon} <strong>${escapeHtml(ev.title || '?')}</strong> — ${escapeHtml(ev.category || 'event')}</div></div>
+        </div>`);
+      }
+    }
+
+    feed.innerHTML = items.length
+      ? items.join('')
+      : `<div style="text-align:center;padding:1rem;font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim)">目前無衝突區火點訊號</div>`;
+  }
+
+  const updEl = document.getElementById('firms-updated');
+  if (updEl) updEl.textContent = '更新：' + new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+
+  htmlWpiRender();
 }
+
+// 舊名保留以兼容 setInterval/初始呼叫，但實際工作由 fetchRealPizzaData 接管
+async function fetchFirmsEvents() { /* no-op: 改由 fetchRealPizzaData 從 data.json 載入 */ }
 
 // 初始化：給 WPI 預設值避免卡在 COMPUTING
 (async()=>{

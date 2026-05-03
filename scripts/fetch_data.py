@@ -11,6 +11,9 @@ WarHub - 靜態網站資料抓取器
   ─ 戰爭/衝突相關預測市場
 - AVI 軍機追蹤: api.adsb.lol/v2/mil
   ─ 全球 ADS-B 軍用飛機即時位置（無金鑰、無速率限制）
+- FIRMS 衛星火點: NASA MODIS 24h 全球 CSV
+  ─ 真實衛星偵測到的火點（戰爭打擊、工業火災、森林火災均可見）
+- EONET 自然事件: NASA Earth Observatory 即時自然事件清單
 """
 
 import asyncio
@@ -30,6 +33,10 @@ ADSB_MIL_FEEDS  = [
     "https://opendata.adsb.fi/api/v2/mil",
     "https://api.adsb.lol/v2/mil",
 ]
+# NASA FIRMS — 24h global active fires (MODIS, no API key needed)
+FIRMS_CSV_URL   = "https://firms.modaps.eosdis.nasa.gov/data/active_fire/modis-c6.1/csv/MODIS_C6_1_Global_24h.csv"
+# NASA EONET — natural event feed (wildfires, volcanoes, etc.)
+EONET_API       = "https://eonet.gsfc.nasa.gov/api/v3/events?status=open&days=7&limit=100"
 DATA_DIR        = Path(__file__).resolve().parent.parent / "data"
 DATA_FILE       = DATA_DIR / "data.json"
 USER_AGENT      = "WarHub/1.0 (+https://github.com/virus11456/warhub)"
@@ -365,6 +372,162 @@ async def fetch_aviation(session: aiohttp.ClientSession) -> dict:
 
 
 # ─────────────────────────────────────────────────────────────
+# FIRMS - NASA satellite fire detections (24h global, no key)
+# ─────────────────────────────────────────────────────────────
+# Typical 24h global MODIS fire pixel count. Used as the divisor for
+# the "vs baseline" delta. We can refine this once we accumulate history.
+FIRMS_TYPICAL_24H = 6500
+
+
+def _firms_region(lat: float, lon: float) -> str:
+    if 24 <= lat <= 50 and -125 <= lon <= -66:  return "north_america"
+    if 35 <= lat <= 72 and -10 <= lon <= 60:    return "europe_russia"
+    if 30 <= lat <= 45 and 30 <= lon <= 60:     return "middle_east"
+    if 5 <= lat <= 50 and 60 <= lon <= 145:     return "asia"
+    if -10 <= lat <= 35 and -20 <= lon <= 55:   return "africa"
+    if -55 <= lat <= 12 and -82 <= lon <= -34:  return "south_america"
+    if -45 <= lat <= 5 and 110 <= lon <= 180:   return "oceania"
+    return "other"
+
+
+# Conflict regions of interest, for hotspot tagging
+_CONFLICT_BBOX = {
+    "ukraine":  (44, 53, 22, 41),    # lat_min, lat_max, lon_min, lon_max
+    "russia":   (44, 70, 30, 180),
+    "israel":   (29, 34, 33, 36),
+    "lebanon":  (33, 35, 35, 37),
+    "syria":    (32, 38, 35, 42),
+    "iran":     (25, 40, 44, 64),
+    "iraq":     (29, 38, 38, 49),
+    "yemen":    (12, 19, 42, 54),
+    "gaza":     (31.2, 31.7, 34, 35),
+    "taiwan":   (21, 26, 119, 123),
+    "korea":    (33, 43, 124, 131),
+}
+
+
+def _firms_conflict_label(lat: float, lon: float) -> str | None:
+    for name, (lat0, lat1, lon0, lon1) in _CONFLICT_BBOX.items():
+        if lat0 <= lat <= lat1 and lon0 <= lon <= lon1:
+            return name
+    return None
+
+
+async def fetch_firms(session: aiohttp.ClientSession) -> dict:
+    """
+    從 NASA 公開 CSV 下載 24h MODIS 火點，回傳統計 + 衝突區熱點。
+    """
+    try:
+        async with session.get(
+            FIRMS_CSV_URL,
+            timeout=aiohttp.ClientTimeout(total=30),
+            headers={"User-Agent": USER_AGENT},
+        ) as resp:
+            resp.raise_for_status()
+            text = await resp.text()
+    except Exception as e:
+        log.error(f"FIRMS CSV fetch failed: {e}")
+        return {"total_24h": 0, "delta_pct": "0%", "by_region": {},
+                "conflict_hotspots": [], "high_conf_count": 0,
+                "source": FIRMS_CSV_URL, "error": str(e)}
+
+    import csv, io
+    rows = list(csv.DictReader(io.StringIO(text)))
+    total = len(rows)
+
+    by_region: dict[str, int] = {}
+    conflict_hits: dict[str, list[dict]] = {}
+    high_conf = 0
+
+    for r in rows:
+        try:
+            lat = float(r["latitude"])
+            lon = float(r["longitude"])
+            frp = float(r.get("frp") or 0)
+            conf = int(r.get("confidence") or 0)
+        except (ValueError, TypeError, KeyError):
+            continue
+
+        if conf >= 80:
+            high_conf += 1
+
+        reg = _firms_region(lat, lon)
+        by_region[reg] = by_region.get(reg, 0) + 1
+
+        cl = _firms_conflict_label(lat, lon)
+        if cl is not None:
+            conflict_hits.setdefault(cl, []).append({
+                "lat": round(lat, 3), "lon": round(lon, 3),
+                "frp": round(frp, 1), "conf": conf,
+                "daynight": r.get("daynight", ""),
+                "acq_date": r.get("acq_date", ""),
+                "acq_time": r.get("acq_time", ""),
+            })
+
+    # Top hotspots: per conflict region, keep top-3 by FRP
+    top_hotspots = []
+    for region_name, hits in conflict_hits.items():
+        hits.sort(key=lambda h: h["frp"], reverse=True)
+        for h in hits[:3]:
+            top_hotspots.append({**h, "region": region_name})
+    top_hotspots.sort(key=lambda h: h["frp"], reverse=True)
+
+    delta_ratio = (total - FIRMS_TYPICAL_24H) / FIRMS_TYPICAL_24H if FIRMS_TYPICAL_24H else 0
+    delta_pct   = f"{'+' if delta_ratio >= 0 else ''}{int(delta_ratio*100)}%"
+
+    log.info(f"FIRMS: {total} fire pixels (24h), high-conf={high_conf}, "
+             f"vs baseline {delta_pct}, conflict hotspots={len(top_hotspots)}")
+
+    return {
+        "total_24h":         total,
+        "high_conf_count":   high_conf,
+        "delta_pct":         delta_pct,
+        "delta_ratio":       round(delta_ratio, 4),
+        "by_region":         by_region,
+        "conflict_hotspots": top_hotspots[:15],
+        "baseline_24h":      FIRMS_TYPICAL_24H,
+        "source":            FIRMS_CSV_URL,
+    }
+
+
+async def fetch_eonet(session: aiohttp.ClientSession) -> list[dict]:
+    """
+    NASA EONET — 經人工策畫的全球自然事件（火災、火山、風暴等）。
+    用作網站「即時事件 feed」。
+    """
+    try:
+        async with session.get(
+            EONET_API,
+            timeout=aiohttp.ClientTimeout(total=15),
+            headers={"User-Agent": USER_AGENT, "Accept": "application/json"},
+        ) as resp:
+            resp.raise_for_status()
+            # EONET sometimes negotiates to RSS — force JSON parse
+            text = await resp.text()
+            data = json.loads(text)
+    except Exception as e:
+        log.warning(f"EONET fetch failed: {e}")
+        return []
+
+    out = []
+    for ev in data.get("events", []) or []:
+        cat = (ev.get("categories") or [{}])[0]
+        geom = (ev.get("geometries") or [{}])[0]
+        coords = geom.get("coordinates") or [None, None]
+        out.append({
+            "id":       ev.get("id"),
+            "title":    ev.get("title"),
+            "category": cat.get("title"),
+            "date":     geom.get("date"),
+            "lat":      coords[1] if len(coords) >= 2 else None,
+            "lon":      coords[0] if len(coords) >= 2 else None,
+            "link":     ev.get("link"),
+        })
+    log.info(f"EONET: {len(out)} active events")
+    return out
+
+
+# ─────────────────────────────────────────────────────────────
 # Combined score
 # ─────────────────────────────────────────────────────────────
 def calculate_score(pizza_index: int, polymarket: list[dict]) -> dict:
@@ -405,8 +568,10 @@ async def main():
         pizzint_task  = asyncio.create_task(fetch_pizzint(session))
         poly_task     = asyncio.create_task(fetch_polymarket(session))
         aviation_task = asyncio.create_task(fetch_aviation(session))
-        pizzint_data, polymarket, aviation = await asyncio.gather(
-            pizzint_task, poly_task, aviation_task
+        firms_task    = asyncio.create_task(fetch_firms(session))
+        eonet_task    = asyncio.create_task(fetch_eonet(session))
+        pizzint_data, polymarket, aviation, firms, eonet = await asyncio.gather(
+            pizzint_task, poly_task, aviation_task, firms_task, eonet_task
         )
 
     pizza_shops  = transform_pizza_shops(pizzint_data)
@@ -423,10 +588,14 @@ async def main():
         "defcon_details": pizzint_data.get("defcon_details"),
         "polymarket":    polymarket[:20],
         "aviation":      aviation,
+        "firms":         firms,
+        "eonet":         eonet[:20],
         "sources": {
             "pizza":      "https://www.pizzint.watch/",
             "polymarket": "https://gamma-api.polymarket.com/",
             "aviation":   "https://api.adsb.lol/v2/mil",
+            "firms":      "https://firms.modaps.eosdis.nasa.gov/",
+            "eonet":      "https://eonet.gsfc.nasa.gov/",
         },
     }
 
