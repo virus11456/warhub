@@ -1202,7 +1202,7 @@
       <div style="margin:.6rem 0 .8rem">
         <div style="display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim);margin-bottom:.4rem">
           <span>異常指數</span>
-          <span id="pizza-gauge-label" style="font-weight:700">--%</span>
+          <span id="pizza-gauge-pct" style="font-weight:700">--%</span>
         </div>
         <div style="height:10px;background:var(--bg3);border:1px solid var(--border);position:relative;border-radius:2px">
           <div id="pizza-gauge-fill" style="height:100%;width:0%;background:linear-gradient(90deg,#004400,var(--accent3));border-radius:2px;transition:width .8s ease;position:relative">
@@ -1755,60 +1755,68 @@ function renderWarAlert(status, shops) {
   const levelNum = document.getElementById('pizza-level-num');
 
   const gaugeVal = Math.round(status.avg);
-  gaugeEl.style.width = gaugeVal + '%';
-  gaugePct.textContent = gaugeVal + '%';
-  gaugePct.style.color = status.gaugeColor;
+  if (gaugeEl) gaugeEl.style.width = gaugeVal + '%';
+  if (gaugePct) {
+    gaugePct.textContent = gaugeVal + '%';
+    gaugePct.style.color = status.gaugeColor;
+  }
 
   if (levelNum) {
     levelNum.textContent = status.levelZh;
     levelNum.style.color = status.gaugeColor;
   }
 
+  const badgeEl = document.getElementById('alert-badge');
+
   if (status.level === 'ANOMALY') {
     // 顯示戰爭警報
-    alertEl.style.display = 'block';
-    cardEl.classList.add('anomaly');
+    if (alertEl) alertEl.style.display = 'block';
+    if (cardEl)  cardEl.classList.add('anomaly');
 
     const anomCount = status.anomalyShops.length;
     const histMatch = HISTORICAL_MATCH[anomCount] || '~76%';
 
-    levelLbl.textContent = `CRITICAL ANOMALY — ${anomCount} 家店觸發`;
-    mainTxt.innerHTML = `🍕 披薩指數<strong style="color:var(--accent2)">嚴重異常</strong> — 歷史上此訊號出現後 <strong>2–48 小時</strong>內曾有軍事行動發生`;
-    shopsCnt.textContent = `${anomCount} / ${shops.length}`;
+    if (levelLbl) levelLbl.textContent = `CRITICAL ANOMALY — ${anomCount} 家店觸發`;
+    if (mainTxt)  mainTxt.innerHTML = `🍕 披薩指數<strong style="color:var(--accent2)">嚴重異常</strong> — 歷史上此訊號出現後 <strong>2–48 小時</strong>內曾有軍事行動發生`;
+    if (shopsCnt) shopsCnt.textContent = `${anomCount} / ${shops.length}`;
 
     // 動態 bullet 列表
     const topShop = [...shops].sort((a,b) => b.busyness - a.busyness)[0];
     const topDev  = Math.round(((topShop.busyness - topShop.baseline) / topShop.baseline) * 100);
-    bullets.innerHTML = `
+    if (bullets) bullets.innerHTML = `
       <div style="color:var(--accent2);">▶ ${topShop.name} 繁忙度較基準高出 <strong>+${topDev}%</strong></div>
       <div style="color:var(--accent3);">▶ ${anomCount} 家店同時出現深夜異常高峰，交叉確認可信度提升</div>
       <div style="color:var(--accent3);">▶ 歷史符合率：${histMatch}（${anomCount} 家店同時觸發時）</div>
       <div style="color:var(--text-dim);">▶ 建議同步觀察：Polymarket 戰爭機率、FlightRadar24 軍機動態</div>`;
 
     // 更新 header 警戒狀態
-    document.getElementById('alert-badge').style.borderColor = 'var(--accent2)';
-    document.getElementById('alert-badge').style.color = 'var(--accent2)';
-    document.getElementById('alert-badge').textContent = '🍕 PIZZA ANOMALY';
+    if (badgeEl) {
+      badgeEl.style.borderColor = 'var(--accent2)';
+      badgeEl.style.color = 'var(--accent2)';
+      badgeEl.textContent = '🍕 PIZZA ANOMALY';
+    }
 
   } else if (status.level === 'HIGH') {
-    alertEl.style.display = 'block';
-    cardEl.classList.remove('anomaly');
-    levelLbl.textContent = 'HIGH ACTIVITY';
-    mainTxt.innerHTML = `🍕 披薩指數<strong style="color:var(--accent3)">偏高</strong> — 多店出現高於平均的深夜訂單量，尚未達到歷史警戒門檻`;
-    shopsCnt.textContent = `${status.highShops.length + status.anomalyShops.length} / ${shops.length}`;
-    bullets.innerHTML = `
+    if (alertEl) alertEl.style.display = 'block';
+    if (cardEl)  cardEl.classList.remove('anomaly');
+    if (levelLbl) levelLbl.textContent = 'HIGH ACTIVITY';
+    if (mainTxt)  mainTxt.innerHTML = `🍕 披薩指數<strong style="color:var(--accent3)">偏高</strong> — 多店出現高於平均的深夜訂單量，尚未達到歷史警戒門檻`;
+    if (shopsCnt) shopsCnt.textContent = `${status.highShops.length + status.anomalyShops.length} / ${shops.length}`;
+    if (bullets) bullets.innerHTML = `
       <div style="color:var(--accent3);">▶ 高活躍度店家：${status.highShops.concat(status.anomalyShops).map(s=>s.name).join('、')}</div>
       <div style="color:var(--text-dim);">▶ 當前水準：偏高，但尚未達到 ANOMALY 閾值（需 ≥${THRESHOLD.ANOMALY}%）</div>
       <div style="color:var(--text-dim);">▶ 建議持續觀察，若再有 1 家店升至異常，將升為戰爭警報</div>`;
 
-    document.getElementById('alert-badge').style.borderColor = 'var(--accent3)';
-    document.getElementById('alert-badge').style.color = 'var(--accent3)';
-    document.getElementById('alert-badge').textContent = '威脅 高度警戒';
+    if (badgeEl) {
+      badgeEl.style.borderColor = 'var(--accent3)';
+      badgeEl.style.color = 'var(--accent3)';
+      badgeEl.textContent = '威脅 高度警戒';
+    }
 
   } else {
     // 正常狀態 — 隱藏警報
-    alertEl.style.display = 'none';
-    cardEl.classList.remove('anomaly');
+    if (alertEl) alertEl.style.display = 'none';
+    if (cardEl)  cardEl.classList.remove('anomaly');
   }
 }
 
