@@ -1,179 +1,99 @@
-# 🍕📊 ConflictWatch — 衝突指標觀測站
+# WarHub — 戰爭預測情報中心
 
-結合 **Pentagon Pizza Index (OSINT)** 與 **Polymarket 預測市場** 的戰爭風險儀表板。
+整合 OSINT（開源情報）的地緣政治衝突監控平台，正式上線於 [warhubs.com](https://warhubs.com/)。
+
+本專案包含兩個子系統：
+
+| 子系統 | 路徑 | 技術 | 用途 |
+|--------|------|------|------|
+| **ConflictWatch** | [`conflictwatch/`](./conflictwatch) | Python (FastAPI) + HTML | 後端資料抓取 + 獨立儀表板 |
+| **WARWATCH** | [`wordpress/`](./wordpress) | WordPress 主題 | 正式網站前端（warhubs.com） |
 
 ---
 
-## 架構總覽
+## 專案結構
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    ConflictWatch 架構                        │
-├─────────────────┬───────────────────┬───────────────────────┤
-│   數據來源       │   後端處理         │   前端呈現             │
-│                 │                   │                       │
-│  Polymarket     │  fetcher.py       │  index.html           │
-│  Gamma API ────►│  (async aiohttp)  │  + Chart.js           │
-│                 │         │         │  + 即時 API 呼叫       │
-│  Google Maps    │         ▼         │                       │
-│  Popular Times ►│  SQLite DB        │  儀表板元素：           │
-│  (populartimes) │  ┌─────────────┐  │  • 綜合威脅指數        │
-│                 │  │ snapshots   │  │  • Pizza 店狀態        │
-│  @PenPizzaReport│  │ poly_data   │  │  • Polymarket 列表    │
-│  (手動 / RSS) ──►│  │ combined    │  │  • 24H 趨勢圖         │
-│                 │  └─────────────┘  │  • 末日時鐘            │
-└─────────────────│         │         └───────────────────────┘
-                  │         ▼
-                  │  FastAPI server.py
-                  │  GET /api/latest
-                  │  GET /api/history
-                  │  GET /api/polymarket/top
-                  │         │
-                  │         ▼
-                  │  alerts.py
-                  │  Telegram Bot ──► 你的手機
-                  │  Discord Webhook ─► 你的伺服器
-                  │
-                  │  GitHub Actions (cron: */15 * * * *)
-                  │  自動每15分鐘執行 fetcher.py
+warhub/
+├── README.md                       # 你正在讀的這個檔案
+├── .gitignore
+├── .env.example                    # ConflictWatch 環境變數範本
+│
+├── .github/
+│   └── workflows/
+│       └── fetch.yml               # 每 15 分鐘自動執行 fetcher.py
+│
+├── conflictwatch/                  # === Python 後端與獨立儀表板 ===
+│   ├── README.md                   # ConflictWatch 安裝與架構說明
+│   ├── requirements.txt
+│   ├── backend/
+│   │   ├── fetcher.py              # 資料抓取（Polymarket + Google Popular Times）
+│   │   ├── server.py               # FastAPI 伺服器
+│   │   └── alerts.py               # Telegram / Discord 警報推播
+│   └── frontend/
+│       └── index.html              # 獨立儀表板
+│
+└── wordpress/                      # === WordPress 主題（線上網站）===
+    ├── README.md                   # WordPress 安裝指南
+    ├── page-warwatch.php           # 頁面範本
+    ├── functions.php               # 完整 Astra functions.php（含 WARWATCH 程式碼）
+    ├── functions-warwatch.php      # 僅 WARWATCH 部分（貼至既有 functions.php 末尾）
+    ├── warwatch.css
+    ├── warwatch.js
+    ├── war-prediction-dashboard.html
+    ├── wp-config.example.php       # wp-config 範本（敏感資訊已移除）
+    └── archive/                    # 舊版本備份
+        ├── page-warwatch.old.php
+        ├── warwatch.old.css
+        └── warwatch.old.js
 ```
+
+---
+
+## 核心功能
+
+| 模組 | 描述 |
+|------|------|
+| **WPI v2.0** | War Pressure Index — 加權多源指數，每 10 分鐘更新 |
+| **PizzINT** | 五角大廈披薩外送異常監控（Pentagon Pizza Index）|
+| **Polymarket** | 預測市場機率聚合 |
+| **AVI** | 軍機 / 加油機航空監控（ADS-B）|
+| **FIRMS** | NASA 衛星火點資料 |
+| **避險指標** | 黃金 / 布倫特原油 / VIX |
+| **熱點地圖** | 俄烏、中東、台海等衝突區即時狀態 |
+| **末日時鐘** | 距午夜倒數 |
 
 ---
 
 ## 快速開始
 
-### 1. 安裝依賴
+### ConflictWatch（Python 後端）
+
 ```bash
-git clone https://github.com/your-repo/conflictwatch
 cd conflictwatch
 pip install -r requirements.txt
-```
-
-### 2. 設定環境變數
-```bash
-cp .env.template .env
-# 編輯 .env，填入：
-# - GOOGLE_MAPS_API_KEY（取得 Popular Times 數據）
-# - TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID（推播警報）
-# - DISCORD_WEBHOOK_URL（Discord 推播）
-```
-
-### 3. 取得 Google Maps API Key
-1. 前往 [Google Cloud Console](https://console.cloud.google.com)
-2. 啟用 **Places API**
-3. 建立 API Key（限制 Places API 範圍）
-4. 填入 `.env` 的 `GOOGLE_MAPS_API_KEY`
-
-### 4. 找到五角大廈披薩店的 Place ID
-```python
-import requests
-# 搜尋 Pentagon 附近 Domino's
-r = requests.get(
-    "https://maps.googleapis.com/maps/api/place/nearbysearch/json",
-    params={
-        "location": "38.8719,-77.0563",  # Pentagon 座標
-        "radius": 3000,
-        "keyword": "dominos pizza",
-        "key": "YOUR_API_KEY"
-    }
-)
-for p in r.json()["results"]:
-    print(p["place_id"], p["name"], p["vicinity"])
-```
-把找到的 `place_id` 填入 `backend/fetcher.py` 的 `PIZZA_SHOPS` 列表。
-
-### 5. 啟動伺服器
-```bash
-cd backend
-python server.py
+cp ../.env.example .env       # 填入你的 API key
+python backend/server.py
 # 開啟 http://localhost:8000
 ```
 
-### 6. 設定 GitHub Actions 自動抓取
-在 GitHub repo 的 **Settings → Secrets** 新增：
-- `GOOGLE_MAPS_API_KEY`
-- `TELEGRAM_BOT_TOKEN`
-- `TELEGRAM_CHAT_ID`
-- `DISCORD_WEBHOOK_URL`
+詳細說明見 [`conflictwatch/README.md`](./conflictwatch/README.md)。
 
-然後啟用 `.github/workflows/fetch.yml`。
+### WARWATCH（WordPress 主題）
 
----
+把 `wordpress/` 內的檔案上傳到 WordPress 主題目錄。
 
-## Polymarket Gamma API
-
-官方文件：https://gamma-api.polymarket.com/docs
-
-```python
-import requests
-
-# 取得所有開放市場
-r = requests.get("https://gamma-api.polymarket.com/markets", params={
-    "active": "true",
-    "tag_slug": "geopolitics",
-    "limit": 100
-})
-markets = r.json()
-
-# 每個市場的結構：
-# {
-#   "id": "...",
-#   "question": "Will Israel attack Iran before Q2 2026?",
-#   "outcomes": [{"name":"Yes","price":"0.28"},{"name":"No","price":"0.72"}],
-#   "volume": 8200000,
-#   "endDate": "2026-06-30T00:00:00Z"
-# }
-```
+詳細安裝步驟見 [`wordpress/README.md`](./wordpress/README.md)。
 
 ---
 
-## 綜合威脅指數計算公式
+## 安全提醒
 
-```
-Pizza Score (0-100)
-  = 各店當前繁忙度的平均值
-  （Google Popular Times 返回 0-100 百分比）
-
-Polymarket Score (0-100)
-  = Σ(市場YES機率 × 成交量) / Σ(成交量)
-  （按交易量加權的平均機率，再 ×100）
-
-Combined Score
-  = Pizza Score × 0.40 + Polymarket Score × 0.60
-
-警戒等級：
-  ≥ 70 → CRITICAL  🔴
-  ≥ 50 → HIGH      🟠
-  ≥ 30 → ELEVATED  🟡
-  < 30 → NORMAL    🟢
-```
-
----
-
-## V2 擴充功能
-
-| 功能 | 實作方式 |
-|------|----------|
-| FlightRadar24 偵察機追蹤 | `adsbexchange.com` API 或 RapidAPI FlightRadar |
-| 黃金/石油避險指標 | `yfinance` 抓取 GLD, USO ETF 價格 |
-| X (Twitter) 戰爭關鍵字熱度 | Twitter API v2 `search/recent` |
-| Kalshi 數據（美國監管版）| `kalshi.com/api/v2/markets` |
-| AI 情緒分析 | Claude API 分析 OSINT 貼文情緒 |
-| 多語言警報 | 中/英/日 推播 |
-
----
-
-## 部署選項
-
-| 平台 | 費用 | 適合 |
-|------|------|------|
-| **Vercel** (前端) + **Railway** (後端) | 免費起 | 輕量部署 |
-| **Cloudflare Pages** + **Supabase** | 免費起 | 無伺服器 |
-| **GitHub Pages** (純靜態 + Actions) | 完全免費 | 最簡單 |
-| **VPS (Hetzner/DigitalOcean)** | $5/月起 | 完整控制 |
+- ⚠️ **絕對不要把真實的 `wp-config.php` 推到公開儲存庫**。本倉庫只保留 `wp-config.example.php`，敏感資料皆為佔位符。
+- ⚠️ API key、Telegram token、Discord webhook 等請放在 `.env`（已被 `.gitignore` 排除）。
 
 ---
 
 ## 免責聲明
 
-本工具僅供教育與研究用途。Pizza 指數是民間 OSINT 觀察，非官方情報。Polymarket 數據反映市場參與者預測，非事實。不構成任何投資、軍事或政策建議。
+本網站資訊僅供研究與觀察用途，不構成任何投資、軍事或政策建議。Pizza 指數為民間 OSINT 觀察，非官方情報；Polymarket 數據反映市場參與者預測，非事實。

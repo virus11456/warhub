@@ -23,13 +23,13 @@ define( 'WP_CACHE', true );
 
 // ** Database settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
-define( 'DB_NAME', 'u167023529_ZlatR' );
+define( 'DB_NAME', 'YOUR_DB_NAME' );
 
 /** Database username */
-define( 'DB_USER', 'u167023529_4M5Vi' );
+define( 'DB_USER', 'YOUR_DB_USER' );
 
 /** Database password */
-define( 'DB_PASSWORD', 'YsoEhZZ2nv' );
+define( 'DB_PASSWORD', 'YOUR_DB_PASSWORD' );
 
 /** Database hostname */
 define( 'DB_HOST', '127.0.0.1' );
@@ -51,15 +51,16 @@ define( 'DB_COLLATE', '' );
  *
  * @since 2.6.0
  */
-define( 'AUTH_KEY',          'B9~WEtK23U}hXjE<o`H.fG|&|^OCI6gg:r`sf@)A2O-]1uo Xk!:L[*s};xJ*qQ`' );
-define( 'SECURE_AUTH_KEY',   'O}SyOiXa{e6r|nQ5*:%,eZ}8}N2ot{:&Rq2 ?` Mv6>s82 Vu|QR.GjzQ?y~5>Q_' );
-define( 'LOGGED_IN_KEY',     '$m]}E$Vnf}QV#%Y%0Xw6#8;W~9l5zSTT|k,M~CIpUk rT7 +AK-=:??y` 5G/[uE' );
-define( 'NONCE_KEY',         '[QYPyGU:Vzz1]+b2THHppd9z=%=8#7&]Nn`4!S9i#4X9HgN/&-IWixBijdRRK#x(' );
-define( 'AUTH_SALT',         '7B_&[q;$*%/i 3_.kn.mw,-=$Bn@#fH38k9g{wpD(?]0G^x9/x&X$|%L_sK%L&,F' );
-define( 'SECURE_AUTH_SALT',  '[8VMj// ,K20Uyar6k`b50sxz:on(5pEEsOd[MxXwoNsZt+UTe)y2K#Xe5i=/Iu3' );
-define( 'LOGGED_IN_SALT',    '3 ^Ix%5r0ym[[Y5L6 gzo<BY4%{__u*pFf=NI&KD.hhlP|X,?MxneZK<,Nfqt:*P' );
-define( 'NONCE_SALT',        '=/H9^tTk`AHvomC2F[*J,B>Vy},FM^K[yRO%gUfN?m<ij]yr%6:i-! ;K<z=XU;t' );
-define( 'WP_CACHE_KEY_SALT', '|ccY]/X5?N8wF1T3hi`*ik)lW(@iD<yv,X3Wb<S|{e0iEQsrW;m$S=vdAw-CraAK' );
+// Generate new keys at: https://api.wordpress.org/secret-key/1.1/salt/
+define( 'AUTH_KEY',          'put your unique phrase here' );
+define( 'SECURE_AUTH_KEY',   'put your unique phrase here' );
+define( 'LOGGED_IN_KEY',     'put your unique phrase here' );
+define( 'NONCE_KEY',         'put your unique phrase here' );
+define( 'AUTH_SALT',         'put your unique phrase here' );
+define( 'SECURE_AUTH_SALT',  'put your unique phrase here' );
+define( 'LOGGED_IN_SALT',    'put your unique phrase here' );
+define( 'NONCE_SALT',        'put your unique phrase here' );
+define( 'WP_CACHE_KEY_SALT', 'put your unique phrase here' );
 
 
 /**#@-*/
@@ -94,7 +95,7 @@ if ( ! defined( 'WP_DEBUG' ) ) {
 }
 
 define( 'FS_METHOD', 'direct' );
-define( 'COOKIEHASH', '76a35d7cdb689dc52a89d3176dbaa4af' );
+define( 'COOKIEHASH', 'YOUR_COOKIE_HASH' );
 define( 'WP_AUTO_UPDATE_CORE', 'minor' );
 define( 'DISABLE_WP_CRON', true ); // 由系統 cron 負責觸發，避免依賴訪客
 /* That's all, stop editing! Happy publishing. */
