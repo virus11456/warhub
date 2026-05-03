@@ -335,7 +335,6 @@
   .pizza-bar-card { border-top: 3px solid; border-image: linear-gradient(90deg, var(--accent3), var(--accent4)) 1; }
   .pbi-header     { margin-bottom: .6rem; }
   .pbi-title-row  { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: .4rem; }
-  .pbi-grid       { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: .4rem; }
 
   /* 歷史 chips 橫向捲動 */
   .ph-scroll      { display: flex; gap: .5rem; overflow-x: auto; padding-bottom: .4rem; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
@@ -429,9 +428,9 @@
 
   .pizza-tracker-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.5rem;
-    margin-top: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 0.6rem;
+    margin-top: 0.8rem;
   }
 
   .pizza-shop {
@@ -751,7 +750,6 @@
     .threat-hero   { padding: 1.2rem; }
     .threat-grid   { grid-template-columns: 1fr; gap: 1.2rem; }
     .main-grid     { grid-template-columns: 1fr; gap: 1rem; }
-    .pbi-grid      { grid-template-columns: 1fr; gap: .8rem; }
     .poly-grid     { grid-template-columns: 1fr; }
     .bottom-grid   { grid-template-columns: 1fr 1fr; gap: 1rem; }
     .card          { padding: 1rem; }
@@ -933,22 +931,6 @@
     border-left: 1px solid var(--accent);
   }
 
-/* ── 酒吧反向指標 ─────────────────────────────── */
-.bar-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.6rem;
-  margin-top: 0.5rem;
-}
-.bar-shop {
-  background: rgba(0,170,255,0.04);
-  border: 1px solid rgba(0,170,255,0.15);
-  border-radius: 6px;
-  padding: 0.7rem 0.8rem;
-  transition: border-color 0.3s;
-}
-.bar-shop.quiet { border-color: rgba(0,170,255,0.5); background: rgba(0,170,255,0.08); }
-.bar-shop.closed { opacity: 0.6; }
 </style>
 </head>
 <body>
@@ -1206,7 +1188,7 @@
     <div class="pbi-header">
       <div class="pbi-title-row">
         <div>
-          <div class="section-title" style="margin:0 0 .2rem">🍕 Pentagon Pizza Index (PizzINT) <span style="font-family:'Share Tech Mono',monospace;font-size:.58rem;color:var(--text-dim);font-weight:400">+ 🍺 酒吧反向指標</span></div>
+          <div class="section-title" style="margin:0 0 .2rem">🍕 Pentagon Pizza Index (PizzINT)</div>
           <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim)">KGB 代號 PIZZINT · Google Maps Popular Times · 每小時更新 · Pentagon / 白宮 / CIA HQ 3英里</div>
         </div>
         <div style="text-align:right;flex-shrink:0">
@@ -1239,34 +1221,15 @@
 
       <!-- 說明 -->
       <div style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim);line-height:1.6;margin-bottom:.6rem">
-        冷戰時 KGB 監視五角大廈深夜外送作為早期預警。<strong style="color:var(--accent4)">反向邏輯</strong>：酒吧冷清＋Pizza 爆滿 → 五角大廈沒在慶祝，他們在策劃。
-      </div>
-
-      <!-- Cross-signal -->
-      <div id="bar-cross-signal" style="display:none;margin-bottom:.8rem;padding:.7rem 1rem;background:rgba(255,0,68,.08);border:1px solid rgba(255,0,68,.4);border-left:3px solid #ff0044;border-radius:0 4px 4px 0">
-        <div style="font-family:'Orbitron',monospace;font-size:.63rem;color:#ff4444;letter-spacing:2px;margin-bottom:.3rem">🚨 CROSS-SIGNAL CONFIRMED</div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-primary);line-height:1.6">
-          Pizza 多店爆單 <strong style="color:#ff4444">同時</strong> 酒吧驟冷 — 歷史最強早期預警雙重訊號
-        </div>
+        冷戰時 KGB 監視五角大廈深夜外送作為早期預警。<strong style="color:var(--accent4)">PizzINT</strong>：Pentagon 周邊披薩店突發爆單、深夜外送量暴增 → 五角大廈正在加班策劃。
       </div>
     </div>
 
-    <!-- 主體 2 欄：披薩店 / 酒吧 -->
-    <div class="pbi-grid">
-      <div>
-        <div class="section-title" style="font-size:.62rem">🍕 披薩店監控</div>
-        <div class="pizza-tracker-grid" id="pizza-shops-grid">
-          <div style="grid-column:span 2;text-align:center;padding:.8rem;font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim)">載入中…</div>
-        </div>
-      </div>
-      <div>
-        <div class="section-title" style="font-size:.62rem">🍺 酒吧反向監控</div>
-        <div class="bar-grid" id="bar-shops-grid">
-          <div style="grid-column:span 2;text-align:center;padding:.8rem;font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim)">載入中…</div>
-        </div>
-        <div style="margin-top:.4rem;font-family:'Share Tech Mono',monospace;font-size:.56rem;color:var(--text-dim);padding:.4rem .6rem;background:rgba(0,170,255,.04);border-left:2px solid rgba(0,170,255,.2)">
-          下班時段（ET 17:00-22:00）酒吧冷清 = 異常
-        </div>
+    <!-- 披薩店監控（全寬） -->
+    <div>
+      <div class="section-title" style="font-size:.62rem">🍕 披薩店監控</div>
+      <div class="pizza-tracker-grid" id="pizza-shops-grid">
+        <div style="grid-column:1/-1;text-align:center;padding:.8rem;font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim)">載入中…</div>
       </div>
     </div>
 
@@ -1306,12 +1269,7 @@
       真實資金下注 · 準確率 <span style="color:var(--accent1)">94%</span>（事件前一個月）· 2025 年地緣政治交易量 <span style="color:var(--accent3)">$33B+</span>
     </div>
     <div class="poly-grid" id="poly-list-container">
-      <a href="https://polymarket.com" target="_blank" rel="noopener" style="text-decoration:none;color:inherit"><div class="poly-item high" style="cursor:pointer" onmouseover="this.style.borderLeftWidth='5px'" onmouseout="this.style.borderLeftWidth='3px'"><div class="poly-question">🇺🇦 俄烏停火：2026年底前達成協議？</div><div class="poly-bar-container"><span style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);width:24px">YES</span><div class="poly-bar"><div class="poly-fill" style="width:37%;background:linear-gradient(90deg,rgba(0,10,30,.8),var(--accent4))"></div></div><div class="poly-percent" style="color:var(--accent4)">37%</div></div><div class="poly-meta"><span>交易量 $10.5M</span><span style="color:var(--text-dim)">polymarket.com ↗</span></div></div></a>
-      <a href="https://polymarket.com" target="_blank" rel="noopener" style="text-decoration:none;color:inherit"><div class="poly-item high" style="cursor:pointer" onmouseover="this.style.borderLeftWidth='5px'" onmouseout="this.style.borderLeftWidth='3px'"><div class="poly-question">🇮🇷 美伊直接軍事衝突（2026）？</div><div class="poly-bar-container"><span style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);width:24px">YES</span><div class="poly-bar"><div class="poly-fill" style="width:28%;background:linear-gradient(90deg,rgba(0,10,30,.8),var(--accent4))"></div></div><div class="poly-percent" style="color:var(--accent4)">28%</div></div><div class="poly-meta"><span>川普：「正在考慮有限軍事行動」</span><span style="color:var(--text-dim)">polymarket.com ↗</span></div></div></a>
-      <a href="https://polymarket.com" target="_blank" rel="noopener" style="text-decoration:none;color:inherit"><div class="poly-item medium" style="cursor:pointer" onmouseover="this.style.borderLeftWidth='5px'" onmouseout="this.style.borderLeftWidth='3px'"><div class="poly-question">🇸🇴 美軍攻擊索馬利亞海盜？</div><div class="poly-bar-container"><span style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);width:24px">YES</span><div class="poly-bar"><div class="poly-fill" style="width:89%;background:linear-gradient(90deg,rgba(0,10,30,.8),var(--accent2))"></div></div><div class="poly-percent" style="color:var(--accent2)">89%</div></div><div class="poly-meta"><span>Hegseth 已授權擴打擊海盜</span><span style="color:var(--text-dim)">polymarket.com ↗</span></div></div></a>
-      <a href="https://polymarket.com" target="_blank" rel="noopener" style="text-decoration:none;color:inherit"><div class="poly-item" style="cursor:pointer" onmouseover="this.style.borderLeftWidth='5px'" onmouseout="this.style.borderLeftWidth='3px'"><div class="poly-question">🇹🇼 台海武裝衝突（2026年內）？</div><div class="poly-bar-container"><span style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);width:24px">YES</span><div class="poly-bar"><div class="poly-fill" style="width:12%;background:linear-gradient(90deg,rgba(0,10,30,.8),var(--accent4))"></div></div><div class="poly-percent" style="color:var(--accent4)">12%</div></div><div class="poly-meta"><span>市場波動較低，相對穩定</span><span style="color:var(--text-dim)">polymarket.com ↗</span></div></div></a>
-      <a href="https://polymarket.com" target="_blank" rel="noopener" style="text-decoration:none;color:inherit"><div class="poly-item medium" style="cursor:pointer" onmouseover="this.style.borderLeftWidth='5px'" onmouseout="this.style.borderLeftWidth='3px'"><div class="poly-question">☢️ 核武器在任何衝突中被使用（2026）？</div><div class="poly-bar-container"><span style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);width:24px">YES</span><div class="poly-bar"><div class="poly-fill" style="width:5%;background:linear-gradient(90deg,rgba(0,10,30,.8),var(--accent4))"></div></div><div class="poly-percent" style="color:var(--accent4)">5%</div></div><div class="poly-meta"><span>低機率高衝擊監控項目</span><span style="color:var(--text-dim)">polymarket.com ↗</span></div></div></a>
-      <a href="https://polymarket.com" target="_blank" rel="noopener" style="text-decoration:none;color:inherit"><div class="poly-item" style="cursor:pointer" onmouseover="this.style.borderLeftWidth='5px'" onmouseout="this.style.borderLeftWidth='3px'"><div class="poly-question">🌐 全球貿易戰升級為武裝衝突？</div><div class="poly-bar-container"><span style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);width:24px">YES</span><div class="poly-bar"><div class="poly-fill" style="width:8%;background:linear-gradient(90deg,rgba(0,10,30,.8),var(--accent4))"></div></div><div class="poly-percent" style="color:var(--accent4)">8%</div></div><div class="poly-meta"><span>關稅戰持續升溫</span><span style="color:var(--text-dim)">polymarket.com ↗</span></div></div></a>
+      <div style="grid-column:1/-1;text-align:center;padding:1.4rem;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">載入即時 Polymarket 戰爭預測市場…</div>
     </div>
     <div style="margin-top:.8rem;padding:.6rem .8rem;background:rgba(0,170,255,.04);border:1px solid rgba(0,170,255,.15);font-family:'Share Tech Mono',monospace;font-size:.58rem;color:var(--text-dim)">
       ⚠️ 僅供資訊參考，不構成投資建議。機率隨事件發展即時變動。
@@ -2039,12 +1997,97 @@ async function fetchRealPizzaData() {
     renderPizzaShops(PIZZA_SHOPS_DATA);
     renderWarAlert(status, PIZZA_SHOPS_DATA);
     HTML_WPI_STATE.pizza = PIZZA_SHOPS_DATA.map(s => ({ busyness: s.busyness }));
+
+    // 同步渲染 Polymarket 卡片（使用後端已篩選好的戰爭/衝突相關市場）
+    if (Array.isArray(json.polymarket) && json.polymarket.length) {
+      renderPolymarketCards(json.polymarket);
+      // 同步 WPI poly state（取交易量最高的前 5 個）
+      HTML_WPI_STATE.poly = [...json.polymarket]
+        .filter(m => m.yes_price != null && m.volume > 0)
+        .sort((a, b) => b.volume - a.volume)
+        .slice(0, 5)
+        .map(m => ({ yes_pct: m.yes_price * 100, volume: m.volume }));
+    }
     htmlWpiRender();
-    console.log('[WARWATCH] pizza data refreshed @', json.updated_at);
+
+    console.log('[WARWATCH] data refreshed @', json.updated_at);
   } catch (e) {
-    console.warn('[WARWATCH] pizza fetch failed, using simulated:', e.message);
+    console.warn('[WARWATCH] data fetch failed, using simulated:', e.message);
     simulateLiveUpdate();
   }
+}
+
+// ─── 渲染 Polymarket 卡片（從 data/data.json 的 polymarket array）────
+function renderPolymarketCards(markets) {
+  const container = document.getElementById('poly-list-container');
+  if (!container) return;
+
+  // 排序：依 YES 機率 × 交易量（影響力高的優先）
+  const sorted = [...markets]
+    .filter(m => m.yes_price != null && m.question)
+    .sort((a, b) => (b.yes_price * b.volume) - (a.yes_price * a.volume))
+    .slice(0, 8);
+
+  if (!sorted.length) {
+    container.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:1.4rem;font-family:\'Share Tech Mono\',monospace;font-size:.7rem;color:var(--text-dim)">目前無相關市場資料</div>';
+    return;
+  }
+
+  container.innerHTML = sorted.map(m => {
+    const yesPct  = Math.round(m.yes_price * 100);
+    const volStr  = formatVolume(m.volume);
+    const flag    = pickMarketFlag(m.question);
+    // 顏色：機率高 = 紅色（風險高），中等 = 橘色，低 = 藍色
+    let pctColor, severity;
+    if (yesPct >= 50)      { pctColor = 'var(--accent2)'; severity = 'high'; }
+    else if (yesPct >= 20) { pctColor = 'var(--accent3)'; severity = 'medium'; }
+    else                   { pctColor = 'var(--accent4)'; severity = ''; }
+    const url = m.slug ? `https://polymarket.com/market/${m.slug}` : 'https://polymarket.com';
+    const question = escapeHtml(m.question);
+
+    return `<a href="${url}" target="_blank" rel="noopener" style="text-decoration:none;color:inherit">
+      <div class="poly-item ${severity}" style="cursor:pointer" onmouseover="this.style.borderLeftWidth='5px'" onmouseout="this.style.borderLeftWidth='3px'">
+        <div class="poly-question">${flag} ${question}</div>
+        <div class="poly-bar-container">
+          <span style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);width:24px">YES</span>
+          <div class="poly-bar"><div class="poly-fill" style="width:${yesPct}%;background:linear-gradient(90deg,rgba(0,10,30,.8),${pctColor})"></div></div>
+          <div class="poly-percent" style="color:${pctColor}">${yesPct}%</div>
+        </div>
+        <div class="poly-meta">
+          <span>交易量 ${volStr}</span>
+          <span style="color:var(--text-dim)">polymarket.com ↗</span>
+        </div>
+      </div>
+    </a>`;
+  }).join('');
+}
+
+function formatVolume(v) {
+  if (!v) return '$0';
+  if (v >= 1e9) return '$' + (v / 1e9).toFixed(1) + 'B';
+  if (v >= 1e6) return '$' + (v / 1e6).toFixed(1) + 'M';
+  if (v >= 1e3) return '$' + (v / 1e3).toFixed(0) + 'K';
+  return '$' + Math.round(v);
+}
+
+function pickMarketFlag(question) {
+  const q = (question || '').toLowerCase();
+  if (q.includes('ukrain') || q.includes('russia') || q.includes('putin')) return '🇺🇦';
+  if (q.includes('iran'))   return '🇮🇷';
+  if (q.includes('israel') || q.includes('netanyahu')) return '🇮🇱';
+  if (q.includes('taiwan')) return '🇹🇼';
+  if (q.includes('china')  || q.includes('xi jinping')) return '🇨🇳';
+  if (q.includes('north korea') || q.includes('kim jong')) return '🇰🇵';
+  if (q.includes('nuclear') || q.includes('nuke')) return '☢️';
+  if (q.includes('nato'))   return '🛡️';
+  if (q.includes('trump'))  return '🇺🇸';
+  return '🌐';
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
 }
 
 // 啟動
@@ -2159,59 +2202,6 @@ setInterval(() => {
 }, 15 * 60 * 1000);
 
 
-
-// ═══════════════════════════════════════════════════════════════
-// 🍺 酒吧反向指標
-// ═══════════════════════════════════════════════════════════════
-const BAR_SHOPS_DATA = [
-  { name: 'Crystal City Sports Pub', icon: '🍺', is_open: false, status: 'closed', busyness: 0, is_quiet: false },
-  { name: "McNamara's Pub",          icon: '🍺', is_open: false, status: 'closed', busyness: 0, is_quiet: false },
-  { name: 'Banditos Bar',            icon: '🍺', is_open: false, status: 'closed', busyness: 0, is_quiet: false },
-  { name: 'HIGHLINE RxR',            icon: '🍺', is_open: false, status: 'closed', busyness: 0, is_quiet: false },
-  { name: 'Continental Pool Lounge', icon: '🍺', is_open: false, status: 'closed', busyness: 0, is_quiet: false },
-];
-
-function renderBars(bars) {
-  const grid = document.getElementById('bar-shops-grid');
-  if (!grid) return;
-  grid.innerHTML = bars.map(bar => {
-    const isClosed = bar.is_open === false || bar.status === 'closed';
-    const isQuiet  = !isClosed && bar.is_quiet === true;
-    let statusColor, statusText, dotCls;
-    if (isClosed) {
-      statusColor = 'rgba(255,255,255,0.25)'; statusText = '⬛ CLOSED'; dotCls = 'normal';
-    } else if (isQuiet) {
-      statusColor = 'var(--accent)'; statusText = `⚠ 異常冷清 (${bar.busyness}%)`; dotCls = 'medium';
-    } else {
-      statusColor = 'var(--accent)'; statusText = `✓ 正常 (${bar.busyness}%)`; dotCls = 'normal';
-    }
-    const barColor = isQuiet ? 'var(--accent)' : isClosed ? 'rgba(255,255,255,0.08)' : 'rgba(0,170,255,0.5)';
-    return `<div class="bar-shop${isQuiet ? ' quiet' : ''}${isClosed ? ' closed' : ''}">
-      <div style="font-size:0.72rem;font-weight:600;margin-bottom:0.3rem;color:${isClosed ? 'rgba(255,255,255,0.4)' : 'var(--text-primary)'}">
-        ${bar.icon} ${bar.name}
-      </div>
-      <div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.3rem;">
-        <div class="status-dot ${dotCls}" style="width:6px;height:6px;border-radius:50%;background:${statusColor};flex-shrink:0;"></div>
-        <span style="color:${statusColor};font-size:0.6rem;font-family:'Share Tech Mono',monospace">${statusText}</span>
-      </div>
-      <div style="height:3px;background:var(--bg);border:1px solid var(--border);overflow:hidden;border-radius:2px;">
-        <div style="height:100%;width:${isClosed ? 0 : bar.busyness}%;background:${barColor};transition:width 1s;"></div>
-      </div>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.56rem;color:rgba(255,255,255,0.25);margin-top:0.2rem;text-align:right;">
-        ${isClosed ? '目前未營業' : isQuiet ? '⚠ 下班時段應忙卻冷清' : '正常客流'}
-      </div>
-    </div>`;
-  }).join('');
-
-  // Cross-signal：pizza 多店爆單 + 酒吧冷清
-  const pizzaBusy = PIZZA_SHOPS_DATA.filter(s => s.is_open !== false && s.busyness >= 70).length;
-  const barQuiet  = bars.filter(b => b.is_open !== false && b.is_quiet).length;
-  const crossEl   = document.getElementById('bar-cross-signal');
-  if (crossEl) crossEl.style.display = (pizzaBusy >= 2 && barQuiet >= 2) ? 'block' : 'none';
-}
-
-// 初始渲染
-renderBars(BAR_SHOPS_DATA);
 
 // ═══════════════════════════════════════════════════════════════
 // 🌐 真實 API Fetchers（透過 allorigins CORS proxy）
