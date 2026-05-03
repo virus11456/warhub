@@ -2,5 +2,7 @@
 aiohttp>=3.9
 requests>=2.31
 
-# Optional - only used when GOOGLE_MAPS_API_KEY is set
-# populartimes>=0.1.8
+# Google Maps Popular Times scraper (unofficial)
+# Used by fetch_data.py when GOOGLE_MAPS_API_KEY is set;
+# falls back gracefully to mock data if it fails to import.
+populartimes @ git+https://github.com/m-wrzr/populartimes

@@ -2009,9 +2009,45 @@ function htmlWpiRender() {
 setTimeout(htmlWpiRender, 400);
 setInterval(htmlWpiRender, 10 * 60 * 1000);
 
+// ─── 從 /data/data.json 抓取真實資料 ─────────────────────────
+// 由 GitHub Actions 每 15 分鐘更新（scripts/fetch_data.py）
+// 若 GOOGLE_MAPS_API_KEY 未設定，後端會回傳模擬資料
+async function fetchRealPizzaData() {
+  try {
+    const res = await fetch('data/data.json?t=' + Date.now(), { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
+    if (!Array.isArray(json.pizza) || json.pizza.length === 0) {
+      throw new Error('no pizza data');
+    }
+
+    // 用後端資料覆蓋 PIZZA_SHOPS_DATA（保留 icon 等前端專屬欄位）
+    const byName = Object.fromEntries(json.pizza.map(s => [s.name, s]));
+    PIZZA_SHOPS_DATA.forEach(shop => {
+      const incoming = byName[shop.name];
+      if (!incoming) return;
+      shop.busyness = incoming.busyness ?? 0;
+      shop.is_open  = incoming.is_open ?? false;
+      shop.status   = incoming.status  ?? (incoming.is_open ? 'open' : 'closed');
+      if (incoming.baseline) shop.baseline = incoming.baseline;
+    });
+
+    const status = evaluatePizzaStatus(PIZZA_SHOPS_DATA);
+    renderPizzaShops(PIZZA_SHOPS_DATA);
+    renderWarAlert(status, PIZZA_SHOPS_DATA);
+    HTML_WPI_STATE.pizza = PIZZA_SHOPS_DATA.map(s => ({ busyness: s.busyness }));
+    htmlWpiRender();
+    console.log('[WARWATCH] pizza data refreshed @', json.updated_at);
+  } catch (e) {
+    console.warn('[WARWATCH] pizza fetch failed, using simulated:', e.message);
+    simulateLiveUpdate();
+  }
+}
+
 // 啟動
 initPizzaSystem();
-setInterval(simulateLiveUpdate, 30000);  // 每30秒模擬更新
+fetchRealPizzaData();                            // 立即抓一次
+setInterval(fetchRealPizzaData, 5 * 60 * 1000);  // 之後每 5 分鐘抓
 
 // ═══════════════════════════════════════════════════════════════
 // ✈️  航空異常 / 🔥 FIRMS / 💰 Finance — 模擬即時更新

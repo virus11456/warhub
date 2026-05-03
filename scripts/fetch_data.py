@@ -19,11 +19,18 @@ POLYMARKET_API = "https://gamma-api.polymarket.com"
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 DATA_FILE = DATA_DIR / "data.json"
 
+# Pentagon-area pizza shops (matches the list in index.html)
+# baseline = typical busyness for this time slot (used to detect anomalies)
+# Run scripts/find_places.py to obtain real place_ids once you have a
+# Google Maps API key. Until then, these are placeholders and the fetcher
+# will fall back to mock data.
 PIZZA_SHOPS = [
-    {"name": "Domino's Pizza - Arlington",   "place_id": "ChIJ2Q6XXXXX"},
-    {"name": "Papa John's - Pentagon City",  "place_id": "ChIJ3R7YYYYY"},
-    {"name": "Pizza Hut - Crystal City",     "place_id": "ChIJ4S8ZZZZZ"},
-    {"name": "Domino's - Alexandria",        "place_id": "ChIJ5T9AAAAA"},
+    {"name": "We The Pizza",          "place_id": "PLACE_ID_HERE", "baseline": 45},
+    {"name": "Pizzato Pizza",         "place_id": "PLACE_ID_HERE", "baseline": 40},
+    {"name": "Papa Johns Pizza",      "place_id": "PLACE_ID_HERE", "baseline": 38},
+    {"name": "Domino's Pizza",        "place_id": "PLACE_ID_HERE", "baseline": 35},
+    {"name": "Extreme Pizza",         "place_id": "PLACE_ID_HERE", "baseline": 30},
+    {"name": "District Pizza Palace", "place_id": "PLACE_ID_HERE", "baseline": 32},
 ]
 
 WAR_KEYWORDS = [
@@ -83,8 +90,15 @@ async def fetch_polymarket(session: aiohttp.ClientSession) -> list[dict]:
 
 
 def fetch_pizza(google_api_key: str) -> list[dict]:
-    """抓取披薩店繁忙度。若無 Google API key 則使用模擬資料"""
-    if not google_api_key:
+    """抓取披薩店繁忙度。若無 Google API key 或 place_id 為佔位符則使用模擬資料"""
+    have_real_ids = all(s["place_id"] != "PLACE_ID_HERE" for s in PIZZA_SHOPS)
+
+    if not google_api_key or not have_real_ids:
+        if not google_api_key:
+            log.warning("GOOGLE_MAPS_API_KEY not set - using mock data")
+        else:
+            log.warning("Place IDs are still placeholders - using mock data. "
+                        "Run scripts/find_places.py to fill them in.")
         return _mock_pizza()
 
     try:
@@ -95,20 +109,31 @@ def fetch_pizza(google_api_key: str) -> list[dict]:
 
     results = []
     for shop in PIZZA_SHOPS:
+        entry = _shop_template(shop, busyness=0, is_open=False)
         try:
             data = populartimes.get_id(google_api_key, shop["place_id"])
             live = data.get("current_popularity")
             if live is None:
                 live = _estimate_busyness(data) or 0
-            results.append({
-                "shop_name":    data.get("name", shop["name"]),
-                "place_id":     shop["place_id"],
-                "busyness_pct": live,
-                "is_anomaly":   int(live > 70),
-            })
+
+            entry["busyness"] = int(live)
+            entry["is_open"]  = bool(_is_open_now(data))
+            entry["status"]   = "open" if entry["is_open"] else "closed"
         except Exception as e:
             log.warning(f"Failed for {shop['name']}: {e}")
+        results.append(entry)
     return results
+
+
+def _shop_template(shop: dict, *, busyness: int, is_open: bool) -> dict:
+    return {
+        "name":     shop["name"],
+        "place_id": shop["place_id"],
+        "baseline": shop.get("baseline", 40),
+        "busyness": busyness,
+        "is_open":  is_open,
+        "status":   "open" if is_open else "closed",
+    }
 
 
 def _estimate_busyness(data: dict) -> Optional[int]:
@@ -121,26 +146,40 @@ def _estimate_busyness(data: dict) -> Optional[int]:
     return None
 
 
+def _is_open_now(data: dict) -> bool:
+    """從 populartimes 回傳的資料推斷店家現在是否營業"""
+    times = data.get("time_spent")  # populartimes returns this when open
+    if data.get("current_popularity") is not None:
+        return True
+    # Fallback: check if today's typical popularity at this hour is non-zero
+    return (_estimate_busyness(data) or 0) > 0
+
+
 def _mock_pizza() -> list[dict]:
+    """無 API key 時的模擬資料 - 還原 'closed' 為主、夾雜異常的演示狀態"""
     import random
-    base = [45, 38, 72, 55]
-    return [
-        {
-            "shop_name":    s["name"],
-            "place_id":     s["place_id"],
-            "busyness_pct": base[i] + random.randint(-5, 5),
-            "is_anomaly":   int(base[i] > 65),
-        }
-        for i, s in enumerate(PIZZA_SHOPS)
-    ]
+    # 模擬：白天大部分開、晚上關；隨機把幾家拉高觸發異常
+    is_business_hours = 11 <= datetime.now().hour <= 21
+    results = []
+    for i, shop in enumerate(PIZZA_SHOPS):
+        if is_business_hours:
+            base = shop.get("baseline", 35)
+            busyness = max(0, min(100, base + random.randint(-10, 25)))
+            is_open = True
+        else:
+            busyness = 0
+            is_open = False
+        results.append(_shop_template(shop, busyness=busyness, is_open=is_open))
+    return results
 
 
 def calculate_score(pizza: list[dict], polymarket: list[dict]) -> dict:
     """綜合威脅指數：Pizza 40% + Polymarket 60%"""
-    pizza_score = (
-        sum(s["busyness_pct"] for s in pizza) / len(pizza)
-        if pizza else 0.0
-    )
+    open_shops = [s for s in pizza if s.get("is_open")]
+    if open_shops:
+        pizza_score = sum(s["busyness"] for s in open_shops) / len(open_shops)
+    else:
+        pizza_score = 0.0
     pizza_score = min(100, pizza_score)
 
     total_volume = sum(m["volume"] for m in polymarket if m["yes_price"] is not None)

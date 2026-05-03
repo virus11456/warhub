@@ -72,6 +72,46 @@ warhub/
 
 ---
 
+## 接上真實 Pizza 資料（Google Maps API）
+
+預設情況下 Pizza 指數使用模擬資料。要接上真實的 Pentagon 周邊披薩店繁忙度，需要四個步驟：
+
+### 1. 申請 Google Cloud API key
+
+1. 到 [Google Cloud Console](https://console.cloud.google.com/) 建立或選擇一個專案
+2. 啟用 **Places API**（左側選單 → APIs & Services → Library → 搜尋 Places API → Enable）
+3. 建立 API key（左側選單 → APIs & Services → Credentials → Create Credentials → API key）
+4. 強烈建議**限制這把 key 只能用 Places API**
+
+> ⚠️ 費用：Places API 每月 $200 免費額度。本專案每 15 分鐘抓 6 家店，約佔 ~$73/月（在免費額度內）。
+
+### 2. 找出真實的 Place ID
+
+在本機執行：
+
+```bash
+export GOOGLE_MAPS_API_KEY=你的key
+pip install -r scripts/requirements.txt requests
+python scripts/find_places.py
+```
+
+它會在 Pentagon 周邊 5 km 內搜尋，列出每家店的 `place_id` 候選，並輸出可貼回 `fetch_data.py` 的程式片段。
+
+### 3. 更新 `scripts/fetch_data.py`
+
+把上一步輸出的 `PIZZA_SHOPS = [...]` 區塊整個取代到 `fetch_data.py` 裡。
+
+### 4. 把 API key 設為 GitHub Secret
+
+GitHub 倉庫 → Settings → Secrets and variables → Actions → New repository secret：
+
+- Name: `GOOGLE_MAPS_API_KEY`
+- Value: 你的 API key
+
+下次 `update-data.yml` 執行時（每 15 分鐘），就會抓真實資料。也可以到 Actions 頁面手動觸發 "Update data" workflow 立即生效。
+
+---
+
 ## 本地開發
 
 ```bash
