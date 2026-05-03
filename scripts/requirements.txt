@@ -1,8 +1,2 @@
 # WarHub - GitHub Actions data fetcher dependencies
 aiohttp>=3.9
-requests>=2.31
-
-# Google Maps Popular Times scraper (unofficial)
-# Used by fetch_data.py when GOOGLE_MAPS_API_KEY is set;
-# falls back gracefully to mock data if it fails to import.
-populartimes @ git+https://github.com/m-wrzr/populartimes

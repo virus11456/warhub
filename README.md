@@ -57,58 +57,30 @@ warhub/
 
 ---
 
-## 設定資料抓取
+## 資料來源
 
-在 GitHub 倉庫 **Settings → Secrets and variables → Actions** 新增（皆為選用）：
+`scripts/fetch_data.py` 由 GitHub Actions 每 15 分鐘執行，從以下兩個**完全免費的公開 API** 抓取資料，寫入 `data/data.json`：
 
-| Secret | 用途 |
-|--------|------|
-| `GOOGLE_MAPS_API_KEY` | 取得 Pizza 店繁忙度（沒設定時用模擬資料）|
-| `TELEGRAM_BOT_TOKEN` | 警報推播到 Telegram |
-| `TELEGRAM_CHAT_ID` | Telegram 接收頻道 |
-| `DISCORD_WEBHOOK_URL` | 警報推播到 Discord |
+| 來源 | 用途 | 端點 |
+|------|------|------|
+| [pizzint.watch](https://www.pizzint.watch/) | Pentagon Pizza Index、DEFCON 等級、各店即時繁忙度與 24h 歷史 | `/api/dashboard-data` |
+| [Polymarket Gamma](https://gamma-api.polymarket.com/) | 戰爭/衝突相關預測市場機率 | `/markets?tag_slug=geopolitics` |
 
-`update-data.yml` 會每 15 分鐘執行 `scripts/fetch_data.py`，把結果寫入 `data/data.json` 並 commit。
+不需要任何 API key，所以 GitHub Actions 不需要設定任何 Secret 就能運作。
+
+> 💡 **致謝**：Pentagon Pizza 資料來源為 [pizzint.watch](https://www.pizzint.watch/)（PizzINT Team）— 他們直接抓 Google Maps Popular Times 並提供公開 API。如果這個專案對你有用，請去支持原作者。
 
 ---
 
-## 接上真實 Pizza 資料（Google Maps API）
+## 警報推播（選用）
 
-預設情況下 Pizza 指數使用模擬資料。要接上真實的 Pentagon 周邊披薩店繁忙度，需要四個步驟：
+如果想在指數突破閾值時自動推播到 Telegram / Discord，到 GitHub 倉庫 **Settings → Secrets and variables → Actions** 新增：
 
-### 1. 申請 Google Cloud API key
-
-1. 到 [Google Cloud Console](https://console.cloud.google.com/) 建立或選擇一個專案
-2. 啟用 **Places API**（左側選單 → APIs & Services → Library → 搜尋 Places API → Enable）
-3. 建立 API key（左側選單 → APIs & Services → Credentials → Create Credentials → API key）
-4. 強烈建議**限制這把 key 只能用 Places API**
-
-> ⚠️ 費用：Places API 每月 $200 免費額度。本專案每 15 分鐘抓 6 家店，約佔 ~$73/月（在免費額度內）。
-
-### 2. 找出真實的 Place ID
-
-在本機執行：
-
-```bash
-export GOOGLE_MAPS_API_KEY=你的key
-pip install -r scripts/requirements.txt requests
-python scripts/find_places.py
-```
-
-它會在 Pentagon 周邊 5 km 內搜尋，列出每家店的 `place_id` 候選，並輸出可貼回 `fetch_data.py` 的程式片段。
-
-### 3. 更新 `scripts/fetch_data.py`
-
-把上一步輸出的 `PIZZA_SHOPS = [...]` 區塊整個取代到 `fetch_data.py` 裡。
-
-### 4. 把 API key 設為 GitHub Secret
-
-GitHub 倉庫 → Settings → Secrets and variables → Actions → New repository secret：
-
-- Name: `GOOGLE_MAPS_API_KEY`
-- Value: 你的 API key
-
-下次 `update-data.yml` 執行時（每 15 分鐘），就會抓真實資料。也可以到 Actions 頁面手動觸發 "Update data" workflow 立即生效。
+| Secret | 用途 |
+|--------|------|
+| `TELEGRAM_BOT_TOKEN` | 推播到 Telegram |
+| `TELEGRAM_CHAT_ID` | Telegram 接收頻道 |
+| `DISCORD_WEBHOOK_URL` | 推播到 Discord |
 
 ---
 

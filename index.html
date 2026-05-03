@@ -1692,13 +1692,16 @@ document.querySelectorAll('.meter-fill').forEach(bar => {
 // busyness = 當前 Google Popular Times 百分比 (0-100)
 // baseline = 同時段正常水準（用於計算偏差率）
 // dist = 距離五角大廈距離
+// 名稱必須與 scripts/fetch_data.py 的 SHOPS_TO_DISPLAY 完全相符
+// 資料來源：https://www.pizzint.watch/api/dashboard-data
 const PIZZA_SHOPS_DATA = [
-  { name: "We The Pizza",          busyness: 0, baseline: 45, icon: "🍕", is_open: false, status: "closed" },
-  { name: "Pizzato Pizza",         busyness: 0, baseline: 40, icon: "🍕", is_open: false, status: "closed" },
-  { name: "Papa Johns Pizza",      busyness: 0, baseline: 38, icon: "🍕", is_open: false, status: "closed" },
-  { name: "Domino's Pizza",        busyness: 0, baseline: 35, icon: "🍕", is_open: false, status: "closed" },
-  { name: "Extreme Pizza",         busyness: 0, baseline: 30, icon: "🍕", is_open: false, status: "closed" },
-  { name: "District Pizza Palace", busyness: 0, baseline: 32, icon: "🍕", is_open: false, status: "closed" },
+  { name: "We, The Pizza",                     busyness: 0, baseline: 45, icon: "🍕", is_open: false, status: "closed" },
+  { name: "Pizzato Pizza",                     busyness: 0, baseline: 40, icon: "🍕", is_open: false, status: "closed" },
+  { name: "Papa Johns Pizza",                  busyness: 0, baseline: 38, icon: "🍕", is_open: false, status: "closed" },
+  { name: "Domino's Pizza (Pentagon Closest)", busyness: 0, baseline: 35, icon: "🍕", is_open: false, status: "closed" },
+  { name: "Extreme Pizza",                     busyness: 0, baseline: 30, icon: "🍕", is_open: false, status: "closed" },
+  { name: "District Pizza Palace",             busyness: 0, baseline: 32, icon: "🍕", is_open: false, status: "closed" },
+  { name: "Nighthawk Brewery & Pizza",         busyness: 0, baseline: 35, icon: "🍕", is_open: false, status: "closed" },
 ];
 
 // 異常閾值設定
