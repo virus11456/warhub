@@ -9,6 +9,8 @@ WarHub - 靜態網站資料抓取器
   ─ Credit: https://www.pizzint.watch/
 - Polymarket: gamma-api.polymarket.com 公開 API
   ─ 戰爭/衝突相關預測市場
+- AVI 軍機追蹤: api.adsb.lol/v2/mil
+  ─ 全球 ADS-B 軍用飛機即時位置（無金鑰、無速率限制）
 """
 
 import asyncio
@@ -23,6 +25,11 @@ log = logging.getLogger("warhub")
 
 PIZZINT_API     = "https://www.pizzint.watch/api/dashboard-data"
 POLYMARKET_API  = "https://gamma-api.polymarket.com/markets"
+# Public ADS-B "/mil" feeds — try in order, both return identical schema
+ADSB_MIL_FEEDS  = [
+    "https://opendata.adsb.fi/api/v2/mil",
+    "https://api.adsb.lol/v2/mil",
+]
 DATA_DIR        = Path(__file__).resolve().parent.parent / "data"
 DATA_FILE       = DATA_DIR / "data.json"
 USER_AGENT      = "WarHub/1.0 (+https://github.com/virus11456/warhub)"
@@ -202,6 +209,162 @@ async def fetch_polymarket(session: aiohttp.ClientSession) -> list[dict]:
 
 
 # ─────────────────────────────────────────────────────────────
+# AVI - Military aviation tracking via adsb.lol
+# ─────────────────────────────────────────────────────────────
+# ICAO type code → role mapping
+_TANKERS = {"K35R", "K35E", "K35", "K135", "KC135", "KC46", "K46",
+            "KC10", "KDC1", "VC10", "A332", "A330MRTT"}
+_AWACS   = {"E3", "E3CF", "E3TF", "E767", "E7", "E737", "A50",
+            "E2", "E2C", "E2D", "E8", "E8C", "E8B"}
+_UAV     = {"GLOB", "RQ4", "GHWK", "MQ9", "Q9", "MQ4", "HALE",
+            "HERN", "RPAS", "MQ1", "SHE2"}
+_TRANSPORT = {"C5", "C5M", "C17", "C130", "C30J", "C160", "A400", "C295", "B350"}
+_FIGHTER = {"F15", "F16", "F18", "F22", "F35", "FA18", "EUFI", "TYPH", "RFAL"}
+_C4ISR   = {"RC35", "RC135", "E6", "E6B", "P3", "P8", "P8I", "U2"}
+
+# ICAO type → human-readable label (subset)
+_TYPE_NAMES = {
+    "K35R": "KC-135R", "K35E": "KC-135E", "K135": "KC-135",
+    "K46": "KC-46A",   "KC46": "KC-46A",  "KC10": "KC-10",
+    "C5":  "C-5",      "C5M":  "C-5M Super Galaxy",
+    "C17": "C-17 Globemaster III",
+    "C130": "C-130",   "C30J": "C-130J",
+    "A400": "A400M",
+    "E3":  "E-3 Sentry", "E3CF": "E-3 Sentry", "E3TF": "E-3 Sentry",
+    "E7":  "E-7A Wedgetail", "E737": "E-7A Wedgetail",
+    "E767": "E-767", "E2": "E-2 Hawkeye", "E2C": "E-2C", "E2D": "E-2D",
+    "E8C": "E-8C JSTARS", "E8B": "E-8B",
+    "GLOB": "RQ-4 Global Hawk", "RQ4": "RQ-4 Global Hawk",
+    "MQ9": "MQ-9 Reaper",  "Q9": "MQ-9 Reaper",
+    "MQ4": "MQ-4 Triton",  "MQ1": "MQ-1 Predator",
+    "F22": "F-22 Raptor",  "F35": "F-35 Lightning II",
+    "F15": "F-15", "F16": "F-16", "F18": "F/A-18", "FA18": "F/A-18",
+    "P8":  "P-8 Poseidon", "P8I": "P-8I Neptune",
+    "RC135": "RC-135 Rivet Joint", "RC35": "RC-135",
+    "E6":  "E-6B Mercury", "E6B": "E-6B Mercury",
+    "U2":  "U-2 Dragon Lady",
+}
+
+
+def _classify_aircraft(t: str) -> str:
+    """Map ICAO type code to a role category"""
+    t = (t or "").upper()
+    if t in _TANKERS:   return "tanker"
+    if t in _AWACS:     return "awacs"
+    if t in _UAV:       return "uav"
+    if t in _TRANSPORT: return "transport"
+    if t in _FIGHTER:   return "fighter"
+    if t in _C4ISR:     return "c4isr"
+    return "other"
+
+
+def _region_from_latlon(lat, lon) -> str:
+    """Rough geographic region for display"""
+    if lat is None or lon is None:
+        return "未知"
+    if 24 <= lat <= 50 and -125 <= lon <= -66:
+        return "北美"
+    if 35 <= lat <= 72 and -10 <= lon <= 60:
+        return "歐洲"
+    if 30 <= lat <= 60 and 60 <= lon <= 140:
+        return "歐亞 / 中東"
+    if 12 <= lat <= 35 and 25 <= lon <= 60:
+        return "中東"
+    if 5 <= lat <= 50 and 100 <= lon <= 145:
+        return "西太平洋"
+    if -45 <= lat <= 5 and 90 <= lon <= 180:
+        return "南太平洋"
+    return f"{lat:.1f},{lon:.1f}"
+
+
+async def fetch_aviation(session: aiohttp.ClientSession) -> dict:
+    """
+    從公開 ADS-B 鏡像抓取目前全球可見的軍用飛機。
+    依序試 ADSB_MIL_FEEDS，遇到第一個成功就用。
+    回傳 {summary: {tankers, awacs, uav, ...}, aircraft: [...], source}
+    """
+    payload = None
+    used_source = None
+    for url in ADSB_MIL_FEEDS:
+        try:
+            async with session.get(
+                url,
+                timeout=aiohttp.ClientTimeout(total=20),
+                headers={"User-Agent": USER_AGENT, "Accept": "application/json"},
+            ) as resp:
+                if resp.status != 200:
+                    log.warning(f"AVI feed {url} returned {resp.status}, trying next")
+                    continue
+                payload = await resp.json()
+                used_source = url
+                break
+        except Exception as e:
+            log.warning(f"AVI feed {url} failed: {e}, trying next")
+            continue
+
+    if payload is None:
+        log.error("All AVI feeds unavailable")
+        return {"summary": {"tankers": 0, "awacs": 0, "uav": 0,
+                            "transport": 0, "fighter": 0, "c4isr": 0,
+                            "total": 0, "anomaly_pct": 0},
+                "aircraft": [],
+                "source": None,
+                "error": "all_feeds_unavailable"}
+
+    raw = payload.get("ac", []) or []
+    counts = {"tanker": 0, "awacs": 0, "uav": 0,
+              "transport": 0, "fighter": 0, "c4isr": 0, "other": 0}
+    aircraft = []
+
+    for a in raw:
+        t       = (a.get("t") or "").upper()
+        flight  = (a.get("flight") or "").strip()
+        hexid   = (a.get("hex") or "").upper()
+        alt     = a.get("alt_baro")
+        lat, lon = a.get("lat"), a.get("lon")
+        role    = _classify_aircraft(t)
+        counts[role] = counts.get(role, 0) + 1
+
+        # 只把「值得追蹤的類型」放進 aircraft list
+        if role not in ("other",):
+            try:
+                alt_ft = int(alt) if alt and alt != "ground" else 0
+            except (ValueError, TypeError):
+                alt_ft = 0
+            aircraft.append({
+                "icao24":   hexid,
+                "callsign": flight or "—",
+                "type":     _TYPE_NAMES.get(t, t or "—"),
+                "type_code": t,
+                "role":     role,
+                "alt_ft":   alt_ft,
+                "lat":      lat,
+                "lon":      lon,
+                "region":   _region_from_latlon(lat, lon),
+            })
+
+    # 排序：先 tanker、awacs、uav，然後依 callsign
+    role_order = {"awacs": 0, "uav": 1, "tanker": 2, "c4isr": 3,
+                  "fighter": 4, "transport": 5, "other": 9}
+    aircraft.sort(key=lambda a: (role_order.get(a["role"], 99), a["callsign"]))
+
+    summary = {
+        "tankers":   counts["tanker"],
+        "awacs":     counts["awacs"],
+        "uav":       counts["uav"],
+        "transport": counts["transport"],
+        "fighter":   counts["fighter"],
+        "c4isr":     counts["c4isr"],
+        "total":     len(raw),
+    }
+    log.info(f"AVI: {summary['total']} mil aircraft global ({used_source}); "
+             f"tankers={summary['tankers']} awacs={summary['awacs']} "
+             f"uav={summary['uav']} transport={summary['transport']}")
+
+    return {"summary": summary, "aircraft": aircraft[:30], "source": used_source}
+
+
+# ─────────────────────────────────────────────────────────────
 # Combined score
 # ─────────────────────────────────────────────────────────────
 def calculate_score(pizza_index: int, polymarket: list[dict]) -> dict:
@@ -239,9 +402,12 @@ def calculate_score(pizza_index: int, polymarket: list[dict]) -> dict:
 
 async def main():
     async with aiohttp.ClientSession() as session:
-        pizzint_task = asyncio.create_task(fetch_pizzint(session))
-        poly_task    = asyncio.create_task(fetch_polymarket(session))
-        pizzint_data, polymarket = await asyncio.gather(pizzint_task, poly_task)
+        pizzint_task  = asyncio.create_task(fetch_pizzint(session))
+        poly_task     = asyncio.create_task(fetch_polymarket(session))
+        aviation_task = asyncio.create_task(fetch_aviation(session))
+        pizzint_data, polymarket, aviation = await asyncio.gather(
+            pizzint_task, poly_task, aviation_task
+        )
 
     pizza_shops  = transform_pizza_shops(pizzint_data)
     pizza_index  = pizzint_data.get("overall_index", 0)
@@ -256,9 +422,11 @@ async def main():
         "defcon_level":  defcon_level,
         "defcon_details": pizzint_data.get("defcon_details"),
         "polymarket":    polymarket[:20],
+        "aviation":      aviation,
         "sources": {
             "pizza":      "https://www.pizzint.watch/",
             "polymarket": "https://gamma-api.polymarket.com/",
+            "aviation":   "https://api.adsb.lol/v2/mil",
         },
     }
 

@@ -1528,7 +1528,7 @@
       較 7 日均值 <strong style="color:#ff4444;font-size:.82rem" id="avi-anomaly">--%</strong> &nbsp;·&nbsp; 7日均：<span id="avi-baseline">--</span> 架次/hr
     </div>
     <div class="avi-list" id="avi-list">
-      <div id="avi-list" style="text-align:center;padding:1.2rem;font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim)">⏳ 等待 OpenSky Network 資料…</div>
+      <div style="text-align:center;padding:1.2rem;font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim)">⏳ 載入即時 ADS-B 軍機資料…</div>
     </div>
     <div style="display:flex;gap:.8rem;flex-wrap:wrap;margin-top:.8rem;padding-top:.6rem;border-top:1px solid var(--border);font-family:'Share Tech Mono',monospace;font-size:.56rem;color:var(--text-dim)">
       <span><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#cc44ff;margin-right:3px"></i>加油機</span>
@@ -2008,6 +2008,12 @@ async function fetchRealPizzaData() {
         .slice(0, 5)
         .map(m => ({ yes_pct: m.yes_price * 100, volume: m.volume }));
     }
+
+    // 同步渲染 AVI 軍機資料
+    if (json.aviation) {
+      renderAviation(json.aviation);
+    }
+
     htmlWpiRender();
 
     console.log('[WARWATCH] data refreshed @', json.updated_at);
@@ -2121,34 +2127,72 @@ const STATIC_FINANCE = {
   war_premium_oil: 0
 };
 
-// ── 航空：每30分鐘微幅模擬波動 ────────────────────────────────
-function simulateAviation() {
-  const d  = STATIC_AVIATION;
+// ── 航空：用後端 (adsb.fi/lol) 抓回的軍機資料渲染 ──────────────
+// d 結構：{ summary: {tankers, awacs, uav, transport, c4isr, fighter, total},
+//          aircraft: [...], source }
+function renderAviation(d) {
   const el = (id) => document.getElementById(id);
-  const hasData = d.summary.total > 0 || d.aircraft.length > 0;
-  if (el('avi-tankers'))  el('avi-tankers').textContent  = hasData ? d.summary.tankers       : '--';
-  if (el('avi-awacs'))    el('avi-awacs').textContent    = hasData ? d.summary.awacs         : '--';
-  if (el('avi-uav'))      el('avi-uav').textContent      = hasData ? d.summary.uav           : '--';
-  if (el('avi-anomaly'))  el('avi-anomaly').textContent  = hasData ? '+'+d.summary.anomaly_pct+'%' : '--%';
-  if (el('avi-baseline')) el('avi-baseline').textContent = hasData ? d.summary.baseline_7d   : '--';
+  const s  = d?.summary || {tankers:0, awacs:0, uav:0, total:0};
+  const ac = d?.aircraft || [];
+  const hasData = (s.total || 0) > 0;
+
+  if (el('avi-tankers'))  el('avi-tankers').textContent  = hasData ? s.tankers : '--';
+  if (el('avi-awacs'))    el('avi-awacs').textContent    = hasData ? s.awacs   : '--';
+  if (el('avi-uav'))      el('avi-uav').textContent      = hasData ? s.uav     : '--';
+  if (el('avi-baseline')) el('avi-baseline').textContent = hasData ? s.total   : '--';
+
+  // anomaly_pct: 沒有 baseline 7d 就用「值得關注機型佔比」當代理指標
+  if (el('avi-anomaly')) {
+    const interesting = (s.tankers||0) + (s.awacs||0) + (s.uav||0) + (s.c4isr||0);
+    const pct = hasData && s.total ? Math.round((interesting / s.total) * 100) : null;
+    el('avi-anomaly').textContent = pct == null ? '--%' : pct + '%';
+  }
+
   const listEl = document.getElementById('avi-list');
   if (listEl) {
-    if (!hasData) {
-      listEl.innerHTML = `<div style="text-align:center;padding:1.2rem;font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim)">⏳ 等待 OpenSky Network 資料…</div>`;
+    if (!hasData || ac.length === 0) {
+      listEl.innerHTML = `<div style="text-align:center;padding:1.2rem;font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim)">⏳ 載入即時 ADS-B 軍機資料…</div>`;
     } else {
-      const roleLabel = {tanker:'加油機',awacs:'預警機',uav:'偵察機'};
-      listEl.innerHTML = d.aircraft.map(ac => {
-        const up = ac.trend.startsWith('+');
-        return `<div class="avi-item"><div class="avi-dot ${ac.role}"></div><div><div style="font-size:.7rem;color:var(--text-primary)">${ac.callsign} <span style="color:var(--text-dim);font-size:.58rem">${ac.type}</span></div><div style="color:var(--text-dim);font-size:.58rem">${ac.region} · ${roleLabel[ac.role]||ac.role} · ${ac.alt_ft.toLocaleString()}ft</div></div><div class="avi-trend ${up?'up':'down'}">${ac.trend}</div></div>`;
+      const roleLabel = {
+        tanker:'加油機', awacs:'預警機', uav:'無人機',
+        c4isr:'偵察機', transport:'運輸機', fighter:'戰機', other:'其他'
+      };
+      // 只顯示「值得追蹤」的機型，最多 12 筆
+      const priorityRoles = ['awacs','uav','c4isr','tanker'];
+      const sorted = [...ac].sort((a, b) => {
+        const ai = priorityRoles.indexOf(a.role); const bi = priorityRoles.indexOf(b.role);
+        return (ai === -1 ? 9 : ai) - (bi === -1 ? 9 : bi);
+      }).slice(0, 12);
+      listEl.innerHTML = sorted.map(a => {
+        const cs   = (a.callsign || '—').replace(/\s+/g,'').padEnd(8,' ');
+        const type = a.type || '—';
+        const altStr = a.alt_ft > 0 ? a.alt_ft.toLocaleString() + 'ft' : '地面';
+        const dotCls = ['tanker','awacs','uav','c4isr','fighter','transport'].includes(a.role) ? a.role : 'other';
+        return `<div class="avi-item">
+          <div class="avi-dot ${dotCls}"></div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:.7rem;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+              ${escapeHtml(cs)} <span style="color:var(--text-dim);font-size:.58rem">${escapeHtml(type)}</span>
+            </div>
+            <div style="color:var(--text-dim);font-size:.58rem">${escapeHtml(a.region||'—')} · ${roleLabel[a.role]||a.role} · ${altStr}</div>
+          </div>
+        </div>`;
       }).join('');
     }
   }
+
   if (el('avi-updated')) el('avi-updated').textContent = hasData
     ? '更新：' + new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'})
-    : '等待資料…';
-  HTML_WPI_STATE.avi = d;
+    : 'ADS-B (adsb.fi)';
+
+  HTML_WPI_STATE.avi = {
+    summary: { ...s, anomaly_pct: parseInt(el('avi-anomaly')?.textContent) || 0 }
+  };
   htmlWpiRender();
 }
+
+// 初始化：用 STATIC_AVIATION 顯示佔位（'--'），等 fetchRealPizzaData 拉到真實資料再覆蓋
+function simulateAviation() { renderAviation(STATIC_AVIATION); }
 
 // ── 金融：每10分鐘微幅波動 ────────────────────────────────────
 // 基準值快照（防止累積漂移）
