@@ -1,0 +1,2293 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WARWATCH // 戰爭預測情報中心</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #050a0e;
+    --bg2: #080f14;
+    --bg3: #0c1820;
+    --accent: #00ff88;
+    --accent2: #ff4444;
+    --accent3: #ffaa00;
+    --accent4: #00aaff;
+    --text: #c8d8e8;
+    --text-dim: #6a8a9a;
+    --border: #1a3040;
+    --glow: 0 0 15px rgba(0,255,136,0.3);
+    --glow-red: 0 0 15px rgba(255,68,68,0.4);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Scanline effect */
+  body::after {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.05) 2px,
+      rgba(0,0,0,0.05) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* Header */
+  header {
+    background: linear-gradient(180deg, rgba(0,255,136,0.05) 0%, transparent 100%);
+    border-bottom: 1px solid var(--accent);
+    padding: 0 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+  }
+
+  .header-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+  }
+
+  .logo {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 1.4rem;
+    color: var(--accent);
+    text-shadow: var(--glow);
+    letter-spacing: 4px;
+  }
+
+  .logo span { color: var(--accent2); }
+
+  .header-status {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+  }
+
+  .live-dot {
+    width: 8px; height: 8px;
+    background: var(--accent2);
+    border-radius: 50%;
+    animation: pulse 1s infinite;
+    display: inline-block;
+    margin-right: 6px;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 6px var(--accent2); }
+    50% { opacity: 0.3; box-shadow: none; }
+  }
+
+  .threat-badge {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 4px 12px;
+    border: 1px solid var(--accent3);
+    color: var(--accent3);
+    text-shadow: 0 0 8px var(--accent3);
+  }
+
+  /* Main layout */
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1.5rem 2rem;
+  }
+
+  /* Section titles */
+  .section-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .section-title::before {
+    content: '//';
+    color: var(--accent);
+  }
+
+  /* THREAT METER - Top hero */
+  .threat-hero {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--accent2);
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .threat-hero::before {
+    content: 'GLOBAL THREAT ASSESSMENT';
+    position: absolute;
+    top: 0.5rem;
+    right: 1rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    letter-spacing: 3px;
+  }
+
+  .threat-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 2rem;
+    align-items: center;
+  }
+
+  .threat-level-display {
+    text-align: center;
+  }
+
+  .threat-number {
+    font-family: 'Orbitron', monospace;
+    font-size: 5rem;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--accent3);
+    text-shadow: 0 0 30px rgba(255,170,0,0.5);
+    animation: flicker 8s infinite;
+  }
+
+  @keyframes flicker {
+    0%, 95%, 100% { opacity: 1; }
+    96% { opacity: 0.8; }
+    97% { opacity: 1; }
+    98% { opacity: 0.7; }
+    99% { opacity: 1; }
+  }
+
+  @keyframes scan-line {
+    0%   { left: -60%; }
+    100% { left: 110%; }
+  }
+
+  @keyframes alert-flash {
+    0%, 100% { opacity: 1; background: var(--accent2); }
+    50%       { opacity: 0.7; background: #aa0000; }
+  }
+
+  @keyframes card-danger-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255,68,68,0); border-color: var(--border); }
+    50%       { box-shadow: 0 0 25px 4px rgba(255,68,68,0.25); border-color: rgba(255,68,68,0.5); }
+  }
+
+  .pizza-card.anomaly {
+    animation: card-danger-pulse 2s ease-in-out infinite;
+  }
+
+  .threat-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.8rem;
+    color: var(--accent3);
+    letter-spacing: 3px;
+    margin-top: 0.5rem;
+  }
+
+  .threat-sublabel {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    margin-top: 0.3rem;
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  /* Meter bars */
+  .meter-container { display: flex; flex-direction: column; gap: 0.8rem; }
+
+  .meter-row {
+    display: grid;
+    grid-template-columns: 140px 1fr 50px;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .meter-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    text-align: right;
+  }
+
+  .meter-bar {
+    height: 6px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .meter-fill {
+    height: 100%;
+    position: relative;
+    transition: width 2s ease;
+  }
+
+  .meter-fill::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 3px; height: 100%;
+    background: white;
+    opacity: 0.8;
+  }
+
+  .meter-fill.red { background: linear-gradient(90deg, #440000, var(--accent2)); box-shadow: 0 0 8px rgba(255,68,68,0.5); }
+  .meter-fill.orange { background: linear-gradient(90deg, #442200, var(--accent3)); box-shadow: 0 0 8px rgba(255,170,0,0.5); }
+  .meter-fill.blue { background: linear-gradient(90deg, #001144, var(--accent4)); box-shadow: 0 0 8px rgba(0,170,255,0.5); }
+  .meter-fill.green { background: linear-gradient(90deg, #001122, var(--accent)); box-shadow: 0 0 8px rgba(0,255,136,0.5); }
+
+  .meter-pct {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .meter-pct.red { color: var(--accent2); }
+  .meter-pct.orange { color: var(--accent3); }
+  .meter-pct.blue { color: var(--accent4); }
+  .meter-pct.green { color: var(--accent); }
+
+  /* Right side summary stats */
+  .threat-stats { display: flex; flex-direction: column; gap: 1rem; }
+
+  .stat-box {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 0.8rem 1rem;
+    border-left: 3px solid var(--accent);
+  }
+
+  .stat-box.red { border-left-color: var(--accent2); }
+  .stat-box.orange { border-left-color: var(--accent3); }
+
+  .stat-box-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    margin-bottom: 0.3rem;
+  }
+
+  .stat-box-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.2rem;
+    font-weight: 700;
+  }
+
+  /* Grid layout */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    box-sizing: border-box;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  /* PIZZA INDEX */
+  .pizza-card { border-top: 2px solid var(--accent3); }
+
+  /* ── Pizza + Bar 整合卡片 ─────── */
+  .pizza-bar-card { border-top: 3px solid; border-image: linear-gradient(90deg, var(--accent3), var(--accent4)) 1; }
+  .pbi-header     { margin-bottom: .6rem; }
+  .pbi-title-row  { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: .4rem; }
+  .pbi-grid       { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: .4rem; }
+
+  /* 歷史 chips 橫向捲動 */
+  .ph-scroll      { display: flex; gap: .5rem; overflow-x: auto; padding-bottom: .4rem; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+  .ph-scroll::-webkit-scrollbar { height: 4px; }
+  .ph-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .ph-chip        { flex-shrink: 0; background: var(--bg3); border: 1px solid var(--border); border-radius: 4px; padding: .4rem .7rem; min-width: 110px; }
+  .ph-chip-year   { font-family: 'Orbitron', monospace; font-size: .52rem; color: var(--accent3); letter-spacing: 1px; margin-bottom: .15rem; }
+  .ph-chip-event  { font-family: 'Share Tech Mono', monospace; font-size: .58rem; color: var(--text-primary); line-height: 1.4; margin-bottom: .15rem; }
+  .ph-chip-tag    { font-family: 'Share Tech Mono', monospace; font-size: .56rem; color: var(--text-dim); }
+
+  /* Polymarket 網格多欄 */
+  .poly-grid      { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: .6rem; }
+
+  .pizza-status-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+
+  .pizza-emoji {
+    font-size: 2.5rem;
+    filter: drop-shadow(0 0 10px rgba(255,170,0,0.6));
+    animation: pizza-spin 3s ease-in-out infinite;
+  }
+
+  @keyframes pizza-spin {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+  }
+
+  .pizza-level {
+    text-align: right;
+  }
+
+  .pizza-level-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--accent3);
+    text-shadow: 0 0 20px rgba(255,170,0,0.5);
+  }
+
+  .pizza-level-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+  }
+
+  .pizza-alert-box {
+    background: rgba(255,170,0,0.05);
+    border: 1px solid rgba(255,170,0,0.3);
+    padding: 0.8rem 1rem;
+    margin: 1rem 0;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent3);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .pizza-history {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .history-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.5rem;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    font-size: 0.75rem;
+  }
+
+  .history-year {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    color: var(--accent4);
+    min-width: 45px;
+    font-weight: 700;
+  }
+
+  .history-event { color: var(--text-dim); flex: 1; }
+  .history-pizzas { font-family: 'Share Tech Mono', monospace; color: var(--accent3); min-width: 60px; text-align: right; font-size: 0.7rem; }
+
+  .pizza-tracker-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .pizza-shop {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 0.7rem;
+  }
+
+  .shop-name {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    margin-bottom: 0.5rem;
+  }
+
+  .shop-status {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .status-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    animation: pulse 1.5s infinite;
+  }
+
+  .status-dot.high { background: var(--accent2); box-shadow: 0 0 6px var(--accent2); }
+  .status-dot.medium { background: var(--accent3); box-shadow: 0 0 6px var(--accent3); }
+  .status-dot.normal { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+
+  /* Polymarket Card */
+  .poly-card { border-top: 2px solid var(--accent4); }
+
+  .poly-market-list { display: flex; flex-direction: column; gap: 0.8rem; }
+
+  .poly-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 1rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .poly-item::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--accent4);
+  }
+
+  .poly-item.high::before { background: var(--accent2); }
+  .poly-item.medium::before { background: var(--accent3); }
+
+  .poly-question {
+    font-size: 0.82rem;
+    color: var(--text);
+    margin-bottom: 0.7rem;
+    line-height: 1.4;
+  }
+
+  .poly-bar-container {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .poly-bar {
+    flex: 1;
+    height: 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .poly-bar-fill {
+    height: 100%;
+  }
+
+  .poly-pct {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.85rem;
+    font-weight: 700;
+    min-width: 45px;
+    text-align: right;
+  }
+
+  .poly-meta {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* Bottom grid */
+  .bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Conflict map */
+  .conflict-card { border-top: 2px solid var(--accent2); }
+
+  .conflict-list { display: flex; flex-direction: column; gap: 0.6rem; }
+
+  .conflict-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    padding: 0.7rem;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    gap: 0.5rem;
+  }
+
+  .conflict-region {
+    font-size: 0.82rem;
+    color: var(--text);
+  }
+
+  .conflict-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    margin-top: 0.2rem;
+  }
+
+  .risk-pill {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 3px 8px;
+    border: 1px solid;
+  }
+
+  .risk-pill.critical { color: var(--accent2); border-color: var(--accent2); background: rgba(255,68,68,0.1); }
+  .risk-pill.high { color: var(--accent3); border-color: var(--accent3); background: rgba(255,170,0,0.1); }
+  .risk-pill.medium { color: var(--accent4); border-color: var(--accent4); background: rgba(0,170,255,0.1); }
+  .risk-pill.elevated { color: var(--accent); border-color: var(--accent); background: rgba(0,255,136,0.1); }
+
+  /* Signal card */
+  .signal-card { border-top: 2px solid var(--accent); }
+
+  .signal-list { display: flex; flex-direction: column; gap: 0.6rem; }
+
+  .signal-item {
+    display: flex;
+    gap: 0.7rem;
+    padding: 0.7rem;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    align-items: flex-start;
+  }
+
+  .signal-icon {
+    font-size: 1.2rem;
+    min-width: 24px;
+    text-align: center;
+    margin-top: 2px;
+  }
+
+  .signal-text { font-size: 0.78rem; color: var(--text); line-height: 1.4; flex: 1; }
+  .signal-time { font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; color: var(--text-dim); margin-top: 0.2rem; }
+  .signal-source { font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; color: var(--accent4); }
+
+  /* Nuclear card */
+  .nuclear-card { border-top: 2px solid #aa00ff; }
+
+  .doomsday-display {
+    text-align: center;
+    padding: 1rem 0;
+  }
+
+  .clock-face {
+    font-family: 'Orbitron', monospace;
+    font-size: 3rem;
+    font-weight: 900;
+    color: #cc44ff;
+    text-shadow: 0 0 20px rgba(170,0,255,0.6);
+    letter-spacing: 3px;
+  }
+
+  .clock-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    letter-spacing: 3px;
+    margin-top: 0.5rem;
+  }
+
+  .midnight-bar {
+    display: flex;
+    align-items: center;
+    margin: 1.2rem 0;
+    gap: 0.5rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+  }
+
+  .midnight-track {
+    flex: 1;
+    height: 4px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    position: relative;
+  }
+
+  .midnight-marker {
+    position: absolute;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, #cc44ff);
+    right: 0;
+    width: 14%; /* 90 seconds = ~14% of midnight */
+  }
+
+  .midnight-needle {
+    position: absolute;
+    right: 14%;
+    top: -4px;
+    width: 2px;
+    height: 12px;
+    background: #cc44ff;
+    box-shadow: 0 0 8px #aa00ff;
+  }
+
+  /* Scrolling ticker */
+  .ticker-wrap {
+    background: var(--bg3);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .ticker-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: var(--accent2);
+    letter-spacing: 2px;
+    padding: 0 1rem;
+    white-space: nowrap;
+    border-right: 1px solid var(--border);
+    height: 100%;
+    display: flex;
+    align-items: center;
+    background: rgba(255,68,68,0.1);
+  }
+
+  .ticker-scroll {
+    display: flex;
+    animation: scroll 40s linear infinite;
+    gap: 0;
+  }
+
+  @keyframes scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  .ticker-item {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    white-space: nowrap;
+    padding: 0 2rem;
+  }
+
+  .ticker-item .hi { color: var(--accent3); }
+  .ticker-item .red { color: var(--accent2); }
+  .ticker-item .green { color: var(--accent); }
+
+  /* Footer */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 1rem 2rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     RWD 斷點
+     1100px → 大平板
+      900px → 平板直向
+      640px → 大手機
+      480px → 手機
+      360px → 小手機
+     ══════════════════════════════════════════════════════════ */
+
+  /* ── 1100px ─────────────────────────────────────────────── */
+  @media (max-width: 1100px) {
+    .threat-grid   { grid-template-columns: 200px 1fr; }
+    .threat-stats  { display: none; }
+    .bottom-grid   { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* ── 900px ──────────────────────────────────────────────── */
+  @media (max-width: 900px) {
+    .container     { padding: 1rem; }
+    .threat-hero   { padding: 1.2rem; }
+    .threat-grid   { grid-template-columns: 1fr; gap: 1.2rem; }
+    .main-grid     { grid-template-columns: 1fr; gap: 1rem; }
+    .pbi-grid      { grid-template-columns: 1fr; gap: .8rem; }
+    .poly-grid     { grid-template-columns: 1fr; }
+    .bottom-grid   { grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .card          { padding: 1rem; }
+
+    /* Hero — 橫排 score */
+    .threat-level-display { display: flex; align-items: center; gap: 1.2rem; justify-content: center; }
+    .threat-number { font-size: 3.5rem; }
+
+    /* Meters */
+    .meter-row     { grid-template-columns: 90px 1fr 40px; gap: .5rem; }
+    .meter-label   { font-size: 0.65rem; }
+
+    /* Header */
+    .header-inner  { padding: 0 1rem; height: 54px; }
+    .logo          { font-size: 1.1rem; letter-spacing: 2px; }
+    .logo span:last-child { display: none; } /* 隱藏副標 */
+    .header-status { gap: 1rem; font-size: 0.68rem; }
+
+    /* Pizza */
+    .pizza-tracker-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* ── 640px ──────────────────────────────────────────────── */
+  @media (max-width: 640px) {
+    .container     { padding: .8rem; }
+    .threat-hero   { padding: 1rem; margin-bottom: 1rem; }
+    .main-grid     { gap: .8rem; margin-bottom: 1rem; }
+    .bottom-grid   { grid-template-columns: 1fr; gap: .8rem; }
+    .card          { padding: .9rem; }
+
+    /* Hero */
+    .threat-level-display { flex-direction: column; gap: .4rem; }
+    .threat-number { font-size: 3rem; }
+    .threat-label  { font-size: 0.7rem; }
+    .threat-sublabel { font-size: 0.6rem; }
+
+    /* Meters */
+    .meter-row     { grid-template-columns: 76px 1fr 38px; gap: .4rem; }
+    .meter-label   { font-size: 0.6rem; }
+    .meter-pct     { font-size: 0.65rem; }
+
+    /* Section titles */
+    .section-title { font-size: 0.58rem; letter-spacing: 2px; }
+
+    /* Header */
+    .logo          { font-size: 1rem; letter-spacing: 1px; }
+    .threat-badge  { font-size: 0.58rem; padding: 2px 7px; letter-spacing: 1px; }
+    .header-status { gap: .7rem; }
+
+    /* Pizza */
+    .pizza-emoji   { font-size: 2rem; }
+    .pizza-level-num { font-size: 1.3rem; }
+    .shop-name     { font-size: 0.6rem; }
+    /* 隱藏披薩歷史的數量欄 */
+    .history-pizzas { display: none; }
+    .history-item  { gap: .5rem; padding: .4rem; }
+    .history-event { font-size: 0.68rem; }
+
+    /* Polymarket */
+    .poly-question { font-size: 0.75rem; }
+    .poly-pct      { font-size: 0.75rem; min-width: 36px; }
+
+    /* Conflict */
+    .conflict-region { font-size: 0.75rem; }
+    .conflict-sub  { font-size: 0.58rem; }
+    .risk-pill     { font-size: 0.54rem; padding: 2px 5px; }
+
+    /* Signal */
+    .signal-text   { font-size: 0.72rem; }
+    .signal-time   { font-size: 0.58rem; }
+
+    /* Doomsday */
+    .clock-face    { font-size: 2.2rem; letter-spacing: 2px; }
+    .clock-label   { font-size: 0.62rem; letter-spacing: 1px; }
+
+    /* Pizza alert banner */
+    #pizza-war-alert { padding: .8rem; }
+    #alert-main-text { font-size: 0.75rem; }
+    #alert-bullets   { font-size: 0.65rem; }
+
+    /* Pizza gauge — 隱藏中間 zone labels */
+    .ww-gauge-zone-row span:nth-child(2),
+    .ww-gauge-zone-row span:nth-child(3) { display: none; }
+
+    /* Footer */
+    footer         { padding: .8rem 1rem; font-size: 0.58rem; }
+
+    /* Ticker */
+    .ticker-label  { font-size: 0.55rem; padding: 0 .6rem; }
+    .ticker-item   { font-size: 0.65rem; padding: 0 1rem; }
+  }
+
+  /* ── 480px ──────────────────────────────────────────────── */
+  @media (max-width: 480px) {
+    /* Header 極簡 */
+    .header-inner  { height: 48px; }
+    .logo          { font-size: .9rem; }
+    #clock         { display: none; }
+    .live-dot      { display: none; }
+    .header-status { gap: .5rem; }
+
+    /* Layout */
+    .container     { padding: .6rem; }
+    .card          { padding: .8rem; }
+    .threat-hero   { padding: .8rem; }
+
+    /* Hero */
+    .threat-number { font-size: 2.6rem; }
+    .meter-row     { grid-template-columns: 62px 1fr 34px; gap: .3rem; }
+    .meter-label   { font-size: 0.56rem; }
+    .meter-bar     { height: 5px; }
+
+    /* Pizza shops — 單欄 */
+    .pizza-tracker-grid { grid-template-columns: 1fr; }
+
+    /* Pizza alert stats — 單欄 */
+    #pizza-war-alert > div[style*="grid-template-columns:1fr 1fr"] {
+      display: flex; flex-direction: column;
+    }
+
+    /* History */
+    .history-year  { font-size: 0.6rem; min-width: 32px; }
+    .history-event { font-size: 0.62rem; }
+
+    /* Doomsday */
+    .clock-face    { font-size: 1.8rem; }
+    .midnight-bar  { font-size: 0.58rem; }
+
+    /* Stat boxes */
+    .stat-box      { padding: .6rem; }
+    .stat-box-value { font-size: 1.4rem; }
+  }
+
+  /* ── 360px ──────────────────────────────────────────────── */
+  @media (max-width: 360px) {
+    .logo          { font-size: .8rem; }
+    .threat-badge  { display: none; }
+    .threat-number { font-size: 2.2rem; }
+    .clock-face    { font-size: 1.5rem; }
+    .container     { padding: .5rem; }
+    .card          { padding: .7rem; }
+    .section-title { font-size: 0.5rem; letter-spacing: 1px; }
+    .meter-row     { grid-template-columns: 54px 1fr 30px; }
+    .meter-label   { font-size: 0.52rem; }
+  }
+
+  /* ── 觸控裝置：ticker 不因假 hover 暫停 ─────────────────── */
+  @media (hover: none) {
+    .ticker-scroll { animation-play-state: running !important; }
+  }
+
+  /* ── 防止長字串破版 ──────────────────────────────────────── */
+  .poly-question, .conflict-region, .signal-text,
+  .history-event, .pizza-alert-box { word-break: break-word; }
+
+  body { overflow-x: hidden; }
+
+  /* Animated grid bg */
+  .bg-grid {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image:
+      linear-gradient(rgba(0,255,136,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,136,0.02) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container, header { position: relative; z-index: 1; }
+
+  /* Corner decorations */
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 10px; height: 10px;
+    border-top: 1px solid var(--accent);
+    border-left: 1px solid var(--accent);
+  }
+
+/* ── 酒吧反向指標 ─────────────────────────────── */
+.bar-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+.bar-shop {
+  background: rgba(0,170,255,0.04);
+  border: 1px solid rgba(0,170,255,0.15);
+  border-radius: 6px;
+  padding: 0.7rem 0.8rem;
+  transition: border-color 0.3s;
+}
+.bar-shop.quiet { border-color: rgba(0,170,255,0.5); background: rgba(0,170,255,0.08); }
+.bar-shop.closed { opacity: 0.6; }
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+
+<!-- Header -->
+<header>
+  <div class="header-inner">
+    <div class="logo">WAR<span>WATCH</span> <span style="font-size:0.7rem;color:var(--text-dim);font-weight:400;letter-spacing:2px">戰爭預測情報中心</span></div>
+    <div class="header-status">
+      <span><span class="live-dot"></span>LIVE DATA</span>
+      <span id="clock">--:--:-- UTC</span>
+      <span class="threat-badge" id="alert-badge">威脅等級 ELEVATED</span>
+    </div>
+  </div>
+</header>
+
+<!-- Ticker -->
+<div class="ticker-wrap">
+  <div class="ticker-label">INTEL FEED</div>
+  <div style="overflow:hidden;flex:1;">
+    <div class="ticker-scroll" id="ticker">
+      <div class="ticker-item">🍕 五角大廈披薩指數 <span class="hi">↑ 異常偏高</span> &nbsp;•&nbsp;</div>
+      <div class="ticker-item">Polymarket：烏克蘭停火機率 <span class="hi">37%</span> &nbsp;•&nbsp;</div>
+      <div class="ticker-item">末日時鐘距離午夜 <span class="red">90秒</span> — 史上最近 &nbsp;•&nbsp;</div>
+      <div class="ticker-item">美伊談判陷入僵局，川普：正在考慮有限軍事行動 &nbsp;•&nbsp;</div>
+      <div class="ticker-item">台海：Polymarket 開戰預測維持 <span class="hi">~12%</span> &nbsp;•&nbsp;</div>
+      
+      <div class="ticker-item">Polymarket 估值達 <span class="green">90億美元</span>，地緣政治賭局交易量激增 &nbsp;•&nbsp;</div>
+      <div class="ticker-item">索馬利亞：美軍打擊海盜概率 <span class="red">89%</span> &nbsp;•&nbsp;</div>
+      <!-- Duplicate for seamless loop -->
+      <div class="ticker-item">🍕 五角大廈披薩指數 <span class="hi">↑ 異常偏高</span> &nbsp;•&nbsp;</div>
+      <div class="ticker-item">Polymarket：烏克蘭停火機率 <span class="hi">37%</span> &nbsp;•&nbsp;</div>
+      <div class="ticker-item">末日時鐘距離午夜 <span class="red">90秒</span> — 史上最近 &nbsp;•&nbsp;</div>
+      <div class="ticker-item">美伊談判陷入僵局，川普：正在考慮有限軍事行動 &nbsp;•&nbsp;</div>
+      <div class="ticker-item">台海：Polymarket 開戰預測維持 <span class="hi">~12%</span> &nbsp;•&nbsp;</div>
+      
+      <div class="ticker-item">Polymarket 估值達 <span class="green">90億美元</span>，地緣政治賭局交易量激增 &nbsp;•&nbsp;</div>
+      <div class="ticker-item">索馬利亞：美軍打擊海盜概率 <span class="red">89%</span> &nbsp;•&nbsp;</div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Threat Hero -->
+  <!-- WPI 戰爭壓力指數 -->
+  <style>
+  .wpi-section {
+    background: linear-gradient(135deg,rgba(10,18,30,.97),rgba(5,12,22,.99));
+    border: 1px solid rgba(0,170,255,.2); border-top: 2px solid rgba(0,170,255,.5);
+    padding: 1.2rem 1.5rem 1rem; margin-bottom: 1.5rem; position: relative; overflow: hidden;
+  }
+  .wpi-section::before {
+    content:''; position:absolute; inset:0;
+    background:radial-gradient(ellipse at 50% -20%,rgba(0,170,255,.06) 0%,transparent 70%);
+    pointer-events:none;
+  }
+  .wpi-topbar { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.2rem; padding-bottom:.8rem; border-bottom:1px solid rgba(0,170,255,.15); }
+  .wpi-title  { font-family:'Orbitron',monospace; font-size:1rem; font-weight:900; color:#00aaff; letter-spacing:3px; }
+  .wpi-ver    { font-size:.55rem; color:var(--text-dim); letter-spacing:2px; margin-left:.5rem; }
+  .wpi-subtitle { font-family:'Share Tech Mono',monospace; font-size:.62rem; color:var(--text-dim); margin-top:.25rem; letter-spacing:1px; }
+  .wpi-badge  { font-family:'Orbitron',monospace; font-size:.7rem; font-weight:700; padding:.4rem .9rem; border:1px solid; letter-spacing:2px; animation:wpi-blink 2s ease-in-out infinite; }
+  .wpi-badge.low      { color:#00ff88; border-color:#00ff88; background:rgba(0,255,136,.06); }
+  .wpi-badge.medium   { color:#ffaa00; border-color:#ffaa00; background:rgba(255,170,0,.06); }
+  .wpi-badge.high     { color:#ff2222; border-color:#ff2222; background:rgba(255,34,34,.08); }
+  .wpi-badge.critical { color:#ff00ff; border-color:#ff00ff; background:rgba(255,0,255,.08); }
+  @keyframes wpi-blink { 0%,100%{opacity:1} 50%{opacity:.6} }
+
+  .wpi-body { display:grid; grid-template-columns:210px 1fr 230px; gap:1.5rem; align-items:center; }
+  .wpi-factors { display:flex; flex-direction:column; gap:.6rem; }
+  .wpi-factor { background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.07); padding:.5rem .65rem; }
+  .wpi-f-hdr  { display:flex; align-items:center; gap:.4rem; margin-bottom:.3rem; }
+  .wpi-f-icon { font-size:.82rem; }
+  .wpi-f-name { font-family:'Share Tech Mono',monospace; font-size:.66rem; color:var(--text-primary); flex:1; }
+  .wpi-f-name em { color:#00aaff; font-style:normal; font-weight:700; }
+  .wpi-f-wt   { font-family:'Orbitron',monospace; font-size:.5rem; color:var(--text-dim); }
+  .wpi-f-bar-wrap { display:flex; align-items:center; gap:.4rem; margin-bottom:.18rem; }
+  .wpi-f-bar  { flex:1; height:5px; background:rgba(255,255,255,.08); overflow:hidden; }
+  .wpi-f-fill { height:100%; background:linear-gradient(90deg,#00aaff,#ff6600); transition:width 1.5s ease; }
+  .wpi-f-val  { font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700; color:#ffaa00; min-width:26px; text-align:right; }
+  .wpi-f-desc { font-family:'Share Tech Mono',monospace; font-size:.53rem; color:var(--text-dim); }
+
+  .wpi-gauge-wrap { display:flex; flex-direction:column; align-items:center; }
+  .wpi-arc { width:240px; height:140px; }
+  .wpi-center { text-align:center; margin-top:-.8rem; }
+  .wpi-num { font-family:'Orbitron',monospace; font-size:3rem; font-weight:900; line-height:1; background:linear-gradient(135deg,#fff,#00aaff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; filter:drop-shadow(0 0 12px rgba(0,170,255,.4)); }
+  .wpi-num-lbl { font-family:'Share Tech Mono',monospace; font-size:.62rem; color:var(--text-dim); margin-top:.1rem; }
+  .wpi-level { font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700; letter-spacing:3px; margin-top:.35rem; color:#ffaa00; }
+  .wpi-scale { display:flex; justify-content:space-between; width:240px; margin-top:.4rem; font-family:'Share Tech Mono',monospace; font-size:.54rem; text-align:center; line-height:1.3; }
+  .wpi-formula { margin-top:.6rem; font-family:'Share Tech Mono',monospace; font-size:.58rem; color:var(--text-dim); background:rgba(0,0,0,.3); padding:.3rem .6rem; border:1px solid rgba(255,255,255,.07); }
+  .wpi-formula em { color:#00aaff; font-style:normal; }
+
+  .wpi-alerts { display:flex; flex-direction:column; gap:.55rem; }
+  .wpi-al-title { font-family:'Orbitron',monospace; font-size:.54rem; color:var(--text-dim); letter-spacing:3px; margin-bottom:.2rem; }
+  .wpi-al-item { display:flex; align-items:flex-start; gap:.55rem; padding:.5rem .65rem; background:rgba(255,255,255,.02); border:1px solid rgba(255,255,255,.07); border-left:3px solid rgba(255,255,255,.1); transition:all .3s; }
+  .wpi-al-item.triggered { background:rgba(255,255,255,.05); }
+  .wpi-al-dot { width:8px; height:8px; border-radius:50%; margin-top:3px; flex-shrink:0; }
+  .wpi-al-dot.low  { background:#00ff88; }
+  .wpi-al-dot.med  { background:#ffaa00; }
+  .wpi-al-dot.high { background:#ff2222; box-shadow:0 0 6px #ff2222; }
+  .wpi-al-name { font-family:'Share Tech Mono',monospace; font-size:.68rem; color:var(--text-primary); font-weight:700; }
+  .wpi-al-cond { font-family:'Share Tech Mono',monospace; font-size:.58rem; color:var(--text-dim); margin-top:.1rem; }
+  .wpi-al-sub  { font-family:'Share Tech Mono',monospace; font-size:.53rem; color:rgba(255,255,255,.22); margin-top:.08rem; }
+  .wpi-al-status { margin-left:auto; flex-shrink:0; font-family:'Orbitron',monospace; font-size:.56rem; font-weight:700; color:var(--text-dim); }
+  .wpi-footer { display:flex; gap:.8rem; align-items:center; flex-wrap:wrap; margin-top:1rem; padding-top:.7rem; border-top:1px solid rgba(0,170,255,.1); font-family:'Share Tech Mono',monospace; font-size:.57rem; color:var(--text-dim); }
+  @media(max-width:1100px){ .wpi-body{ grid-template-columns:1fr 1fr; } }
+  @media(max-width:800px) { .wpi-body{ grid-template-columns:1fr; } .wpi-gauge-wrap{order:-1;} }
+  </style>
+
+  <div class="wpi-section">
+    <div class="wpi-topbar">
+      <div>
+        <div class="wpi-title">WAR PRESSURE INDEX <span class="wpi-ver">v2.0</span></div>
+        <div class="wpi-subtitle">加權多源 OSINT 綜合指數 · 每 10 分鐘自動重算</div>
+      </div>
+      <div class="wpi-badge medium" id="html-wpi-badge">⚠ <span id="html-wpi-badge-text">ELEVATED</span></div>
+    </div>
+
+    <div class="wpi-body">
+      <!-- 左：四子指標 -->
+      <div class="wpi-factors">
+        <div class="wpi-factor">
+          <div class="wpi-f-hdr"><span class="wpi-f-icon">📊</span><span class="wpi-f-name">Polymarket <em>P</em></span><span class="wpi-f-wt">×35%</span></div>
+          <div class="wpi-f-bar-wrap"><div class="wpi-f-bar"><div class="wpi-f-fill" id="html-wpi-p-fill" style="width:0%"></div></div><div class="wpi-f-val" id="html-wpi-p-val">--</div></div>
+          <div class="wpi-f-desc" id="html-wpi-p-desc">市場共識戰爭機率</div>
+        </div>
+        <div class="wpi-factor">
+          <div class="wpi-f-hdr"><span class="wpi-f-icon">✈️</span><span class="wpi-f-name">Aviation <em>A</em></span><span class="wpi-f-wt">×30%</span></div>
+          <div class="wpi-f-bar-wrap"><div class="wpi-f-bar"><div class="wpi-f-fill" id="html-wpi-a-fill" style="width:0%"></div></div><div class="wpi-f-val" id="html-wpi-a-val">--</div></div>
+          <div class="wpi-f-desc" id="html-wpi-a-desc">軍機異常活動頻率</div>
+        </div>
+        <div class="wpi-factor">
+          <div class="wpi-f-hdr"><span class="wpi-f-icon">🔥</span><span class="wpi-f-name">FIRMS <em>F</em></span><span class="wpi-f-wt">×15%</span></div>
+          <div class="wpi-f-bar-wrap"><div class="wpi-f-bar"><div class="wpi-f-fill" id="html-wpi-f-fill" style="width:0%"></div></div><div class="wpi-f-val" id="html-wpi-f-val">--</div></div>
+          <div class="wpi-f-desc" id="html-wpi-f-desc">衛星火點異常指數</div>
+        </div>
+        <div class="wpi-factor">
+          <div class="wpi-f-hdr"><span class="wpi-f-icon">💰</span><span class="wpi-f-name">Sentiment <em>S</em></span><span class="wpi-f-wt">×20%</span></div>
+          <div class="wpi-f-bar-wrap"><div class="wpi-f-bar"><div class="wpi-f-fill" id="html-wpi-s-fill" style="width:0%"></div></div><div class="wpi-f-val" id="html-wpi-s-val">--</div></div>
+          <div class="wpi-f-desc" id="html-wpi-s-desc">VIX · 黃金 · 油價避險情緒</div>
+        </div>
+      </div>
+
+      <!-- 中：錶盤 -->
+      <div class="wpi-gauge-wrap">
+        <svg class="wpi-arc" viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg">
+          <path d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="#1a2535" stroke-width="18" stroke-linecap="round"/>
+          <path d="M 20 110 A 90 90 0 0 1 65 33"  fill="none" stroke="#00ff88" stroke-width="18" stroke-linecap="round" opacity=".3"/>
+          <path d="M 65 33 A 90 90 0 0 1 110 20"  fill="none" stroke="#ffaa00" stroke-width="18" stroke-linecap="round" opacity=".3"/>
+          <path d="M 110 20 A 90 90 0 0 1 155 33" fill="none" stroke="#ff6600" stroke-width="18" stroke-linecap="round" opacity=".3"/>
+          <path d="M 155 33 A 90 90 0 0 1 200 110" fill="none" stroke="#ff2222" stroke-width="18" stroke-linecap="round" opacity=".3"/>
+          <path d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="url(#htmlWpiGrad)" stroke-width="18" stroke-linecap="round"
+            stroke-dasharray="0 283" id="html-wpi-arc" style="transition:stroke-dasharray 1.5s ease"/>
+          <defs>
+            <linearGradient id="htmlWpiGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%"   stop-color="#00ff88"/>
+              <stop offset="40%"  stop-color="#ffaa00"/>
+              <stop offset="70%"  stop-color="#ff6600"/>
+              <stop offset="100%" stop-color="#ff2222"/>
+            </linearGradient>
+          </defs>
+          <line id="html-wpi-needle" x1="110" y1="110" x2="110" y2="28"
+            stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"
+            style="transform-origin:110px 110px;transform:rotate(-90deg);transition:transform 1.5s ease"/>
+          <circle cx="110" cy="110" r="5" fill="#ffffff" opacity=".9"/>
+        </svg>
+        <div class="wpi-center">
+          <div class="wpi-num" id="html-wpi-num">0</div>
+          <div class="wpi-num-lbl">/ 100</div>
+          <div class="wpi-level" id="html-wpi-level">COMPUTING...</div>
+        </div>
+        <div class="wpi-scale">
+          <span style="color:#00ff88">0<br><small>LOW</small></span>
+          <span style="color:#ffaa00">50<br><small>MED</small></span>
+          <span style="color:#ff2222">100<br><small>MAX</small></span>
+        </div>
+        <div class="wpi-formula">WPI = 0.35<em>P</em> + 0.30<em>A</em> + 0.15<em>F</em> + 0.20<em>S</em></div>
+      </div>
+
+      <!-- 右：三級警戒 + 地區熱度 -->
+      <div class="wpi-alerts">
+        <div class="wpi-al-title">多重驗證警戒</div>
+        <div class="wpi-al-item" id="html-wpi-al-low">
+          <div class="wpi-al-dot low"></div>
+          <div><div class="wpi-al-name">低度警戒</div><div class="wpi-al-cond">僅 Polymarket 波動</div><div class="wpi-al-sub">可能是政治口水，無需行動</div></div>
+          <div class="wpi-al-status" id="html-wpi-al-low-st">—</div>
+        </div>
+        <div class="wpi-al-item" id="html-wpi-al-med">
+          <div class="wpi-al-dot med"></div>
+          <div><div class="wpi-al-name">中度警戒</div><div class="wpi-al-cond">市場波動 + 披薩指數上升</div><div class="wpi-al-sub">內部人員可能已開始加班</div></div>
+          <div class="wpi-al-status" id="html-wpi-al-med-st">—</div>
+        </div>
+        <div class="wpi-al-item" id="html-wpi-al-high">
+          <div class="wpi-al-dot high"></div>
+          <div><div class="wpi-al-name">高度警戒</div><div class="wpi-al-cond">以上皆有 + 大量加油機</div><div class="wpi-al-sub">軍事行動即將執行</div></div>
+          <div class="wpi-al-status" id="html-wpi-al-high-st">—</div>
+        </div>
+        <div class="wpi-al-title" style="margin-top:1rem">各地區熱度</div>
+        <div style="display:flex;flex-direction:column;gap:.3rem">
+          <div style="display:grid;grid-template-columns:70px 1fr 36px;align-items:center;gap:.4rem;font-family:'Share Tech Mono',monospace;font-size:.62rem"><span>俄烏衝突</span><div style="height:4px;background:rgba(255,255,255,.08)"><div style="width:78%;height:100%;background:#ff4444"></div></div><span style="color:#ff4444">78%</span></div>
+          <div style="display:grid;grid-template-columns:70px 1fr 36px;align-items:center;gap:.4rem;font-family:'Share Tech Mono',monospace;font-size:.62rem"><span>美伊對峙</span><div style="height:4px;background:rgba(255,255,255,.08)"><div style="width:65%;height:100%;background:#ffaa00"></div></div><span style="color:#ffaa00">65%</span></div>
+          <div style="display:grid;grid-template-columns:70px 1fr 36px;align-items:center;gap:.4rem;font-family:'Share Tech Mono',monospace;font-size:.62rem"><span>台海緊張</span><div style="height:4px;background:rgba(255,255,255,.08)"><div style="width:42%;height:100%;background:#00aaff"></div></div><span style="color:#00aaff">42%</span></div>
+          <div style="display:grid;grid-template-columns:70px 1fr 36px;align-items:center;gap:.4rem;font-family:'Share Tech Mono',monospace;font-size:.62rem"><span>中東地區</span><div style="height:4px;background:rgba(255,255,255,.08)"><div style="width:70%;height:100%;background:#ff4444"></div></div><span style="color:#ff4444">70%</span></div>
+          <div style="display:grid;grid-template-columns:70px 1fr 36px;align-items:center;gap:.4rem;font-family:'Share Tech Mono',monospace;font-size:.62rem"><span>南海爭議</span><div style="height:4px;background:rgba(255,255,255,.08)"><div style="width:35%;height:100%;background:#00ff88"></div></div><span style="color:#00ff88">35%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wpi-footer">
+      <span id="html-wpi-updated">⟳ 計算中…</span>
+      <span>·</span>
+      <span>Polymarket 35% · Aviation 30% · FIRMS 15% · Sentiment 20%</span>
+      <span>·</span>
+      <span style="color:rgba(255,255,255,.25)">僅供參考，非投資建議</span>
+    </div>
+  </div>
+
+  <!-- ══════════ PIZZINT 整合卡片 ══════════ -->
+  <div class="card pizza-bar-card" id="pizza-card">
+
+    <!-- 警報橫幅 -->
+    <div id="pizza-war-alert" style="display:none;position:relative;overflow:hidden;margin:-1.2rem -1.2rem 1.2rem;padding:1.2rem 1.5rem;background:linear-gradient(135deg,rgba(255,0,68,.15),rgba(255,68,0,.1));border-bottom:1px solid rgba(255,0,68,.4)">
+      <div style="position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,0,68,.1),transparent);animation:scan 3s linear infinite"></div>
+      <div style="display:flex;align-items:center;gap:.7rem;margin-bottom:.7rem">
+        <div style="font-family:'Orbitron',monospace;font-size:.7rem;font-weight:700;color:#ff0044;letter-spacing:3px">⚠ WAR ALERT</div>
+        <div style="font-family:'Orbitron',monospace;font-size:.65rem;letter-spacing:2px;color:var(--accent2)">PIZZINT ANOMALY DETECTED</div>
+        <div style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--text-dim)" id="alert-timestamp">--:--:-- UTC</div>
+      </div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.82rem;color:var(--accent2);line-height:1.6;margin-bottom:.8rem" id="alert-main-text">
+        🍕 Pizza DEFCON 異常升高 — 歷史上此訊號出現後 2–48 小時內曾發生軍事行動
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.8rem">
+        <div style="background:rgba(255,68,68,.1);border:1px solid rgba(255,68,68,.3);padding:.6rem;border-radius:4px">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim);margin-bottom:.3rem">觸發店家</div>
+          <div style="font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:700;color:var(--accent2)" id="triggered-shops">--</div>
+        </div>
+        <div style="background:rgba(255,68,68,.1);border:1px solid rgba(255,68,68,.3);padding:.6rem;border-radius:4px">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim);margin-bottom:.3rem">歷史符合率</div>
+          <div style="font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:700;color:var(--accent3)">~76%</div>
+        </div>
+      </div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim);line-height:1.8">
+        <div style="color:var(--accent2)">▶ Domino's Arlington 繁忙度較基準高出 <span id="anomaly-pct-1">--</span>%</div>
+        <div style="color:var(--accent3)">▶ Pentagon 周邊多店同步出現下班異常</div>
+        <div style="color:var(--accent3)">▶ 同時段 Polymarket 戰爭機率同步上升</div>
+      </div>
+      <div style="margin-top:.8rem;padding:.5rem .8rem;background:rgba(0,0,0,.3);font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim)">
+        ⚠ 偽陽性風險：財年截止、演習、重大體育賽事皆可能觸發。請交叉驗證 Polymarket 與 GDELT 數據。
+      </div>
+    </div>
+
+    <!-- 頭部：標題 + DEFCON 量尺 -->
+    <div class="pbi-header">
+      <div class="pbi-title-row">
+        <div>
+          <div class="section-title" style="margin:0 0 .2rem">🍕 Pentagon Pizza Index (PizzINT) <span style="font-family:'Share Tech Mono',monospace;font-size:.58rem;color:var(--text-dim);font-weight:400">+ 🍺 酒吧反向指標</span></div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim)">KGB 代號 PIZZINT · Google Maps Popular Times · 每小時更新 · Pentagon / 白宮 / CIA HQ 3英里</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-family:'Orbitron',monospace;font-size:.55rem;color:var(--text-dim);letter-spacing:2px">PIZZA DEFCON</div>
+          <div class="pizza-level-num" id="pizza-level-num" style="font-size:1.6rem;line-height:1">--</div>
+          <div class="pizza-level-label">⚠ ELEVATED</div>
+        </div>
+      </div>
+
+      <!-- DEFCON 量尺 -->
+      <div style="margin:.6rem 0 .8rem">
+        <div style="display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim);margin-bottom:.4rem">
+          <span>異常指數</span>
+          <span id="pizza-gauge-label" style="font-weight:700">--%</span>
+        </div>
+        <div style="height:10px;background:var(--bg3);border:1px solid var(--border);position:relative;border-radius:2px">
+          <div id="pizza-gauge-fill" style="height:100%;width:0%;background:linear-gradient(90deg,#004400,var(--accent3));border-radius:2px;transition:width .8s ease;position:relative">
+            <div style="position:absolute;right:0;top:0;bottom:0;width:4px;background:white;opacity:.9;border-radius:0 2px 2px 0"></div>
+          </div>
+          <div style="position:absolute;left:40%;top:0;bottom:0;width:1px;background:rgba(255,170,0,.5)"></div>
+          <div style="position:absolute;left:70%;top:0;bottom:0;width:1px;background:rgba(255,68,68,.5)"></div>
+        </div>
+        <div style="position:relative;height:28px;font-family:'Share Tech Mono',monospace;font-size:.52rem;color:var(--text-dim);margin-top:.2rem">
+          <span style="position:absolute;left:0">DEFCON 5 正常</span>
+          <span style="position:absolute;left:38%">DEFCON 4 偏高</span>
+          <span style="position:absolute;left:68%">DEFCON 3 警戒</span>
+          <span style="position:absolute;right:0">DEFCON 1 危機</span>
+        </div>
+      </div>
+
+      <!-- 說明 -->
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim);line-height:1.6;margin-bottom:.6rem">
+        冷戰時 KGB 監視五角大廈深夜外送作為早期預警。<strong style="color:var(--accent4)">反向邏輯</strong>：酒吧冷清＋Pizza 爆滿 → 五角大廈沒在慶祝，他們在策劃。
+      </div>
+
+      <!-- Cross-signal -->
+      <div id="bar-cross-signal" style="display:none;margin-bottom:.8rem;padding:.7rem 1rem;background:rgba(255,0,68,.08);border:1px solid rgba(255,0,68,.4);border-left:3px solid #ff0044;border-radius:0 4px 4px 0">
+        <div style="font-family:'Orbitron',monospace;font-size:.63rem;color:#ff4444;letter-spacing:2px;margin-bottom:.3rem">🚨 CROSS-SIGNAL CONFIRMED</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-primary);line-height:1.6">
+          Pizza 多店爆單 <strong style="color:#ff4444">同時</strong> 酒吧驟冷 — 歷史最強早期預警雙重訊號
+        </div>
+      </div>
+    </div>
+
+    <!-- 主體 2 欄：披薩店 / 酒吧 -->
+    <div class="pbi-grid">
+      <div>
+        <div class="section-title" style="font-size:.62rem">🍕 披薩店監控</div>
+        <div class="pizza-tracker-grid" id="pizza-shops-grid">
+          <div style="grid-column:span 2;text-align:center;padding:.8rem;font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim)">載入中…</div>
+        </div>
+      </div>
+      <div>
+        <div class="section-title" style="font-size:.62rem">🍺 酒吧反向監控</div>
+        <div class="bar-grid" id="bar-shops-grid">
+          <div style="grid-column:span 2;text-align:center;padding:.8rem;font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim)">載入中…</div>
+        </div>
+        <div style="margin-top:.4rem;font-family:'Share Tech Mono',monospace;font-size:.56rem;color:var(--text-dim);padding:.4rem .6rem;background:rgba(0,170,255,.04);border-left:2px solid rgba(0,170,255,.2)">
+          下班時段（ET 17:00-22:00）酒吧冷清 = 異常
+        </div>
+      </div>
+    </div>
+
+    <!-- 分隔線 -->
+    <div style="margin:.8rem 0;border-top:1px solid var(--border)"></div>
+
+    <!-- 歷史事件橫向捲動 chips -->
+    <div class="section-title" style="font-size:.62rem;margin-bottom:.4rem">🕐 歷史 PizzINT 事件</div>
+    <div class="ph-scroll">
+      <div class="ph-chip"><div class="ph-chip-year">1983</div><div class="ph-chip-event">格瑞那達入侵前夕</div><div class="ph-chip-tag">🍕 激增</div></div>
+      <div class="ph-chip"><div class="ph-chip-year">1990</div><div class="ph-chip-event">CIA 單夜訂 21 個披薩</div><div class="ph-chip-tag">🍕×21</div></div>
+      <div class="ph-chip"><div class="ph-chip-year">1991</div><div class="ph-chip-event">沙漠風暴 101 筆外送</div><div class="ph-chip-tag">🍕×101</div></div>
+      <div class="ph-chip"><div class="ph-chip-year">2003</div><div class="ph-chip-event">伊拉克戰爭前</div><div class="ph-chip-tag">🍕 確認</div></div>
+      <div class="ph-chip"><div class="ph-chip-year">2011</div><div class="ph-chip-event">擊斃賓拉登當夜</div><div class="ph-chip-tag">🍕🍕🍕</div></div>
+      <div class="ph-chip"><div class="ph-chip-year">2024-04-13</div><div class="ph-chip-event">伊朗無人機攻以</div><div class="ph-chip-tag">🍕 峰值</div></div>
+      <div class="ph-chip"><div class="ph-chip-year">2025-06-12</div><div class="ph-chip-event">以色列炸伊朗前 1h</div><div class="ph-chip-tag">🍕 確認</div></div>
+      <div class="ph-chip"><div class="ph-chip-year">2025-06-22</div><div class="ph-chip-event">川普宣布打擊伊朗</div><div class="ph-chip-tag">🍕 確認</div></div>
+      <div class="ph-chip"><div class="ph-chip-year">2026-01-02</div><div class="ph-chip-event">美軍馬杜羅行動前夜</div><div class="ph-chip-tag">🍕 確認</div></div>
+    </div>
+
+    <div style="margin-top:.6rem;text-align:right">
+      <a href="https://www.pizzint.watch" target="_blank" rel="noopener" style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--accent4)">→ pizzint.watch ↗</a>
+    </div>
+
+  </div><!-- /.pizza-bar-card -->
+
+  <!-- ══════════ POLYMARKET 獨立卡片 ══════════ -->
+  <div class="card poly-card" style="margin-bottom:1.5rem">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;flex-wrap:wrap;gap:.5rem">
+      <div class="section-title" style="margin:0">📊 Polymarket 戰爭預測市場</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim);display:flex;gap:.8rem;align-items:center">
+        <span style="color:var(--accent1)">⟳ 每 5 分鐘</span>
+        <span id="poly-updated-time">上次更新：載入中…</span>
+      </div>
+    </div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:.63rem;color:var(--text-dim);margin-bottom:.8rem;padding:.5rem .7rem;background:rgba(0,170,255,.05);border-left:2px solid var(--accent4)">
+      真實資金下注 · 準確率 <span style="color:var(--accent1)">94%</span>（事件前一個月）· 2025 年地緣政治交易量 <span style="color:var(--accent3)">$33B+</span>
+    </div>
+    <div class="poly-grid" id="poly-list-container">
+      <a href="https://polymarket.com" target="_blank" rel="noopener" style="text-decoration:none;color:inherit"><div class="poly-item high" style="cursor:pointer" onmouseover="this.style.borderLeftWidth='5px'" onmouseout="this.style.borderLeftWidth='3px'"><div class="poly-question">🇺🇦 俄烏停火：2026年底前達成協議？</div><div class="poly-bar-container"><span style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);width:24px">YES</span><div class="poly-bar"><div class="poly-fill" style="width:37%;background:linear-gradient(90deg,rgba(0,10,30,.8),var(--accent4))"></div></div><div class="poly-percent" style="color:var(--accent4)">37%</div></div><div class="poly-meta"><span>交易量 $10.5M</span><span style="color:var(--text-dim)">polymarket.com ↗</span></div></div></a>
+      <a href="https://polymarket.com" target="_blank" rel="noopener" style="text-decoration:none;color:inherit"><div class="poly-item high" style="cursor:pointer" onmouseover="this.style.borderLeftWidth='5px'" onmouseout="this.style.borderLeftWidth='3px'"><div class="poly-question">🇮🇷 美伊直接軍事衝突（2026）？</div><div class="poly-bar-container"><span style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);width:24px">YES</span><div class="poly-bar"><div class="poly-fill" style="width:28%;background:linear-gradient(90deg,rgba(0,10,30,.8),var(--accent4))"></div></div><div class="poly-percent" style="color:var(--accent4)">28%</div></div><div class="poly-meta"><span>川普：「正在考慮有限軍事行動」</span><span style="color:var(--text-dim)">polymarket.com ↗</span></div></div></a>
+      <a href="https://polymarket.com" target="_blank" rel="noopener" style="text-decoration:none;color:inherit"><div class="poly-item medium" style="cursor:pointer" onmouseover="this.style.borderLeftWidth='5px'" onmouseout="this.style.borderLeftWidth='3px'"><div class="poly-question">🇸🇴 美軍攻擊索馬利亞海盜？</div><div class="poly-bar-container"><span style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);width:24px">YES</span><div class="poly-bar"><div class="poly-fill" style="width:89%;background:linear-gradient(90deg,rgba(0,10,30,.8),var(--accent2))"></div></div><div class="poly-percent" style="color:var(--accent2)">89%</div></div><div class="poly-meta"><span>Hegseth 已授權擴打擊海盜</span><span style="color:var(--text-dim)">polymarket.com ↗</span></div></div></a>
+      <a href="https://polymarket.com" target="_blank" rel="noopener" style="text-decoration:none;color:inherit"><div class="poly-item" style="cursor:pointer" onmouseover="this.style.borderLeftWidth='5px'" onmouseout="this.style.borderLeftWidth='3px'"><div class="poly-question">🇹🇼 台海武裝衝突（2026年內）？</div><div class="poly-bar-container"><span style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);width:24px">YES</span><div class="poly-bar"><div class="poly-fill" style="width:12%;background:linear-gradient(90deg,rgba(0,10,30,.8),var(--accent4))"></div></div><div class="poly-percent" style="color:var(--accent4)">12%</div></div><div class="poly-meta"><span>市場波動較低，相對穩定</span><span style="color:var(--text-dim)">polymarket.com ↗</span></div></div></a>
+      <a href="https://polymarket.com" target="_blank" rel="noopener" style="text-decoration:none;color:inherit"><div class="poly-item medium" style="cursor:pointer" onmouseover="this.style.borderLeftWidth='5px'" onmouseout="this.style.borderLeftWidth='3px'"><div class="poly-question">☢️ 核武器在任何衝突中被使用（2026）？</div><div class="poly-bar-container"><span style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);width:24px">YES</span><div class="poly-bar"><div class="poly-fill" style="width:5%;background:linear-gradient(90deg,rgba(0,10,30,.8),var(--accent4))"></div></div><div class="poly-percent" style="color:var(--accent4)">5%</div></div><div class="poly-meta"><span>低機率高衝擊監控項目</span><span style="color:var(--text-dim)">polymarket.com ↗</span></div></div></a>
+      <a href="https://polymarket.com" target="_blank" rel="noopener" style="text-decoration:none;color:inherit"><div class="poly-item" style="cursor:pointer" onmouseover="this.style.borderLeftWidth='5px'" onmouseout="this.style.borderLeftWidth='3px'"><div class="poly-question">🌐 全球貿易戰升級為武裝衝突？</div><div class="poly-bar-container"><span style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);width:24px">YES</span><div class="poly-bar"><div class="poly-fill" style="width:8%;background:linear-gradient(90deg,rgba(0,10,30,.8),var(--accent4))"></div></div><div class="poly-percent" style="color:var(--accent4)">8%</div></div><div class="poly-meta"><span>關稅戰持續升溫</span><span style="color:var(--text-dim)">polymarket.com ↗</span></div></div></a>
+    </div>
+    <div style="margin-top:.8rem;padding:.6rem .8rem;background:rgba(0,170,255,.04);border:1px solid rgba(0,170,255,.15);font-family:'Share Tech Mono',monospace;font-size:.58rem;color:var(--text-dim)">
+      ⚠️ 僅供資訊參考，不構成投資建議。機率隨事件發展即時變動。
+    </div>
+  </div><!-- /.poly-card -->
+
+
+  <!-- Bottom 3-col grid -->
+  <div class="bottom-grid">
+
+    <!-- Active Conflicts -->
+    <div class="card conflict-card">
+      <div class="section-title">全球熱點衝突地圖</div>
+      <div class="conflict-list">
+        <div class="conflict-item">
+          <div>
+            <div class="conflict-region">🇺🇦 俄烏戰爭</div>
+            <div class="conflict-sub">持續進行 · 第3年 · 前線膠著</div>
+          </div>
+          <div class="risk-pill critical">ACTIVE WAR</div>
+        </div>
+        <div class="conflict-item">
+          <div>
+            <div class="conflict-region">🇮🇱 以巴 / 中東</div>
+            <div class="conflict-sub">加薩持續 · 伊朗代理人威脅</div>
+          </div>
+          <div class="risk-pill critical">ACTIVE</div>
+        </div>
+        <div class="conflict-item">
+          <div>
+            <div class="conflict-region">🇺🇸🇮🇷 美伊對峙</div>
+            <div class="conflict-sub">核談判失敗 · 軍事集結中</div>
+          </div>
+          <div class="risk-pill high">HIGH</div>
+        </div>
+        <div class="conflict-item">
+          <div>
+            <div class="conflict-region">🇸🇩 蘇丹內戰</div>
+            <div class="conflict-sub">RSF vs SAF · 人道危機</div>
+          </div>
+          <div class="risk-pill high">HIGH</div>
+        </div>
+        <div class="conflict-item">
+          <div>
+            <div class="conflict-region">🇰🇵 朝鮮半島</div>
+            <div class="conflict-sub">飛彈試射 · 北韓援俄</div>
+          </div>
+          <div class="risk-pill medium">ELEVATED</div>
+        </div>
+        <div class="conflict-item">
+          <div>
+            <div class="conflict-region">🇨🇳🇹🇼 台海</div>
+            <div class="conflict-sub">軍演頻率升高 · 紅線試探</div>
+          </div>
+          <div class="risk-pill medium">MEDIUM</div>
+        </div>
+        <div class="conflict-item">
+          <div>
+            <div class="conflict-region">🌊 南海爭議</div>
+            <div class="conflict-sub">菲律賓 / 越南 / 中國摩擦</div>
+          </div>
+          <div class="risk-pill elevated">WATCH</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OSINT Signals -->
+    <div class="card signal-card">
+      <div class="section-title">OSINT 情報訊號</div>
+      <div class="signal-list">
+        <a href="https://pizzint.watch" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;display:block">
+        <div class="signal-item" style="cursor:pointer" onmouseover="this.style.background='rgba(0,255,136,0.04)'" onmouseout="this.style.background=''">
+          <div class="signal-icon">🍕</div>
+          <div>
+            <div class="signal-text">PizzINT Watch：Pentagon 周邊 Pizza 店即時人流監控</div>
+            <div class="signal-time">即時 · <span class="signal-source">pizzint.watch ↗</span></div>
+          </div>
+        </div>
+        </a>
+        <a href="https://www.flightradar24.com" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;display:block">
+        <div class="signal-item" style="cursor:pointer" onmouseover="this.style.background='rgba(0,255,136,0.04)'" onmouseout="this.style.background=''">
+          <div class="signal-icon">✈️</div>
+          <div>
+            <div class="signal-text">ADSB 追蹤顯示中東地區 E-8C 地面監視機出現異常路徑</div>
+            <div class="signal-time">即時 · <span class="signal-source">FlightRadar24 ↗</span></div>
+          </div>
+        </div>
+        </a>
+        <a href="https://www.foxnews.com" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;display:block">
+        <div class="signal-item" style="cursor:pointer" onmouseover="this.style.background='rgba(0,255,136,0.04)'" onmouseout="this.style.background=''">
+          <div class="signal-icon">⚡</div>
+          <div>
+            <div class="signal-text">Polymarket：戰爭相關事件即時預測機率</div>
+            <div class="signal-time">即時 · <span class="signal-source">Polymarket ↗</span></div>
+          </div>
+        </div>
+        </a>
+        <a href="https://www.planet.com" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;display:block">
+        <div class="signal-item" style="cursor:pointer" onmouseover="this.style.background='rgba(0,255,136,0.04)'" onmouseout="this.style.background=''">
+          <div class="signal-icon">🛰️</div>
+          <div>
+            <div class="signal-text">商業衛星影像顯示波斯灣美軍艦隊集結規模為近年最大</div>
+            <div class="signal-time">即時 · <span class="signal-source">Planet Labs ↗</span></div>
+          </div>
+        </div>
+        </a>
+        <a href="https://www.38north.org" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;display:block">
+        <div class="signal-item" style="cursor:pointer" onmouseover="this.style.background='rgba(0,255,136,0.04)'" onmouseout="this.style.background=''">
+          <div class="signal-icon">📡</div>
+          <div>
+            <div class="signal-text">北韓短程彈道飛彈試射，疑為新型固燃快速發射型號</div>
+            <div class="signal-time">即時 · <span class="signal-source">38 North ↗</span></div>
+          </div>
+        </div>
+        </a>
+        <a href="https://www.tradingview.com/markets/currencies/quotes-gold/" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;display:block">
+        <div class="signal-item" style="cursor:pointer" onmouseover="this.style.background='rgba(0,255,136,0.04)'" onmouseout="this.style.background=''">
+          <div class="signal-icon">🏦</div>
+          <div>
+            <div class="signal-text">黃金價格突破 $3,100/oz，避險需求創歷史高位</div>
+            <div class="signal-time">即時 · <span class="signal-source">TradingView ↗</span></div>
+          </div>
+        </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Doomsday Clock -->
+    <div class="card nuclear-card">
+      <div class="section-title">末日時鐘 &amp; 核威脅</div>
+
+      <div class="doomsday-display">
+        <div class="clock-face">23:58:30</div>
+        <div class="clock-label">距離午夜（核戰）僅剩 90 秒</div>
+      </div>
+
+      <div class="midnight-bar">
+        <span>00:00</span>
+        <div class="midnight-track">
+          <div class="midnight-marker"></div>
+          <div class="midnight-needle"></div>
+        </div>
+        <span>MIDNIGHT</span>
+      </div>
+
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--text-dim);line-height:1.7;margin-bottom:1rem;">
+        由《原子科學家公報》設定。<span style="color:#cc44ff">2023年首次設定為90秒</span>，為1947年以來最近紀錄。俄烏核威脅、AI軍備競賽及氣候危機為主要考量。
+      </div>
+
+      <div class="section-title">核持有國警戒狀態</div>
+      <div style="display:flex;flex-direction:column;gap:0.5rem;">
+        <div style="display:grid;grid-template-columns:1fr auto;background:var(--bg3);border:1px solid var(--border);padding:0.6rem;gap:0.5rem;">
+          <div style="font-size:0.78rem;">🇷🇺 俄羅斯 — 核武威懾言論</div>
+          <div class="risk-pill critical">HIGH</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr auto;background:var(--bg3);border:1px solid var(--border);padding:0.6rem;gap:0.5rem;">
+          <div style="font-size:0.78rem;">🇺🇸 美國 — DEFCON 維持3級</div>
+          <div class="risk-pill medium">ALERT</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr auto;background:var(--bg3);border:1px solid var(--border);padding:0.6rem;gap:0.5rem;">
+          <div style="font-size:0.78rem;">🇨🇳 中國 — 核彈頭快速擴張中</div>
+          <div class="risk-pill high">HIGH</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr auto;background:var(--bg3);border:1px solid var(--border);padding:0.6rem;gap:0.5rem;">
+          <div style="font-size:0.78rem;">🇮🇳🇵🇰 印巴核對峙</div>
+          <div class="risk-pill medium">WATCH</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr auto;background:var(--bg3);border:1px solid var(--border);padding:0.6rem;gap:0.5rem;">
+          <div style="font-size:0.78rem;">🇮🇷 伊朗 — 濃縮鈾接近武器級</div>
+          <div class="risk-pill high">ELEVATED</div>
+        </div>
+      </div>
+
+      <div style="margin-top:1rem;padding:0.7rem;background:rgba(170,0,255,0.05);border:1px solid rgba(170,0,255,0.2);font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);">
+        ☢️ Polymarket 核武使用概率：5%（2026年）。低但非零。
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════ OSINT 進階三模組 ══════════ -->
+<style>
+/* ── OSINT 三模組共用 ─── */
+.osint-adv-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1.5rem; margin:0 2rem 1.5rem; align-items:stretch; }
+.osint-adv-hdr  { font-family:'Orbitron',monospace; font-size:.56rem; letter-spacing:3px; color:var(--text-dim); text-transform:uppercase; margin-bottom:1rem; padding-bottom:.5rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+.osint-updated  { font-family:'Share Tech Mono',monospace; font-size:.54rem; color:var(--text-dim); letter-spacing:0; }
+/* Aviation */
+.avi-counter    { display:grid; grid-template-columns:repeat(3,1fr); gap:.5rem; margin-bottom:1rem; }
+.avi-box        { background:var(--bg3); border:1px solid var(--border); padding:.6rem; text-align:center; }
+.avi-box-val    { font-family:'Orbitron',monospace; font-size:1.4rem; font-weight:700; line-height:1; }
+.avi-box-lbl    { font-family:'Share Tech Mono',monospace; font-size:.53rem; color:var(--text-dim); letter-spacing:1px; margin-top:.3rem; }
+.avi-list       { display:flex; flex-direction:column; gap:.35rem; }
+.avi-item       { display:grid; grid-template-columns:12px 1fr auto; align-items:center; gap:.5rem; padding:.45rem .55rem; background:var(--bg3); border:1px solid var(--border); font-family:'Share Tech Mono',monospace; font-size:.65rem; }
+.avi-dot        { width:8px; height:8px; border-radius:50%; }
+.avi-dot.tanker { background:#cc44ff; box-shadow:0 0 5px #cc44ff; }
+.avi-dot.awacs  { background:#ffaa00; box-shadow:0 0 5px #ffaa00; animation:blink-dot 1.2s infinite; }
+.avi-dot.uav    { background:#00aaff; box-shadow:0 0 5px #00aaff; }
+@keyframes blink-dot { 0%,100%{opacity:1} 50%{opacity:.3} }
+.avi-trend.up   { color:#ff4444; }
+.avi-trend.down { color:#00ff88; }
+/* FIRMS */
+.fire-summary   { display:grid; grid-template-columns:1fr 1fr; gap:.5rem; margin-bottom:1rem; }
+.fire-box       { background:var(--bg3); border:1px solid var(--border); padding:.6rem; text-align:center; }
+.fire-val       { font-family:'Orbitron',monospace; font-size:1.3rem; font-weight:700; }
+.fire-lbl       { font-family:'Share Tech Mono',monospace; font-size:.53rem; color:var(--text-dim); margin-top:.2rem; }
+.live-feed      { display:flex; flex-direction:column; gap:.35rem; max-height:250px; overflow-y:auto; }
+.live-feed::-webkit-scrollbar { width:3px; }
+.live-feed::-webkit-scrollbar-thumb { background:var(--border); }
+.feed-item      { display:flex; gap:.6rem; padding:.45rem .55rem; background:var(--bg3); border:1px solid var(--border); border-left:2px solid var(--border); font-family:'Share Tech Mono',monospace; font-size:.63rem; }
+.feed-item.fire  { border-left-color:#ff4444; }
+.feed-item.air   { border-left-color:#00aaff; }
+.feed-item.move  { border-left-color:#ffaa00; }
+.feed-item.cyber { border-left-color:#aa44ff; }
+.feed-time { color:var(--text-dim); white-space:nowrap; min-width:38px; font-size:.58rem; }
+.feed-text { flex:1; color:var(--text-primary); line-height:1.4; }
+.event-tags { display:flex; gap:.4rem; flex-wrap:wrap; margin-top:.7rem; padding-top:.5rem; border-top:1px solid var(--border); }
+.event-tag  { font-family:'Share Tech Mono',monospace; font-size:.56rem; padding:2px 5px; border:1px solid; }
+/* Finance */
+.fin-grid   { display:grid; grid-template-columns:1fr 1fr; gap:.5rem; margin-bottom:.8rem; }
+.fin-box    { background:var(--bg3); border:1px solid var(--border); padding:.65rem; }
+.fin-ticker { font-family:'Orbitron',monospace; font-size:.56rem; color:var(--text-dim); letter-spacing:2px; margin-bottom:.2rem; }
+.fin-price  { font-family:'Orbitron',monospace; font-size:1.05rem; font-weight:700; line-height:1; }
+.fin-change { font-family:'Share Tech Mono',monospace; font-size:.62rem; margin-top:.2rem; }
+.fin-change.up   { color:#ff4444; }
+.fin-change.down { color:#00ff88; }
+.fin-ma     { font-family:'Share Tech Mono',monospace; font-size:.53rem; color:var(--text-dim); margin-top:.15rem; }
+.fin-premium { margin-top:.7rem; padding:.55rem .65rem; background:rgba(255,170,0,.05); border:1px solid rgba(255,170,0,.2); font-family:'Share Tech Mono',monospace; font-size:.63rem; color:var(--text-dim); line-height:1.6; }
+.fin-stocks  { display:flex; flex-direction:column; gap:.3rem; margin-top:.7rem; }
+.fin-stock-row { display:grid; grid-template-columns:55px 1fr auto auto; align-items:center; gap:.5rem; padding:.4rem .5rem; background:var(--bg3); border:1px solid var(--border); font-family:'Share Tech Mono',monospace; font-size:.62rem; }
+.fin-sym  { color:#00aaff; font-weight:700; }
+.fin-name { color:var(--text-dim); font-size:.56rem; }
+.fin-px   { text-align:right; }
+.fin-chg  { text-align:right; font-size:.6rem; }
+.fin-chg.up   { color:#ff4444; }
+.fin-chg.down { color:#00ff88; }
+/* RWD */
+@media(max-width:1100px) { .osint-adv-grid { grid-template-columns:1fr 1fr; } }
+@media(max-width:800px)  { .osint-adv-grid { grid-template-columns:1fr; margin:0 1rem 1.5rem; } }
+</style>
+
+<div class="osint-adv-grid">
+
+  <!-- ✈️ A. 航空異常監控 -->
+  <div class="card" style="border-top:2px solid #cc44ff">
+    <div class="osint-adv-hdr">
+      <span>✈️ &nbsp;航空異常監控 (AVI)</span>
+      <span class="osint-updated" id="avi-updated">OpenSky Network</span>
+    </div>
+    <div class="avi-counter">
+      <div class="avi-box"><div class="avi-box-val" id="avi-tankers" style="color:#cc44ff">3</div><div class="avi-box-lbl">加油機</div></div>
+      <div class="avi-box"><div class="avi-box-val" id="avi-awacs"   style="color:#ffaa00">2</div><div class="avi-box-lbl">預警機</div></div>
+      <div class="avi-box"><div class="avi-box-val" id="avi-uav"     style="color:#00aaff">1</div><div class="avi-box-lbl">偵察無人機</div></div>
+    </div>
+    <div style="margin-bottom:.8rem;padding:.5rem .6rem;background:rgba(204,68,255,.06);border:1px solid rgba(204,68,255,.2);font-family:'Share Tech Mono',monospace;font-size:.63rem;color:var(--text-dim)">
+      較 7 日均值 <strong style="color:#ff4444;font-size:.82rem" id="avi-anomaly">--%</strong> &nbsp;·&nbsp; 7日均：<span id="avi-baseline">--</span> 架次/hr
+    </div>
+    <div class="avi-list" id="avi-list">
+      <div id="avi-list" style="text-align:center;padding:1.2rem;font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim)">⏳ 等待 OpenSky Network 資料…</div>
+    </div>
+    <div style="display:flex;gap:.8rem;flex-wrap:wrap;margin-top:.8rem;padding-top:.6rem;border-top:1px solid var(--border);font-family:'Share Tech Mono',monospace;font-size:.56rem;color:var(--text-dim)">
+      <span><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#cc44ff;margin-right:3px"></i>加油機</span>
+      <span><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ffaa00;margin-right:3px"></i>預警機</span>
+      <span><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#00aaff;margin-right:3px"></i>無人機</span>
+    </div>
+    <div style="margin-top:.5rem;text-align:right">
+      <a href="https://globe.adsbexchange.com" target="_blank" rel="noopener" style="font-family:'Share Tech Mono',monospace;font-size:.56rem;color:#00aaff">ADSB.Exchange ↗</a>
+      &nbsp;·&nbsp;
+      <a href="https://opensky-network.org" target="_blank" rel="noopener" style="font-family:'Share Tech Mono',monospace;font-size:.56rem;color:#00aaff">OpenSky ↗</a>
+    </div>
+  </div>
+
+  <!-- 🔥 B. 衝突熱點 FIRMS -->
+  <div class="card" style="border-top:2px solid #ff4444">
+    <div class="osint-adv-hdr">
+      <span>🔥 &nbsp;衝突熱點 (FIRMS)</span>
+      <span class="osint-updated" id="firms-updated">NASA FIRMS</span>
+    </div>
+    <div class="fire-summary">
+      <div class="fire-box"><div class="fire-val" id="firms-count" style="color:var(--text-dim)">--</div><div class="fire-lbl">24hr 衛星火點</div></div>
+      <div class="fire-box"><div class="fire-val" id="firms-delta" style="color:var(--text-dim)">--</div><div class="fire-lbl">vs 7日均值</div></div>
+    </div>
+    <div class="live-feed" id="firms-feed">
+      <div style="text-align:center;padding:1rem;font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim)">⏳ 連接 NASA FIRMS…</div>
+    </div>
+    <div class="event-tags">
+      <span class="event-tag" style="color:#ff4444;border-color:#ff4444;background:rgba(255,68,68,.08)">砲擊/爆炸 45%</span>
+      <span class="event-tag" style="color:#ffaa00;border-color:#ffaa00;background:rgba(255,170,0,.08)">部隊移動 30%</span>
+      <span class="event-tag" style="color:#aa44ff;border-color:#aa44ff;background:rgba(170,68,255,.08)">網路攻擊 15%</span>
+      <span class="event-tag" style="color:#00aaff;border-color:#00aaff;background:rgba(0,170,255,.08)">防空啟動 10%</span>
+    </div>
+    <div style="margin-top:.6rem;text-align:right">
+      <a href="https://firms.modaps.eosdis.nasa.gov/map/" target="_blank" rel="noopener" style="font-family:'Share Tech Mono',monospace;font-size:.56rem;color:#00aaff">NASA FIRMS 即時地圖 ↗</a>
+    </div>
+    <!-- NASA FIRMS WMS 靜態衛星圖（新版端點格式） -->
+    <a href="https://firms.modaps.eosdis.nasa.gov/map/" target="_blank" rel="noopener" style="display:block;margin-top:.8rem;text-decoration:none">
+      <img
+        src="https://firms.modaps.eosdis.nasa.gov/mapserver/wms/fires/a6f68613078dd3564264e6c72a298dcb/fires_viirs_snpp_24,fires_viirs_noaa20_24/triangle,triangle/3,2/255+50+50,255+180+0/?REQUEST=GetMap&WIDTH=600&HEIGHT=300&BBOX=-180,-90,180,90&version=1.1.1"
+        alt="NASA FIRMS 全球即時火點"
+        style="width:100%;height:auto;display:block;opacity:.85;border:1px solid rgba(255,68,68,.2)"
+        onerror="this.parentElement.style.display='none';document.getElementById('html-firms-fallback').style.display='block'"
+      >
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.55rem;color:var(--text-dim);margin-top:.3rem;text-align:center">
+        🛰️ VIIRS S-NPP + NOAA-20 · 24hr · 全球 · 點擊開啟互動地圖 ↗
+      </div>
+    </a>
+    <!-- 圖片載入失敗 fallback -->
+    <a id="html-firms-fallback" href="https://firms.modaps.eosdis.nasa.gov/map/" target="_blank" rel="noopener"
+       style="display:none;margin-top:.8rem;padding:.8rem;background:rgba(255,68,68,.06);border:1px solid rgba(255,68,68,.25);text-align:center;text-decoration:none">
+      <div style="font-size:1.1rem;margin-bottom:.3rem">🛰️</div>
+      <div style="font-family:'Orbitron',monospace;font-size:.62rem;color:#ff4444;letter-spacing:2px">開啟 NASA FIRMS 即時火點圖</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.56rem;color:var(--text-dim);margin-top:.2rem">VIIRS S-NPP · 24hr · 全球 ↗</div>
+    </a>
+  </div>
+
+  <!-- 💰 C. 經濟避險指標 -->
+  <div class="card" style="border-top:2px solid #00ff88">
+    <div class="osint-adv-hdr">
+      <span>💰 &nbsp;經濟避險指標 (FIN)</span>
+      <span class="osint-updated" id="fin-updated">Yahoo Finance</span>
+    </div>
+    <div class="fin-grid" id="fin-assets-grid">
+      <div class="fin-box"><div class="fin-ticker">GC=F</div><div class="fin-price" id="html-fin-gc" style="color:var(--text-dim)">--</div><div class="fin-change" id="html-fin-gc-chg">載入中</div><div class="fin-ma" id="html-fin-gc-ma">--</div></div>
+      <div class="fin-box"><div class="fin-ticker">BZ=F</div><div class="fin-price" id="html-fin-bz" style="color:var(--text-dim)">--</div><div class="fin-change" id="html-fin-bz-chg">載入中</div><div class="fin-ma" id="html-fin-bz-ma">--</div></div>
+      <div class="fin-box"><div class="fin-ticker">USD/CHF</div><div class="fin-price" id="html-fin-chf" style="color:var(--text-dim)">--</div><div class="fin-change" id="html-fin-chf-chg">載入中</div><div class="fin-ma" id="html-fin-chf-ma">--</div></div>
+      <div class="fin-box"><div class="fin-ticker">^VIX</div><div class="fin-price" id="html-fin-vix" style="color:var(--text-dim)">--</div><div class="fin-change" id="html-fin-vix-chg">載入中</div><div class="fin-ma" id="html-fin-vix-ma">--</div></div>
+    </div>
+    <div class="fin-premium">
+      ⛽ 油價戰爭溢價：布倫特較 30日均價高出
+      <strong style="color:#ffaa00;font-size:.82rem" id="fin-war-premium"> --</strong>
+      &nbsp;— 溢價超過 $8 通常代表市場已預期軍事行動
+    </div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:.58rem;color:var(--text-dim);margin:.65rem 0 .3rem;letter-spacing:2px">DEFENSE STOCKS</div>
+    <div class="fin-stocks" id="fin-stocks-list">
+      <div class="fin-stock-row"><div class="fin-sym">LMT</div><div class="fin-name">洛克希德馬丁</div><div class="fin-px" id="html-stk-lmt">--</div><div class="fin-chg" id="html-stk-lmt-c">--</div></div>
+      <div class="fin-stock-row"><div class="fin-sym">RTX</div><div class="fin-name">雷神技術</div><div class="fin-px" id="html-stk-rtx">--</div><div class="fin-chg" id="html-stk-rtx-c">--</div></div>
+      <div class="fin-stock-row"><div class="fin-sym">NOC</div><div class="fin-name">諾斯洛普</div><div class="fin-px" id="html-stk-noc">--</div><div class="fin-chg" id="html-stk-noc-c">--</div></div>
+      <div class="fin-stock-row"><div class="fin-sym">GD</div><div class="fin-name">通用動力</div><div class="fin-px" id="html-stk-gd">--</div><div class="fin-chg" id="html-stk-gd-c">--</div></div>
+    </div>
+    <div style="margin-top:.5rem;font-family:'Share Tech Mono',monospace;font-size:.54rem;color:var(--text-dim)">
+      🚨 = 無財報情況下異常漲幅，可能反映地緣政治張力
+    </div>
+    <div style="margin-top:.4rem;text-align:right">
+      <a href="https://finance.yahoo.com" target="_blank" rel="noopener" style="font-family:'Share Tech Mono',monospace;font-size:.56rem;color:#00aaff">Yahoo Finance ↗</a>
+    </div>
+  </div>
+
+</div><!-- /.osint-adv-grid -->
+  WARWATCH // 戰爭預測情報中心 &nbsp;|&nbsp; 資料來源：Polymarket · Bulletin of Atomic Scientists · Pentagon Pizza Report · @PenPizzaReport · 各開源情報平台 &nbsp;|&nbsp; 僅供資訊參考，不構成任何建議 &nbsp;|&nbsp; <!-- updated dynamically -->
+</footer>
+
+<script>
+// ─── UTC Clock ────────────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  const str = `${pad(now.getUTCHours())}:${pad(now.getUTCMinutes())}:${pad(now.getUTCSeconds())} UTC`;
+  document.getElementById('clock').textContent = str;
+  const alertTs = document.getElementById('alert-timestamp');
+  if (alertTs) alertTs.textContent = str;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ─── Animate meter bars ────────────────────────────────────
+document.querySelectorAll('.meter-fill').forEach(bar => {
+  const w = bar.style.width; bar.style.width = '0%';
+  setTimeout(() => { bar.style.width = w; }, 600);
+});
+// WPI 數字由 htmlWpiAnimNum() 驅動，不用 threat-num 假值
+
+
+// ═══════════════════════════════════════════════════════════════
+// 🍕 PIZZA ANOMALY ALERT ENGINE
+// ═══════════════════════════════════════════════════════════════
+
+// 披薩店資料 — 含「基準值」與「當前值」
+// busyness = 當前 Google Popular Times 百分比 (0-100)
+// baseline = 同時段正常水準（用於計算偏差率）
+// dist = 距離五角大廈距離
+const PIZZA_SHOPS_DATA = [
+  { name: "We The Pizza",          busyness: 0, baseline: 45, icon: "🍕", is_open: false, status: "closed" },
+  { name: "Pizzato Pizza",         busyness: 0, baseline: 40, icon: "🍕", is_open: false, status: "closed" },
+  { name: "Papa Johns Pizza",      busyness: 0, baseline: 38, icon: "🍕", is_open: false, status: "closed" },
+  { name: "Domino's Pizza",        busyness: 0, baseline: 35, icon: "🍕", is_open: false, status: "closed" },
+  { name: "Extreme Pizza",         busyness: 0, baseline: 30, icon: "🍕", is_open: false, status: "closed" },
+  { name: "District Pizza Palace", busyness: 0, baseline: 32, icon: "🍕", is_open: false, status: "closed" },
+];
+
+// 異常閾值設定
+const THRESHOLD = {
+  ELEVATED:  40,   // busyness > 40 → 偏高
+  HIGH:      60,   // busyness > 60 → 高度警戒
+  ANOMALY:   70,   // busyness > 70 → 異常（觸發戰爭警報）
+};
+
+// 多少家店異常才觸發紅色警報
+const ANOMALY_SHOPS_REQUIRED = 2;
+
+// 歷史符合率（依觸發店家數）
+const HISTORICAL_MATCH = { 1: '~42%', 2: '~63%', 3: '~76%', 4: '~91%' };
+
+// ─── 評估當前披薩狀態 ────────────────────────────────────────
+function evaluatePizzaStatus(shops) {
+  const anomalyShops = shops.filter(s => s.busyness >= THRESHOLD.ANOMALY);
+  const highShops    = shops.filter(s => s.busyness >= THRESHOLD.HIGH && s.busyness < THRESHOLD.ANOMALY);
+  const avg          = shops.reduce((a,s) => a + s.busyness, 0) / shops.length;
+
+  let level, levelZh, gaugeColor;
+  if (anomalyShops.length >= ANOMALY_SHOPS_REQUIRED) {
+    level = 'ANOMALY'; levelZh = '⚠ 戰爭預警'; gaugeColor = '#ff2200';
+  } else if (anomalyShops.length === 1 || highShops.length >= 2) {
+    level = 'HIGH'; levelZh = '⚠ 高度警戒'; gaugeColor = '#ff8800';
+  } else if (avg >= THRESHOLD.ELEVATED) {
+    level = 'ELEVATED'; levelZh = '▲ 偏高'; gaugeColor = '#ffaa00';
+  } else {
+    level = 'NORMAL'; levelZh = '● 正常'; gaugeColor = '#00ff88';
+  }
+
+  return { level, levelZh, gaugeColor, anomalyShops, highShops, avg };
+}
+
+// ─── 渲染披薩店格子 ──────────────────────────────────────────
+function renderPizzaShops(shops) {
+  const grid = document.getElementById('pizza-shops-grid');
+  grid.innerHTML = shops.map(shop => {
+    const isClosed   = shop.is_open === false || shop.status === 'closed';
+    const isAnomaly  = !isClosed && shop.busyness >= THRESHOLD.ANOMALY;
+    const isHigh     = !isClosed && shop.busyness >= THRESHOLD.HIGH && !isAnomaly;
+    const deviation  = shop.baseline ? Math.round(((shop.busyness - shop.baseline) / shop.baseline) * 100) : 0;
+    const devStr     = deviation > 0 ? `+${deviation}%` : `${deviation}%`;
+
+    let dotCls, statusColor, statusText;
+    if (isClosed) {
+      dotCls = 'normal'; statusColor = 'rgba(255,255,255,0.25)';
+      statusText = '⬛ CLOSED';
+    } else if (isAnomaly) {
+      dotCls = 'high'; statusColor = 'var(--accent2)';
+      statusText = `🚨 ANOMALY (${shop.busyness}%)`;
+    } else if (isHigh) {
+      dotCls = 'medium'; statusColor = 'var(--accent3)';
+      statusText = `⚠ ELEVATED (${shop.busyness}%)`;
+    } else {
+      dotCls = 'normal'; statusColor = 'var(--accent)';
+      statusText = `✓ NORMAL (${shop.busyness}%)`;
+    }
+
+    // Mini bar
+    const barColor = isClosed ? 'rgba(255,255,255,0.1)' : isAnomaly ? 'var(--accent2)' : isHigh ? 'var(--accent3)' : 'var(--accent)';
+
+    return `<div class="pizza-shop" style="${isClosed ? 'opacity:0.7;' : isAnomaly ? 'border-color:rgba(255,68,68,0.4);background:rgba(255,30,0,0.05);' : ''}">
+      <div class="shop-name" style="${isClosed ? 'color:rgba(255,255,255,0.4);' : ''}">${shop.icon} ${shop.name}</div>
+      <div class="shop-status">
+        <div class="status-dot ${dotCls}"></div>
+        <span style="color:${statusColor};font-size:0.65rem;">${statusText}</span>
+      </div>
+      <div style="margin-top:0.4rem;">
+        <div style="height:3px;background:var(--bg);border:1px solid var(--border);overflow:hidden;">
+          <div style="height:100%;width:${isClosed ? 0 : shop.busyness}%;background:${barColor};transition:width 1s;"></div>
+        </div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:rgba(255,255,255,0.25);margin-top:0.2rem;text-align:right;">
+          ${isClosed ? '目前未營業' : 'vs 基準 <span style=\"font-weight:700;\">' + devStr + '</span>'}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── 渲染警報橫幅 ─────────────────────────────────────────────
+function renderWarAlert(status, shops) {
+  const alertEl  = document.getElementById('pizza-war-alert');
+  const cardEl   = document.getElementById('pizza-card');
+  const normalHd = document.getElementById('pizza-normal-header');
+  const levelLbl = document.getElementById('alert-level-label');
+  const mainTxt  = document.getElementById('alert-main-text');
+  const shopsCnt = document.getElementById('alert-shops-count');
+  const bullets  = document.getElementById('alert-bullets');
+  const gaugeEl  = document.getElementById('pizza-gauge-fill');
+  const gaugePct = document.getElementById('pizza-gauge-pct');
+  const levelNum = document.getElementById('pizza-level-num');
+
+  const gaugeVal = Math.round(status.avg);
+  gaugeEl.style.width = gaugeVal + '%';
+  gaugePct.textContent = gaugeVal + '%';
+  gaugePct.style.color = status.gaugeColor;
+
+  if (levelNum) {
+    levelNum.textContent = status.levelZh;
+    levelNum.style.color = status.gaugeColor;
+  }
+
+  if (status.level === 'ANOMALY') {
+    // 顯示戰爭警報
+    alertEl.style.display = 'block';
+    cardEl.classList.add('anomaly');
+
+    const anomCount = status.anomalyShops.length;
+    const histMatch = HISTORICAL_MATCH[anomCount] || '~76%';
+
+    levelLbl.textContent = `CRITICAL ANOMALY — ${anomCount} 家店觸發`;
+    mainTxt.innerHTML = `🍕 披薩指數<strong style="color:var(--accent2)">嚴重異常</strong> — 歷史上此訊號出現後 <strong>2–48 小時</strong>內曾有軍事行動發生`;
+    shopsCnt.textContent = `${anomCount} / ${shops.length}`;
+
+    // 動態 bullet 列表
+    const topShop = [...shops].sort((a,b) => b.busyness - a.busyness)[0];
+    const topDev  = Math.round(((topShop.busyness - topShop.baseline) / topShop.baseline) * 100);
+    bullets.innerHTML = `
+      <div style="color:var(--accent2);">▶ ${topShop.name} 繁忙度較基準高出 <strong>+${topDev}%</strong></div>
+      <div style="color:var(--accent3);">▶ ${anomCount} 家店同時出現深夜異常高峰，交叉確認可信度提升</div>
+      <div style="color:var(--accent3);">▶ 歷史符合率：${histMatch}（${anomCount} 家店同時觸發時）</div>
+      <div style="color:var(--text-dim);">▶ 建議同步觀察：Polymarket 戰爭機率、FlightRadar24 軍機動態</div>`;
+
+    // 更新 header 警戒狀態
+    document.getElementById('alert-badge').style.borderColor = 'var(--accent2)';
+    document.getElementById('alert-badge').style.color = 'var(--accent2)';
+    document.getElementById('alert-badge').textContent = '🍕 PIZZA ANOMALY';
+
+  } else if (status.level === 'HIGH') {
+    alertEl.style.display = 'block';
+    cardEl.classList.remove('anomaly');
+    levelLbl.textContent = 'HIGH ACTIVITY';
+    mainTxt.innerHTML = `🍕 披薩指數<strong style="color:var(--accent3)">偏高</strong> — 多店出現高於平均的深夜訂單量，尚未達到歷史警戒門檻`;
+    shopsCnt.textContent = `${status.highShops.length + status.anomalyShops.length} / ${shops.length}`;
+    bullets.innerHTML = `
+      <div style="color:var(--accent3);">▶ 高活躍度店家：${status.highShops.concat(status.anomalyShops).map(s=>s.name).join('、')}</div>
+      <div style="color:var(--text-dim);">▶ 當前水準：偏高，但尚未達到 ANOMALY 閾值（需 ≥${THRESHOLD.ANOMALY}%）</div>
+      <div style="color:var(--text-dim);">▶ 建議持續觀察，若再有 1 家店升至異常，將升為戰爭警報</div>`;
+
+    document.getElementById('alert-badge').style.borderColor = 'var(--accent3)';
+    document.getElementById('alert-badge').style.color = 'var(--accent3)';
+    document.getElementById('alert-badge').textContent = '威脅 高度警戒';
+
+  } else {
+    // 正常狀態 — 隱藏警報
+    alertEl.style.display = 'none';
+    cardEl.classList.remove('anomaly');
+  }
+}
+
+// ─── 主初始化 ─────────────────────────────────────────────────
+function initPizzaSystem() {
+  const status = evaluatePizzaStatus(PIZZA_SHOPS_DATA);
+  renderPizzaShops(PIZZA_SHOPS_DATA);
+  renderWarAlert(status, PIZZA_SHOPS_DATA);
+}
+
+// ─── 模擬即時數據波動（每30秒更新一次模擬值）─────────────────
+// 實際部署時，改為從 API fetch Google Maps 數據
+// 基準快照，防止 busyness 隨機漂移
+const PIZZA_BASE = PIZZA_SHOPS_DATA.map(s => ({ ...s }));
+
+function simulateLiveUpdate() {
+  // 每次從基準值加 ±5 抖動，不累積
+  PIZZA_SHOPS_DATA.forEach((shop, i) => {
+    const base = PIZZA_BASE[i];
+    shop.busyness = Math.round(Math.max(0, Math.min(100,
+      base.busyness + (Math.random() * 10 - 5)
+    )));
+  });
+  const status = evaluatePizzaStatus(PIZZA_SHOPS_DATA);
+  renderPizzaShops(PIZZA_SHOPS_DATA);
+  renderWarAlert(status, PIZZA_SHOPS_DATA);
+  // 同步 WPI pizza state
+  HTML_WPI_STATE.pizza = PIZZA_SHOPS_DATA.map(s => ({ busyness: s.busyness }));
+  htmlWpiRender();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 🧮 WPI — 戰爭壓力指數計算引擎（HTML 版）
+// WPI = 0.35*P + 0.30*A + 0.15*F + 0.20*S
+// ═══════════════════════════════════════════════════════════════
+const HTML_WPI_WEIGHTS = { p:0.35, a:0.30, f:0.15, s:0.20 };
+
+// 靜態初始數據（對應 STATIC_AVIATION / STATIC_FINANCE）
+const HTML_WPI_STATE = {
+  poly:    [{ yes_pct:37, volume:10500000 },{ yes_pct:28, volume:8200000 },{ yes_pct:89, volume:5100000 },{ yes_pct:12, volume:4700000 },{ yes_pct:5, volume:3200000 }],
+  avi:     { summary:{ anomaly_pct:20 } },
+  firms:   { fire_delta:'0%' },
+  finance: { assets:[] },
+  pizza:   [{ busyness:89 },{ busyness:71 },{ busyness:76 },{ busyness:82 }]
+};
+
+function htmlWpiComputeScores() {
+  // P
+  const poly = HTML_WPI_STATE.poly;
+  const totalVol = poly.reduce((s,m) => s+(m.volume||1), 0);
+  const pScore = Math.min(100, Math.max(0, poly.reduce((s,m) => s+(m.yes_pct||0)*(m.volume||1), 0) / totalVol));
+
+  // A
+  const ap = HTML_WPI_STATE.avi.summary?.anomaly_pct ?? 114;
+  const aScore = Math.min(100, Math.max(0, ap / 2));
+
+  // F
+  const delta = parseFloat((HTML_WPI_STATE.firms.fire_delta||'0%').replace('%','')) || 0;
+  const fScore = Math.min(100, Math.max(0, 50 + delta * 0.5));
+
+  // S
+  const comps = [];
+  (HTML_WPI_STATE.finance.assets||[]).forEach(a => {
+    const dev = a.ma30 > 0 ? (a.price - a.ma30) / a.ma30 * 100 : 0;
+    if (a.ticker==='^VIX')     comps.push(Math.min(100,Math.max(0, 50+dev)));
+    if (a.ticker==='GC=F')     comps.push(Math.min(100,Math.max(0, 50+dev*2)));
+    if (a.ticker==='BZ=F')     comps.push(Math.min(100,Math.max(0, 50+dev*1.5)));
+    if (a.ticker==='USDCHF=X') comps.push(Math.min(100,Math.max(0, 50-dev*3)));
+  });
+  const sScore = comps.length ? comps.reduce((s,v)=>s+v,0)/comps.length : 55;
+
+  return { p:pScore, a:aScore, f:fScore, s:sScore };
+}
+
+function htmlWpiCalc(sc) {
+  return Math.round(sc.p*HTML_WPI_WEIGHTS.p + sc.a*HTML_WPI_WEIGHTS.a + sc.f*HTML_WPI_WEIGHTS.f + sc.s*HTML_WPI_WEIGHTS.s);
+}
+
+function htmlWpiLevel(wpi) {
+  if (wpi>=80) return { label:'CRITICAL', cls:'critical', color:'#ff00ff' };
+  if (wpi>=65) return { label:'HIGH',     cls:'high',     color:'#ff2222' };
+  if (wpi>=45) return { label:'ELEVATED', cls:'medium',   color:'#ffaa00' };
+  if (wpi>=25) return { label:'MODERATE', cls:'low',      color:'#ffcc44' };
+  return               { label:'LOW',     cls:'low',      color:'#00ff88' };
+}
+
+function htmlWpiAnimNum(target) {
+  const el = document.getElementById('html-wpi-num'); if(!el) return;
+  let cur = parseInt(el.textContent)||0;
+  const step = () => {
+    if(cur===target) return;
+    cur += cur<target ? Math.min(2,target-cur) : -Math.min(2,cur-target);
+    el.textContent = cur; requestAnimationFrame(step);
+  };
+  step();
+}
+
+function htmlWpiRender() {
+  const sc    = htmlWpiComputeScores();
+  const wpi   = htmlWpiCalc(sc);
+  const level = htmlWpiLevel(wpi);
+  const pizza = HTML_WPI_STATE.pizza;
+  const pizzaHigh = pizza.some(s => (s.busyness||0) >= 70);
+  const alts  = { low: sc.p>=40, med: sc.p>=40 && pizzaHigh, high: sc.p>=40 && pizzaHigh && sc.a>=50 };
+
+  // 數字 + 錶盤
+  htmlWpiAnimNum(wpi);
+  const arc = document.getElementById('html-wpi-arc');
+  if (arc) arc.setAttribute('stroke-dasharray', `${(wpi/100)*283} 283`);
+  const needle = document.getElementById('html-wpi-needle');
+  if (needle) needle.style.transform = `rotate(${-90+(wpi/100)*180}deg)`;
+
+  // 等級
+  const lvl = document.getElementById('html-wpi-level');
+  if (lvl) { lvl.textContent = level.label; lvl.style.color = level.color; }
+  const badge = document.getElementById('html-wpi-badge');
+  if (badge) badge.className = `wpi-badge ${level.cls}`;
+  const badgeTxt = document.getElementById('html-wpi-badge-text');
+  if (badgeTxt) badgeTxt.textContent = level.label;
+
+  // 子指標
+  [
+    { key:'p', pfx:'html-wpi-p', desc:`Polymarket 加權平均 ${sc.p.toFixed(1)}%` },
+    { key:'a', pfx:'html-wpi-a', desc:`航空異常指數 ${sc.a.toFixed(1)}%` },
+    { key:'f', pfx:'html-wpi-f', desc:`FIRMS 火點異常 ${sc.f.toFixed(1)}%` },
+    { key:'s', pfx:'html-wpi-s', desc:`金融情緒指數 ${sc.s.toFixed(1)}%` },
+  ].forEach(f => {
+    const score = sc[f.key];
+    const col   = score>=70?'#ff4444':score>=45?'#ffaa00':'#00ff88';
+    const fill  = document.getElementById(`${f.pfx}-fill`);
+    const val   = document.getElementById(`${f.pfx}-val`);
+    const desc  = document.getElementById(`${f.pfx}-desc`);
+    if (fill) { fill.style.width=`${score}%`; fill.style.background=`linear-gradient(90deg,#004,${col})`; }
+    if (val)  { val.textContent=Math.round(score); val.style.color=col; }
+    if (desc) desc.textContent = f.desc;
+  });
+
+  // 三級警戒
+  [
+    { id:'html-wpi-al-low',  stId:'html-wpi-al-low-st',  trig:alts.low,  hiCls:false, st:alts.low ?'✓ 觸發':'—' },
+    { id:'html-wpi-al-med',  stId:'html-wpi-al-med-st',  trig:alts.med,  hiCls:false, st:alts.med ?'⚠ 觸發':'—' },
+    { id:'html-wpi-al-high', stId:'html-wpi-al-high-st', trig:alts.high, hiCls:true,  st:alts.high?'🚨 觸發':'—' },
+  ].forEach(al => {
+    const el = document.getElementById(al.id);
+    const st = document.getElementById(al.stId);
+    if (el) {
+      el.className = `wpi-al-item${al.trig?' triggered':''}`;
+      if (al.trig) el.style.borderLeftColor = al.hiCls ? '#ff4444' : '#ffaa00';
+    }
+    if (st) { st.textContent=al.st; st.style.color=al.trig?(al.hiCls?'#ff4444':'#ffaa00'):''; }
+  });
+
+  // 時間戳
+  const ts = document.getElementById('html-wpi-updated');
+  if (ts) ts.textContent = `⟳ WPI 上次計算：${new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'})}`;
+}
+
+// 啟動 WPI
+setTimeout(htmlWpiRender, 400);
+setInterval(htmlWpiRender, 10 * 60 * 1000);
+
+// 啟動
+initPizzaSystem();
+setInterval(simulateLiveUpdate, 30000);  // 每30秒模擬更新
+
+// ═══════════════════════════════════════════════════════════════
+// ✈️  航空異常 / 🔥 FIRMS / 💰 Finance — 模擬即時更新
+// ═══════════════════════════════════════════════════════════════
+
+// 靜態初始資料（後端連線前使用）
+const STATIC_AVIATION = {
+  summary: { tankers:0, awacs:0, uav:0, baseline_7d:0, anomaly_pct:0, total:0 },
+  aircraft: []
+};
+
+const STATIC_FINANCE = {
+  assets:[
+    { ticker:'GC=F',     name:'黃金',     price:0, change:0,  ma30:0  },
+    { ticker:'BZ=F',     name:'布倫特油', price:0, change:0, ma30:0  },
+    { ticker:'USDCHF=X', name:'USD/CHF',  price:0.7678,  change:-0.64, ma30:0.810 },
+    { ticker:'^VIX',     name:'恐慌指數', price:0, change:0, ma30:0 },
+  ],
+  stocks:[
+    { sym:'LMT', name:'洛克希德馬丁', price:0, change:0, flag:false },
+    { sym:'RTX', name:'雷神技術',     price:0, change:0, flag:false },
+    { sym:'NOC', name:'諾斯洛普',     price:0, change:0, flag:false },
+    { sym:'GD',  name:'通用動力',     price:0, change:0, flag:false },
+  ],
+  war_premium_oil: 0
+};
+
+// ── 航空：每30分鐘微幅模擬波動 ────────────────────────────────
+function simulateAviation() {
+  const d  = STATIC_AVIATION;
+  const el = (id) => document.getElementById(id);
+  const hasData = d.summary.total > 0 || d.aircraft.length > 0;
+  if (el('avi-tankers'))  el('avi-tankers').textContent  = hasData ? d.summary.tankers       : '--';
+  if (el('avi-awacs'))    el('avi-awacs').textContent    = hasData ? d.summary.awacs         : '--';
+  if (el('avi-uav'))      el('avi-uav').textContent      = hasData ? d.summary.uav           : '--';
+  if (el('avi-anomaly'))  el('avi-anomaly').textContent  = hasData ? '+'+d.summary.anomaly_pct+'%' : '--%';
+  if (el('avi-baseline')) el('avi-baseline').textContent = hasData ? d.summary.baseline_7d   : '--';
+  const listEl = document.getElementById('avi-list');
+  if (listEl) {
+    if (!hasData) {
+      listEl.innerHTML = `<div style="text-align:center;padding:1.2rem;font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim)">⏳ 等待 OpenSky Network 資料…</div>`;
+    } else {
+      const roleLabel = {tanker:'加油機',awacs:'預警機',uav:'偵察機'};
+      listEl.innerHTML = d.aircraft.map(ac => {
+        const up = ac.trend.startsWith('+');
+        return `<div class="avi-item"><div class="avi-dot ${ac.role}"></div><div><div style="font-size:.7rem;color:var(--text-primary)">${ac.callsign} <span style="color:var(--text-dim);font-size:.58rem">${ac.type}</span></div><div style="color:var(--text-dim);font-size:.58rem">${ac.region} · ${roleLabel[ac.role]||ac.role} · ${ac.alt_ft.toLocaleString()}ft</div></div><div class="avi-trend ${up?'up':'down'}">${ac.trend}</div></div>`;
+      }).join('');
+    }
+  }
+  if (el('avi-updated')) el('avi-updated').textContent = hasData
+    ? '更新：' + new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'})
+    : '等待資料…';
+  HTML_WPI_STATE.avi = d;
+  htmlWpiRender();
+}
+
+// ── 金融：每10分鐘微幅波動 ────────────────────────────────────
+// 基準值快照（防止累積漂移）
+const FINANCE_BASE = STATIC_FINANCE.assets.map(a => ({ ...a }));
+
+function simulateFinance() {
+  const idMap = {
+    'GC=F':'html-fin-gc', 'BZ=F':'html-fin-bz',
+    'USDCHF=X':'html-fin-chf', '^VIX':'html-fin-vix'
+  };
+  FINANCE_BASE.forEach((base, i) => {
+    if (!base.price) return;  // 無資料時跳過，保持 --
+    const jitter = (Math.random() - 0.5) * 0.1;
+    const price  = base.price * (1 + jitter / 100);
+    const chg    = +(base.change + jitter * 0.1).toFixed(2);
+    const devPct = base.ma30 ? +((price - base.ma30)/base.ma30*100).toFixed(1) : 0;
+    const pid    = idMap[base.ticker];
+    const pxEl   = pid ? document.getElementById(pid) : null;
+    const chEl   = pid ? document.getElementById(pid+'-chg') : null;
+    const maEl   = pid ? document.getElementById(pid+'-ma') : null;
+    const fmtPx  = base.ticker === 'USDCHF=X' ? price.toFixed(4) : price.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2});
+    if (pxEl) { pxEl.textContent = fmtPx; pxEl.style.color = chg>=0?'#ffaa00':'#00ff88'; }
+    if (chEl) { chEl.textContent = (chg>=0?'+':'')+chg+'% 24h'; chEl.className='fin-change '+(chg>=0?'up':'down'); }
+    if (maEl) { maEl.innerHTML = '30MA偏離 '+(devPct>=0?'+':'')+devPct+'%'+(Math.abs(devPct)>5?' <span style="color:#ffaa00">⚠</span>':''); }
+    if (HTML_WPI_STATE.finance.assets[i]) HTML_WPI_STATE.finance.assets[i].price = price;
+  });
+  // 軍工股（price=0 時跳過）
+  const stkIds = ['lmt','rtx','noc','gd'];
+  STATIC_FINANCE.stocks.forEach((s,i) => {
+    if (!s.price) return;
+    const jitter = (Math.random()-0.5)*0.1;
+    const price  = +(s.price*(1+jitter/100)).toFixed(2);
+    const chg    = +(s.change+jitter*0.1).toFixed(2);
+    const pxEl = document.getElementById('html-stk-'+stkIds[i]);
+    const chEl = document.getElementById('html-stk-'+stkIds[i]+'-c');
+    if (pxEl) pxEl.textContent = price.toFixed(2);
+    if (chEl) { chEl.textContent=(chg>=0?'+':'')+chg+'%'+(s.flag?' 🚨':''); chEl.className='fin-chg '+(chg>=0?'up':'down'); }
+  });
+  const finTs = document.getElementById('fin-updated');
+  if (finTs) finTs.textContent = '更新：' + new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+  htmlWpiRender();
+}
+
+// 首次載入 + 定時刷新
+simulateAviation();  setInterval(simulateAviation,  30 * 60 * 1000);
+simulateFinance();   setInterval(simulateFinance,   10 * 60 * 1000);
+// FIRMS feed 每 15 分鐘更新時間戳（內容由靜態資料維護）
+setInterval(() => {
+  const t = document.getElementById('firms-updated');
+  if (t) t.textContent = '更新：' + new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+}, 15 * 60 * 1000);
+
+
+
+// ═══════════════════════════════════════════════════════════════
+// 🍺 酒吧反向指標
+// ═══════════════════════════════════════════════════════════════
+const BAR_SHOPS_DATA = [
+  { name: 'Crystal City Sports Pub', icon: '🍺', is_open: false, status: 'closed', busyness: 0, is_quiet: false },
+  { name: "McNamara's Pub",          icon: '🍺', is_open: false, status: 'closed', busyness: 0, is_quiet: false },
+  { name: 'Banditos Bar',            icon: '🍺', is_open: false, status: 'closed', busyness: 0, is_quiet: false },
+  { name: 'HIGHLINE RxR',            icon: '🍺', is_open: false, status: 'closed', busyness: 0, is_quiet: false },
+  { name: 'Continental Pool Lounge', icon: '🍺', is_open: false, status: 'closed', busyness: 0, is_quiet: false },
+];
+
+function renderBars(bars) {
+  const grid = document.getElementById('bar-shops-grid');
+  if (!grid) return;
+  grid.innerHTML = bars.map(bar => {
+    const isClosed = bar.is_open === false || bar.status === 'closed';
+    const isQuiet  = !isClosed && bar.is_quiet === true;
+    let statusColor, statusText, dotCls;
+    if (isClosed) {
+      statusColor = 'rgba(255,255,255,0.25)'; statusText = '⬛ CLOSED'; dotCls = 'normal';
+    } else if (isQuiet) {
+      statusColor = 'var(--accent)'; statusText = `⚠ 異常冷清 (${bar.busyness}%)`; dotCls = 'medium';
+    } else {
+      statusColor = 'var(--accent)'; statusText = `✓ 正常 (${bar.busyness}%)`; dotCls = 'normal';
+    }
+    const barColor = isQuiet ? 'var(--accent)' : isClosed ? 'rgba(255,255,255,0.08)' : 'rgba(0,170,255,0.5)';
+    return `<div class="bar-shop${isQuiet ? ' quiet' : ''}${isClosed ? ' closed' : ''}">
+      <div style="font-size:0.72rem;font-weight:600;margin-bottom:0.3rem;color:${isClosed ? 'rgba(255,255,255,0.4)' : 'var(--text-primary)'}">
+        ${bar.icon} ${bar.name}
+      </div>
+      <div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.3rem;">
+        <div class="status-dot ${dotCls}" style="width:6px;height:6px;border-radius:50%;background:${statusColor};flex-shrink:0;"></div>
+        <span style="color:${statusColor};font-size:0.6rem;font-family:'Share Tech Mono',monospace">${statusText}</span>
+      </div>
+      <div style="height:3px;background:var(--bg);border:1px solid var(--border);overflow:hidden;border-radius:2px;">
+        <div style="height:100%;width:${isClosed ? 0 : bar.busyness}%;background:${barColor};transition:width 1s;"></div>
+      </div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.56rem;color:rgba(255,255,255,0.25);margin-top:0.2rem;text-align:right;">
+        ${isClosed ? '目前未營業' : isQuiet ? '⚠ 下班時段應忙卻冷清' : '正常客流'}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Cross-signal：pizza 多店爆單 + 酒吧冷清
+  const pizzaBusy = PIZZA_SHOPS_DATA.filter(s => s.is_open !== false && s.busyness >= 70).length;
+  const barQuiet  = bars.filter(b => b.is_open !== false && b.is_quiet).length;
+  const crossEl   = document.getElementById('bar-cross-signal');
+  if (crossEl) crossEl.style.display = (pizzaBusy >= 2 && barQuiet >= 2) ? 'block' : 'none';
+}
+
+// 初始渲染
+renderBars(BAR_SHOPS_DATA);
+
+// ═══════════════════════════════════════════════════════════════
+// 🌐 真實 API Fetchers（透過 allorigins CORS proxy）
+// ═══════════════════════════════════════════════════════════════
+
+async function fetchFinanceData() {
+  const tickers = ['GC=F','BZ=F','USDCHF=X','^VIX','LMT','RTX','NOC','GD'];
+  const idMap = {
+    'GC=F':    { el:'html-fin-gc',  chg:'html-fin-gc-chg',  ma:'html-fin-gc-ma',  ma30:4980  },
+    'BZ=F':    { el:'html-fin-bz',  chg:'html-fin-bz-chg',  ma:'html-fin-bz-ma',  ma30:67.5  },
+    'USDCHF=X':{ el:'html-fin-chf', chg:'html-fin-chf-chg', ma:'html-fin-chf-ma', ma30:0.810 },
+    '^VIX':    { el:'html-fin-vix', chg:'html-fin-vix-chg', ma:'html-fin-vix-ma', ma30:16.2  },
+  };
+  const stkMap = { 'LMT':'lmt','RTX':'rtx','NOC':'noc','GD':'gd' };
+  try {
+    const sym = encodeURIComponent(tickers.join(','));
+    const yUrl = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${sym}&fields=regularMarketPrice,regularMarketChangePercent`;
+    const url = `https://api.allorigins.win/get?url=${encodeURIComponent(yUrl)}`;
+    const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
+    const wrapper = await res.json();
+    const quotes = JSON.parse(wrapper.contents)?.quoteResponse?.result || [];
+    const finAssets = [];
+    quotes.forEach(q => {
+      const price = q.regularMarketPrice;
+      const chgPct = +(q.regularMarketChangePercent||0).toFixed(2);
+      if (idMap[q.symbol]) {
+        const m = idMap[q.symbol];
+        const devPct = m.ma30 ? +((price-m.ma30)/m.ma30*100).toFixed(1) : 0;
+        const fmt = q.symbol==='USDCHF=X' ? price.toFixed(4) : price.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2});
+        const col = chgPct>=0?'#ffaa00':'#00ff88';
+        const pxEl=document.getElementById(m.el), chEl=document.getElementById(m.chg), maEl=document.getElementById(m.ma);
+        if (pxEl){pxEl.textContent=fmt; pxEl.style.color=col;}
+        if (chEl){chEl.textContent=(chgPct>=0?'+':'')+chgPct+'% 24h'; chEl.className='fin-change '+(chgPct>=0?'up':'down');}
+        if (maEl){maEl.innerHTML='30MA偏離 '+(devPct>=0?'+':'')+devPct+'%'+(Math.abs(devPct)>5?' <span style=\"color:#ffaa00\">⚠</span>':'');}
+        finAssets.push({ticker:q.symbol, price, ma30:m.ma30, change:chgPct});
+        if (q.symbol==='BZ=F'&&m.ma30){
+          const prem=+(price-m.ma30).toFixed(2);
+          const el=document.getElementById('fin-war-premium');
+          if (el){el.textContent=(prem>=0?'+$':'-$')+Math.abs(prem)+'/bbl'; el.style.color=prem>5?'#ff4444':'#ffaa00';}
+        }
+      }
+      if (stkMap[q.symbol]) {
+        const id=stkMap[q.symbol];
+        const pxEl=document.getElementById('html-stk-'+id), chEl=document.getElementById('html-stk-'+id+'-c');
+        if (pxEl) pxEl.textContent=price.toFixed(2);
+        if (chEl){const flag=(q.symbol==='NOC'&&chgPct>4)?' 🚨':''; chEl.textContent=(chgPct>=0?'+':'')+chgPct+'%'+flag; chEl.className='fin-chg '+(chgPct>=0?'up':'down');}
+      }
+    });
+    if (finAssets.length) { HTML_WPI_STATE.finance.assets=finAssets; }
+    const ts=document.getElementById('fin-updated');
+    if (ts) ts.textContent='更新：'+new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+    htmlWpiRender();
+  } catch(e) { console.warn('Finance fetch failed:',e.message); }
+}
+
+async function fetchPolymarketLive() {
+  try {
+    const res = await fetch('https://gamma-api.polymarket.com/markets?active=true&closed=false&limit=200',{signal:AbortSignal.timeout(10000)});
+    if (!res.ok) throw new Error();
+    const raw = await res.json();
+    const markets = Array.isArray(raw)?raw:(raw.data||[]);
+    const kw = ['ukraine','russia','iran','taiwan','nuclear','war','military','strike','attack','conflict'];
+    const filtered = markets.filter(m=>kw.some(k=>(m.question||'').toLowerCase().includes(k))).slice(0,8);
+    if (filtered.length) {
+      HTML_WPI_STATE.poly = filtered.map(m=>{
+        let yes=50;
+        try{yes=parseFloat(JSON.parse(m.outcomePrices||'["0.5"]')[0])*100;}catch(e){}
+        return {yes_pct:yes,volume:m.volume||1};
+      });
+      htmlWpiRender();
+    }
+  } catch(e){console.warn('Polymarket fetch failed');}
+}
+
+async function fetchFirmsEvents() {
+  try {
+    const url='https://api.allorigins.win/get?url='+encodeURIComponent('https://eonet.gsfc.nasa.gov/api/v3/events?status=open&days=1&limit=100');
+    const res=await fetch(url,{signal:AbortSignal.timeout(12000)});
+    const data=JSON.parse((await res.json()).contents);
+    const events=(data.events||[]);
+    const count=events.length;
+    const countEl=document.getElementById('firms-count');
+    if (countEl&&count>0){countEl.textContent=count; countEl.style.color='#ff4444';}
+    const delta=count>100?'+20%':count>70?'+10%':count>40?'+2%':'0%';
+    const deltaEl=document.getElementById('firms-delta');
+    if (deltaEl){deltaEl.textContent=delta; deltaEl.style.color=delta.startsWith('+')?'#ff4444':'#00ff88';}
+    HTML_WPI_STATE.firms={fire_delta:delta};
+    // 更新 live feed
+    const feed=document.getElementById('firms-feed');
+    if (feed&&events.length){
+      const typeIcon={Wildfires:'🔥',Volcanoes:'🌋',SevereStorms:'⚡',SeaLakeIce:'❄️',Earthquakes:'🌊'};
+      feed.innerHTML=events.slice(0,6).map(ev=>{
+        const cat=ev.categories?.[0]?.title||'event';
+        const icon=typeIcon[cat]||'⚡';
+        const region=ev.title||'未知區域';
+        const time=ev.geometries?.[0]?.date?new Date(ev.geometries[0].date).toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'}):'--:--';
+        return `<div class="feed-item fire"><div class="feed-time">${time}</div><div><div class="feed-text">${icon} <strong>${region}</strong> — ${cat}</div></div></div>`;
+      }).join('');
+    }
+    htmlWpiRender();
+  } catch(e){console.warn('FIRMS/EONET fetch failed');}
+}
+
+// 初始化：給 WPI 預設值避免卡在 COMPUTING
+(async()=>{
+  htmlWpiRender();  // 用現有預設值跑一次
+  fetchPolymarketLive();
+  fetchFinanceData();
+  fetchFirmsEvents();
+  setInterval(fetchFinanceData,    10*60*1000);
+  setInterval(fetchPolymarketLive,  5*60*1000);
+  setInterval(fetchFirmsEvents,    15*60*1000);
+})();
+
+</script>
+
+</body>
+</html>
