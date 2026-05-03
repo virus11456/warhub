@@ -1520,9 +1520,9 @@
       <span class="osint-updated" id="avi-updated">OpenSky Network</span>
     </div>
     <div class="avi-counter">
-      <div class="avi-box"><div class="avi-box-val" id="avi-tankers" style="color:#cc44ff">3</div><div class="avi-box-lbl">加油機</div></div>
-      <div class="avi-box"><div class="avi-box-val" id="avi-awacs"   style="color:#ffaa00">2</div><div class="avi-box-lbl">預警機</div></div>
-      <div class="avi-box"><div class="avi-box-val" id="avi-uav"     style="color:#00aaff">1</div><div class="avi-box-lbl">偵察無人機</div></div>
+      <div class="avi-box"><div class="avi-box-val" id="avi-tankers" style="color:#cc44ff">--</div><div class="avi-box-lbl">加油機</div></div>
+      <div class="avi-box"><div class="avi-box-val" id="avi-awacs"   style="color:#ffaa00">--</div><div class="avi-box-lbl">預警機</div></div>
+      <div class="avi-box"><div class="avi-box-val" id="avi-uav"     style="color:#00aaff">--</div><div class="avi-box-lbl">偵察無人機</div></div>
     </div>
     <div style="margin-bottom:.8rem;padding:.5rem .6rem;background:rgba(204,68,255,.06);border:1px solid rgba(204,68,255,.2);font-family:'Share Tech Mono',monospace;font-size:.63rem;color:var(--text-dim)">
       較 7 日均值 <strong style="color:#ff4444;font-size:.82rem" id="avi-anomaly">--%</strong> &nbsp;·&nbsp; 7日均：<span id="avi-baseline">--</span> 架次/hr
@@ -1983,40 +1983,48 @@ async function fetchRealPizzaData() {
     }
 
     // 用後端資料覆蓋 PIZZA_SHOPS_DATA（保留 icon 等前端專屬欄位）
-    const byName = Object.fromEntries(json.pizza.map(s => [s.name, s]));
-    PIZZA_SHOPS_DATA.forEach(shop => {
-      const incoming = byName[shop.name];
-      if (!incoming) return;
-      shop.busyness = incoming.busyness ?? 0;
-      shop.is_open  = incoming.is_open ?? false;
-      shop.status   = incoming.status  ?? (incoming.is_open ? 'open' : 'closed');
-      if (incoming.baseline) shop.baseline = incoming.baseline;
-    });
+    try {
+      const byName = Object.fromEntries(json.pizza.map(s => [s.name, s]));
+      PIZZA_SHOPS_DATA.forEach(shop => {
+        const incoming = byName[shop.name];
+        if (!incoming) return;
+        shop.busyness = incoming.busyness ?? 0;
+        shop.is_open  = incoming.is_open ?? false;
+        shop.status   = incoming.status  ?? (incoming.is_open ? 'open' : 'closed');
+        if (incoming.baseline) shop.baseline = incoming.baseline;
+      });
 
-    const status = evaluatePizzaStatus(PIZZA_SHOPS_DATA);
-    renderPizzaShops(PIZZA_SHOPS_DATA);
-    renderWarAlert(status, PIZZA_SHOPS_DATA);
-    HTML_WPI_STATE.pizza = PIZZA_SHOPS_DATA.map(s => ({ busyness: s.busyness }));
+      const status = evaluatePizzaStatus(PIZZA_SHOPS_DATA);
+      renderPizzaShops(PIZZA_SHOPS_DATA);
+      renderWarAlert(status, PIZZA_SHOPS_DATA);
+      HTML_WPI_STATE.pizza = PIZZA_SHOPS_DATA.map(s => ({ busyness: s.busyness }));
+    } catch(err) { console.warn('[WARWATCH] pizza render error:', err.message); }
 
     // 同步渲染 Polymarket 卡片（使用後端已篩選好的戰爭/衝突相關市場）
-    if (Array.isArray(json.polymarket) && json.polymarket.length) {
-      renderPolymarketCards(json.polymarket);
-      // 同步 WPI poly state（取交易量最高的前 5 個）
-      HTML_WPI_STATE.poly = [...json.polymarket]
-        .filter(m => m.yes_price != null && m.volume > 0)
-        .sort((a, b) => b.volume - a.volume)
-        .slice(0, 5)
-        .map(m => ({ yes_pct: m.yes_price * 100, volume: m.volume }));
-    }
+    try {
+      if (Array.isArray(json.polymarket) && json.polymarket.length) {
+        renderPolymarketCards(json.polymarket);
+        HTML_WPI_STATE.poly = [...json.polymarket]
+          .filter(m => m.yes_price != null && m.volume > 0)
+          .sort((a, b) => b.volume - a.volume)
+          .slice(0, 5)
+          .map(m => ({ yes_pct: m.yes_price * 100, volume: m.volume }));
+      }
+    } catch(err) { console.warn('[WARWATCH] polymarket render error:', err.message); }
 
     // 同步渲染 AVI 軍機資料
     if (json.aviation) {
-      renderAviation(json.aviation);
+      try { renderAviation(json.aviation); }
+      catch(err) { console.warn('[WARWATCH] renderAviation error:', err.message); }
+    } else {
+      console.warn('[WARWATCH] data.json has no aviation field');
     }
 
     htmlWpiRender();
 
-    console.log('[WARWATCH] data refreshed @', json.updated_at);
+    console.log('[WARWATCH] data refreshed @', json.updated_at,
+                '| pizza_idx', json.pizza_index,
+                '| AVI total', json.aviation?.summary?.total ?? 'n/a');
   } catch (e) {
     console.warn('[WARWATCH] data fetch failed, using simulated:', e.message);
     simulateLiveUpdate();
