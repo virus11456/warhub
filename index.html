@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ConflictWatch // 衝突指標觀測站</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg:#050a0e; --bg2:#080f14; --bg3:#0c1820;
+  --g:#00ff88; --r:#ff4444; --o:#ffaa00; --b:#00aaff; --p:#cc44ff;
+  --dim:#5a7a8a; --border:#1a3040; --text:#c8d8e8;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:'IBM Plex Sans',sans-serif; min-height:100vh; }
+body::after {
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:9999;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.04) 2px,rgba(0,0,0,.04) 4px);
+}
+.bg-grid {
+  position:fixed; inset:0; pointer-events:none;
+  background-image: linear-gradient(rgba(0,255,136,.015) 1px,transparent 1px),
+                    linear-gradient(90deg,rgba(0,255,136,.015) 1px,transparent 1px);
+  background-size:40px 40px;
+}
+
+/* ── Header ── */
+header {
+  border-bottom:1px solid var(--g); background:rgba(0,255,136,.03);
+  backdrop-filter:blur(12px); position:sticky; top:0; z-index:100;
+}
+.h-inner { max-width:1400px; margin:0 auto; padding:0 2rem; height:60px; display:flex; align-items:center; justify-content:space-between; }
+.logo { font-family:'Orbitron',monospace; font-weight:900; font-size:1.3rem; color:var(--g); text-shadow:0 0 15px rgba(0,255,136,.4); letter-spacing:4px; }
+.logo em { color:var(--r); font-style:normal; }
+.h-right { font-family:'Share Tech Mono',monospace; font-size:.72rem; color:var(--dim); display:flex; align-items:center; gap:1.5rem; }
+.live { display:flex; align-items:center; gap:.4rem; }
+.dot { width:8px; height:8px; border-radius:50%; background:var(--g); box-shadow:0 0 6px var(--g); animation:blink 1s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+.badge { font-family:'Orbitron',monospace; font-size:.65rem; font-weight:700; letter-spacing:2px; padding:3px 10px; border:1px solid var(--o); color:var(--o); text-shadow:0 0 8px var(--o); }
+
+/* ── Ticker ── */
+.ticker { height:30px; background:var(--bg3); border-bottom:1px solid var(--border); display:flex; overflow:hidden; }
+.ticker-lbl { font-family:'Orbitron',monospace; font-size:.6rem; font-weight:700; color:var(--r); letter-spacing:2px; background:rgba(255,68,68,.1); border-right:1px solid var(--border); padding:0 1rem; white-space:nowrap; display:flex; align-items:center; }
+.ticker-body { flex:1; overflow:hidden; display:flex; align-items:center; }
+.ticker-scroll { display:flex; animation:ticker 50s linear infinite; }
+.ticker-scroll:hover { animation-play-state:paused; }
+@keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+.ti { font-family:'Share Tech Mono',monospace; font-size:.7rem; color:var(--dim); white-space:nowrap; padding:0 1.5rem; }
+.ti .hl { color:var(--o); }
+.ti .danger { color:var(--r); }
+.ti .ok { color:var(--g); }
+
+/* ── Layout ── */
+.wrap { max-width:1400px; margin:0 auto; padding:1.5rem 2rem; position:relative; z-index:1; }
+.sec-title { font-family:'Orbitron',monospace; font-size:.65rem; font-weight:700; letter-spacing:4px; color:var(--dim); text-transform:uppercase; margin-bottom:.9rem; padding-bottom:.5rem; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:.5rem; }
+.sec-title::before { content:'//'; color:var(--g); }
+.card { background:var(--bg2); border:1px solid var(--border); padding:1.4rem; position:relative; }
+.card-top-g { border-top:2px solid var(--g); }
+.card-top-r { border-top:2px solid var(--r); }
+.card-top-o { border-top:2px solid var(--o); }
+.card-top-b { border-top:2px solid var(--b); }
+.card-top-p { border-top:2px solid var(--p); }
+
+/* ── Hero Row ── */
+.hero { display:grid; grid-template-columns:220px 1fr 220px; gap:1.5rem; margin-bottom:1.5rem; }
+.score-box { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2rem 1rem; }
+.score-num { font-family:'Orbitron',monospace; font-size:5rem; font-weight:900; line-height:1; color:var(--o); text-shadow:0 0 30px rgba(255,170,0,.5); }
+.score-lbl { font-family:'Orbitron',monospace; font-size:.7rem; letter-spacing:3px; color:var(--o); margin-top:.5rem; }
+.score-sub { font-family:'Share Tech Mono',monospace; font-size:.65rem; color:var(--dim); margin-top:.3rem; }
+
+/* ── Meter bars ── */
+.meters { display:flex; flex-direction:column; gap:.75rem; justify-content:center; }
+.meter-row { display:grid; grid-template-columns:130px 1fr 48px; align-items:center; gap:.7rem; }
+.ml { font-family:'Share Tech Mono',monospace; font-size:.7rem; color:var(--dim); text-align:right; }
+.mb { height:6px; background:var(--bg3); border:1px solid var(--border); overflow:hidden; }
+.mf { height:100%; width:0; transition:width 1.5s ease; position:relative; }
+.mf::after { content:''; position:absolute; right:0; top:0; bottom:0; width:2px; background:rgba(255,255,255,.7); }
+.mf.r { background:linear-gradient(90deg,#330,var(--r)); box-shadow:0 0 6px rgba(255,68,68,.4); }
+.mf.o { background:linear-gradient(90deg,#330,var(--o)); box-shadow:0 0 6px rgba(255,170,0,.4); }
+.mf.b { background:linear-gradient(90deg,#003,var(--b)); box-shadow:0 0 6px rgba(0,170,255,.4); }
+.mf.g { background:linear-gradient(90deg,#020,var(--g)); box-shadow:0 0 6px rgba(0,255,136,.4); }
+.mp { font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700; }
+.mp.r{color:var(--r)} .mp.o{color:var(--o)} .mp.b{color:var(--b)} .mp.g{color:var(--g)}
+
+/* Right stat boxes */
+.stat-col { display:flex; flex-direction:column; gap:.8rem; justify-content:center; }
+.stat-b { background:var(--bg3); border:1px solid var(--border); border-left:3px solid var(--g); padding:.7rem 1rem; }
+.stat-b.r { border-left-color:var(--r); }
+.stat-b.o { border-left-color:var(--o); }
+.stat-b-lbl { font-family:'Share Tech Mono',monospace; font-size:.62rem; color:var(--dim); letter-spacing:2px; margin-bottom:.25rem; }
+.stat-b-val { font-family:'Orbitron',monospace; font-size:1.1rem; font-weight:700; }
+
+/* ── Main Grid ── */
+.main-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem; }
+
+/* Chart */
+.chart-wrap { position:relative; height:200px; }
+
+/* Pizza */
+.pizza-shops { display:grid; grid-template-columns:1fr 1fr; gap:.5rem; margin-bottom:1rem; }
+.pshop { background:var(--bg3); border:1px solid var(--border); padding:.7rem; }
+.pshop-name { font-family:'Share Tech Mono',monospace; font-size:.62rem; color:var(--dim); margin-bottom:.4rem; }
+.pshop-status { font-family:'Orbitron',monospace; font-size:.68rem; font-weight:700; display:flex; align-items:center; gap:.4rem; }
+.sd { width:6px; height:6px; border-radius:50%; }
+.sd.r { background:var(--r); box-shadow:0 0 5px var(--r); animation:blink 1s infinite; }
+.sd.o { background:var(--o); box-shadow:0 0 5px var(--o); animation:blink 1.5s infinite; }
+.sd.g { background:var(--g); box-shadow:0 0 5px var(--g); }
+
+/* Polymarket list */
+.poly-list { display:flex; flex-direction:column; gap:.7rem; }
+.poly-item { background:var(--bg3); border:1px solid var(--border); border-left:3px solid var(--b); padding:.9rem 1rem; }
+.poly-item.danger { border-left-color:var(--r); }
+.poly-item.warn { border-left-color:var(--o); }
+.poly-q { font-size:.8rem; margin-bottom:.6rem; line-height:1.4; }
+.poly-bar-row { display:flex; align-items:center; gap:.6rem; }
+.poly-bar { flex:1; height:7px; background:var(--bg); border:1px solid var(--border); overflow:hidden; }
+.poly-fill { height:100%; transition:width 1s ease; }
+.poly-pct { font-family:'Orbitron',monospace; font-size:.82rem; font-weight:700; min-width:42px; text-align:right; }
+.poly-meta { font-family:'Share Tech Mono',monospace; font-size:.62rem; color:var(--dim); display:flex; justify-content:space-between; margin-top:.4rem; }
+
+/* Bottom grid */
+.bottom-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1.5rem; margin-bottom:1.5rem; }
+
+/* Conflict list */
+.conf-item { display:grid; grid-template-columns:1fr auto; align-items:center; padding:.65rem; background:var(--bg3); border:1px solid var(--border); margin-bottom:.5rem; gap:.5rem; }
+.conf-name { font-size:.8rem; }
+.conf-sub { font-family:'Share Tech Mono',monospace; font-size:.62rem; color:var(--dim); margin-top:.15rem; }
+.pill { font-family:'Orbitron',monospace; font-size:.58rem; font-weight:700; letter-spacing:1px; padding:3px 7px; border:1px solid; white-space:nowrap; }
+.pill.crit { color:var(--r); border-color:var(--r); background:rgba(255,68,68,.08); }
+.pill.high { color:var(--o); border-color:var(--o); background:rgba(255,170,0,.08); }
+.pill.med  { color:var(--b); border-color:var(--b); background:rgba(0,170,255,.08); }
+.pill.low  { color:var(--g); border-color:var(--g); background:rgba(0,255,136,.08); }
+
+/* Signal feed */
+.sig-item { display:flex; gap:.7rem; padding:.7rem; background:var(--bg3); border:1px solid var(--border); margin-bottom:.5rem; }
+.sig-icon { font-size:1.1rem; min-width:22px; text-align:center; }
+.sig-text { font-size:.76rem; line-height:1.4; flex:1; }
+.sig-meta { font-family:'Share Tech Mono',monospace; font-size:.62rem; color:var(--dim); margin-top:.2rem; }
+.sig-src { color:var(--b); }
+
+/* Doomsday */
+.doom-center { text-align:center; padding:1rem 0; }
+.doom-clock { font-family:'Orbitron',monospace; font-size:2.8rem; font-weight:900; color:var(--p); text-shadow:0 0 20px rgba(170,0,255,.5); letter-spacing:3px; }
+.doom-lbl { font-family:'Share Tech Mono',monospace; font-size:.68rem; color:var(--dim); letter-spacing:2px; margin-top:.4rem; }
+.doom-track-row { display:flex; align-items:center; gap:.5rem; margin:1rem 0; font-family:'Share Tech Mono',monospace; font-size:.62rem; color:var(--dim); }
+.doom-track { flex:1; height:4px; background:var(--bg); border:1px solid var(--border); position:relative; }
+.doom-fill { position:absolute; right:0; top:0; bottom:0; width:14%; background:linear-gradient(90deg,transparent,var(--p)); }
+.doom-pin { position:absolute; right:14%; top:-4px; width:2px; height:12px; background:var(--p); box-shadow:0 0 8px var(--p); }
+
+/* Loading state */
+.loading { opacity:.4; pointer-events:none; }
+.error-msg { font-family:'Share Tech Mono',monospace; font-size:.72rem; color:var(--r); padding:.5rem; text-align:center; }
+
+/* Footer */
+footer { border-top:1px solid var(--border); padding:1rem 2rem; text-align:center; font-family:'Share Tech Mono',monospace; font-size:.63rem; color:var(--dim); letter-spacing:1px; }
+
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr}
+  .main-grid{grid-template-columns:1fr}
+  .bottom-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+
+<header>
+  <div class="h-inner">
+    <div class="logo">CONFLICT<em>WATCH</em> <span style="font-size:.65rem;color:var(--dim);font-weight:400;letter-spacing:2px">衝突指標觀測站</span></div>
+    <div class="h-right">
+      <div class="live"><div class="dot"></div><span>LIVE</span></div>
+      <span id="utc-clock">--:--:-- UTC</span>
+      <div class="badge" id="alert-badge">LOADING...</div>
+    </div>
+  </div>
+</header>
+
+<!-- Ticker -->
+<div class="ticker">
+  <div class="ticker-lbl">INTEL FEED</div>
+  <div class="ticker-body">
+    <div class="ticker-scroll" id="ticker-scroll">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="card card-top-o score-box">
+      <div class="score-num" id="score-num">--</div>
+      <div class="score-lbl" id="score-lbl">LOADING</div>
+      <div class="score-sub">綜合威脅指數 / 100</div>
+    </div>
+
+    <div class="card card-top-g" style="padding:1.5rem 2rem">
+      <div class="sec-title">衝突壓力儀表</div>
+      <div class="meters" id="meters">
+        <!-- Populated by JS or static -->
+        <div class="meter-row"><div class="ml">俄烏戰爭</div><div class="mb"><div class="mf r" data-w="78"></div></div><div class="mp r">78%</div></div>
+        <div class="meter-row"><div class="ml">美伊對峙</div><div class="mb"><div class="mf o" data-w="65"></div></div><div class="mp o">65%</div></div>
+        <div class="meter-row"><div class="ml">台海緊張</div><div class="mb"><div class="mf b" data-w="42"></div></div><div class="mp b">42%</div></div>
+        <div class="meter-row"><div class="ml">朝鮮半島</div><div class="mb"><div class="mf o" data-w="55"></div></div><div class="mp o">55%</div></div>
+        <div class="meter-row"><div class="ml">中東</div><div class="mb"><div class="mf r" data-w="70"></div></div><div class="mp r">70%</div></div>
+        <div class="meter-row"><div class="ml">南海</div><div class="mb"><div class="mf g" data-w="35"></div></div><div class="mp g">35%</div></div>
+      </div>
+    </div>
+
+    <div class="card card-top-r">
+      <div class="sec-title">關鍵數據</div>
+      <div class="stat-col">
+        <div class="stat-b r"><div class="stat-b-lbl">PIZZA 指數</div><div class="stat-b-val" id="pizza-score" style="color:var(--o)">--</div></div>
+        <div class="stat-b o"><div class="stat-b-lbl">POLYMARKET 指數</div><div class="stat-b-val" id="poly-score" style="color:var(--b)">--</div></div>
+        <div class="stat-b"><div class="stat-b-lbl">資料更新</div><div class="stat-b-val" id="updated-at" style="font-size:.7rem;color:var(--dim)">--</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main 2-col -->
+  <div class="main-grid">
+
+    <!-- Pizza Card -->
+    <div class="card card-top-o">
+      <div class="sec-title">🍕 五角大廈披薩指數 (PPI)</div>
+      <div class="pizza-shops" id="pizza-shops">
+        <div class="pshop"><div class="pshop-name">Domino's — Arlington</div><div class="pshop-status"><div class="sd o"></div><span style="color:var(--o)">載入中…</span></div></div>
+        <div class="pshop"><div class="pshop-name">Papa John's — Pentagon</div><div class="pshop-status"><div class="sd g"></div><span style="color:var(--g)">載入中…</span></div></div>
+        <div class="pshop"><div class="pshop-name">Pizza Hut — Crystal City</div><div class="pshop-status"><div class="sd g"></div><span style="color:var(--g)">載入中…</span></div></div>
+        <div class="pshop"><div class="pshop-name">CIA 周邊 Delivery</div><div class="pshop-status"><div class="sd r"></div><span style="color:var(--r)">載入中…</span></div></div>
+      </div>
+
+      <!-- Mini chart -->
+      <div class="sec-title">披薩指數 24H 趨勢</div>
+      <div class="chart-wrap">
+        <canvas id="pizza-chart"></canvas>
+      </div>
+
+      <div style="margin-top:1rem;padding:.7rem;background:rgba(255,170,0,.05);border:1px solid rgba(255,170,0,.2);font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--o);">
+        ⚡ 歷史案例：1990年伊拉克入侵科威特前夕，CIA單夜訂了21個披薩。Wolf Blitzer名言：<em>"Bottom line for journalists: Always monitor the pizzas."</em>
+      </div>
+    </div>
+
+    <!-- Polymarket Card -->
+    <div class="card card-top-b">
+      <div class="sec-title">📊 Polymarket 戰爭預測市場</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--dim);margin-bottom:1rem;line-height:1.7;">
+        真實資金下注 · 準確率 <span style="color:var(--g)">94%</span>（事件前一個月）· 2025年地緣政治交易量 <span style="color:var(--o)">$33B+</span>
+      </div>
+      <div class="poly-list" id="poly-list">
+        <!-- Populated by API -->
+        <div style="text-align:center;padding:2rem;font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--dim);">載入 Polymarket 數據中…</div>
+      </div>
+
+      <!-- Trend chart -->
+      <div class="sec-title" style="margin-top:1rem;">市場活躍度趨勢</div>
+      <div class="chart-wrap">
+        <canvas id="poly-chart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom 3-col -->
+  <div class="bottom-grid">
+
+    <!-- Conflicts -->
+    <div class="card card-top-r">
+      <div class="sec-title">全球熱點衝突</div>
+      <div class="conf-item"><div><div class="conf-name">🇺🇦 俄烏戰爭</div><div class="conf-sub">持續進行 · 第3年 · 前線膠著</div></div><div class="pill crit">ACTIVE</div></div>
+      <div class="conf-item"><div><div class="conf-name">🇮🇱 以巴 / 中東</div><div class="conf-sub">加薩持續 · 伊朗代理人威脅</div></div><div class="pill crit">ACTIVE</div></div>
+      <div class="conf-item"><div><div class="conf-name">🇺🇸🇮🇷 美伊對峙</div><div class="conf-sub">核談判失敗 · 軍事集結中</div></div><div class="pill high">HIGH</div></div>
+      <div class="conf-item"><div><div class="conf-name">🇸🇩 蘇丹內戰</div><div class="conf-sub">RSF vs SAF · 人道危機持續</div></div><div class="pill high">HIGH</div></div>
+      <div class="conf-item"><div><div class="conf-name">🇰🇵 朝鮮半島</div><div class="conf-sub">飛彈試射 · 北韓援俄</div></div><div class="pill med">ELEVATED</div></div>
+      <div class="conf-item"><div><div class="conf-name">🇨🇳🇹🇼 台海</div><div class="conf-sub">軍演頻率升高 · 紅線試探</div></div><div class="pill med">MEDIUM</div></div>
+      <div class="conf-item"><div><div class="conf-name">🌊 南海爭議</div><div class="conf-sub">菲律賓 / 越南 / 中國摩擦</div></div><div class="pill low">WATCH</div></div>
+    </div>
+
+    <!-- OSINT Feed -->
+    <div class="card card-top-g">
+      <div class="sec-title">OSINT 情報訊號</div>
+      <div id="osint-feed">
+        <div class="sig-item"><div class="sig-icon">🍕</div><div><div class="sig-text">五角大廈附近 Domino's 深夜流量異常，OSINT 帳號 @PenPizzaReport 已標記</div><div class="sig-meta">2026-02-28 · <span class="sig-src">pizzint.watch</span></div></div></div>
+        <div class="sig-item"><div class="sig-icon">✈️</div><div><div class="sig-text">ADSB 追蹤：中東地區 E-8C 地面監視機出現異常路徑，疑似偵察集結</div><div class="sig-meta">2026-02-27 · <span class="sig-src">FlightRadar24</span></div></div></div>
+        <div class="sig-item"><div class="sig-icon">⚡</div><div><div class="sig-text">Hegseth：「可能隨機訂披薩混淆 OSINT 分析師，讓大家摸不清方向」</div><div class="sig-meta">2026-02-24 · <span class="sig-src">Fox News</span></div></div></div>
+        <div class="sig-item"><div class="sig-icon">🛰️</div><div><div class="sig-text">商業衛星影像：波斯灣美軍艦隊集結規模近年最大，至少2艘航母戰鬥群</div><div class="sig-meta">2026-02-20 · <span class="sig-src">Planet Labs</span></div></div></div>
+        <div class="sig-item"><div class="sig-icon">🏦</div><div><div class="sig-text">黃金突破 $3,100/oz，原油上漲 3.2%，避險需求指標持續飆升</div><div class="sig-meta">2026-02-26 · <span class="sig-src">市場數據</span></div></div></div>
+      </div>
+    </div>
+
+    <!-- Doomsday + nuclear -->
+    <div class="card card-top-p">
+      <div class="sec-title">☢️ 末日時鐘 &amp; 核威脅</div>
+      <div class="doom-center">
+        <div class="doom-clock">23:58:30</div>
+        <div class="doom-lbl">距離午夜（核戰）僅剩 90 秒</div>
+      </div>
+      <div class="doom-track-row">
+        <span>00:00</span>
+        <div class="doom-track">
+          <div class="doom-fill"></div>
+          <div class="doom-pin"></div>
+        </div>
+        <span>MIDNIGHT</span>
+      </div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--dim);line-height:1.65;margin-bottom:.8rem;">
+        <span style="color:var(--p)">2023年設定，史上最近</span>。俄烏核威脅 + AI 軍備競賽 + 氣候危機為主要因素。由《原子科學家公報》設定。
+      </div>
+      <div class="conf-item" style="margin-bottom:.4rem;"><div><div class="conf-name">🇷🇺 俄羅斯核武威懾</div></div><div class="pill crit">HIGH</div></div>
+      <div class="conf-item" style="margin-bottom:.4rem;"><div><div class="conf-name">🇨🇳 中國核彈頭快速擴張</div></div><div class="pill high">HIGH</div></div>
+      <div class="conf-item" style="margin-bottom:.4rem;"><div><div class="conf-name">🇮🇷 伊朗接近武器級濃縮</div></div><div class="pill high">ELEVATED</div></div>
+      <div class="conf-item"><div><div class="conf-name">Polymarket 核武使用（2026）</div></div><div class="pill med">5%</div></div>
+    </div>
+  </div>
+
+  <!-- Disclaimer -->
+  <div style="padding:.8rem 1rem;background:rgba(0,0,0,.3);border:1px solid var(--border);font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--dim);text-align:center;margin-bottom:1.5rem;">
+    ⚠️ 本網站資訊僅供研究與觀察用途，不構成任何投資、軍事或政策建議。Pizza 指數具有「偽陽性」風險（如預算截止日），預測市場機率會隨時間持續變動。
+  </div>
+
+</div>
+
+<footer>
+  ConflictWatch 衝突指標觀測站 &nbsp;|&nbsp; 數據來源：Polymarket Gamma API · @PenPizzaReport · pizzint.watch · Google Maps Popular Times · Bulletin of Atomic Scientists &nbsp;|&nbsp; 非投資建議
+</footer>
+
+<script>
+// ─── UTC Clock ───────────────────────────────
+function updateClock() {
+  const d = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  document.getElementById('utc-clock').textContent =
+    `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())} UTC`;
+}
+setInterval(updateClock, 1000); updateClock();
+
+// ─── Animate meter bars ──────────────────────
+function animateMeters() {
+  document.querySelectorAll('.mf[data-w]').forEach(el => {
+    const w = el.dataset.w;
+    el.style.width = '0%';
+    setTimeout(() => { el.style.width = w + '%'; }, 400);
+  });
+}
+setTimeout(animateMeters, 200);
+
+// ─── Animate score number ────────────────────
+function animateScore(target) {
+  let cur = 0;
+  const el = document.getElementById('score-num');
+  const step = () => {
+    if (cur < target) { cur++; el.textContent = cur; setTimeout(step, 18); }
+  };
+  step();
+}
+
+// ─── Score color helper ──────────────────────
+const LEVEL_COLORS = { NORMAL:'var(--g)', ELEVATED:'var(--o)', HIGH:'#ff7700', CRITICAL:'var(--r)' };
+const LEVEL_ZH = { NORMAL:'正常', ELEVATED:'偏高', HIGH:'高度警戒', CRITICAL:'危急' };
+
+// ─── API fetch ───────────────────────────────
+async function fetchData() {
+  try {
+    // 嘗試從 API 讀取；如果本地開發就用 mock
+    const res = await fetch('/api/latest');
+    if (!res.ok) throw new Error('API not available');
+    return await res.json();
+  } catch {
+    return getMockData();
+  }
+}
+
+function getMockData() {
+  return {
+    score: { combined_score:72, pizza_score:58, polymarket_score:81, alert_level:'ELEVATED', calculated_at: new Date().toISOString() },
+    pizza: [
+      {shop:"Domino's — Arlington", busyness:82, anomaly:true},
+      {shop:"Papa John's — Pentagon", busyness:61, anomaly:false},
+      {shop:"Pizza Hut — Crystal City", busyness:38, anomaly:false},
+      {shop:"Domino's — Alexandria", busyness:75, anomaly:true},
+    ],
+    polymarket: [
+      {question:"Will there be a Russia-Ukraine ceasefire by end of 2026?", yes_pct:37, volume:10500000},
+      {question:"Will the US take direct military action against Iran in 2026?", yes_pct:28, volume:8200000},
+      {question:"US military action against Somali pirates?", yes_pct:89, volume:5100000},
+      {question:"Will Taiwan experience military conflict in 2026?", yes_pct:12, volume:4700000},
+      {question:"Will nuclear weapons be used in any conflict in 2026?", yes_pct:5, volume:3200000},
+      {question:"Will China escalate in the South China Sea in H1 2026?", yes_pct:22, volume:2900000},
+    ]
+  };
+}
+
+// ─── Render functions ────────────────────────
+function renderScore(score) {
+  const col = LEVEL_COLORS[score.alert_level] || 'var(--o)';
+  const lbl = LEVEL_ZH[score.alert_level] || score.alert_level;
+  const el = document.getElementById('score-num');
+  el.style.color = col;
+  el.style.textShadow = `0 0 30px ${col}80`;
+  document.getElementById('score-lbl').textContent = score.alert_level;
+  document.getElementById('score-lbl').style.color = col;
+  document.getElementById('alert-badge').textContent = `威脅 ${lbl}`;
+  document.getElementById('alert-badge').style.borderColor = col;
+  document.getElementById('alert-badge').style.color = col;
+  document.getElementById('pizza-score').textContent = score.pizza_score?.toFixed(1) ?? '--';
+  document.getElementById('poly-score').textContent = score.polymarket_score?.toFixed(1) ?? '--';
+  const ua = new Date(score.calculated_at);
+  document.getElementById('updated-at').textContent =
+    `${ua.toISOString().replace('T',' ').slice(0,19)} UTC`;
+  animateScore(Math.round(score.combined_score));
+}
+
+function renderPizza(pizzaData) {
+  const container = document.getElementById('pizza-shops');
+  container.innerHTML = pizzaData.map(s => {
+    const cls = s.anomaly ? 'r' : (s.busyness > 55 ? 'o' : 'g');
+    const txt = s.anomaly ? 'ANOMALY DETECTED' : (s.busyness > 55 ? 'ABOVE AVERAGE' : 'NORMAL');
+    const col = s.anomaly ? 'var(--r)' : (s.busyness > 55 ? 'var(--o)' : 'var(--g)');
+    return `<div class="pshop">
+      <div class="pshop-name">${s.shop}</div>
+      <div class="pshop-status"><div class="sd ${cls}"></div><span style="color:${col}">${txt} (${s.busyness}%)</span></div>
+    </div>`;
+  }).join('');
+}
+
+function renderPolymarket(markets) {
+  const container = document.getElementById('poly-list');
+  container.innerHTML = markets.map(m => {
+    const pct = m.yes_pct;
+    let cls = '';
+    let col = 'var(--b)';
+    if (pct >= 70) { cls='danger'; col='var(--r)'; }
+    else if (pct >= 40) { cls='warn'; col='var(--o)'; }
+    const vol = m.volume >= 1e6 ? `$${(m.volume/1e6).toFixed(1)}M` : `$${(m.volume/1e3).toFixed(0)}K`;
+    return `<div class="poly-item ${cls}">
+      <div class="poly-q">${m.question}</div>
+      <div class="poly-bar-row">
+        <span style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--dim);width:24px">YES</span>
+        <div class="poly-bar"><div class="poly-fill" style="width:${pct}%;background:linear-gradient(90deg,#001,${col})"></div></div>
+        <div class="poly-pct" style="color:${col}">${pct}%</div>
+      </div>
+      <div class="poly-meta"><span>交易量 ${vol}</span><span>polymarket.com</span></div>
+    </div>`;
+  }).join('');
+}
+
+// ─── Charts ──────────────────────────────────
+const CHART_OPTS = {
+  responsive: true, maintainAspectRatio: false,
+  plugins: { legend: { display:false } },
+  scales: {
+    x: { grid:{color:'rgba(255,255,255,.04)'}, ticks:{color:'#5a7a8a',font:{family:'Share Tech Mono',size:9}} },
+    y: { grid:{color:'rgba(255,255,255,.04)'}, ticks:{color:'#5a7a8a',font:{family:'Share Tech Mono',size:9}}, min:0, max:100 }
+  }
+};
+
+function makePizzaChart() {
+  // 模擬 24H 歷史數據
+  const labels = Array.from({length:24}, (_,i) => `${String(i).padStart(2,'0')}:00`);
+  const data = [15,12,10,8,6,5,5,12,28,42,45,48,52,50,47,55,60,72,80,75,68,58,52,58];
+  const ctx = document.getElementById('pizza-chart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        borderColor: '#ffaa00',
+        backgroundColor: 'rgba(255,170,0,.08)',
+        borderWidth: 2,
+        fill: true,
+        tension: .4,
+        pointRadius: 0,
+        pointHoverRadius: 4,
+      }]
+    },
+    options: { ...CHART_OPTS,
+      plugins: { ...CHART_OPTS.plugins,
+        annotation: { annotations: [{
+          type:'line', yMin:70, yMax:70,
+          borderColor:'rgba(255,68,68,.5)', borderWidth:1, borderDash:[4,4],
+          label:{content:'異常閾值',display:true,position:'end',color:'#ff4444',font:{size:9}}
+        }]}
+      }
+    }
+  });
+}
+
+function makePolyChart() {
+  const labels = ['Jan','Feb W1','Feb W2','Feb W3','Feb W4','Now'];
+  const data = [62,65,68,72,75,81];
+  const ctx = document.getElementById('poly-chart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: data.map(v => v >= 80 ? 'rgba(255,68,68,.6)' : v >= 70 ? 'rgba(255,170,0,.6)' : 'rgba(0,170,255,.5)'),
+        borderColor: data.map(v => v >= 80 ? '#ff4444' : v >= 70 ? '#ffaa00' : '#00aaff'),
+        borderWidth: 1,
+      }]
+    },
+    options: { ...CHART_OPTS, scales: { ...CHART_OPTS.scales, y: { ...CHART_OPTS.scales.y, min:50 } } }
+  });
+}
+
+// ─── Ticker ──────────────────────────────────
+const TICKER_ITEMS = [
+  `🍕 Pizza 指數 <span class="hl">↑ 異常偏高</span>`,
+  `Polymarket：俄烏停火 <span class="hl">37%</span>`,
+  `末日時鐘距離午夜 <span class="danger">90秒</span>`,
+  `美伊談判僵局 · 軍事行動機率攀升`,
+  `台海衝突 2026：Polymarket <span class="hl">12%</span>`,
+  `Hegseth：考慮用披薩訂單混淆 OSINT 分析師`,
+  `黃金突破 $3,100 · 避險需求創歷史高位`,
+  `索馬利亞美軍打擊海盜概率 <span class="danger">89%</span>`,
+  `🍕 CIA 周邊深夜外送量異常上升`,
+  `Polymarket 2025 年地緣政治交易量 <span class="ok">$33B+</span>`,
+];
+function buildTicker() {
+  const doubled = [...TICKER_ITEMS, ...TICKER_ITEMS];
+  const html = doubled.map(t => `<div class="ti">${t} &nbsp; •</div>`).join('');
+  document.getElementById('ticker-scroll').innerHTML = html;
+}
+
+// ─── Init ─────────────────────────────────────
+async function init() {
+  buildTicker();
+  makePizzaChart();
+  makePolyChart();
+
+  const data = await fetchData();
+  renderScore(data.score);
+  renderPizza(data.pizza);
+  renderPolymarket(data.polymarket);
+
+  // Refresh every 5 minutes
+  setInterval(async () => {
+    const d = await fetchData();
+    renderScore(d.score);
+    renderPizza(d.pizza);
+    renderPolymarket(d.polymarket);
+  }, 5 * 60 * 1000);
+}
+
+init();
+</script>
+</body>
+</html>

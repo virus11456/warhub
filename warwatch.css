@@ -1,0 +1,1249 @@
+/* ============================================================
+   WARWATCH — 戰爭預測情報中心
+   WordPress CSS
+   路徑: /wp-content/themes/css/warwatch.css
+   ============================================================ */
+
+/* ── Reset & Root ─────────────────────────────────────────── */
+:root {
+  --ww-bg:      #050a0e;
+  --ww-bg2:     #080f14;
+  --ww-bg3:     #0c1820;
+  --ww-g:       #00ff88;
+  --ww-r:       #ff4444;
+  --ww-o:       #ffaa00;
+  --ww-b:       #00aaff;
+  --ww-p:       #cc44ff;
+  --ww-text:    #c8d8e8;
+  --ww-dim:     #6a8a9a;
+  --ww-border:  #1a3040;
+}
+
+/* Full-page override — scoped to our wrapper only */
+#warwatch-page {
+  background: var(--ww-bg);
+  color: var(--ww-text);
+  font-family: 'IBM Plex Sans', sans-serif;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Hide default WP theme header/footer on this page via body class */
+body.warwatch-fullpage .site-header,
+body.warwatch-fullpage .site-footer,
+body.warwatch-fullpage #wpadminbar ~ .site-header,
+body.warwatch-fullpage .entry-header,
+body.warwatch-fullpage .ast-page-title-bar,
+body.warwatch-fullpage .ast-breadcrumbs-wrapper,
+body.warwatch-fullpage .ast-above-header-wrap,
+body.warwatch-fullpage .ast-below-header-wrap,
+body.warwatch-fullpage .page-title-bar { display: none !important; }
+
+body.warwatch-fullpage { background: var(--ww-bg) !important; }
+
+/* ── Scanline overlay ─────────────────────────────────────── */
+#warwatch-page::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 2px,
+    rgba(0,0,0,.04) 2px, rgba(0,0,0,.04) 4px
+  );
+  pointer-events: none;
+  z-index: 9000;
+}
+
+/* ── Grid background ──────────────────────────────────────── */
+.ww-bg-grid {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(rgba(0,255,136,.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,136,.018) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ── Header ───────────────────────────────────────────────── */
+.ww-header {
+  border-bottom: 1px solid var(--ww-g);
+  background: rgba(0,255,136,.03);
+  backdrop-filter: blur(12px);
+  position: sticky; top: 0; z-index: 200;
+}
+.ww-header-inner {
+  max-width: 1400px; margin: 0 auto;
+  padding: 0 2rem; height: 60px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.ww-logo {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900; font-size: 1.3rem;
+  color: var(--ww-g); letter-spacing: 4px;
+  text-shadow: 0 0 15px rgba(0,255,136,.4);
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.ww-logo em { color: var(--ww-r); font-style: normal; }
+.ww-logo small {
+  font-size: .6rem; color: var(--ww-dim);
+  font-weight: 400; letter-spacing: 2px;
+  font-family: 'Share Tech Mono', monospace;
+}
+.ww-hright {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .72rem; color: var(--ww-dim);
+  display: flex; align-items: center; gap: 1.5rem;
+  flex-shrink: 0; overflow: hidden;
+}
+.ww-live { display: flex; align-items: center; gap: .4rem; }
+.ww-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--ww-g); box-shadow: 0 0 6px var(--ww-g);
+  animation: ww-blink 1s infinite;
+}
+@keyframes ww-blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+.ww-badge {
+  font-family: 'Orbitron', monospace; font-size: .65rem;
+  font-weight: 700; letter-spacing: 2px;
+  padding: 3px 10px;
+  border: 1px solid var(--ww-o); color: var(--ww-o);
+  text-shadow: 0 0 8px var(--ww-o);
+  white-space: nowrap; flex-shrink: 0;
+}
+
+/* ── Ticker ───────────────────────────────────────────────── */
+.ww-ticker {
+  height: 30px; background: var(--ww-bg3);
+  border-bottom: 1px solid var(--ww-border);
+  display: flex; overflow: hidden; position: relative; z-index: 1;
+}
+.ww-ticker-lbl {
+  font-family: 'Orbitron', monospace; font-size: .6rem;
+  font-weight: 700; color: var(--ww-r); letter-spacing: 2px;
+  background: rgba(255,68,68,.1); border-right: 1px solid var(--ww-border);
+  padding: 0 1rem; white-space: nowrap;
+  display: flex; align-items: center; flex-shrink: 0;
+}
+.ww-ticker-body { flex: 1; overflow: hidden; display: flex; align-items: center; }
+.ww-ticker-scroll { display: flex; animation: ww-ticker 55s linear infinite; }
+.ww-ticker-scroll:hover { animation-play-state: paused; }
+@keyframes ww-ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+.ww-ti {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .7rem; color: var(--ww-dim);
+  white-space: nowrap; padding: 0 1.5rem;
+}
+.ww-ti .hl { color: var(--ww-o); }
+.ww-ti .danger { color: var(--ww-r); }
+.ww-ti .ok { color: var(--ww-g); }
+
+/* ── Layout ───────────────────────────────────────────────── */
+.ww-wrap {
+  max-width: 1400px; margin: 0 auto;
+  padding: 1.5rem 2rem; position: relative; z-index: 1;
+}
+.ww-sec-title {
+  font-family: 'Orbitron', monospace; font-size: .65rem;
+  font-weight: 700; letter-spacing: 4px;
+  color: var(--ww-dim); text-transform: uppercase;
+  margin-bottom: .9rem; padding-bottom: .5rem;
+  border-bottom: 1px solid var(--ww-border);
+  display: flex; align-items: center; gap: .5rem;
+}
+.ww-sec-title::before { content: '//'; color: var(--ww-g); }
+
+/* ── Card ─────────────────────────────────────────────────── */
+.ww-card {
+  background: var(--ww-bg2);
+  border: 1px solid var(--ww-border);
+  padding: 1.4rem; position: relative;
+  box-sizing: border-box;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+}
+.ww-osint-grid > .ww-card {
+  /* grid item 直接等高，不需要 height:100% */
+  min-height: 0;
+}
+.ww-card::before {
+  content: ''; position: absolute; top: 0; left: 0;
+  width: 10px; height: 10px;
+  border-top: 1px solid var(--ww-g); border-left: 1px solid var(--ww-g);
+}
+.ww-card-r { border-top: 2px solid var(--ww-r); }
+.ww-card-o { border-top: 2px solid var(--ww-o); }
+.ww-card-g { border-top: 2px solid var(--ww-g); }
+.ww-card-b { border-top: 2px solid var(--ww-b); }
+.ww-card-p { border-top: 2px solid var(--ww-p); }
+
+/* ── Hero threat block ────────────────────────────────────── */
+.ww-threat-hero {
+  background: var(--ww-bg2); border: 1px solid var(--ww-border);
+  border-top: 2px solid var(--ww-r);
+  padding: 2rem; margin-bottom: 1.5rem; position: relative;
+}
+.ww-threat-grid {
+  display: grid; grid-template-columns: 220px 1fr 220px;
+  gap: 2rem; align-items: center;
+}
+.ww-score-box { text-align: center; }
+.ww-score-num {
+  font-family: 'Orbitron', monospace; font-size: 5rem;
+  font-weight: 900; line-height: 1; color: var(--ww-o);
+  text-shadow: 0 0 30px rgba(255,170,0,.5);
+  animation: ww-flicker 10s infinite;
+}
+@keyframes ww-flicker {
+  0%,94%,96%,98%,100%{opacity:1} 95%,97%,99%{opacity:.7}
+}
+.ww-score-lbl {
+  font-family: 'Orbitron', monospace; font-size: .7rem;
+  color: var(--ww-o); letter-spacing: 3px; margin-top: .5rem;
+}
+.ww-score-sub { font-family: 'Share Tech Mono', monospace; font-size: .65rem; color: var(--ww-dim); }
+
+/* Meters */
+.ww-meters { display: flex; flex-direction: column; gap: .75rem; }
+.ww-meter-row { display: grid; grid-template-columns: 130px 1fr 48px; align-items: center; gap: .7rem; }
+.ww-ml { font-family: 'Share Tech Mono', monospace; font-size: .7rem; color: var(--ww-dim); text-align: right; }
+.ww-mb { height: 6px; background: var(--ww-bg3); border: 1px solid var(--ww-border); overflow: hidden; }
+.ww-mf { height: 100%; width: 0; transition: width 1.5s ease; position: relative; }
+.ww-mf::after { content:''; position:absolute; right:0; top:0; bottom:0; width:2px; background:rgba(255,255,255,.7); }
+.ww-mf.r { background: linear-gradient(90deg,#330,var(--ww-r)); box-shadow: 0 0 6px rgba(255,68,68,.4); }
+.ww-mf.o { background: linear-gradient(90deg,#330,var(--ww-o)); box-shadow: 0 0 6px rgba(255,170,0,.4); }
+.ww-mf.b { background: linear-gradient(90deg,#003,var(--ww-b)); box-shadow: 0 0 6px rgba(0,170,255,.4); }
+.ww-mf.g { background: linear-gradient(90deg,#020,var(--ww-g)); box-shadow: 0 0 6px rgba(0,255,136,.4); }
+.ww-mp { font-family: 'Orbitron', monospace; font-size: .72rem; font-weight: 700; }
+.ww-mp.r{color:var(--ww-r)} .ww-mp.o{color:var(--ww-o)} .ww-mp.b{color:var(--ww-b)} .ww-mp.g{color:var(--ww-g)}
+
+/* Stat boxes */
+.ww-stat-col { display: flex; flex-direction: column; gap: .8rem; }
+.ww-stat-b {
+  background: var(--ww-bg3); border: 1px solid var(--ww-border);
+  border-left: 3px solid var(--ww-g); padding: .7rem 1rem;
+}
+.ww-stat-b.r { border-left-color: var(--ww-r); }
+.ww-stat-b.o { border-left-color: var(--ww-o); }
+.ww-stat-b-lbl { font-family: 'Share Tech Mono', monospace; font-size: .62rem; color: var(--ww-dim); letter-spacing: 2px; margin-bottom: .25rem; }
+.ww-stat-b-val { font-family: 'Orbitron', monospace; font-size: 1.1rem; font-weight: 700; }
+
+/* ── Main 2-col grid ──────────────────────────────────────── */
+.ww-main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+
+/* ── Pizza + Bar 整合卡片 ─────────────────────────── */
+.ww-card-pizza-bar { border-top: 3px solid; border-image: linear-gradient(90deg, var(--ww-o), var(--ww-b)) 1; }
+
+/* 頭部標題列 */
+.ww-pbi-header     { margin-bottom: .6rem; }
+.ww-pbi-title-row  { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: .4rem; }
+
+/* 主體 2 欄：左披薩 / 右酒吧 */
+.ww-pbi-grid       { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: .4rem; }
+
+/* 歷史事件橫向捲動 chips */
+.ww-ph-scroll      { display: flex; gap: .5rem; overflow-x: auto; padding-bottom: .4rem; scrollbar-width: thin; scrollbar-color: var(--ww-border) transparent; }
+.ww-ph-scroll::-webkit-scrollbar { height: 4px; }
+.ww-ph-scroll::-webkit-scrollbar-thumb { background: var(--ww-border); border-radius: 2px; }
+.ww-ph-chip        { flex-shrink: 0; background: var(--ww-bg3); border: 1px solid var(--ww-border); border-radius: 4px; padding: .4rem .7rem; min-width: 120px; }
+.ww-ph-chip-year   { font-family: 'Orbitron', monospace; font-size: .55rem; color: var(--ww-o); letter-spacing: 1px; margin-bottom: .2rem; }
+.ww-ph-chip-event  { font-family: 'Share Tech Mono', monospace; font-size: .6rem; color: var(--ww-text); line-height: 1.4; margin-bottom: .2rem; }
+.ww-ph-chip-tag    { font-family: 'Share Tech Mono', monospace; font-size: .58rem; color: var(--ww-dim); }
+
+/* Polymarket 網格（多欄） */
+.ww-poly-grid      { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: .6rem; align-items: stretch; }
+
+/* ── Pizza card ───────────────────────────────────────────── */
+@keyframes ww-scan-line { 0%{left:-60%} 100%{left:110%} }
+@keyframes ww-alert-flash {
+  0%,100%{opacity:1;background:var(--ww-r)} 50%{opacity:.7;background:#aa0000}
+}
+@keyframes ww-card-pulse {
+  0%,100%{box-shadow:0 0 0 0 rgba(255,68,68,0);border-color:var(--ww-border)}
+  50%{box-shadow:0 0 25px 4px rgba(255,68,68,.25);border-color:rgba(255,68,68,.5)}
+}
+.ww-pizza-card.anomaly { animation: ww-card-pulse 2s ease-in-out infinite; }
+
+.ww-pizza-alert {
+  display: none; position: relative; margin-bottom: 1.2rem;
+  background: linear-gradient(135deg,rgba(255,30,30,.12),rgba(255,100,0,.08));
+  border: 1.5px solid var(--ww-r); padding: 1rem 1.2rem; overflow: hidden;
+}
+.ww-pizza-alert .ww-scan { 
+  position: absolute; top: 0; left: -60%; width: 60%; height: 100%;
+  background: linear-gradient(90deg,transparent,rgba(255,68,68,.08),transparent);
+  animation: ww-scan-line 2.5s linear infinite; pointer-events: none;
+}
+.ww-alert-hdr { display: flex; align-items: center; gap: .7rem; margin-bottom: .7rem; flex-wrap: wrap; }
+.ww-alert-tag {
+  font-family: 'Orbitron', monospace; font-size: .65rem;
+  font-weight: 900; letter-spacing: 3px; color: #fff;
+  background: var(--ww-r); padding: 3px 10px;
+  animation: ww-alert-flash .8s infinite;
+}
+.ww-alert-lvl { font-family: 'Orbitron', monospace; font-size: .65rem; letter-spacing: 2px; color: var(--ww-r); }
+.ww-alert-ts { margin-left: auto; font-family: 'Share Tech Mono', monospace; font-size: .65rem; color: var(--ww-dim); }
+.ww-alert-main { font-family: 'Share Tech Mono', monospace; font-size: .82rem; color: var(--ww-r); line-height: 1.6; margin-bottom: .8rem; }
+.ww-alert-stats { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; margin-bottom: .8rem; }
+.ww-alert-stat { background: rgba(255,68,68,.1); border: 1px solid rgba(255,68,68,.3); padding: .6rem; }
+.ww-alert-stat-lbl { font-family: 'Share Tech Mono', monospace; font-size: .6rem; color: var(--ww-dim); letter-spacing: 2px; margin-bottom: .3rem; }
+.ww-alert-stat-val { font-family: 'Orbitron', monospace; font-size: 1.2rem; font-weight: 700; color: var(--ww-r); }
+.ww-alert-bullets { font-family: 'Share Tech Mono', monospace; font-size: .7rem; color: var(--ww-dim); line-height: 1.8; }
+.ww-alert-disclaimer {
+  margin-top: .8rem; padding: .5rem .8rem;
+  background: rgba(0,0,0,.3); font-family: 'Share Tech Mono', monospace;
+  font-size: .62rem; color: var(--ww-dim); border-left: 2px solid var(--ww-dim);
+}
+
+/* Pizza gauge */
+.ww-gauge-wrap { margin: .8rem 0 1rem; }
+.ww-gauge-labels { display: flex; justify-content: space-between; font-family: 'Share Tech Mono', monospace; font-size: .62rem; color: var(--ww-dim); margin-bottom: .4rem; }
+.ww-gauge-track { height: 10px; background: var(--ww-bg3); border: 1px solid var(--ww-border); position: relative; overflow: visible; }
+.ww-gauge-marker-el { position: absolute; left: 40%; top: -7px; font-family: 'Share Tech Mono', monospace; font-size: .5rem; color: var(--ww-o); white-space: nowrap; }
+.ww-gauge-marker-hi { position: absolute; left: 70%; top: -7px; font-family: 'Share Tech Mono', monospace; font-size: .5rem; color: var(--ww-r); white-space: nowrap; }
+.ww-gauge-fill {
+  height: 100%; width: 0; position: relative;
+  background: linear-gradient(90deg,#001a00,#226600,#ff8800,#ff2200);
+  box-shadow: 0 0 10px rgba(255,68,68,.5); transition: width 1.5s ease;
+}
+.ww-gauge-fill::after { content:''; position:absolute; right:0; top:0; bottom:0; width:4px; background:white; opacity:.9; box-shadow:0 0 8px white; }
+.ww-gauge-thr-el { position: absolute; left: 40%; top: 0; bottom: 0; width: 1px; background: rgba(255,170,0,.5); }
+.ww-gauge-thr-hi { position: absolute; left: 70%; top: 0; bottom: 0; width: 1px; background: rgba(255,68,68,.6); }
+.ww-gauge-zone-row { display: flex; justify-content: space-between; font-family: 'Share Tech Mono', monospace; font-size: .55rem; color: var(--ww-dim); margin-top: .3rem; }
+
+/* Pizza shops grid */
+.ww-pizza-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin-bottom: 1rem; }
+.ww-bar-grid   { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin-bottom: .6rem; }
+.ww-pshop { background: var(--ww-bg3); border: 1px solid var(--ww-border); padding: .7rem; }
+.ww-pshop.anomaly { border-color: rgba(255,68,68,.4); background: rgba(255,30,0,.05); }
+.ww-pshop.quiet  { border-color: rgba(0,170,255,.3); background: rgba(0,170,255,.04); }
+.ww-pshop-name { font-family: 'Share Tech Mono', monospace; font-size: .62rem; color: var(--ww-dim); margin-bottom: .4rem; }
+.ww-pshop-status { display: flex; align-items: center; gap: .4rem; font-family: 'Orbitron', monospace; font-size: .68rem; font-weight: 700; }
+.ww-sd { width: 6px; height: 6px; border-radius: 50%; }
+.ww-sd.r { background: var(--ww-r); box-shadow: 0 0 5px var(--ww-r); animation: ww-blink 1s infinite; }
+.ww-sd.o { background: var(--ww-o); box-shadow: 0 0 5px var(--ww-o); animation: ww-blink 1.5s infinite; }
+.ww-sd.g { background: var(--ww-g); box-shadow: 0 0 5px var(--ww-g); }
+.ww-sd.b { background: var(--ww-b); box-shadow: 0 0 5px var(--ww-b); animation: ww-blink 2s infinite; }
+.ww-sd.dim { background: var(--ww-dim); box-shadow: none; }
+.ww-pshop.closed { opacity: 1; border-color: rgba(255,255,255,.08); }
+.ww-pshop.closed .ww-pshop-name { color: var(--ww-dim); }
+.ww-pshop.closed .ww-shop-bar-fill { background: var(--ww-border) !important; width: 0% !important; }
+.ww-shop-bar-wrap { margin-top: .4rem; }
+.ww-shop-bar { height: 3px; background: var(--ww-bg); border: 1px solid var(--ww-border); overflow: hidden; }
+.ww-shop-bar-fill { height: 100%; transition: width 1s; }
+.ww-shop-dev { font-family: 'Share Tech Mono', monospace; font-size: .6rem; margin-top: .2rem; text-align: right; }
+
+/* Pizza history */
+.ww-pizza-history { display: flex; flex-direction: column; gap: .4rem; }
+.ww-ph-item { display: flex; align-items: center; gap: .8rem; padding: .5rem; background: var(--ww-bg3); border: 1px solid var(--ww-border); font-size: .75rem; }
+.ww-ph-year { font-family: 'Orbitron', monospace; font-size: .7rem; color: var(--ww-b); min-width: 42px; font-weight: 700; }
+.ww-ph-event { color: var(--ww-dim); flex: 1; }
+.ww-ph-pizzas { font-family: 'Share Tech Mono', monospace; color: var(--ww-o); min-width: 60px; text-align: right; font-size: .68rem; }
+
+/* ── Polymarket card ──────────────────────────────────────── */
+.ww-poly-list { display: flex; flex-direction: column; gap: .7rem; }
+.ww-poly-item { background: var(--ww-bg3); border: 1px solid var(--ww-border); border-left: 3px solid var(--ww-b); padding: .9rem 1rem; display: flex; flex-direction: column; justify-content: space-between; }
+.ww-poly-item.danger { border-left-color: var(--ww-r); }
+.ww-poly-item.warn   { border-left-color: var(--ww-o); }
+.ww-poly-q { font-size: .8rem; margin-bottom: .6rem; line-height: 1.4; }
+.ww-poly-bar-row { display: flex; align-items: center; gap: .6rem; }
+.ww-poly-bar { flex: 1; height: 7px; background: var(--ww-bg); border: 1px solid var(--ww-border); overflow: hidden; }
+.ww-poly-fill { height: 100%; transition: width 1s ease; }
+.ww-poly-pct { font-family: 'Orbitron', monospace; font-size: .82rem; font-weight: 700; min-width: 42px; text-align: right; }
+.ww-poly-meta { font-family: 'Share Tech Mono', monospace; font-size: .62rem; color: var(--ww-dim); display: flex; justify-content: space-between; margin-top: .4rem; flex-wrap: wrap; gap: .3rem; }
+
+/* ── Bottom 3-col grid ────────────────────────────────────── */
+.ww-bottom-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+
+/* Conflict list */
+.ww-conf-item { display: grid; grid-template-columns: 1fr auto; align-items: center; padding: .65rem; background: var(--ww-bg3); border: 1px solid var(--ww-border); margin-bottom: .5rem; gap: .5rem; }
+.ww-conf-name { font-size: .8rem; }
+.ww-conf-sub { font-family: 'Share Tech Mono', monospace; font-size: .62rem; color: var(--ww-dim); margin-top: .15rem; }
+.ww-pill { font-family: 'Orbitron', monospace; font-size: .58rem; font-weight: 700; letter-spacing: 1px; padding: 3px 7px; border: 1px solid; white-space: nowrap; }
+.ww-pill.crit { color:var(--ww-r); border-color:var(--ww-r); background:rgba(255,68,68,.08); }
+.ww-pill.high { color:var(--ww-o); border-color:var(--ww-o); background:rgba(255,170,0,.08); }
+.ww-pill.med  { color:var(--ww-b); border-color:var(--ww-b); background:rgba(0,170,255,.08); }
+.ww-pill.low  { color:var(--ww-g); border-color:var(--ww-g); background:rgba(0,255,136,.08); }
+
+/* OSINT signal feed */
+.ww-sig-item { display: flex; gap: .7rem; padding: .7rem; background: var(--ww-bg3); border: 1px solid var(--ww-border); margin-bottom: .5rem; }
+.ww-sig-icon { font-size: 1.1rem; min-width: 22px; text-align: center; }
+.ww-sig-text { font-size: .76rem; line-height: 1.4; flex: 1; }
+.ww-sig-meta { font-family: 'Share Tech Mono', monospace; font-size: .62rem; color: var(--ww-dim); margin-top: .2rem; }
+.ww-sig-src { color: var(--ww-b); }
+
+/* Doomsday */
+.ww-doom-clock { font-family: 'Orbitron', monospace; font-size: 2.8rem; font-weight: 900; color: var(--ww-p); text-shadow: 0 0 20px rgba(170,0,255,.5); letter-spacing: 3px; text-align: center; }
+.ww-doom-lbl { font-family: 'Share Tech Mono', monospace; font-size: .68rem; color: var(--ww-dim); letter-spacing: 2px; text-align: center; margin-top: .4rem; }
+.ww-doom-track-row { display: flex; align-items: center; gap: .5rem; margin: 1rem 0; font-family: 'Share Tech Mono', monospace; font-size: .62rem; color: var(--ww-dim); }
+.ww-doom-track { flex: 1; height: 4px; background: var(--ww-bg); border: 1px solid var(--ww-border); position: relative; }
+.ww-doom-fill { position: absolute; right: 0; top: 0; bottom: 0; width: 14%; background: linear-gradient(90deg,transparent,var(--ww-p)); }
+.ww-doom-pin { position: absolute; right: 14%; top: -4px; width: 2px; height: 12px; background: var(--ww-p); box-shadow: 0 0 8px var(--ww-p); }
+
+/* ── Disclaimer & Footer ──────────────────────────────────── */
+.ww-disclaimer { padding: .8rem 1rem; background: rgba(0,0,0,.3); border: 1px solid var(--ww-border); font-family: 'Share Tech Mono', monospace; font-size: .65rem; color: var(--ww-dim); text-align: center; margin-bottom: 1.5rem; }
+.ww-footer {
+  border-top: 1px solid var(--ww-border);
+  padding: 1rem 2rem;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .63rem;
+  color: var(--ww-dim);
+  letter-spacing: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ══════════════════════════════════════════════════════════
+   WPI — 戰爭壓力指數儀表板
+   ══════════════════════════════════════════════════════════ */
+.ww-wpi-section {
+  background: linear-gradient(135deg, rgba(10,18,30,0.95), rgba(5,12,22,0.98));
+  border: 1px solid rgba(0,170,255,.2);
+  border-top: 2px solid rgba(0,170,255,.5);
+  padding: 1.2rem 1.5rem 1rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+.ww-wpi-section::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% -20%, rgba(0,170,255,.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* 頂部標題列 */
+.ww-wpi-topbar {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 1.2rem; padding-bottom: .8rem;
+  border-bottom: 1px solid rgba(0,170,255,.15);
+}
+.ww-wpi-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 1rem; font-weight: 900;
+  color: var(--ww-b); letter-spacing: 3px;
+}
+.ww-wpi-ver {
+  font-size: .55rem; color: var(--ww-dim);
+  letter-spacing: 2px; margin-left: .5rem;
+}
+.ww-wpi-subtitle {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .62rem; color: var(--ww-dim);
+  margin-top: .25rem; letter-spacing: 1px;
+}
+.ww-wpi-alert-badge {
+  font-family: 'Orbitron', monospace;
+  font-size: .7rem; font-weight: 700;
+  padding: .4rem .9rem;
+  border: 1px solid; letter-spacing: 2px;
+  animation: ww-blink 2s ease-in-out infinite;
+}
+.ww-wpi-alert-badge.low    { color:var(--ww-g); border-color:var(--ww-g); background:rgba(0,255,136,.06); }
+.ww-wpi-alert-badge.medium { color:var(--ww-o); border-color:var(--ww-o); background:rgba(255,170,0,.06); }
+.ww-wpi-alert-badge.high   { color:var(--ww-r); border-color:var(--ww-r); background:rgba(255,68,68,.08); }
+.ww-wpi-alert-badge.critical{ color:#ff00ff; border-color:#ff00ff; background:rgba(255,0,255,.08); }
+
+/* 主體三欄 */
+.ww-wpi-body {
+  display: grid;
+  grid-template-columns: 220px 1fr 240px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+/* 左：四子指標 */
+.ww-wpi-factors { display: flex; flex-direction: column; gap: .65rem; }
+.ww-wpi-factor {
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.07);
+  padding: .55rem .7rem;
+  transition: border-color .3s;
+}
+.ww-wpi-factor.active { border-color: rgba(0,170,255,.4); }
+.ww-wpi-f-header {
+  display: flex; align-items: center; gap: .4rem;
+  margin-bottom: .35rem;
+}
+.ww-wpi-f-icon  { font-size: .85rem; }
+.ww-wpi-f-name  {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .68rem; color: var(--ww-text); flex: 1;
+}
+.ww-wpi-f-name em { color: var(--ww-b); font-style: normal; font-weight: 700; }
+.ww-wpi-f-weight {
+  font-family: 'Orbitron', monospace;
+  font-size: .52rem; color: var(--ww-dim); letter-spacing: 1px;
+}
+.ww-wpi-f-bar-wrap { display: flex; align-items: center; gap: .5rem; margin-bottom: .2rem; }
+.ww-wpi-f-bar {
+  flex: 1; height: 5px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.1);
+  overflow: hidden;
+}
+.ww-wpi-f-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00aaff, #ff6600);
+  transition: width 1.5s ease;
+}
+.ww-wpi-f-val {
+  font-family: 'Orbitron', monospace;
+  font-size: .75rem; font-weight: 700;
+  color: var(--ww-o); min-width: 28px; text-align: right;
+}
+.ww-wpi-f-desc {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .55rem; color: var(--ww-dim);
+}
+
+/* 中：大錶盤 */
+.ww-wpi-gauge-wrap {
+  display: flex; flex-direction: column; align-items: center;
+  position: relative;
+}
+.ww-wpi-arc { width: 240px; height: 140px; }
+.ww-wpi-center {
+  text-align: center; margin-top: -1rem;
+}
+.ww-wpi-num {
+  font-family: 'Orbitron', monospace;
+  font-size: 3.2rem; font-weight: 900;
+  line-height: 1;
+  background: linear-gradient(135deg, #ffffff, #00aaff);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 15px rgba(0,170,255,.4));
+}
+.ww-wpi-num-lbl {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .65rem; color: var(--ww-dim); margin-top: .1rem;
+}
+.ww-wpi-level {
+  font-family: 'Orbitron', monospace;
+  font-size: .75rem; font-weight: 700;
+  letter-spacing: 3px; margin-top: .4rem;
+  color: var(--ww-o);
+}
+.ww-wpi-scale {
+  display: flex; justify-content: space-between;
+  width: 240px; margin-top: .4rem;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .55rem; text-align: center; line-height: 1.3;
+}
+.ww-wpi-formula {
+  margin-top: .7rem;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .6rem; color: var(--ww-dim);
+  background: rgba(0,0,0,.3);
+  padding: .3rem .7rem; border: 1px solid rgba(255,255,255,.07);
+  letter-spacing: .5px;
+}
+.ww-wpi-formula em { color: var(--ww-b); font-style: normal; }
+
+/* 右：三級警戒 */
+.ww-wpi-alerts { display: flex; flex-direction: column; gap: .6rem; }
+.ww-wpi-al-title {
+  font-family: 'Orbitron', monospace;
+  font-size: .55rem; color: var(--ww-dim);
+  letter-spacing: 3px; margin-bottom: .2rem;
+}
+.ww-wpi-al-item {
+  display: flex; align-items: flex-start; gap: .6rem;
+  padding: .55rem .7rem;
+  background: rgba(255,255,255,.02);
+  border: 1px solid rgba(255,255,255,.07);
+  border-left: 3px solid rgba(255,255,255,.1);
+  transition: all .3s;
+}
+.ww-wpi-al-item.triggered { background: rgba(255,255,255,.05); }
+.ww-wpi-al-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  margin-top: 3px; flex-shrink: 0;
+}
+.ww-wpi-al-dot.low  { background: var(--ww-g); }
+.ww-wpi-al-dot.med  { background: var(--ww-o); }
+.ww-wpi-al-dot.high { background: var(--ww-r); box-shadow: 0 0 6px var(--ww-r); }
+.ww-wpi-al-name {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .7rem; color: var(--ww-text); font-weight: 700;
+}
+.ww-wpi-al-cond {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .6rem; color: var(--ww-dim); margin-top: .1rem;
+}
+.ww-wpi-al-sub {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .55rem; color: rgba(255,255,255,.25); margin-top: .1rem;
+}
+.ww-wpi-al-status {
+  margin-left: auto; flex-shrink: 0;
+  font-family: 'Orbitron', monospace;
+  font-size: .58rem; font-weight: 700;
+  color: var(--ww-dim);
+}
+.ww-wpi-al-item.triggered .ww-wpi-al-status { color: var(--ww-o); }
+.ww-wpi-al-item.triggered.high-alert .ww-wpi-al-status { color: var(--ww-r); }
+
+/* 底部 footer */
+.ww-wpi-footer {
+  display: flex; gap: .8rem; align-items: center; flex-wrap: wrap;
+  margin-top: 1rem; padding-top: .7rem;
+  border-top: 1px solid rgba(0,170,255,.1);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .58rem; color: var(--ww-dim);
+}
+
+/* RWD */
+@media (max-width: 1100px) {
+  .ww-wpi-body { grid-template-columns: 200px 1fr; }
+  .ww-wpi-alerts { grid-column: span 2; flex-direction: row; flex-wrap: wrap; }
+  .ww-wpi-al-item { flex: 1; min-width: 160px; }
+}
+@media (max-width: 768px) {
+  .ww-wpi-section { padding: .8rem 1rem; }
+  .ww-wpi-topbar { flex-direction: column; gap: .5rem; }
+  .ww-wpi-alert-badge { align-self: flex-start; }
+
+  /* 手機版：單欄 */
+  .ww-wpi-body {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: .8rem;
+  }
+  .ww-wpi-gauge-wrap { align-self: center; width: 100%; }
+  .ww-wpi-factors    { display: grid !important; grid-template-columns: 1fr 1fr; gap: .5rem; width: 100%; }
+  .ww-wpi-alerts     { flex-direction: column; width: 100%; }
+
+  .ww-wpi-arc { width: 220px; height: 130px; }
+  .ww-wpi-scale { width: 220px; }
+  .ww-wpi-num { font-size: 2.6rem; }
+  .ww-wpi-factor { padding: .45rem .55rem; }
+  .ww-wpi-f-name { font-size: .62rem; }
+  .ww-wpi-f-val  { font-size: .68rem; }
+  .ww-wpi-f-desc { font-size: .5rem; }
+  .ww-wpi-al-item { min-width: unset; }
+  .ww-wpi-formula { font-size: .52rem; }
+  .ww-wpi-title { font-size: .8rem; letter-spacing: 2px; }
+  .ww-wpi-subtitle { font-size: .55rem; }
+}
+@media (max-width: 480px) {
+  .ww-wpi-factors { grid-template-columns: 1fr 1fr; }
+  .ww-wpi-arc { width: 190px; height: 112px; }
+  .ww-wpi-scale { width: 190px; }
+}
+
+/* ══════════════════════════════════════════════════════════
+   新 OSINT 模組：Aviation / Conflict / Finance
+   ══════════════════════════════════════════════════════════ */
+
+/* ── 共用：全寬橫排 3 欄 grid ─────────────────────────────── */
+.ww-osint-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  align-items: stretch;
+}
+.ww-osint-header {
+  font-family: 'Orbitron', monospace;
+  font-size: .58rem; letter-spacing: 3px;
+  color: var(--ww-dim); text-transform: uppercase;
+  margin-bottom: 1rem; padding-bottom: .5rem;
+  border-bottom: 1px solid var(--ww-border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.ww-osint-updated {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .55rem; color: var(--ww-dim);
+  letter-spacing: 1px;
+}
+
+/* ── A. 航空監控 ──────────────────────────────────────────── */
+.ww-avi-counter {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: .5rem;
+  margin-bottom: 1rem;
+}
+.ww-avi-box {
+  background: var(--ww-bg3); border: 1px solid var(--ww-border);
+  padding: .6rem; text-align: center;
+}
+.ww-avi-box-val {
+  font-family: 'Orbitron', monospace; font-size: 1.4rem;
+  font-weight: 700; line-height: 1;
+}
+.ww-avi-box-lbl {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .55rem; color: var(--ww-dim);
+  letter-spacing: 1px; margin-top: .3rem;
+}
+.ww-avi-list { display: flex; flex-direction: column; gap: .4rem; }
+.ww-avi-item {
+  display: grid; grid-template-columns: 18px 1fr auto;
+  align-items: center; gap: .5rem;
+  padding: .5rem .6rem;
+  background: var(--ww-bg3); border: 1px solid var(--ww-border);
+  font-family: 'Share Tech Mono', monospace; font-size: .68rem;
+}
+.ww-avi-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  justify-self: center;
+}
+.ww-avi-dot.tanker  { background: #cc44ff; box-shadow: 0 0 5px #cc44ff; }
+.ww-avi-dot.awacs   { background: #ffaa00; box-shadow: 0 0 5px #ffaa00; animation: ww-blink 1.2s infinite; }
+.ww-avi-dot.uav     { background: #00aaff; box-shadow: 0 0 5px #00aaff; }
+.ww-avi-dot.unknown { background: #6a8a9a; }
+.ww-avi-type { color: var(--ww-dim); font-size: .58rem; }
+.ww-avi-trend { font-size: .65rem; }
+.ww-avi-trend.up   { color: var(--ww-r); }
+.ww-avi-trend.down { color: var(--ww-g); }
+.ww-avi-trend.flat { color: var(--ww-dim); }
+.ww-avi-legend {
+  display: flex; gap: .8rem; flex-wrap: wrap;
+  margin-top: .8rem; padding-top: .6rem;
+  border-top: 1px solid var(--ww-border);
+  font-family: 'Share Tech Mono', monospace; font-size: .58rem; color: var(--ww-dim);
+}
+.ww-avi-legend span { display: flex; align-items: center; gap: .3rem; }
+
+/* ── B. 衝突熱點 (Live Feed) ──────────────────────────────── */
+.ww-fire-summary {
+  display: grid; grid-template-columns: 1fr 1fr; gap: .5rem;
+  margin-bottom: 1rem;
+}
+.ww-fire-box {
+  background: var(--ww-bg3); border: 1px solid var(--ww-border);
+  padding: .6rem; text-align: center;
+}
+.ww-fire-val {
+  font-family: 'Orbitron', monospace; font-size: 1.3rem; font-weight: 700;
+}
+.ww-fire-lbl {
+  font-family: 'Share Tech Mono', monospace; font-size: .55rem;
+  color: var(--ww-dim); margin-top: .2rem;
+}
+.ww-live-feed { display: flex; flex-direction: column; gap: .4rem; max-height: 260px; overflow-y: auto; }
+.ww-live-feed::-webkit-scrollbar { width: 3px; }
+.ww-live-feed::-webkit-scrollbar-thumb { background: var(--ww-border); }
+.ww-feed-item {
+  display: flex; gap: .6rem;
+  padding: .5rem .6rem;
+  background: var(--ww-bg3); border: 1px solid var(--ww-border);
+  border-left: 2px solid var(--ww-border);
+  font-family: 'Share Tech Mono', monospace; font-size: .65rem;
+}
+.ww-feed-item.fire  { border-left-color: var(--ww-r); }
+.ww-feed-item.air   { border-left-color: var(--ww-b); }
+.ww-feed-item.move  { border-left-color: var(--ww-o); }
+.ww-feed-item.cyber { border-left-color: var(--ww-p); }
+.ww-feed-time { color: var(--ww-dim); white-space: nowrap; min-width: 42px; font-size: .6rem; }
+.ww-feed-text { flex: 1; color: var(--ww-text); line-height: 1.4; }
+.ww-feed-src  { color: var(--ww-dim); font-size: .58rem; margin-top: .15rem; }
+
+/* 事件類型圓餅 — 純 CSS 色環 */
+.ww-event-types {
+  display: flex; gap: .5rem; flex-wrap: wrap;
+  margin-top: .8rem; padding-top: .6rem;
+  border-top: 1px solid var(--ww-border);
+}
+.ww-event-tag {
+  font-family: 'Share Tech Mono', monospace; font-size: .58rem;
+  padding: 2px 6px; border: 1px solid;
+}
+
+/* ── C. 經濟避險 ──────────────────────────────────────────── */
+.ww-fin-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: .5rem;
+  margin-bottom: 1rem;
+}
+.ww-fin-box {
+  background: var(--ww-bg3); border: 1px solid var(--ww-border);
+  padding: .7rem;
+}
+.ww-fin-ticker {
+  font-family: 'Orbitron', monospace; font-size: .6rem;
+  color: var(--ww-dim); letter-spacing: 2px; margin-bottom: .1rem;
+}
+.ww-fin-ticker-zh {
+  font-family: 'Share Tech Mono', monospace; font-size: .58rem;
+  color: var(--ww-dim); opacity: .7; margin-bottom: .2rem; letter-spacing: 0;
+}
+.ww-fin-price {
+  font-family: 'Orbitron', monospace; font-size: 1.1rem;
+  font-weight: 700; line-height: 1;
+}
+.ww-fin-change {
+  font-family: 'Share Tech Mono', monospace; font-size: .65rem;
+  margin-top: .25rem;
+}
+.ww-fin-change.up   { color: var(--ww-r); }
+.ww-fin-change.down { color: var(--ww-g); }
+.ww-fin-war-premium {
+  margin-top: .8rem; padding: .6rem;
+  background: rgba(255,170,0,.05); border: 1px solid rgba(255,170,0,.2);
+  font-family: 'Share Tech Mono', monospace; font-size: .65rem; color: var(--ww-dim);
+  line-height: 1.6;
+}
+.ww-fin-stocks { display: flex; flex-direction: column; gap: .35rem; margin-top: .8rem; }
+.ww-fin-stock-item {
+  display: grid; grid-template-columns: 60px 1fr auto auto;
+  align-items: center; gap: .5rem;
+  padding: .4rem .5rem;
+  background: var(--ww-bg3); border: 1px solid var(--ww-border);
+  font-family: 'Share Tech Mono', monospace; font-size: .65rem;
+}
+.ww-fin-stock-sym { color: var(--ww-b); font-weight: 700; }
+.ww-fin-stock-name { color: var(--ww-dim); font-size: .58rem; }
+.ww-fin-stock-px { text-align: right; }
+.ww-fin-stock-chg { text-align: right; font-size: .62rem; }
+
+/* ── RWD for new modules ──────────────────────────────────── */
+@media (max-width: 1100px) { .ww-osint-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 900px)  { .ww-osint-grid { grid-template-columns: 1fr; } .ww-avi-counter { grid-template-columns: repeat(3,1fr); } }
+@media (max-width: 640px)  { .ww-fin-grid { grid-template-columns: 1fr 1fr; } .ww-avi-counter { grid-template-columns: repeat(3,1fr); } }
+@media (max-width: 480px)  { .ww-fin-grid { grid-template-columns: 1fr 1fr; } .ww-avi-counter { grid-template-columns: 1fr 1fr 1fr; } }
+
+/* ══════════════════════════════════════════════════════════
+   RWD — 斷點策略
+   1280px+ : 桌面全版（預設）
+   1100px  : 大平板 — 隱藏右側 stat-col
+    900px  : 平板直向 — 單欄 main-grid / threat-grid
+    640px  : 大手機 — 縮小字型、底部 2 欄
+    480px  : 手機   — 完全單欄、簡化 header
+    360px  : 小手機 — 極限壓縮
+   ══════════════════════════════════════════════════════════ */
+
+/* ── 1100px：大平板 ───────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .ww-threat-grid { grid-template-columns: 200px 1fr; }
+  .ww-stat-col    { display: none; }
+  .ww-bottom-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* ── 900px：平板直向 ──────────────────────────────────────── */
+@media (max-width: 900px) {
+  /* Layout */
+  .ww-wrap             { padding: 1rem 1rem; }
+  .ww-threat-hero      { padding: 1.2rem; }
+  .ww-threat-grid      { grid-template-columns: 1fr; gap: 1.2rem; }
+  .ww-main-grid        { grid-template-columns: 1fr; gap: 1rem; }
+  .ww-pbi-grid         { grid-template-columns: 1fr; gap: .8rem; }
+  .ww-poly-grid        { grid-template-columns: 1fr; }
+  .ww-bottom-grid      { grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .ww-card             { padding: 1rem; }
+
+  /* Hero score */
+  .ww-score-box        { display: flex; align-items: center; gap: 1.2rem; justify-content: center; }
+  .ww-score-num        { font-size: 4rem; }
+
+  /* Meters — 縮短 label 欄 */
+  .ww-meter-row        { grid-template-columns: 100px 1fr 42px; gap: .5rem; }
+  .ww-ml               { font-size: .65rem; }
+
+  /* Header */
+  .ww-header-inner     { padding: 0 1rem; height: 54px; }
+  .ww-logo             { font-size: 1.1rem; letter-spacing: 2px; }
+  .ww-logo small       { display: none; }
+  .ww-hright           { gap: 1rem; }
+
+  /* Pizza */
+  .ww-pizza-grid       { grid-template-columns: 1fr 1fr; }
+  .ww-alert-stats      { grid-template-columns: 1fr 1fr; }
+
+  /* History — 隱藏披薩數量欄 */
+  .ww-ph-pizzas        { display: none; }
+  .ww-ph-item          { gap: .5rem; }
+
+  /* Doomsday clock */
+  .ww-doom-clock       { font-size: 2.2rem; }
+}
+
+/* ── 640px：大手機 ────────────────────────────────────────── */
+@media (max-width: 640px) {
+  /* Layout */
+  .ww-wrap             { padding: .8rem; }
+  .ww-threat-hero      { padding: 1rem; margin-bottom: 1rem; }
+  .ww-main-grid        { gap: .8rem; margin-bottom: 1rem; }
+  .ww-bottom-grid      { grid-template-columns: 1fr; gap: .8rem; margin-bottom: 1rem; }
+  .ww-card             { padding: .9rem; }
+
+  /* Hero */
+  .ww-score-box        { flex-direction: column; gap: .4rem; }
+  .ww-score-num        { font-size: 3.2rem; }
+  .ww-score-lbl        { font-size: .65rem; }
+  .ww-score-sub        { font-size: .6rem; }
+
+  /* Meters */
+  .ww-meter-row        { grid-template-columns: 80px 1fr 40px; gap: .4rem; }
+  .ww-ml               { font-size: .62rem; }
+  .ww-mp               { font-size: .65rem; }
+
+  /* Section titles */
+  .ww-sec-title        { font-size: .58rem; letter-spacing: 2px; }
+
+  /* Header */
+  .ww-logo             { font-size: 1rem; letter-spacing: 1px; }
+  .ww-badge            { font-size: .58rem; padding: 2px 7px; letter-spacing: 1px; }
+  .ww-hright           { gap: .7rem; font-size: .65rem; }
+
+  /* Pizza shops — 2欄保持，但字縮小 */
+  .ww-pshop-name       { font-size: .58rem; }
+  .ww-pshop-status     { font-size: .62rem; }
+
+  /* Pizza history */
+  .ww-ph-year          { font-size: .65rem; min-width: 36px; }
+  .ww-ph-event         { font-size: .7rem; }
+  .ww-ph-item          { padding: .4rem; }
+
+  /* Polymarket */
+  .ww-poly-q           { font-size: .75rem; }
+  .ww-poly-pct         { font-size: .75rem; min-width: 36px; }
+
+  /* Conflict */
+  .ww-conf-name        { font-size: .75rem; }
+  .ww-conf-sub         { font-size: .58rem; }
+  .ww-pill             { font-size: .54rem; padding: 2px 5px; }
+
+  /* OSINT */
+  .ww-sig-text         { font-size: .72rem; }
+  .ww-sig-meta         { font-size: .58rem; }
+
+  /* Doomsday */
+  .ww-doom-clock       { font-size: 2rem; letter-spacing: 2px; }
+  .ww-doom-lbl         { font-size: .62rem; letter-spacing: 1px; }
+
+  /* Alert banner */
+  .ww-alert-main       { font-size: .75rem; }
+  .ww-alert-bullets    { font-size: .65rem; }
+  .ww-alert-stat-val   { font-size: 1rem; }
+
+  /* Gauge zone labels — hide middle ones */
+  .ww-gauge-zone-row span:nth-child(2),
+  .ww-gauge-zone-row span:nth-child(3) { display: none; }
+  .ww-gauge-marker-el,
+  .ww-gauge-marker-hi { display: none; }
+
+  /* Footer */
+  .ww-footer           { padding: .8rem 1rem; font-size: .58rem; }
+  .ww-disclaimer       { font-size: .6rem; }
+}
+
+/* ── 480px：手機 ──────────────────────────────────────────── */
+@media (max-width: 480px) {
+  /* Header — 極簡模式 */
+  .ww-header-inner     { height: 48px; }
+  .ww-logo             { font-size: .95rem; letter-spacing: 0; }
+  #ww-clock            { display: none; }
+  .ww-live             { display: none; }
+  .ww-hright           { gap: .5rem; }
+
+  /* Pizza shops — 單欄 */
+  .ww-pizza-grid       { grid-template-columns: 1fr; }
+
+  /* Alert stats — 單欄 */
+  .ww-alert-stats      { grid-template-columns: 1fr; }
+  .ww-alert-hdr        { flex-wrap: wrap; gap: .4rem; }
+  .ww-alert-ts         { margin-left: 0; }
+
+  /* Score */
+  .ww-score-num        { font-size: 2.8rem; }
+
+  /* Meters — label 縮更短 */
+  .ww-meter-row        { grid-template-columns: 68px 1fr 36px; gap: .3rem; }
+  .ww-ml               { font-size: .58rem; }
+
+  /* History — 只顯示年份和事件 */
+  .ww-ph-item          { flex-wrap: wrap; }
+  .ww-ph-event         { font-size: .65rem; line-height: 1.4; }
+
+  /* Ticker */
+  .ww-ticker-lbl       { font-size: .55rem; padding: 0 .6rem; letter-spacing: 1px; }
+  .ww-ti               { font-size: .65rem; padding: 0 1rem; }
+
+  /* Doomsday */
+  .ww-doom-clock       { font-size: 1.7rem; letter-spacing: 1px; }
+
+  /* Poly */
+  .ww-poly-bar-row     { gap: .4rem; }
+
+  /* Wrap */
+  .ww-wrap             { padding: .6rem; }
+  .ww-card             { padding: .8rem; }
+  .ww-threat-hero      { padding: .8rem; }
+}
+
+/* ── 360px：小手機 ────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════
+   手機版全頁 RWD 補丁（768px 以下未涵蓋區塊）
+   ══════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* Intel Feed ticker — 字體縮小 */
+  .ww-ticker-text      { font-size: .58rem; }
+
+  /* Polymarket grid — auto-fill 在手機已自動單欄，確保 minmax 夠小 */
+  .ww-poly-grid        { grid-template-columns: 1fr; }
+  .ww-poly-item        { padding: .6rem .7rem; }
+  .ww-poly-q           { font-size: .72rem; }
+
+  /* Bar grid — 手機單欄 */
+  .ww-bar-grid         { grid-template-columns: 1fr; gap: .4rem; }
+
+  /* Fire summary — 手機單欄 */
+  .ww-fire-summary     { grid-template-columns: 1fr; }
+
+  /* Finance stock items — 縮減欄寬 */
+  .ww-fin-stock-item   { grid-template-columns: 50px 1fr auto; gap: .3rem; }
+  .ww-fin-stock-item > *:last-child { display: none; } /* 隱藏第4欄 */
+  .ww-fin-grid         { grid-template-columns: 1fr 1fr; gap: .4rem; }
+
+  /* Conflict region items */
+  .ww-conf-item        { padding: .5rem; }
+
+  /* OSINT section headers */
+  .ww-osint-header     { font-size: .5rem; letter-spacing: 2px; }
+
+  /* Pizza/Bar section header */
+  .ww-pbi-header       { flex-wrap: wrap; gap: .3rem; }
+
+  /* 各地區熱度 — 文字縮小 */
+  .ww-region-name      { font-size: .62rem; }
+  .ww-region-pct       { font-size: .72rem; }
+
+  /* History chips 橫捲 */
+  .ww-ph-item          { min-width: 130px; }
+  .ww-ph-year          { font-size: .8rem; }
+  .ww-ph-desc          { font-size: .6rem; }
+
+  /* Bottom grid（最下方三欄）→ 單欄 */
+  .ww-bottom-grid      { grid-template-columns: 1fr; }
+
+  /* Doom clock */
+  .ww-doom-clock       { font-size: 1.4rem; }
+}
+
+@media (max-width: 480px) {
+  /* Fin grid → 單欄 */
+  .ww-fin-grid         { grid-template-columns: 1fr; }
+
+  /* Poly meta 縮小 */
+  .ww-poly-meta        { font-size: .52rem; }
+  .ww-poly-pct         { font-size: .85rem; }
+
+  /* Pizza/Bar card title */
+  .ww-sec-title        { font-size: .65rem; letter-spacing: 2px; }
+}
+
+@media (max-width: 360px) {
+  .ww-logo             { font-size: .85rem; }
+  .ww-badge            { display: none; }
+  .ww-score-num        { font-size: 2.4rem; }
+  .ww-doom-clock       { font-size: 1.5rem; }
+  .ww-wrap             { padding: .5rem; }
+  .ww-card             { padding: .7rem; }
+  .ww-meter-row        { grid-template-columns: 58px 1fr 32px; }
+  .ww-ml               { font-size: .55rem; }
+  .ww-sec-title        { font-size: .52rem; letter-spacing: 1px; }
+}
+
+/* ── Touch：取消 hover pause on ticker（手機無 hover）─────── */
+@media (hover: none) {
+  .ww-ticker-scroll    { animation-play-state: running !important; }
+}
+
+/* ── 確保 inline style 在手機也不溢出 ─────────────────────── */
+#warwatch-page         { word-break: break-word; }
+.ww-poly-q            { word-break: break-word; }
+.ww-conf-name         { word-break: break-word; }
+.ww-sig-text          { word-break: break-word; }
+
+/* ══════════════════════════════════════════════════════════
+   金融市場 × WPI 相關性分析
+   ══════════════════════════════════════════════════════════ */
+.ww-corr-wrap {
+  background: var(--ww-bg2);
+  border: 1px solid var(--ww-border);
+  border-top: 2px solid var(--ww-o);
+  padding: 1.4rem 1.5rem 1.2rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+.ww-corr-wrap::before {
+  content: '';
+  position: absolute; top: 0; left: 0;
+  width: 10px; height: 10px;
+  border-top: 1px solid var(--ww-g);
+  border-left: 1px solid var(--ww-g);
+}
+.ww-corr-wrap::after {
+  content: '';
+  position: absolute; bottom: 0; right: 0;
+  width: 10px; height: 10px;
+  border-bottom: 1px solid var(--ww-g);
+  border-right: 1px solid var(--ww-g);
+}
+
+.ww-corr-chart-box {
+  /* 樣式已移至 .ww-corr-wrap，此處保留空選擇器向後相容 */
+}
+.ww-corr-chart-box-old-before-removed {
+
+.ww-corr-canvas-wrap {
+  height: 240px;
+  margin: 1rem 0;
+  position: relative;
+}
+
+.ww-corr-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .72rem;
+  color: var(--ww-dim);
+  text-align: center;
+  padding: 0 2rem;
+}
+
+.ww-corr-badges {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: .8rem;
+  margin-top: 1rem;
+}
+
+.ww-corr-badge {
+  background: var(--ww-bg3);
+  border: 1px solid var(--ww-border);
+  padding: .8rem 1rem;
+}
+
+.ww-corr-badge-lbl {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .6rem;
+  color: var(--ww-dim);
+  letter-spacing: 1px;
+  margin-bottom: .4rem;
+  text-transform: uppercase;
+}
+
+.ww-corr-val {
+  font-family: 'Orbitron', monospace;
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--ww-dim);
+}
+.ww-corr-val.corr-strong { color: var(--ww-r); text-shadow: 0 0 8px rgba(255,68,68,.3); }
+.ww-corr-val.corr-mod    { color: var(--ww-o); }
+.ww-corr-val.corr-weak   { color: var(--ww-dim); }
+
+.ww-corr-hint {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .65rem;
+  color: var(--ww-dim);
+  line-height: 1.7;
+  margin-top: .8rem;
+  padding: .6rem .8rem;
+  background: rgba(0,0,0,.2);
+  border-left: 2px solid var(--ww-o);
+}
+
+.ww-corr-meta {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .6rem;
+  color: var(--ww-dim);
+  margin-top: .8rem;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: .3rem;
+  padding-top: .6rem;
+  border-top: 1px solid var(--ww-border);
+}
+
+@media (max-width: 768px) {
+  .ww-corr-badges { grid-template-columns: 1fr; }
+  .ww-corr-canvas-wrap { height: 200px; }
+}
+
+/* ── RSS Ticker 樣式 ──────────────────────────────────────── */
+.ww-ti-src {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .65rem;
+  color: var(--ww-g, #00ff88);
+  letter-spacing: 1px;
+  margin-right: .3rem;
+  opacity: .8;
+}
+.ww-ti-link {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255,255,255,.15);
+  transition: border-color .2s, color .2s;
+}
+.ww-ti-link:hover {
+  color: var(--ww-g, #00ff88);
+  border-bottom-color: var(--ww-g, #00ff88);
+}
+.ww-ti-age {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .6rem;
+  color: var(--ww-dim, #4a6070);
+  margin-left: .3rem;
+}
+
+
+
+/* ══════════════════════════════════════════════════════════
+   RSS 即時戰爭新聞卡片
+   ══════════════════════════════════════════════════════════ */
+
+#ww-news-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: .9rem;
+}
+
+/* Ticker inline style fallback classes */
+.ww-ti-src {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .65rem;
+  color: var(--ww-g, #00ff88);
+  margin-right: .3rem;
+  opacity: .8;
+}
+
+.ww-ti-link {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255,255,255,.12);
+  transition: color .2s, border-color .2s;
+}
+
+.ww-ti-link:hover {
+  color: var(--ww-g, #00ff88);
+  border-bottom-color: var(--ww-g, #00ff88);
+}
+
+.ww-ti-age {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .6rem;
+  color: var(--ww-dim, #4a6070);
+  margin-left: .3rem;
+}
+
+/* Card hover handled by inline JS — no CSS needed, but keep for
+   potential external JS usage */
+[data-src] a:hover { color: #fff !important; }
+
+/* Responsive */
+@media (max-width: 1024px) {
+  #ww-news-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px) {
+  #ww-news-grid { grid-template-columns: 1fr; }
+}

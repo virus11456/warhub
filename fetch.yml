@@ -1,0 +1,54 @@
+name: ConflictWatch — 自動數據抓取
+
+on:
+  schedule:
+    # 每 15 分鐘執行一次（UTC）
+    - cron: '*/15 * * * *'
+  workflow_dispatch:  # 允許手動觸發
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install aiohttp populartimes requests python-dotenv
+
+      - name: Run fetcher
+        env:
+          GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+          TELEGRAM_BOT_TOKEN:  ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID:    ${{ secrets.TELEGRAM_CHAT_ID }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          cd backend
+          python fetcher.py
+
+      # 如果 combined_score 上升到 CRITICAL，額外推播
+      - name: Check and alert
+        env:
+          TELEGRAM_BOT_TOKEN:  ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID:    ${{ secrets.TELEGRAM_CHAT_ID }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          python backend/alert_check.py
+
+      # 將 data.json 推回 repo（或上傳到 Supabase Storage）
+      - name: Commit updated data
+        run: |
+          git config user.name "ConflictWatch Bot"
+          git config user.email "bot@conflictwatch.io"
+          git add public/data.json conflictwatch.db
+          git diff --staged --quiet || git commit -m "chore: update data $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          git push
