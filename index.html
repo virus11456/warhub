@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WARWATCH // 戰爭預測情報中心</title>
+<meta name="description" content="WARWATCH 戰爭預測情報中心 — Polymarket 預測市場、Pentagon Pizza Index、軍機動態、NASA FIRMS 衛星火點、避險資產等多源 OSINT 即時儀表板">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%A1%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -1202,7 +1204,7 @@
       <div style="margin:.6rem 0 .8rem">
         <div style="display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim);margin-bottom:.4rem">
           <span>異常指數</span>
-          <span id="pizza-gauge-label" style="font-weight:700">--%</span>
+          <span id="pizza-gauge-pct" style="font-weight:700">--%</span>
         </div>
         <div style="height:10px;background:var(--bg3);border:1px solid var(--border);position:relative;border-radius:2px">
           <div id="pizza-gauge-fill" style="height:100%;width:0%;background:linear-gradient(90deg,#004400,var(--accent3));border-radius:2px;transition:width .8s ease;position:relative">
@@ -1618,6 +1620,8 @@
   </div>
 
 </div><!-- /.osint-adv-grid -->
+
+<footer>
   WARWATCH // 戰爭預測情報中心 &nbsp;|&nbsp; 資料來源：Polymarket · pizzint.watch · adsb.fi · NASA FIRMS / EONET &nbsp;|&nbsp; 僅供資訊參考，不構成任何建議 &nbsp;|&nbsp; <span id="last-update-ts" style="color:var(--text-dim)">⏳ 等待後端資料…</span>
 </footer>
 
@@ -1755,60 +1759,68 @@ function renderWarAlert(status, shops) {
   const levelNum = document.getElementById('pizza-level-num');
 
   const gaugeVal = Math.round(status.avg);
-  gaugeEl.style.width = gaugeVal + '%';
-  gaugePct.textContent = gaugeVal + '%';
-  gaugePct.style.color = status.gaugeColor;
+  if (gaugeEl) gaugeEl.style.width = gaugeVal + '%';
+  if (gaugePct) {
+    gaugePct.textContent = gaugeVal + '%';
+    gaugePct.style.color = status.gaugeColor;
+  }
 
   if (levelNum) {
     levelNum.textContent = status.levelZh;
     levelNum.style.color = status.gaugeColor;
   }
 
+  const badgeEl = document.getElementById('alert-badge');
+
   if (status.level === 'ANOMALY') {
     // 顯示戰爭警報
-    alertEl.style.display = 'block';
-    cardEl.classList.add('anomaly');
+    if (alertEl) alertEl.style.display = 'block';
+    if (cardEl)  cardEl.classList.add('anomaly');
 
     const anomCount = status.anomalyShops.length;
     const histMatch = HISTORICAL_MATCH[anomCount] || '~76%';
 
-    levelLbl.textContent = `CRITICAL ANOMALY — ${anomCount} 家店觸發`;
-    mainTxt.innerHTML = `🍕 披薩指數<strong style="color:var(--accent2)">嚴重異常</strong> — 歷史上此訊號出現後 <strong>2–48 小時</strong>內曾有軍事行動發生`;
-    shopsCnt.textContent = `${anomCount} / ${shops.length}`;
+    if (levelLbl) levelLbl.textContent = `CRITICAL ANOMALY — ${anomCount} 家店觸發`;
+    if (mainTxt)  mainTxt.innerHTML = `🍕 披薩指數<strong style="color:var(--accent2)">嚴重異常</strong> — 歷史上此訊號出現後 <strong>2–48 小時</strong>內曾有軍事行動發生`;
+    if (shopsCnt) shopsCnt.textContent = `${anomCount} / ${shops.length}`;
 
     // 動態 bullet 列表
     const topShop = [...shops].sort((a,b) => b.busyness - a.busyness)[0];
     const topDev  = Math.round(((topShop.busyness - topShop.baseline) / topShop.baseline) * 100);
-    bullets.innerHTML = `
+    if (bullets) bullets.innerHTML = `
       <div style="color:var(--accent2);">▶ ${topShop.name} 繁忙度較基準高出 <strong>+${topDev}%</strong></div>
       <div style="color:var(--accent3);">▶ ${anomCount} 家店同時出現深夜異常高峰，交叉確認可信度提升</div>
       <div style="color:var(--accent3);">▶ 歷史符合率：${histMatch}（${anomCount} 家店同時觸發時）</div>
       <div style="color:var(--text-dim);">▶ 建議同步觀察：Polymarket 戰爭機率、FlightRadar24 軍機動態</div>`;
 
     // 更新 header 警戒狀態
-    document.getElementById('alert-badge').style.borderColor = 'var(--accent2)';
-    document.getElementById('alert-badge').style.color = 'var(--accent2)';
-    document.getElementById('alert-badge').textContent = '🍕 PIZZA ANOMALY';
+    if (badgeEl) {
+      badgeEl.style.borderColor = 'var(--accent2)';
+      badgeEl.style.color = 'var(--accent2)';
+      badgeEl.textContent = '🍕 PIZZA ANOMALY';
+    }
 
   } else if (status.level === 'HIGH') {
-    alertEl.style.display = 'block';
-    cardEl.classList.remove('anomaly');
-    levelLbl.textContent = 'HIGH ACTIVITY';
-    mainTxt.innerHTML = `🍕 披薩指數<strong style="color:var(--accent3)">偏高</strong> — 多店出現高於平均的深夜訂單量，尚未達到歷史警戒門檻`;
-    shopsCnt.textContent = `${status.highShops.length + status.anomalyShops.length} / ${shops.length}`;
-    bullets.innerHTML = `
+    if (alertEl) alertEl.style.display = 'block';
+    if (cardEl)  cardEl.classList.remove('anomaly');
+    if (levelLbl) levelLbl.textContent = 'HIGH ACTIVITY';
+    if (mainTxt)  mainTxt.innerHTML = `🍕 披薩指數<strong style="color:var(--accent3)">偏高</strong> — 多店出現高於平均的深夜訂單量，尚未達到歷史警戒門檻`;
+    if (shopsCnt) shopsCnt.textContent = `${status.highShops.length + status.anomalyShops.length} / ${shops.length}`;
+    if (bullets) bullets.innerHTML = `
       <div style="color:var(--accent3);">▶ 高活躍度店家：${status.highShops.concat(status.anomalyShops).map(s=>s.name).join('、')}</div>
       <div style="color:var(--text-dim);">▶ 當前水準：偏高，但尚未達到 ANOMALY 閾值（需 ≥${THRESHOLD.ANOMALY}%）</div>
       <div style="color:var(--text-dim);">▶ 建議持續觀察，若再有 1 家店升至異常，將升為戰爭警報</div>`;
 
-    document.getElementById('alert-badge').style.borderColor = 'var(--accent3)';
-    document.getElementById('alert-badge').style.color = 'var(--accent3)';
-    document.getElementById('alert-badge').textContent = '威脅 高度警戒';
+    if (badgeEl) {
+      badgeEl.style.borderColor = 'var(--accent3)';
+      badgeEl.style.color = 'var(--accent3)';
+      badgeEl.textContent = '威脅 高度警戒';
+    }
 
   } else {
     // 正常狀態 — 隱藏警報
-    alertEl.style.display = 'none';
-    cardEl.classList.remove('anomaly');
+    if (alertEl) alertEl.style.display = 'none';
+    if (cardEl)  cardEl.classList.remove('anomaly');
   }
 }
 
@@ -1975,7 +1987,11 @@ setInterval(htmlWpiRender, 10 * 60 * 1000);
 // 若 GOOGLE_MAPS_API_KEY 未設定，後端會回傳模擬資料
 async function fetchRealPizzaData() {
   try {
-    const res = await fetch('data/data.json?t=' + Date.now(), { cache: 'no-store' });
+    // 先抓同站的 data/data.json；不存在時（如 Vercel 鏡像部署）改抓 GitHub 上的資料
+    let res = await fetch('data/data.json?t=' + Date.now(), { cache: 'no-store' }).catch(() => null);
+    if (!res || !res.ok) {
+      res = await fetch('https://raw.githubusercontent.com/virus11456/warhub/main/data/data.json?t=' + Date.now(), { cache: 'no-store' });
+    }
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const json = await res.json();
     if (!Array.isArray(json.pizza) || json.pizza.length === 0) {
@@ -2273,8 +2289,8 @@ setInterval(() => {
 // 🌐 真實 API Fetchers（透過 allorigins CORS proxy）
 // ═══════════════════════════════════════════════════════════════
 
+// 注意：Yahoo v7/finance/quote 需要 cookie+crumb 驗證（2023 起），改用仍開放的 v8/finance/chart
 async function fetchFinanceData() {
-  const tickers = ['GC=F','BZ=F','USDCHF=X','^VIX','LMT','RTX','NOC','GD'];
   const idMap = {
     'GC=F':    { el:'html-fin-gc',  chg:'html-fin-gc-chg',  ma:'html-fin-gc-ma',  ma30:4980  },
     'BZ=F':    { el:'html-fin-bz',  chg:'html-fin-bz-chg',  ma:'html-fin-bz-ma',  ma30:67.5  },
@@ -2282,45 +2298,76 @@ async function fetchFinanceData() {
     '^VIX':    { el:'html-fin-vix', chg:'html-fin-vix-chg', ma:'html-fin-vix-ma', ma30:16.2  },
   };
   const stkMap = { 'LMT':'lmt','RTX':'rtx','NOC':'noc','GD':'gd' };
-  try {
-    const sym = encodeURIComponent(tickers.join(','));
-    const yUrl = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${sym}&fields=regularMarketPrice,regularMarketChangePercent`;
-    const url = `https://api.allorigins.win/get?url=${encodeURIComponent(yUrl)}`;
-    const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
-    const wrapper = await res.json();
-    const quotes = JSON.parse(wrapper.contents)?.quoteResponse?.result || [];
-    const finAssets = [];
-    quotes.forEach(q => {
-      const price = q.regularMarketPrice;
-      const chgPct = +(q.regularMarketChangePercent||0).toFixed(2);
-      if (idMap[q.symbol]) {
-        const m = idMap[q.symbol];
-        const devPct = m.ma30 ? +((price-m.ma30)/m.ma30*100).toFixed(1) : 0;
-        const fmt = q.symbol==='USDCHF=X' ? price.toFixed(4) : price.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2});
-        const col = chgPct>=0?'#ffaa00':'#00ff88';
-        const pxEl=document.getElementById(m.el), chEl=document.getElementById(m.chg), maEl=document.getElementById(m.ma);
-        if (pxEl){pxEl.textContent=fmt; pxEl.style.color=col;}
-        if (chEl){chEl.textContent=(chgPct>=0?'+':'')+chgPct+'% 24h'; chEl.className='fin-change '+(chgPct>=0?'up':'down');}
-        if (maEl){maEl.innerHTML='30MA偏離 '+(devPct>=0?'+':'')+devPct+'%'+(Math.abs(devPct)>5?' <span style=\"color:#ffaa00\">⚠</span>':'');}
-        finAssets.push({ticker:q.symbol, price, ma30:m.ma30, change:chgPct});
-        if (q.symbol==='BZ=F'&&m.ma30){
-          const prem=+(price-m.ma30).toFixed(2);
-          const el=document.getElementById('fin-war-premium');
-          if (el){el.textContent=(prem>=0?'+$':'-$')+Math.abs(prem)+'/bbl'; el.style.color=prem>5?'#ff4444':'#ffaa00';}
-        }
+  const tickers = [...Object.keys(idMap), ...Object.keys(stkMap)];
+
+  async function fetchChart(symbol) {
+    const yUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=1mo`;
+    const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(yUrl)}`, { signal: AbortSignal.timeout(15000) });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const result = (await res.json())?.chart?.result?.[0];
+    const meta = result?.meta;
+    const price = meta?.regularMarketPrice;
+    if (price == null) throw new Error('no price');
+    const closes = (result.indicators?.quote?.[0]?.close || []).filter(c => c != null);
+    const prev = closes.length >= 2 ? closes[closes.length - 2] : (meta.chartPreviousClose ?? meta.previousClose);
+    const chgPct = prev ? +((price - prev) / prev * 100).toFixed(2) : 0;
+    const ma30 = closes.length ? closes.reduce((s, c) => s + c, 0) / closes.length : null;
+    return { symbol, price, chgPct, ma30 };
+  }
+
+  // allorigins 免費代理同時打 8 個請求容易 5xx：分批送出並失敗重試一次
+  async function fetchChartRetry(symbol, delayMs) {
+    await new Promise(r => setTimeout(r, delayMs));
+    try { return await fetchChart(symbol); }
+    catch (e) {
+      await new Promise(r => setTimeout(r, 2000));
+      return fetchChart(symbol);
+    }
+  }
+  const results = await Promise.allSettled(tickers.map((s, i) => fetchChartRetry(s, i * 400)));
+  const finAssets = [];
+  results.forEach(r => {
+    if (r.status !== 'fulfilled') return;
+    const { symbol, price, chgPct } = r.value;
+    if (idMap[symbol]) {
+      const m = idMap[symbol];
+      const ma30 = r.value.ma30 ?? m.ma30;
+      const devPct = ma30 ? +((price-ma30)/ma30*100).toFixed(1) : 0;
+      const fmt = symbol==='USDCHF=X' ? price.toFixed(4) : price.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2});
+      const col = chgPct>=0?'#ffaa00':'#00ff88';
+      const pxEl=document.getElementById(m.el), chEl=document.getElementById(m.chg), maEl=document.getElementById(m.ma);
+      if (pxEl){pxEl.textContent=fmt; pxEl.style.color=col;}
+      if (chEl){chEl.textContent=(chgPct>=0?'+':'')+chgPct+'% 24h'; chEl.className='fin-change '+(chgPct>=0?'up':'down');}
+      if (maEl){maEl.innerHTML='30MA偏離 '+(devPct>=0?'+':'')+devPct+'%'+(Math.abs(devPct)>5?' <span style=\"color:#ffaa00\">⚠</span>':'');}
+      finAssets.push({ticker:symbol, price, ma30, change:chgPct});
+      if (symbol==='BZ=F'&&ma30){
+        const prem=+(price-ma30).toFixed(2);
+        const el=document.getElementById('fin-war-premium');
+        if (el){el.textContent=(prem>=0?'+$':'-$')+Math.abs(prem)+'/bbl'; el.style.color=prem>5?'#ff4444':'#ffaa00';}
       }
-      if (stkMap[q.symbol]) {
-        const id=stkMap[q.symbol];
-        const pxEl=document.getElementById('html-stk-'+id), chEl=document.getElementById('html-stk-'+id+'-c');
-        if (pxEl) pxEl.textContent=price.toFixed(2);
-        if (chEl){const flag=(q.symbol==='NOC'&&chgPct>4)?' 🚨':''; chEl.textContent=(chgPct>=0?'+':'')+chgPct+'%'+flag; chEl.className='fin-chg '+(chgPct>=0?'up':'down');}
-      }
-    });
-    if (finAssets.length) { HTML_WPI_STATE.finance.assets=finAssets; }
-    const ts=document.getElementById('fin-updated');
-    if (ts) ts.textContent='更新：'+new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
-    htmlWpiRender();
-  } catch(e) { console.warn('Finance fetch failed:',e.message); }
+    }
+    if (stkMap[symbol]) {
+      const id=stkMap[symbol];
+      const pxEl=document.getElementById('html-stk-'+id), chEl=document.getElementById('html-stk-'+id+'-c');
+      if (pxEl) pxEl.textContent=price.toFixed(2);
+      if (chEl){const flag=(symbol==='NOC'&&chgPct>4)?' 🚨':''; chEl.textContent=(chgPct>=0?'+':'')+chgPct+'%'+flag; chEl.className='fin-chg '+(chgPct>=0?'up':'down');}
+    }
+  });
+
+  // 個別失敗的格子把「載入中」佔位改成 --，避免永遠卡在載入狀態
+  Object.values(idMap).forEach(m => {
+    const chEl = document.getElementById(m.chg);
+    if (chEl && chEl.textContent === '載入中') chEl.textContent = '--';
+  });
+  if (!finAssets.length) {
+    console.warn('Finance fetch failed: all tickers unavailable');
+    return;
+  }
+
+  HTML_WPI_STATE.finance.assets = finAssets;
+  const ts=document.getElementById('fin-updated');
+  if (ts) ts.textContent='更新：'+new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+  htmlWpiRender();
 }
 
 async function fetchPolymarketLive() {
@@ -2335,7 +2382,8 @@ async function fetchPolymarketLive() {
       HTML_WPI_STATE.poly = filtered.map(m=>{
         let yes=50;
         try{yes=parseFloat(JSON.parse(m.outcomePrices||'["0.5"]')[0])*100;}catch(e){}
-        return {yes_pct:yes,volume:m.volume||1};
+        // gamma API 的 volume 是字串，必須轉數字，否則 WPI 加總會變 NaN
+        return {yes_pct:yes,volume:parseFloat(m.volume)||1};
       });
       htmlWpiRender();
     }
@@ -2386,7 +2434,7 @@ function renderFirms(firms, eonetEvents) {
       }[h.region] || '🔥';
       items.push(`<div class="feed-item fire">
         <div class="feed-time">${time}Z</div>
-        <div><div class="feed-text">${flag} <strong>${escapeHtml(h.region)}</strong> — 衛星火點 FRP ${h.frp.toFixed(0)} (信心度 ${h.conf}%)</div></div>
+        <div><div class="feed-text">${flag} <strong>${escapeHtml(h.region)}</strong> — 衛星火點 FRP ${(h.frp ?? 0).toFixed(0)} (信心度 ${h.conf ?? '--'}%)</div></div>
       </div>`);
     }
 
