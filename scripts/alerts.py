@@ -1,11 +1,12 @@
 """
-ConflictWatch - 推播警報系統
-當指數異常時，自動推送到 Telegram Bot 和 Discord Webhook
+WarHub - 推播警報系統
+當綜合指數等級升高時，自動推送到 Telegram Bot 和 Discord Webhook。
+由 fetch_data.py 在每次資料更新後呼叫；上次等級由呼叫端從前一份
+data.json 讀出傳入（GitHub Actions 每次都是全新 process，不能存記憶體）。
 """
 
 import asyncio
 import aiohttp
-import json
 import os
 from datetime import datetime, timezone
 
@@ -13,9 +14,6 @@ from datetime import datetime, timezone
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_CHAT_ID   = os.environ.get("TELEGRAM_CHAT_ID", "")
 DISCORD_WEBHOOK    = os.environ.get("DISCORD_WEBHOOK_URL", "")
-
-# 上次發送的等級（避免重複推播）
-_last_alert_level = "NORMAL"
 
 
 LEVEL_EMOJI = {
@@ -49,9 +47,9 @@ def build_message(score: dict, pizza: list, polymarket: list) -> str:
         for m in top_markets
     ) or "  （無資料）"
 
-    # 披薩異常店家
-    anomaly_shops = [s for s in pizza if s.get("is_anomaly")]
-    pizza_line = ", ".join(s["shop_name"] for s in anomaly_shops) if anomaly_shops else "無異常"
+    # 披薩異常店家（spike 或繁忙度 >= 70 視為異常）
+    anomaly_shops = [s for s in pizza if s.get("spike") or (s.get("busyness") or 0) >= 70]
+    pizza_line = ", ".join(s["name"] for s in anomaly_shops) if anomaly_shops else "無異常"
 
     msg = f"""
 {emoji} *ConflictWatch 警報* {emoji}
@@ -66,7 +64,7 @@ def build_message(score: dict, pizza: list, polymarket: list) -> str:
 📊 Polymarket 指數：{score['polymarket_score']:.1f}
 {poly_lines}
 
-🔗 https://your-conflictwatch-domain.com
+🔗 https://warhubs.com
     """.strip()
 
     return msg
@@ -111,13 +109,20 @@ async def send_discord(session: aiohttp.ClientSession, text: str, score: dict):
             print(f"❌ Discord 失敗: {await resp.text()}")
 
 
-async def maybe_alert(score: dict, pizza: list, polymarket: list):
-    """如果等級升高，觸發推播"""
-    global _last_alert_level
+async def maybe_alert(score: dict, pizza: list, polymarket: list, prev_level: str = "NORMAL"):
+    """如果等級較上一次資料更新時升高，觸發推播"""
     new_level = score["alert_level"]
 
-    if not should_alert(new_level, _last_alert_level):
-        print(f"ℹ️ 等級未升高（{_last_alert_level} → {new_level}），跳過推播")
+    if new_level not in LEVEL_EMOJI or prev_level not in LEVEL_EMOJI:
+        print(f"ℹ️ 未知等級（{prev_level} → {new_level}），跳過推播")
+        return
+
+    if not should_alert(new_level, prev_level):
+        print(f"ℹ️ 等級未升高（{prev_level} → {new_level}），跳過推播")
+        return
+
+    if not (TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID) and not DISCORD_WEBHOOK:
+        print("ℹ️ 未設定推播 Secrets，跳過推播")
         return
 
     msg = build_message(score, pizza, polymarket)
@@ -128,5 +133,3 @@ async def maybe_alert(score: dict, pizza: list, polymarket: list):
             send_telegram(session, msg),
             send_discord(session, msg, score),
         )
-
-    _last_alert_level = new_level

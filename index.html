@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WARWATCH // 戰爭預測情報中心</title>
 <meta name="description" content="WARWATCH 戰爭預測情報中心 — Polymarket 預測市場、Pentagon Pizza Index、軍機動態、NASA FIRMS 衛星火點、避險資產等多源 OSINT 即時儀表板">
+<meta name="theme-color" content="#050a0e">
+<link rel="canonical" href="https://warhubs.com/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="WARWATCH // 戰爭預測情報中心">
+<meta property="og:description" content="Polymarket 預測市場、Pentagon Pizza Index、軍機動態、NASA FIRMS 衛星火點等多源 OSINT 即時儀表板">
+<meta property="og:url" content="https://warhubs.com/">
+<meta name="twitter:card" content="summary">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%A1%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
@@ -14,10 +21,12 @@
     --bg2: #080f14;
     --bg3: #0c1820;
     --accent: #00ff88;
+    --accent1: #00ff88;
     --accent2: #ff4444;
     --accent3: #ffaa00;
     --accent4: #00aaff;
     --text: #c8d8e8;
+    --text-primary: #dcebf8;
     --text-dim: #6a8a9a;
     --border: #1a3040;
     --glow: 0 0 15px rgba(0,255,136,0.3);
@@ -512,11 +521,11 @@
     overflow: hidden;
   }
 
-  .poly-bar-fill {
+  .poly-bar-fill, .poly-fill {
     height: 100%;
   }
 
-  .poly-pct {
+  .poly-pct, .poly-percent {
     font-family: 'Orbitron', monospace;
     font-size: 0.85rem;
     font-weight: 700;
@@ -812,7 +821,7 @@
 
     /* Polymarket */
     .poly-question { font-size: 0.75rem; }
-    .poly-pct      { font-size: 0.75rem; min-width: 36px; }
+    .poly-pct, .poly-percent { font-size: 0.75rem; min-width: 36px; }
 
     /* Conflict */
     .conflict-region { font-size: 0.75rem; }
@@ -958,7 +967,7 @@
     <div class="ticker-scroll" id="ticker">
       <div class="ticker-item">🍕 五角大廈披薩指數 <span class="hi">↑ 異常偏高</span> &nbsp;•&nbsp;</div>
       <div class="ticker-item">Polymarket：烏克蘭停火機率 <span class="hi">37%</span> &nbsp;•&nbsp;</div>
-      <div class="ticker-item">末日時鐘距離午夜 <span class="red">90秒</span> — 史上最近 &nbsp;•&nbsp;</div>
+      <div class="ticker-item">末日時鐘距離午夜 <span class="red">89秒</span> — 史上最近 &nbsp;•&nbsp;</div>
       <div class="ticker-item">美伊談判陷入僵局，川普：正在考慮有限軍事行動 &nbsp;•&nbsp;</div>
       <div class="ticker-item">台海：Polymarket 開戰預測維持 <span class="hi">~12%</span> &nbsp;•&nbsp;</div>
       
@@ -967,7 +976,7 @@
       <!-- Duplicate for seamless loop -->
       <div class="ticker-item">🍕 五角大廈披薩指數 <span class="hi">↑ 異常偏高</span> &nbsp;•&nbsp;</div>
       <div class="ticker-item">Polymarket：烏克蘭停火機率 <span class="hi">37%</span> &nbsp;•&nbsp;</div>
-      <div class="ticker-item">末日時鐘距離午夜 <span class="red">90秒</span> — 史上最近 &nbsp;•&nbsp;</div>
+      <div class="ticker-item">末日時鐘距離午夜 <span class="red">89秒</span> — 史上最近 &nbsp;•&nbsp;</div>
       <div class="ticker-item">美伊談判陷入僵局，川普：正在考慮有限軍事行動 &nbsp;•&nbsp;</div>
       <div class="ticker-item">台海：Polymarket 開戰預測維持 <span class="hi">~12%</span> &nbsp;•&nbsp;</div>
       
@@ -1196,7 +1205,7 @@
         <div style="text-align:right;flex-shrink:0">
           <div style="font-family:'Orbitron',monospace;font-size:.55rem;color:var(--text-dim);letter-spacing:2px">PIZZA DEFCON</div>
           <div class="pizza-level-num" id="pizza-level-num" style="font-size:1.6rem;line-height:1">--</div>
-          <div class="pizza-level-label">⚠ ELEVATED</div>
+          <div class="pizza-level-label" id="pizza-level-label">--</div>
         </div>
       </div>
 
@@ -1404,8 +1413,8 @@
       <div class="section-title">末日時鐘 &amp; 核威脅</div>
 
       <div class="doomsday-display">
-        <div class="clock-face">23:58:30</div>
-        <div class="clock-label">距離午夜（核戰）僅剩 90 秒</div>
+        <div class="clock-face">23:58:31</div>
+        <div class="clock-label">距離午夜（核戰）僅剩 89 秒</div>
       </div>
 
       <div class="midnight-bar">
@@ -1418,7 +1427,7 @@
       </div>
 
       <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--text-dim);line-height:1.7;margin-bottom:1rem;">
-        由《原子科學家公報》設定。<span style="color:#cc44ff">2023年首次設定為90秒</span>，為1947年以來最近紀錄。俄烏核威脅、AI軍備競賽及氣候危機為主要考量。
+        由《原子科學家公報》設定。<span style="color:#cc44ff">2025年調整至 89 秒</span>，為1947年以來最接近午夜的紀錄。俄烏核威脅、AI軍備競賽及氣候危機為主要考量。
       </div>
 
       <div class="section-title">核持有國警戒狀態</div>
@@ -1770,6 +1779,12 @@ function renderWarAlert(status, shops) {
     levelNum.style.color = status.gaugeColor;
   }
 
+  const levelLabelEl = document.getElementById('pizza-level-label');
+  if (levelLabelEl) {
+    levelLabelEl.textContent = status.level;
+    levelLabelEl.style.color = status.gaugeColor;
+  }
+
   const badgeEl = document.getElementById('alert-badge');
 
   if (status.level === 'ANOMALY') {
@@ -1818,9 +1833,14 @@ function renderWarAlert(status, shops) {
     }
 
   } else {
-    // 正常狀態 — 隱藏警報
+    // 正常狀態 — 隱藏警報，header 徽章同步顯示目前等級
     if (alertEl) alertEl.style.display = 'none';
     if (cardEl)  cardEl.classList.remove('anomaly');
+    if (badgeEl) {
+      badgeEl.style.borderColor = status.gaugeColor;
+      badgeEl.style.color = status.gaugeColor;
+      badgeEl.textContent = `威脅等級 ${status.level}`;
+    }
   }
 }
 
@@ -2025,8 +2045,14 @@ async function fetchRealPizzaData() {
           .sort((a, b) => b.volume - a.volume)
           .slice(0, 5)
           .map(m => ({ yes_pct: m.yes_price * 100, volume: m.volume }));
+        const polyTs = document.getElementById('poly-updated-time');
+        if (polyTs) polyTs.textContent = '上次更新：' + new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
       }
     } catch(err) { console.warn('[WARWATCH] polymarket render error:', err.message); }
+
+    // 用即時資料重建 INTEL FEED 跑馬燈
+    try { renderTicker(json); }
+    catch(err) { console.warn('[WARWATCH] ticker render error:', err.message); }
 
     // 同步渲染 AVI 軍機資料
     if (json.aviation) {
@@ -2059,6 +2085,39 @@ async function fetchRealPizzaData() {
     console.warn('[WARWATCH] data fetch failed, using simulated:', e.message);
     simulateLiveUpdate();
   }
+}
+
+// ─── INTEL FEED 跑馬燈：用 data.json 即時資料重建 ─────────────
+function renderTicker(json) {
+  const el = document.getElementById('ticker');
+  if (!el) return;
+  const items = [];
+
+  if (json.pizza_index != null) {
+    items.push(`🍕 五角大廈披薩指數 <span class="hi">${json.pizza_index}</span>${json.defcon_level ? ` · PIZZA DEFCON <span class="hi">${json.defcon_level}</span>` : ''}`);
+  }
+  [...(json.polymarket || [])]
+    .filter(m => m.yes_price != null && m.question)
+    .sort((a, b) => (b.volume || 0) - (a.volume || 0))
+    .slice(0, 3)
+    .forEach(m => {
+      items.push(`📊 ${escapeHtml(m.question)} <span class="hi">${Math.round(m.yes_price * 100)}%</span>`);
+    });
+  if (json.firms?.total_24h) {
+    items.push(`🔥 NASA FIRMS 24hr 衛星火點 <span class="red">${json.firms.total_24h.toLocaleString()}</span>（vs 基準 ${json.firms.delta_pct || '--'}）`);
+  }
+  const av = json.aviation?.summary;
+  if (av?.total) {
+    items.push(`✈️ 全球軍機追蹤 <span class="hi">${av.total}</span> 架 · 加油機 ${av.tankers} · 運輸機 ${av.transport}`);
+  }
+  if (json.score?.combined_score != null) {
+    items.push(`🎯 綜合威脅指數 <span class="hi">${json.score.combined_score}</span> / 100 · ${json.score.alert_level}`);
+  }
+  items.push(`末日時鐘距離午夜 <span class="red">89秒</span> — 史上最近`);
+
+  if (!items.length) return;
+  const html = items.map(t => `<div class="ticker-item">${t} &nbsp;•&nbsp;</div>`).join('');
+  el.innerHTML = html + html; // 複製一份做無縫循環
 }
 
 // ─── 渲染 Polymarket 卡片（從 data/data.json 的 polymarket array）────
@@ -2300,19 +2359,35 @@ async function fetchFinanceData() {
   const stkMap = { 'LMT':'lmt','RTX':'rtx','NOC':'noc','GD':'gd' };
   const tickers = [...Object.keys(idMap), ...Object.keys(stkMap)];
 
+  // 報價來源鏈：
+  // 1. 同站 /api/yahoo/*（Vercel rewrite 第一方代理，最可靠；GitHub Pages 上會 404 自動跳過）
+  // 2. 免費 CORS 代理，逐一嘗試直到成功
+  const QUOTE_SOURCES = [
+    (sym, qs) => `/api/yahoo/${encodeURIComponent(sym)}?${qs}`,
+    (sym, qs) => `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?${qs}`)}`,
+    (sym, qs) => `https://corsproxy.io/?url=${encodeURIComponent(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?${qs}`)}`,
+    (sym, qs) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?${qs}`)}`,
+  ];
+
   async function fetchChart(symbol) {
-    const yUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=1mo`;
-    const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(yUrl)}`, { signal: AbortSignal.timeout(15000) });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const result = (await res.json())?.chart?.result?.[0];
-    const meta = result?.meta;
-    const price = meta?.regularMarketPrice;
-    if (price == null) throw new Error('no price');
-    const closes = (result.indicators?.quote?.[0]?.close || []).filter(c => c != null);
-    const prev = closes.length >= 2 ? closes[closes.length - 2] : (meta.chartPreviousClose ?? meta.previousClose);
-    const chgPct = prev ? +((price - prev) / prev * 100).toFixed(2) : 0;
-    const ma30 = closes.length ? closes.reduce((s, c) => s + c, 0) / closes.length : null;
-    return { symbol, price, chgPct, ma30 };
+    const qs = 'interval=1d&range=1mo';
+    let lastErr;
+    for (const source of QUOTE_SOURCES) {
+      try {
+        const res = await fetch(source(symbol, qs), { signal: AbortSignal.timeout(12000) });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const result = (await res.json())?.chart?.result?.[0];
+        const meta = result?.meta;
+        const price = meta?.regularMarketPrice;
+        if (price == null) throw new Error('no price');
+        const closes = (result.indicators?.quote?.[0]?.close || []).filter(c => c != null);
+        const prev = closes.length >= 2 ? closes[closes.length - 2] : (meta.chartPreviousClose ?? meta.previousClose);
+        const chgPct = prev ? +((price - prev) / prev * 100).toFixed(2) : 0;
+        const ma30 = closes.length ? closes.reduce((s, c) => s + c, 0) / closes.length : null;
+        return { symbol, price, chgPct, ma30 };
+      } catch (e) { lastErr = e; }
+    }
+    throw lastErr || new Error('all proxies failed');
   }
 
   // allorigins 免費代理同時打 8 個請求容易 5xx：分批送出並失敗重試一次
@@ -2359,6 +2434,17 @@ async function fetchFinanceData() {
     const chEl = document.getElementById(m.chg);
     if (chEl && chEl.textContent === '載入中') chEl.textContent = '--';
   });
+
+  // 有失敗的報價 → 90 秒後自動補抓一次（不必等 10 分鐘的下一輪）
+  const failedCount = results.filter(r => r.status !== 'fulfilled').length;
+  if (failedCount > 0 && !fetchFinanceData._refillTimer) {
+    console.warn(`Finance: ${failedCount} ticker(s) failed, refill in 90s`);
+    fetchFinanceData._refillTimer = setTimeout(() => {
+      fetchFinanceData._refillTimer = null;
+      fetchFinanceData();
+    }, 90 * 1000);
+  }
+
   if (!finAssets.length) {
     console.warn('Finance fetch failed: all tickers unavailable');
     return;
@@ -2377,7 +2463,12 @@ async function fetchPolymarketLive() {
     const raw = await res.json();
     const markets = Array.isArray(raw)?raw:(raw.data||[]);
     const kw = ['ukraine','russia','iran','taiwan','nuclear','war','military','strike','attack','conflict'];
-    const filtered = markets.filter(m=>kw.some(k=>(m.question||'').toLowerCase().includes(k))).slice(0,8);
+    // 排除運動／娛樂盤的誤中（例：Will Iran win the FIFA World Cup?）
+    const ex = ['world cup','fifa','olympic','super bowl','nba','nfl','mlb','album','grammy','oscar','bitcoin','eurovision'];
+    const filtered = markets.filter(m=>{
+      const q=(m.question||'').toLowerCase();
+      return kw.some(k=>q.includes(k)) && !ex.some(e=>q.includes(e));
+    }).slice(0,8);
     if (filtered.length) {
       HTML_WPI_STATE.poly = filtered.map(m=>{
         let yes=50;

@@ -20,6 +20,7 @@ import asyncio
 import aiohttp
 import json
 import logging
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -54,10 +55,27 @@ SHOPS_TO_DISPLAY = [
 ]
 
 WAR_KEYWORDS = [
-    "war", "strike", "attack", "invasion", "conflict",
-    "ceasefire", "nuclear", "missile", "troops", "military",
+    "war", "strike", "airstrike", "attack", "invasion", "invade",
+    "conflict", "ceasefire", "nuclear", "missile", "troops", "military",
+    "annex", "blockade", "coup",
     "Iran", "Taiwan", "Ukraine", "Korea", "China",
     "Israel", "NATO",
+]
+
+# 用字界比對（允許複數型），避免 "war" 誤中 award / warming、"strike" 誤中 striker
+_WAR_KW_RE = re.compile(
+    r"\b(" + "|".join(re.escape(k.lower()) for k in WAR_KEYWORDS) + r")s?\b"
+)
+
+# 明顯與軍事衝突無關的主題（運動、娛樂、加密幣），先排除
+# 例：'Will Iran win the 2026 FIFA World Cup?' 含 "Iran" 但不是戰爭市場
+# 注意：不能排除 "GTA"——Polymarket 慣用「before GTA VI」當時間基準，
+# 例如 'Russia-Ukraine Ceasefire before GTA VI?' 是正經的戰爭市場
+EXCLUDE_KEYWORDS = [
+    "world cup", "fifa", "olympic", "super bowl", "nba", "nfl", "mlb",
+    "premier league", "champions league", "grammy", "oscar", "album",
+    "box office", "bitcoin", "ethereum", "eurovision", "tiktok",
+    "counter-strike", "esports", "valorant", "dota",
 ]
 
 
@@ -174,25 +192,46 @@ def _parse_outcome_prices(market: dict) -> tuple[float | None, float | None]:
 
 async def fetch_polymarket(session: aiohttp.ClientSession) -> list[dict]:
     """從 Polymarket Gamma API 抓取戰爭/衝突相關市場"""
-    params = {"limit": 200, "active": "true", "closed": "false", "tag_slug": "geopolitics"}
+    # gamma API 單頁上限 100 筆，抓 3 頁並按 24h 交易量排序，
+    # 確保大交易量的戰爭市場（俄烏停火等）不會因分頁被漏掉
     war_markets = []
+    markets = []
+    seen_ids = set()
     try:
-        async with session.get(
-            POLYMARKET_API, params=params,
-            timeout=aiohttp.ClientTimeout(total=15),
-            headers={"User-Agent": USER_AGENT},
-        ) as resp:
-            if resp.status != 200:
-                log.warning(f"Polymarket returned {resp.status}")
-                return []
-            data = await resp.json()
+        for offset in (0, 100, 200):
+            params = {
+                "limit": 100, "offset": offset,
+                "active": "true", "closed": "false",
+                "tag_slug": "geopolitics",
+                "order": "volume24hr", "ascending": "false",
+            }
+            async with session.get(
+                POLYMARKET_API, params=params,
+                timeout=aiohttp.ClientTimeout(total=15),
+                headers={"User-Agent": USER_AGENT},
+            ) as resp:
+                if resp.status != 200:
+                    log.warning(f"Polymarket returned {resp.status} (offset={offset})")
+                    break
+                data = await resp.json()
 
-        markets = data if isinstance(data, list) else data.get("data", [])
+            page = data if isinstance(data, list) else data.get("data", [])
+            if not page:
+                break
+            for m in page:
+                mid = m.get("conditionId") or m.get("id")
+                if mid not in seen_ids:
+                    seen_ids.add(mid)
+                    markets.append(m)
+            if len(page) < 100:
+                break
         log.info(f"Fetched {len(markets)} Polymarket markets")
 
         for m in markets:
             text = ((m.get("question") or "") + " " + (m.get("description") or "")).lower()
-            if not any(kw.lower() in text for kw in WAR_KEYWORDS):
+            if any(ex in text for ex in EXCLUDE_KEYWORDS):
+                continue
+            if not _WAR_KW_RE.search(text):
                 continue
 
             yes_price, no_price = _parse_outcome_prices(m)
@@ -579,6 +618,13 @@ async def main():
     defcon_level = pizzint_data.get("defcon_level")
     score        = calculate_score(pizza_index, polymarket)
 
+    # 前一份 data.json 的警戒等級（供 alerts.py 判斷是否「升級」）
+    prev_level = "NORMAL"
+    try:
+        prev_level = json.loads(DATA_FILE.read_text(encoding="utf-8"))["score"]["alert_level"]
+    except Exception:
+        pass
+
     output = {
         "updated_at":    datetime.now(timezone.utc).isoformat(),
         "score":         score,
@@ -607,6 +653,13 @@ async def main():
              f"pizza_index={pizza_index}, defcon={defcon_level}, "
              f"open_shops={open_count}/{len(pizza_shops)}, "
              f"combined={score['combined_score']} [{score['alert_level']}]")
+
+    # 等級升高時推播 Telegram / Discord（未設定 Secrets 則自動跳過）
+    try:
+        from alerts import maybe_alert
+        await maybe_alert(score, pizza_shops, polymarket, prev_level)
+    except Exception as e:
+        log.warning(f"alert push skipped: {e}")
 
 
 if __name__ == "__main__":
