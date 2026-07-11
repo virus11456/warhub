@@ -353,9 +353,9 @@
   .ph-scroll::-webkit-scrollbar { height: 4px; }
   .ph-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
   .ph-chip        { flex-shrink: 0; background: var(--bg3); border: 1px solid var(--border); border-radius: 4px; padding: .4rem .7rem; min-width: 110px; }
-  .ph-chip-year   { font-family: 'Orbitron', monospace; font-size: .52rem; color: var(--accent3); letter-spacing: 1px; margin-bottom: .15rem; }
-  .ph-chip-event  { font-family: 'Share Tech Mono', monospace; font-size: .58rem; color: var(--text-primary); line-height: 1.4; margin-bottom: .15rem; }
-  .ph-chip-tag    { font-family: 'Share Tech Mono', monospace; font-size: .56rem; color: var(--text-dim); }
+  .ph-chip-year   { font-family: 'Orbitron', monospace; font-size: .6rem; color: var(--accent3); letter-spacing: 1px; margin-bottom: .15rem; }
+  .ph-chip-event  { font-family: 'Share Tech Mono', monospace; font-size: .64rem; color: var(--text-primary); line-height: 1.4; margin-bottom: .15rem; }
+  .ph-chip-tag    { font-family: 'Share Tech Mono', monospace; font-size: .62rem; color: var(--text-dim); }
 
   /* Polymarket 網格多欄 */
   .poly-grid      { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: .6rem; }
@@ -973,7 +973,7 @@
     background: linear-gradient(135deg, #fff, var(--accent));
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   }
-  .hero-wpi-title { font-family: 'Orbitron', monospace; font-size: .62rem; letter-spacing: 2px; color: var(--text-dim); }
+  .hero-wpi-title { font-family: 'Orbitron', monospace; font-size: .68rem; letter-spacing: 2px; color: var(--text-dim); }
   .hero-wpi-level { font-family: 'Orbitron', monospace; font-size: .95rem; font-weight: 700; letter-spacing: 2px; margin-top: .2rem; }
   .hero-regions { display: flex; gap: .5rem; flex-wrap: wrap; }
   .hero-region-pill {
@@ -995,38 +995,38 @@
   /* 小字級下限（原 .5–.62rem 的字全面提升） */
   .section-title  { font-size: .78rem; letter-spacing: 3px; }
   .osint-adv-hdr  { font-size: .68rem; }
-  .osint-updated  { font-size: .62rem; }
+  .osint-updated  { font-size: .68rem; }
   .ticker-item    { font-size: .8rem; }
   .wpi-subtitle   { font-size: .7rem; }
   .wpi-f-name     { font-size: .74rem; }
-  .wpi-f-desc     { font-size: .62rem; }
-  .wpi-f-wt       { font-size: .58rem; }
+  .wpi-f-desc     { font-size: .68rem; }
+  .wpi-f-wt       { font-size: .64rem; }
   .wpi-al-name    { font-size: .76rem; }
   .wpi-al-cond    { font-size: .66rem; }
-  .wpi-al-sub     { font-size: .6rem; }
-  .wpi-al-title   { font-size: .62rem; }
+  .wpi-al-sub     { font-size: .66rem; }
+  .wpi-al-title   { font-size: .68rem; }
   .wpi-formula    { font-size: .66rem; }
   .wpi-num-lbl    { font-size: .68rem; }
-  .wpi-scale      { font-size: .6rem; }
-  .avi-box-lbl    { font-size: .62rem; }
+  .wpi-scale      { font-size: .66rem; }
+  .avi-box-lbl    { font-size: .68rem; }
   .avi-item       { font-size: .74rem; }
-  .fire-lbl       { font-size: .62rem; }
+  .fire-lbl       { font-size: .68rem; }
   .feed-item      { font-size: .72rem; }
-  .feed-time      { font-size: .64rem; }
-  .event-tag      { font-size: .64rem; }
+  .feed-time      { font-size: .7rem; }
+  .event-tag      { font-size: .7rem; }
   .fin-ticker     { font-size: .66rem; }
   .fin-change     { font-size: .7rem; }
-  .fin-ma         { font-size: .62rem; }
+  .fin-ma         { font-size: .68rem; }
   .fin-premium    { font-size: .7rem; }
   .fin-stock-row  { font-size: .72rem; }
-  .fin-name       { font-size: .64rem; }
+  .fin-name       { font-size: .7rem; }
   .fin-chg        { font-size: .68rem; }
   .poly-question  { font-size: .88rem; }
   .poly-meta      { font-size: .7rem; }
   .shop-name      { font-size: .72rem; }
-  .ph-chip-year   { font-size: .6rem; }
+  .ph-chip-year   { font-size: .66rem; }
   .ph-chip-event  { font-size: .66rem; }
-  .ph-chip-tag    { font-size: .62rem; }
+  .ph-chip-tag    { font-size: .68rem; }
   .pizza-level-label { font-size: .76rem; }
   .clock-label    { font-size: .74rem; }
 
@@ -1071,7 +1071,7 @@
     .wpi-f-desc  { display: none; }
     .wpi-f-name  { font-size: .68rem; }
     .wpi-f-val   { font-size: .8rem; min-width: 22px; }
-    .wpi-f-wt    { font-size: .52rem; }
+    .wpi-f-wt    { font-size: .6rem; }
 
     /* WPI 右欄的「各地區風險」迷你列與頂部 hero、下方看板重複 → 手機隱藏 */
     .wpi-mini-regions { display: none; }
@@ -1081,7 +1081,7 @@
     .wpi-al-item { padding: .45rem .55rem; }
 
     /* 地區看板卡片緊湊 */
-    #region-board { grid-template-columns: 1fr !important; }
+    #region-board { grid-template-columns: minmax(0, 1fr) !important; }
     #region-board > div { padding: .7rem .8rem !important; }
 
     /* 戰爭警報橫幅：標題不換行擠壓、副標手機隱藏、內距收斂 */
@@ -1095,7 +1095,7 @@
   @media (max-width: 400px) {
     /* 極窄：名稱欄縮短 */
     .wpi-factor { grid-template-columns: 108px 1fr; }
-    .wpi-f-name { font-size: .62rem; }
+    .wpi-f-name { font-size: .68rem; }
   }
 
 
@@ -1240,22 +1240,22 @@
   <div class="card" style="border-top:2px solid var(--accent2);margin-bottom:1.5rem">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-bottom:.3rem">
       <div class="section-title" style="margin:0">⚔️ 地區戰爭風險評估</div>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim)" id="region-board-updated">依 Polymarket 盤口 + GDELT 新聞強度 + FIRMS 火點 + 軍機活動 即時計算</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim)" id="region-board-updated">依 Polymarket 盤口 + GDELT 新聞強度 + FIRMS 火點 + 軍機活動 即時計算</div>
     </div>
-    <div id="region-board" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:.8rem;margin-top:.8rem">
+    <div id="region-board" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:.8rem;margin-top:.8rem;align-items:stretch">
       <div style="grid-column:1/-1;text-align:center;padding:1.2rem;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 計算地區風險中…</div>
     </div>
-    <div style="margin-top:.7rem;font-family:'Share Tech Mono',monospace;font-size:.56rem;color:var(--text-dim)">
+    <div style="margin-top:.7rem;font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim)">
       計分：Polymarket 35%（停火盤反向）· GDELT 新聞強度 25% · 領空 NOTAM 15% · 衛星火點 12% · 軍機活動 13% ｜ ↑↓ = 與 24 小時前相比
     </div>
 
     <!-- 7 天風險趨勢圖 -->
     <div style="margin-top:1rem;border-top:1px solid var(--border);padding-top:.8rem">
       <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:.5rem">
-        <div style="font-family:'Orbitron',monospace;font-size:.6rem;letter-spacing:2px;color:var(--text-dim)">📈 風險趨勢（7 天）</div>
-        <div id="trend-legend" style="display:flex;gap:.9rem;font-family:'Share Tech Mono',monospace;font-size:.56rem;color:var(--text-dim)"></div>
+        <div style="font-family:'Orbitron',monospace;font-size:.66rem;letter-spacing:2px;color:var(--text-dim)">📈 風險趨勢（7 天）</div>
+        <div id="trend-legend" style="display:flex;gap:.9rem;font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim)"></div>
       </div>
-      <div id="trend-chart" style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim)">⏳ 歷史資料累積中…</div>
+      <div id="trend-chart" style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim)">⏳ 歷史資料累積中…</div>
     </div>
   </div>
 
@@ -1274,8 +1274,8 @@
   }
   .wpi-topbar { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.2rem; padding-bottom:.8rem; border-bottom:1px solid rgba(0,207,232,.15); }
   .wpi-title  { font-family:'Orbitron',monospace; font-size:1rem; font-weight:900; color:var(--accent); letter-spacing:3px; }
-  .wpi-ver    { font-size:.55rem; color:var(--text-dim); letter-spacing:2px; margin-left:.5rem; }
-  .wpi-subtitle { font-family:'Share Tech Mono',monospace; font-size:.62rem; color:var(--text-dim); margin-top:.25rem; letter-spacing:1px; }
+  .wpi-ver    { font-size:.62rem; color:var(--text-dim); letter-spacing:2px; margin-left:.5rem; }
+  .wpi-subtitle { font-family:'Share Tech Mono',monospace; font-size:.68rem; color:var(--text-dim); margin-top:.25rem; letter-spacing:1px; }
   .wpi-badge  { font-family:'Orbitron',monospace; font-size:.7rem; font-weight:700; padding:.4rem .9rem; border:1px solid; letter-spacing:2px; animation:wpi-blink 2s ease-in-out infinite; }
   .wpi-badge.low      { color:var(--accent); border-color:var(--accent); background:rgba(0,207,232,.06); }
   .wpi-badge.medium   { color:var(--accent3); border-color:var(--accent3); background:rgba(245,166,35,.06); }
@@ -1295,20 +1295,20 @@
   .wpi-f-bar  { flex:1; height:5px; background:rgba(255,255,255,.08); overflow:hidden; }
   .wpi-f-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent3)); transition:width 1.5s ease; }
   .wpi-f-val  { font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700; color:var(--accent3); min-width:26px; text-align:right; }
-  .wpi-f-desc { font-family:'Share Tech Mono',monospace; font-size:.53rem; color:var(--text-dim); }
+  .wpi-f-desc { font-family:'Share Tech Mono',monospace; font-size:.6rem; color:var(--text-dim); }
 
   .wpi-gauge-wrap { display:flex; flex-direction:column; align-items:center; }
   .wpi-arc { width:300px; height:175px; }
   .wpi-center { text-align:center; margin-top:-.8rem; }
   .wpi-num { font-family:'Orbitron',monospace; font-size:3rem; font-weight:900; line-height:1; background:linear-gradient(135deg,#fff,var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; filter:drop-shadow(0 0 12px rgba(0,207,232,.4)); }
-  .wpi-num-lbl { font-family:'Share Tech Mono',monospace; font-size:.62rem; color:var(--text-dim); margin-top:.1rem; }
+  .wpi-num-lbl { font-family:'Share Tech Mono',monospace; font-size:.68rem; color:var(--text-dim); margin-top:.1rem; }
   .wpi-level { font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700; letter-spacing:3px; margin-top:.35rem; color:var(--accent3); }
-  .wpi-scale { display:flex; justify-content:space-between; width:300px; max-width:100%; margin-top:.4rem; font-family:'Share Tech Mono',monospace; font-size:.54rem; text-align:center; line-height:1.3; }
-  .wpi-formula { margin-top:.6rem; font-family:'Share Tech Mono',monospace; font-size:.58rem; color:var(--text-dim); background:rgba(0,0,0,.3); padding:.3rem .6rem; border:1px solid rgba(255,255,255,.07); }
+  .wpi-scale { display:flex; justify-content:space-between; width:300px; max-width:100%; margin-top:.4rem; font-family:'Share Tech Mono',monospace; font-size:.6rem; text-align:center; line-height:1.3; }
+  .wpi-formula { margin-top:.6rem; font-family:'Share Tech Mono',monospace; font-size:.64rem; color:var(--text-dim); background:rgba(0,0,0,.3); padding:.3rem .6rem; border:1px solid rgba(255,255,255,.07); }
   .wpi-formula em { color:var(--accent); font-style:normal; }
 
   .wpi-alerts { display:flex; flex-direction:column; gap:.55rem; }
-  .wpi-al-title { font-family:'Orbitron',monospace; font-size:.54rem; color:var(--text-dim); letter-spacing:3px; margin-bottom:.2rem; }
+  .wpi-al-title { font-family:'Orbitron',monospace; font-size:.6rem; color:var(--text-dim); letter-spacing:3px; margin-bottom:.2rem; }
   .wpi-al-item { display:flex; align-items:flex-start; gap:.55rem; padding:.5rem .65rem; background:rgba(255,255,255,.02); border:1px solid rgba(255,255,255,.07); border-left:3px solid rgba(255,255,255,.1); transition:all .3s; }
   .wpi-al-item.triggered { background:rgba(255,255,255,.05); }
   .wpi-al-dot { width:8px; height:8px; border-radius:50%; margin-top:3px; flex-shrink:0; }
@@ -1316,9 +1316,9 @@
   .wpi-al-dot.med  { background:var(--accent3); }
   .wpi-al-dot.high { background:var(--accent2); box-shadow:0 0 6px var(--accent2); }
   .wpi-al-name { font-family:'Share Tech Mono',monospace; font-size:.68rem; color:var(--text-primary); font-weight:700; }
-  .wpi-al-cond { font-family:'Share Tech Mono',monospace; font-size:.58rem; color:var(--text-dim); margin-top:.1rem; }
-  .wpi-al-sub  { font-family:'Share Tech Mono',monospace; font-size:.53rem; color:rgba(255,255,255,.22); margin-top:.08rem; }
-  .wpi-al-status { margin-left:auto; flex-shrink:0; font-family:'Orbitron',monospace; font-size:.56rem; font-weight:700; color:var(--text-dim); }
+  .wpi-al-cond { font-family:'Share Tech Mono',monospace; font-size:.64rem; color:var(--text-dim); margin-top:.1rem; }
+  .wpi-al-sub  { font-family:'Share Tech Mono',monospace; font-size:.6rem; color:rgba(255,255,255,.22); margin-top:.08rem; }
+  .wpi-al-status { margin-left:auto; flex-shrink:0; font-family:'Orbitron',monospace; font-size:.62rem; font-weight:700; color:var(--text-dim); }
   .wpi-footer { display:flex; gap:.8rem; align-items:center; flex-wrap:wrap; margin-top:1rem; padding-top:.7rem; border-top:1px solid rgba(0,207,232,.1); font-family:'Share Tech Mono',monospace; font-size:.57rem; color:var(--text-dim); }
   @media(max-width:1100px){ .wpi-body{ grid-template-columns:1fr 1fr; } }
   @media(max-width:800px) { .wpi-body{ grid-template-columns:1fr; } .wpi-gauge-wrap{order:-1;} }
@@ -1430,7 +1430,7 @@
         <div class="wpi-mini-regions">
           <div class="wpi-al-title" style="margin-top:1rem">各地區風險（即時計算）</div>
           <div id="region-mini-list" style="display:flex;flex-direction:column;gap:.3rem">
-            <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim)">⏳ 載入地區風險資料…</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim)">⏳ 載入地區風險資料…</div>
           </div>
         </div>
       </div>
@@ -1454,26 +1454,26 @@
       <div style="position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,77,94,.1),transparent);animation:scan 3s linear infinite"></div>
       <div class="alert-hdr" style="display:flex;align-items:center;gap:.7rem;margin-bottom:.7rem;flex-wrap:wrap">
         <div style="font-family:'Orbitron',monospace;font-size:.7rem;font-weight:700;color:var(--accent2);letter-spacing:3px">⚠ WAR ALERT</div>
-        <div class="alert-hdr-sub" style="font-family:'Orbitron',monospace;font-size:.65rem;letter-spacing:2px;color:var(--accent2)">PIZZINT ANOMALY DETECTED</div>
-        <div style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--text-dim)" id="alert-timestamp">--:--:-- UTC</div>
+        <div class="alert-hdr-sub" style="font-family:'Orbitron',monospace;font-size:.7rem;letter-spacing:2px;color:var(--accent2)">PIZZINT ANOMALY DETECTED</div>
+        <div style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)" id="alert-timestamp">--:--:-- UTC</div>
       </div>
       <div style="font-family:'Share Tech Mono',monospace;font-size:.82rem;color:var(--accent2);line-height:1.6;margin-bottom:.8rem" id="alert-main-text">
         🍕 Pizza DEFCON 異常升高 — 歷史上此訊號出現後 2–48 小時內曾發生軍事行動
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.8rem">
         <div style="background:rgba(255,77,94,.1);border:1px solid rgba(255,77,94,.3);padding:.6rem;border-radius:4px">
-          <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim);margin-bottom:.3rem">觸發店家</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim);margin-bottom:.3rem">觸發店家</div>
           <div style="font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:700;color:var(--accent2)" id="triggered-shops">--</div>
         </div>
         <div style="background:rgba(255,77,94,.1);border:1px solid rgba(255,77,94,.3);padding:.6rem;border-radius:4px">
-          <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim);margin-bottom:.3rem">異常等級</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim);margin-bottom:.3rem">異常等級</div>
           <div style="font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:700;color:var(--accent3)" id="alert-magnitude">--</div>
         </div>
       </div>
       <div style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim);line-height:1.8" id="alert-bullets">
         <div>▶ 等待 pizzint.watch spike 事件…</div>
       </div>
-      <div style="margin-top:.8rem;padding:.5rem .8rem;background:rgba(0,0,0,.3);font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim)">
+      <div style="margin-top:.8rem;padding:.5rem .8rem;background:rgba(0,0,0,.3);font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim)">
         ⚠ 偽陽性風險：財年截止、演習、重大體育賽事皆可能觸發。請交叉驗證右方地區風險看板與 GDELT 新聞強度。資料來源：pizzint.watch
       </div>
     </div>
@@ -1483,10 +1483,10 @@
       <div class="pbi-title-row">
         <div>
           <div class="section-title" style="margin:0 0 .2rem">🍕 Pentagon Pizza Index (PizzINT)</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim)">KGB 代號 PIZZINT · Google Maps Popular Times · 每小時更新 · Pentagon / 白宮 / CIA HQ 3英里</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim)">KGB 代號 PIZZINT · Google Maps Popular Times · 每小時更新 · Pentagon / 白宮 / CIA HQ 3英里</div>
         </div>
         <div style="text-align:right;flex-shrink:0">
-          <div style="font-family:'Orbitron',monospace;font-size:.55rem;color:var(--text-dim);letter-spacing:2px">PIZZA DEFCON</div>
+          <div style="font-family:'Orbitron',monospace;font-size:.62rem;color:var(--text-dim);letter-spacing:2px">PIZZA DEFCON</div>
           <div class="pizza-level-num" id="pizza-level-num" style="font-size:1.6rem;line-height:1">--</div>
           <div class="pizza-level-label" id="pizza-level-label">--</div>
         </div>
@@ -1494,7 +1494,7 @@
 
       <!-- DEFCON 量尺 -->
       <div style="margin:.6rem 0 .8rem">
-        <div style="display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim);margin-bottom:.4rem">
+        <div style="display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim);margin-bottom:.4rem">
           <span>異常指數</span>
           <span id="pizza-gauge-pct" style="font-weight:700">--%</span>
         </div>
@@ -1505,7 +1505,7 @@
           <div style="position:absolute;left:40%;top:0;bottom:0;width:1px;background:rgba(245,166,35,.5)"></div>
           <div style="position:absolute;left:70%;top:0;bottom:0;width:1px;background:rgba(255,77,94,.5)"></div>
         </div>
-        <div class="pizza-zones" style="position:relative;height:20px;font-family:'Share Tech Mono',monospace;font-size:.52rem;color:var(--text-dim);margin-top:.2rem">
+        <div class="pizza-zones" style="position:relative;height:20px;font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim);margin-top:.2rem">
           <span style="position:absolute;left:0">5 正常</span>
           <span style="position:absolute;left:38%">4 偏高</span>
           <span style="position:absolute;left:68%">3 警戒</span>
@@ -1514,30 +1514,30 @@
       </div>
 
       <!-- 說明 -->
-      <div style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim);line-height:1.6;margin-bottom:.6rem">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim);line-height:1.6;margin-bottom:.6rem">
         冷戰時 KGB 監視五角大廈深夜外送作為早期預警。<strong style="color:var(--accent4)">PizzINT</strong>：Pentagon 周邊披薩店突發爆單、深夜外送量暴增 → 五角大廈正在加班策劃。
       </div>
 
       <!-- 🍺 加班指數（PizzINT × 酒吧反向 交叉判讀）-->
       <div style="margin:.2rem 0 .4rem;padding:.7rem .8rem;background:rgba(0,207,232,.04);border:1px solid var(--border);border-left:3px solid var(--accent4)">
         <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.5rem">
-          <span style="font-family:'Orbitron',monospace;font-size:.62rem;letter-spacing:2px;color:var(--accent4)">🍺 五角大廈加班指數</span>
-          <span style="font-family:'Share Tech Mono',monospace;font-size:.55rem;color:var(--text-dim)">PizzINT × 酒吧反向 · 交叉確認</span>
+          <span style="font-family:'Orbitron',monospace;font-size:.68rem;letter-spacing:2px;color:var(--accent4)">🍺 五角大廈加班指數</span>
+          <span style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim)">PizzINT × 酒吧反向 · 交叉確認</span>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.5rem">
           <div style="background:var(--bg3);border:1px solid var(--border);padding:.5rem .6rem">
-            <div style="font-family:'Share Tech Mono',monospace;font-size:.56rem;color:var(--text-dim);margin-bottom:.2rem">🍕 披薩需求</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);margin-bottom:.2rem">🍕 披薩需求</div>
             <div style="font-family:'Orbitron',monospace;font-size:.95rem;font-weight:700;color:var(--accent3)" id="overtime-pizza">--</div>
           </div>
           <div style="background:var(--bg3);border:1px solid var(--border);padding:.5rem .6rem">
-            <div style="font-family:'Share Tech Mono',monospace;font-size:.56rem;color:var(--text-dim);margin-bottom:.2rem">🍺 酒吧人流（反向）</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);margin-bottom:.2rem">🍺 酒吧人流（反向）</div>
             <div style="font-family:'Orbitron',monospace;font-size:.72rem;font-weight:700;color:var(--text-dim)" id="overtime-bar">待接資料源</div>
           </div>
         </div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim);line-height:1.6" id="overtime-note">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim);line-height:1.6" id="overtime-note">
           判讀邏輯：披薩<strong style="color:var(--accent3)">爆單</strong> ＋ 酒吧下班後<strong style="color:var(--accent4)">異常冷清</strong>（幕僚沒去喝酒）＝ 五角大廈留守加班策劃。兩訊號同時異常時，偽陽性（財年截止、演習、賽事）大幅降低。
         </div>
-        <div id="overtime-footnote" style="margin-top:.45rem;font-family:'Share Tech Mono',monospace;font-size:.54rem;color:rgba(255,255,255,.28)">
+        <div id="overtime-footnote" style="margin-top:.45rem;font-family:'Share Tech Mono',monospace;font-size:.6rem;color:rgba(255,255,255,.28)">
           🍺 酒吧即時人流由 BestTime 提供，僅美東傍晚下班時段（16–24 時）查詢。非該時段或未營業時顯示待接/無資料。
         </div>
       </div>
@@ -1545,7 +1545,7 @@
 
     <!-- 披薩店監控（全寬） -->
     <div>
-      <div class="section-title" style="font-size:.62rem">🍕 披薩店監控</div>
+      <div class="section-title" style="font-size:.68rem">🍕 披薩店監控</div>
       <div class="pizza-tracker-grid" id="pizza-shops-grid">
         <div style="grid-column:1/-1;text-align:center;padding:.8rem;font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim)">載入中…</div>
       </div>
@@ -1555,7 +1555,7 @@
     <div style="margin:.8rem 0;border-top:1px solid var(--border)"></div>
 
     <!-- 歷史事件橫向捲動 chips -->
-    <div class="section-title" style="font-size:.62rem;margin-bottom:.4rem">🕐 歷史 PizzINT 事件</div>
+    <div class="section-title" style="font-size:.68rem;margin-bottom:.4rem">🕐 歷史 PizzINT 事件</div>
     <div class="ph-scroll">
       <div class="ph-chip"><div class="ph-chip-year">1983</div><div class="ph-chip-event">格瑞那達入侵前夕</div><div class="ph-chip-tag">🍕 激增</div></div>
       <div class="ph-chip"><div class="ph-chip-year">1990</div><div class="ph-chip-event">CIA 單夜訂 21 個披薩</div><div class="ph-chip-tag">🍕×21</div></div>
@@ -1569,7 +1569,7 @@
     </div>
 
     <div style="margin-top:.6rem;text-align:right">
-      <a href="https://www.pizzint.watch" target="_blank" rel="noopener" style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--accent4)">→ pizzint.watch ↗</a>
+      <a href="https://www.pizzint.watch" target="_blank" rel="noopener" style="font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--accent4)">→ pizzint.watch ↗</a>
     </div>
 
   </div><!-- /.pizza-bar-card -->
@@ -1578,18 +1578,18 @@
   <div class="card poly-card" style="margin-bottom:1.5rem">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;flex-wrap:wrap;gap:.5rem">
       <div class="section-title" style="margin:0">📊 Polymarket 戰爭預測市場</div>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim);display:flex;gap:.8rem;align-items:center">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim);display:flex;gap:.8rem;align-items:center">
         <span style="color:var(--accent1)">⟳ 每 5 分鐘</span>
         <span id="poly-updated-time">上次更新：載入中…</span>
       </div>
     </div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:.63rem;color:var(--text-dim);margin-bottom:.8rem;padding:.5rem .7rem;background:rgba(0,207,232,.05);border-left:2px solid var(--accent4)">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim);margin-bottom:.8rem;padding:.5rem .7rem;background:rgba(0,207,232,.05);border-left:2px solid var(--accent4)">
       真實資金下注 · 準確率 <span style="color:var(--accent1)">94%</span>（事件前一個月）· 2025 年地緣政治交易量 <span style="color:var(--accent3)">$33B+</span>
     </div>
     <div class="poly-grid" id="poly-list-container">
       <div style="grid-column:1/-1;text-align:center;padding:1.4rem;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">載入即時 Polymarket 戰爭預測市場…</div>
     </div>
-    <div style="margin-top:.8rem;padding:.6rem .8rem;background:rgba(0,207,232,.04);border:1px solid rgba(0,207,232,.15);font-family:'Share Tech Mono',monospace;font-size:.58rem;color:var(--text-dim)">
+    <div style="margin-top:.8rem;padding:.6rem .8rem;background:rgba(0,207,232,.04);border:1px solid rgba(0,207,232,.15);font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim)">
       ⚠️ 僅供資訊參考，不構成投資建議。機率隨事件發展即時變動。
     </div>
   </div><!-- /.poly-card -->
@@ -1598,15 +1598,15 @@
 <style>
 /* ── OSINT 三模組共用 ─── */
 .osint-adv-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.2rem; margin:0 0 1.5rem; align-items:stretch; }
-.osint-adv-hdr  { font-family:'Orbitron',monospace; font-size:.56rem; letter-spacing:3px; color:var(--text-dim); text-transform:uppercase; margin-bottom:1rem; padding-bottom:.5rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
-.osint-updated  { font-family:'Share Tech Mono',monospace; font-size:.54rem; color:var(--text-dim); letter-spacing:0; }
+.osint-adv-hdr  { font-family:'Orbitron',monospace; font-size:.62rem; letter-spacing:3px; color:var(--text-dim); text-transform:uppercase; margin-bottom:1rem; padding-bottom:.5rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+.osint-updated  { font-family:'Share Tech Mono',monospace; font-size:.6rem; color:var(--text-dim); letter-spacing:0; }
 /* Aviation */
 .avi-counter    { display:grid; grid-template-columns:repeat(3,1fr); gap:.5rem; margin-bottom:1rem; }
 .avi-box        { background:var(--bg3); border:1px solid var(--border); padding:.6rem; text-align:center; }
 .avi-box-val    { font-family:'Orbitron',monospace; font-size:1.4rem; font-weight:700; line-height:1; }
-.avi-box-lbl    { font-family:'Share Tech Mono',monospace; font-size:.53rem; color:var(--text-dim); letter-spacing:1px; margin-top:.3rem; }
+.avi-box-lbl    { font-family:'Share Tech Mono',monospace; font-size:.6rem; color:var(--text-dim); letter-spacing:1px; margin-top:.3rem; }
 .avi-list       { display:flex; flex-direction:column; gap:.35rem; }
-.avi-item       { display:grid; grid-template-columns:12px 1fr auto; align-items:center; gap:.5rem; padding:.45rem .55rem; background:var(--bg3); border:1px solid var(--border); font-family:'Share Tech Mono',monospace; font-size:.65rem; }
+.avi-item       { display:grid; grid-template-columns:12px 1fr auto; align-items:center; gap:.5rem; padding:.45rem .55rem; background:var(--bg3); border:1px solid var(--border); font-family:'Share Tech Mono',monospace; font-size:.7rem; }
 .avi-dot        { width:8px; height:8px; border-radius:50%; }
 .avi-dot.tanker { background:var(--accent); box-shadow:0 0 5px var(--accent); }
 .avi-dot.awacs  { background:var(--accent3); box-shadow:0 0 5px var(--accent3); animation:blink-dot 1.2s infinite; }
@@ -1618,35 +1618,35 @@
 .fire-summary   { display:grid; grid-template-columns:1fr 1fr; gap:.5rem; margin-bottom:1rem; }
 .fire-box       { background:var(--bg3); border:1px solid var(--border); padding:.6rem; text-align:center; }
 .fire-val       { font-family:'Orbitron',monospace; font-size:1.3rem; font-weight:700; }
-.fire-lbl       { font-family:'Share Tech Mono',monospace; font-size:.53rem; color:var(--text-dim); margin-top:.2rem; }
+.fire-lbl       { font-family:'Share Tech Mono',monospace; font-size:.6rem; color:var(--text-dim); margin-top:.2rem; }
 .live-feed      { display:flex; flex-direction:column; gap:.35rem; max-height:250px; overflow-y:auto; }
 .live-feed::-webkit-scrollbar { width:3px; }
 .live-feed::-webkit-scrollbar-thumb { background:var(--border); }
-.feed-item      { display:flex; gap:.6rem; padding:.45rem .55rem; background:var(--bg3); border:1px solid var(--border); border-left:2px solid var(--border); font-family:'Share Tech Mono',monospace; font-size:.63rem; }
+.feed-item      { display:flex; gap:.6rem; padding:.45rem .55rem; background:var(--bg3); border:1px solid var(--border); border-left:2px solid var(--border); font-family:'Share Tech Mono',monospace; font-size:.68rem; }
 .feed-item.fire  { border-left-color:var(--accent2); }
 .feed-item.air   { border-left-color:var(--accent); }
 .feed-item.move  { border-left-color:var(--accent3); }
 .feed-item.cyber { border-left-color:var(--accent); }
-.feed-time { color:var(--text-dim); white-space:nowrap; min-width:38px; font-size:.58rem; }
+.feed-time { color:var(--text-dim); white-space:nowrap; min-width:38px; font-size:.64rem; }
 .feed-text { flex:1; color:var(--text-primary); line-height:1.4; }
 .event-tags { display:flex; gap:.4rem; flex-wrap:wrap; margin-top:.7rem; padding-top:.5rem; border-top:1px solid var(--border); }
-.event-tag  { font-family:'Share Tech Mono',monospace; font-size:.56rem; padding:2px 5px; border:1px solid; }
+.event-tag  { font-family:'Share Tech Mono',monospace; font-size:.62rem; padding:2px 5px; border:1px solid; }
 /* Finance */
 .fin-grid   { display:grid; grid-template-columns:1fr 1fr; gap:.5rem; margin-bottom:.8rem; }
 .fin-box    { background:var(--bg3); border:1px solid var(--border); padding:.65rem; }
-.fin-ticker { font-family:'Orbitron',monospace; font-size:.56rem; color:var(--text-dim); letter-spacing:2px; margin-bottom:.2rem; }
+.fin-ticker { font-family:'Orbitron',monospace; font-size:.62rem; color:var(--text-dim); letter-spacing:2px; margin-bottom:.2rem; }
 .fin-price  { font-family:'Orbitron',monospace; font-size:1.05rem; font-weight:700; line-height:1; }
-.fin-change { font-family:'Share Tech Mono',monospace; font-size:.62rem; margin-top:.2rem; }
+.fin-change { font-family:'Share Tech Mono',monospace; font-size:.68rem; margin-top:.2rem; }
 .fin-change.up   { color:var(--accent2); }
 .fin-change.down { color:var(--accent); }
-.fin-ma     { font-family:'Share Tech Mono',monospace; font-size:.53rem; color:var(--text-dim); margin-top:.15rem; }
-.fin-premium { margin-top:.7rem; padding:.55rem .65rem; background:rgba(245,166,35,.05); border:1px solid rgba(245,166,35,.2); font-family:'Share Tech Mono',monospace; font-size:.63rem; color:var(--text-dim); line-height:1.6; }
+.fin-ma     { font-family:'Share Tech Mono',monospace; font-size:.6rem; color:var(--text-dim); margin-top:.15rem; }
+.fin-premium { margin-top:.7rem; padding:.55rem .65rem; background:rgba(245,166,35,.05); border:1px solid rgba(245,166,35,.2); font-family:'Share Tech Mono',monospace; font-size:.68rem; color:var(--text-dim); line-height:1.6; }
 .fin-stocks  { display:flex; flex-direction:column; gap:.3rem; margin-top:.7rem; }
-.fin-stock-row { display:grid; grid-template-columns:55px 1fr auto auto; align-items:center; gap:.5rem; padding:.4rem .5rem; background:var(--bg3); border:1px solid var(--border); font-family:'Share Tech Mono',monospace; font-size:.62rem; }
+.fin-stock-row { display:grid; grid-template-columns:55px 1fr auto auto; align-items:center; gap:.5rem; padding:.4rem .5rem; background:var(--bg3); border:1px solid var(--border); font-family:'Share Tech Mono',monospace; font-size:.68rem; }
 .fin-sym  { color:var(--accent); font-weight:700; }
-.fin-name { color:var(--text-dim); font-size:.56rem; }
+.fin-name { color:var(--text-dim); font-size:.62rem; }
 .fin-px   { text-align:right; }
-.fin-chg  { text-align:right; font-size:.6rem; }
+.fin-chg  { text-align:right; font-size:.66rem; }
 .fin-chg.up   { color:var(--accent2); }
 .fin-chg.down { color:var(--accent); }
 /* RWD */
@@ -1666,21 +1666,21 @@
       <div class="avi-box"><div class="avi-box-val" id="avi-awacs"   style="color:var(--accent3)">--</div><div class="avi-box-lbl">預警機</div></div>
       <div class="avi-box"><div class="avi-box-val" id="avi-uav"     style="color:var(--accent)">--</div><div class="avi-box-lbl">偵察無人機</div></div>
     </div>
-    <div style="margin-bottom:.8rem;padding:.5rem .6rem;background:rgba(0,207,232,.06);border:1px solid rgba(0,207,232,.2);font-family:'Share Tech Mono',monospace;font-size:.63rem;color:var(--text-dim)">
+    <div style="margin-bottom:.8rem;padding:.5rem .6rem;background:rgba(0,207,232,.06);border:1px solid rgba(0,207,232,.2);font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim)">
       較 7 日均值 <strong style="color:var(--accent2);font-size:.82rem" id="avi-anomaly">--%</strong> &nbsp;·&nbsp; 7日均：<span id="avi-baseline">--</span> 架次/hr
     </div>
     <div class="avi-list" id="avi-list">
       <div style="text-align:center;padding:1.2rem;font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim)">⏳ 載入即時 ADS-B 軍機資料…</div>
     </div>
-    <div style="display:flex;gap:.8rem;flex-wrap:wrap;margin-top:.8rem;padding-top:.6rem;border-top:1px solid var(--border);font-family:'Share Tech Mono',monospace;font-size:.56rem;color:var(--text-dim)">
+    <div style="display:flex;gap:.8rem;flex-wrap:wrap;margin-top:.8rem;padding-top:.6rem;border-top:1px solid var(--border);font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim)">
       <span><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:3px"></i>加油機</span>
       <span><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent3);margin-right:3px"></i>預警機</span>
       <span><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:3px"></i>無人機</span>
     </div>
     <div style="margin-top:.5rem;text-align:right">
-      <a href="https://globe.adsbexchange.com" target="_blank" rel="noopener" style="font-family:'Share Tech Mono',monospace;font-size:.56rem;color:var(--accent)">ADSB.Exchange ↗</a>
+      <a href="https://globe.adsbexchange.com" target="_blank" rel="noopener" style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--accent)">ADSB.Exchange ↗</a>
       &nbsp;·&nbsp;
-      <a href="https://opensky-network.org" target="_blank" rel="noopener" style="font-family:'Share Tech Mono',monospace;font-size:.56rem;color:var(--accent)">OpenSky ↗</a>
+      <a href="https://opensky-network.org" target="_blank" rel="noopener" style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--accent)">OpenSky ↗</a>
     </div>
   </div>
 
@@ -1704,7 +1704,7 @@
       <span class="event-tag" style="color:var(--accent);border-color:var(--accent);background:rgba(0,207,232,.08)">防空啟動 10%</span>
     </div>
     <div style="margin-top:.6rem;text-align:right">
-      <a href="https://firms.modaps.eosdis.nasa.gov/map/" target="_blank" rel="noopener" style="font-family:'Share Tech Mono',monospace;font-size:.56rem;color:var(--accent)">NASA FIRMS 即時地圖 ↗</a>
+      <a href="https://firms.modaps.eosdis.nasa.gov/map/" target="_blank" rel="noopener" style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--accent)">NASA FIRMS 即時地圖 ↗</a>
     </div>
     <!-- NASA FIRMS WMS 靜態衛星圖（新版端點格式） -->
     <a href="https://firms.modaps.eosdis.nasa.gov/map/" target="_blank" rel="noopener" style="display:block;margin-top:.8rem;text-decoration:none">
@@ -1714,7 +1714,7 @@
         style="width:100%;height:auto;display:block;opacity:.85;border:1px solid rgba(255,77,94,.2)"
         onerror="this.parentElement.style.display='none';document.getElementById('html-firms-fallback').style.display='block'"
       >
-      <div style="font-family:'Share Tech Mono',monospace;font-size:.55rem;color:var(--text-dim);margin-top:.3rem;text-align:center">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);margin-top:.3rem;text-align:center">
         🛰️ VIIRS S-NPP + NOAA-20 · 24hr · 全球 · 點擊開啟互動地圖 ↗
       </div>
     </a>
@@ -1722,8 +1722,8 @@
     <a id="html-firms-fallback" href="https://firms.modaps.eosdis.nasa.gov/map/" target="_blank" rel="noopener"
        style="display:none;margin-top:.8rem;padding:.8rem;background:rgba(255,77,94,.06);border:1px solid rgba(255,77,94,.25);text-align:center;text-decoration:none">
       <div style="font-size:1.1rem;margin-bottom:.3rem">🛰️</div>
-      <div style="font-family:'Orbitron',monospace;font-size:.62rem;color:var(--accent2);letter-spacing:2px">開啟 NASA FIRMS 即時火點圖</div>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:.56rem;color:var(--text-dim);margin-top:.2rem">VIIRS S-NPP · 24hr · 全球 ↗</div>
+      <div style="font-family:'Orbitron',monospace;font-size:.68rem;color:var(--accent2);letter-spacing:2px">開啟 NASA FIRMS 即時火點圖</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);margin-top:.2rem">VIIRS S-NPP · 24hr · 全球 ↗</div>
     </a>
   </div>
 
@@ -1745,18 +1745,18 @@
       <strong style="color:var(--accent3);font-size:.82rem" id="fin-war-premium"> --</strong>
       &nbsp;— 溢價超過 $8 通常代表市場已預期軍事行動
     </div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:.58rem;color:var(--text-dim);margin:.65rem 0 .3rem;letter-spacing:2px">DEFENSE STOCKS</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim);margin:.65rem 0 .3rem;letter-spacing:2px">DEFENSE STOCKS</div>
     <div class="fin-stocks" id="fin-stocks-list">
       <div class="fin-stock-row"><div class="fin-sym">LMT</div><div class="fin-name">洛克希德馬丁</div><div class="fin-px" id="html-stk-lmt">--</div><div class="fin-chg" id="html-stk-lmt-c">--</div></div>
       <div class="fin-stock-row"><div class="fin-sym">RTX</div><div class="fin-name">雷神技術</div><div class="fin-px" id="html-stk-rtx">--</div><div class="fin-chg" id="html-stk-rtx-c">--</div></div>
       <div class="fin-stock-row"><div class="fin-sym">NOC</div><div class="fin-name">諾斯洛普</div><div class="fin-px" id="html-stk-noc">--</div><div class="fin-chg" id="html-stk-noc-c">--</div></div>
       <div class="fin-stock-row"><div class="fin-sym">GD</div><div class="fin-name">通用動力</div><div class="fin-px" id="html-stk-gd">--</div><div class="fin-chg" id="html-stk-gd-c">--</div></div>
     </div>
-    <div style="margin-top:.5rem;font-family:'Share Tech Mono',monospace;font-size:.54rem;color:var(--text-dim)">
+    <div style="margin-top:.5rem;font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim)">
       🚨 = 無財報情況下異常漲幅，可能反映地緣政治張力
     </div>
     <div style="margin-top:.4rem;text-align:right">
-      <a href="https://finance.yahoo.com" target="_blank" rel="noopener" style="font-family:'Share Tech Mono',monospace;font-size:.56rem;color:var(--accent)">Yahoo Finance ↗</a>
+      <a href="https://finance.yahoo.com" target="_blank" rel="noopener" style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--accent)">Yahoo Finance ↗</a>
     </div>
   </div>
 
@@ -2440,7 +2440,7 @@ function renderHero(json) {
       return `<a class="hero-region-pill" style="border-color:${st.color}" href="#region-board" title="${r.level} · ${st.zh}">
         <span>${r.flag}</span><span>${escapeHtml(r.name)}</span>
         <b style="color:${st.color}">${Math.round(r.score)}</b>
-        <span style="font-size:.62rem">${trendArrow(r.score, r.key)}</span>
+        <span style="font-size:.68rem">${trendArrow(r.score, r.key)}</span>
       </a>`;
     }).join('');
   }
@@ -2491,27 +2491,27 @@ function renderRegions(regions) {
       const factorRow = (label, val, extra) => {
         const has = val != null;
         const right = has ? (extra ?? Math.round(val)) : '--';
-        return `<div style="display:grid;grid-template-columns:58px 1fr 62px;align-items:center;gap:.4rem;font-size:.56rem">
-          <span style="color:var(--text-dim)">${label}</span>
-          <div style="height:3px;background:rgba(255,255,255,.08)"><div style="width:${has ? Math.min(100,val) : 0}%;height:100%;background:${st.color};opacity:.7"></div></div>
-          <span style="text-align:right;color:var(--text-dim)">${right}</span>
+        return `<div style="display:grid;grid-template-columns:68px minmax(0,1fr) 68px;align-items:center;gap:.5rem;font-size:.74rem">
+          <span style="color:var(--text)">${label}</span>
+          <div style="height:5px;min-width:0;background:rgba(255,255,255,.08)"><div style="width:${has ? Math.min(100,val) : 0}%;height:100%;background:${st.color};opacity:.8"></div></div>
+          <span style="text-align:right;color:var(--text);white-space:nowrap">${right}</span>
         </div>`;
       };
-      return `<div style="display:flex;flex-direction:column;background:var(--bg3);border:1px solid var(--border);border-left:3px solid ${st.color};padding:.7rem .8rem">
-        <div style="display:flex;align-items:baseline;gap:.5rem;margin-bottom:.35rem">
-          <span style="font-size:.85rem">${r.flag} ${escapeHtml(r.name)}</span>
-          <span style="margin-left:auto;font-family:'Orbitron',monospace;font-size:1.25rem;font-weight:900;color:${st.color}">${Math.round(r.score)}</span>
-          <span style="font-family:'Share Tech Mono',monospace;font-size:.6rem">${trend}</span>
+      return `<div style="display:flex;flex-direction:column;min-width:0;overflow:hidden;background:var(--bg3);border:1px solid var(--border);border-left:3px solid ${st.color};padding:.9rem 1rem">
+        <div style="display:flex;align-items:baseline;gap:.5rem;margin-bottom:.4rem">
+          <span style="font-size:1rem">${r.flag} ${escapeHtml(r.name)}</span>
+          <span style="margin-left:auto;font-family:'Orbitron',monospace;font-size:1.5rem;font-weight:900;color:${st.color}">${Math.round(r.score)}</span>
+          <span style="font-family:'Share Tech Mono',monospace;font-size:.72rem">${trend}</span>
         </div>
-        <div style="font-family:'Orbitron',monospace;font-size:.55rem;letter-spacing:2px;color:${st.color};margin-bottom:.45rem">${r.level} · ${st.zh}</div>
-        <div style="display:flex;flex-direction:column;gap:.22rem;font-family:'Share Tech Mono',monospace">
+        <div style="font-family:'Orbitron',monospace;font-size:.7rem;letter-spacing:2px;color:${st.color};margin-bottom:.55rem">${r.level} · ${st.zh}</div>
+        <div style="display:flex;flex-direction:column;gap:.34rem;font-family:'Share Tech Mono',monospace">
           ${factorRow('市場盤口', f.poly)}
           ${factorRow('新聞強度', f.gdelt, gdeltDelta)}
-          ${factorRow('領空NOTAM', f.notam, f.notam == null ? null : (f.notam_closure ? '⛔ 關閉' : (f.notam_danger ?? 0) + ' 警戒'))}
+          ${factorRow('領空', f.notam, f.notam == null ? null : (f.notam_closure ? '⛔ 關閉' : (f.notam_danger ?? 0) + ' 警戒'))}
           ${factorRow('衛星火點', f.firms, (f.firms_hotspots ?? 0) + ' 處')}
           ${factorRow('軍機活動', f.avi, (f.avi_count ?? 0) + ' 架')}
         </div>
-        <div style="margin-top:auto;padding-top:.45rem;font-family:'Share Tech Mono',monospace;font-size:.54rem;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.top_market ? escapeHtml(r.top_market) : ''}">${r.top_market ? '📊 ' + escapeHtml(r.top_market) : '&nbsp;'}</div>
+        <div style="margin-top:auto;padding-top:.55rem;font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.top_market ? escapeHtml(r.top_market) : ''}">${r.top_market ? '📊 ' + escapeHtml(r.top_market) : '&nbsp;'}</div>
       </div>`;
     }).join('');
   }
@@ -2521,11 +2521,11 @@ function renderRegions(regions) {
   if (mini) {
     mini.innerHTML = regions.map(r => {
       const st = REGION_LEVEL_STYLE[r.level] || REGION_LEVEL_STYLE.WATCH;
-      return `<div style="display:grid;grid-template-columns:82px 1fr 34px 30px;align-items:center;gap:.4rem;font-family:'Share Tech Mono',monospace;font-size:.62rem">
+      return `<div style="display:grid;grid-template-columns:82px 1fr 34px 30px;align-items:center;gap:.4rem;font-family:'Share Tech Mono',monospace;font-size:.68rem">
         <span>${r.flag} ${escapeHtml(r.name)}</span>
         <div style="height:4px;background:rgba(255,255,255,.08)"><div style="width:${Math.min(100, r.score)}%;height:100%;background:${st.color}"></div></div>
         <span style="color:${st.color};text-align:right">${Math.round(r.score)}</span>
-        <span style="font-size:.55rem">${trendArrow(r.score, r.key)}</span>
+        <span style="font-size:.62rem">${trendArrow(r.score, r.key)}</span>
       </div>`;
     }).join('');
   }
@@ -2553,7 +2553,7 @@ function renderNuclearSeismic(ns) {
     return `<div style="display:flex;justify-content:space-between"><span>${escapeHtml(s.name)}</span><span style="color:${color}">${note}</span></div>`;
   });
   el.innerHTML = rows.join('') +
-    `<div style="margin-top:.3rem;font-size:.52rem;color:rgba(255,255,255,.25)">核試驗特徵：淺層（&lt;2km）+ 試驗場 150km 內 · 資料：USGS</div>`;
+    `<div style="margin-top:.3rem;font-size:.6rem;color:rgba(255,255,255,.25)">核試驗特徵：淺層（&lt;2km）+ 試驗場 150km 內 · 資料：USGS</div>`;
 }
 
 // ─── PizzINT 深度情報：後端 DEFCON 演算法 + spike 事件 ────────
@@ -2607,7 +2607,7 @@ function applyPizzintIntel(json) {
           : empt >= 10 ? { t: `偏冷清 ${delta}%`, c: 'var(--accent2)' }
           : delta > 10 ? { t: `熱鬧 +${delta}%`, c: 'var(--accent)' }
           : { t: `正常 ${delta >= 0 ? '+' : ''}${delta}%`, c: 'var(--accent3)' };
-        otBar.innerHTML = `${s.t} <span style="font-size:.6rem;color:var(--text-dim)">（${b.open_count}/${b.total} 開）</span>`;
+        otBar.innerHTML = `${s.t} <span style="font-size:.66rem;color:var(--text-dim)">（${b.open_count}/${b.total} 開）</span>`;
         otBar.style.color = s.c;
         otBar.style.fontSize = '.82rem';
       }
@@ -2763,7 +2763,7 @@ function renderPolymarketCards(markets) {
       <div class="poly-item ${severity}" style="cursor:pointer" onmouseover="this.style.borderLeftWidth='5px'" onmouseout="this.style.borderLeftWidth='3px'">
         <div class="poly-question">${flag} ${question}</div>
         <div class="poly-bar-container">
-          <span style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);width:24px">YES</span>
+          <span style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim);width:24px">YES</span>
           <div class="poly-bar"><div class="poly-fill" style="width:${yesPct}%;background:linear-gradient(90deg,rgba(0,10,30,.8),${pctColor})"></div></div>
           <div class="poly-percent" style="color:${pctColor}">${yesPct}%</div>
         </div>
@@ -2880,9 +2880,9 @@ function renderAviation(d) {
           <div class="avi-dot ${dotCls}"></div>
           <div style="flex:1;min-width:0">
             <div style="font-size:.7rem;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
-              ${escapeHtml(cs)} <span style="color:var(--text-dim);font-size:.58rem">${escapeHtml(type)}</span>
+              ${escapeHtml(cs)} <span style="color:var(--text-dim);font-size:.64rem">${escapeHtml(type)}</span>
             </div>
-            <div style="color:var(--text-dim);font-size:.58rem">${escapeHtml(a.region||'—')} · ${roleLabel[a.role]||a.role} · ${altStr}</div>
+            <div style="color:var(--text-dim);font-size:.64rem">${escapeHtml(a.region||'—')} · ${roleLabel[a.role]||a.role} · ${altStr}</div>
           </div>
         </div>`;
       }).join('');
