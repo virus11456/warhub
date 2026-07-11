@@ -957,15 +957,24 @@ async def fetch_bars(session: aiohttp.ClientSession) -> dict:
         avg_live = sum(b["live_busyness"] for b in live_bars) / len(live_bars)
         deltas = [b["delta"] for b in live_bars if b["delta"] is not None]
         avg_delta = sum(deltas) / len(deltas) if deltas else 0
-        # 冷清度：比平時安靜多少（正值＝異常冷清＝加班訊號）
-        emptiness = max(0.0, -avg_delta)
+        # 冷清度：每間酒吧「比平時安靜多少」，正值＝異常冷清＝加班訊號。
+        # 先逐間 clamp（熱鬧的店只貢獻 0，不抵銷別家的冷清），再把整體平均與
+        # 「最冷清的單店」混合，讓「任一關鍵酒吧變鬼城」也能觸發，同時保留廣度。
+        per_empt = [max(0.0, -d) for d in deltas]
+        avg_empt = sum(per_empt) / len(per_empt) if per_empt else 0.0
+        max_empt = max(per_empt) if per_empt else 0.0
+        emptiness = 0.6 * avg_empt + 0.4 * max_empt
+        # 加班分數 0–100：冷清度映射（比平時安靜 40% 即封頂），供前端統一分級／重用
+        overtime_score = round(min(100.0, emptiness / 40.0 * 100), 1)
         result.update({
             "avg_live_busyness": round(avg_live, 1),
             "avg_delta": round(avg_delta, 1),
+            "max_emptiness": round(max_empt, 1),
             "emptiness": round(emptiness, 1),
+            "overtime_score": overtime_score,
         })
         log.info(f"Bars: {len(live_bars)}/{len(bars)} open, avg_live={avg_live:.0f}% "
-                 f"avg_delta={avg_delta:+.0f}% emptiness={emptiness:.0f}")
+                 f"avg_delta={avg_delta:+.0f}% emptiness={emptiness:.0f} score={overtime_score:.0f}")
     else:
         result["reason"] = "目前無酒吧即時資料（可能皆未營業）"
         log.info(f"Bars: no live data ({result.get('reason')})")
