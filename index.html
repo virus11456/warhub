@@ -1098,14 +1098,14 @@
     .wpi-f-name { font-size: .62rem; }
   }
 
-  /* ══════════ 8-BIT 切換鈕 ══════════ */
-  #theme-toggle {
-    font-family:'Orbitron',monospace; font-size:.6rem; font-weight:700; letter-spacing:1px;
-    padding:4px 9px; cursor:pointer; background:transparent; color:var(--accent3);
-    border:1px solid var(--accent3); border-radius:3px; white-space:nowrap;
+
+  /* 繁體中文像素字型 Cubic 11（俐方體十一號）*/
+  @font-face {
+    font-family:'Cubic 11';
+    src:url('https://cdn.jsdelivr.net/gh/ACh-K/Cubic-11@1.500/fonts/web/Cubic_11.woff2') format('woff2'),
+        url('https://cdn.jsdelivr.net/gh/ACh-K/Cubic-11@1.500/fonts/web/Cubic_11.woff') format('woff');
+    font-display:swap;
   }
-  #theme-toggle:hover { background:rgba(245,166,35,.14); }
-  @media (max-width:640px){ #theme-toggle{ font-size:.54rem; padding:3px 6px; } }
 
   /* ══════════ 🎮 8-BIT 像素風主題（可切換）══════════ */
   body.theme-8bit {
@@ -1119,7 +1119,7 @@
     .threat-badge, #alert-badge, .wpi-f-val, .avi-box-val, .fire-val, .fin-price, .clock-face,
     .osint-adv-hdr, .risk-pill, .wpi-badge, .ticker-label, #theme-toggle, .pizza-level-num,
     .ph-chip-year, .wpi-al-status, .hero-region-pill b) {
-    font-family:'Press Start 2P','Orbitron',monospace !important;
+    font-family:'Press Start 2P','Cubic 11','Orbitron',monospace !important;
     letter-spacing:0 !important; line-height:1.4 !important;
   }
   /* 大數字縮一點，像素字較寬 */
@@ -1128,7 +1128,7 @@
   body.theme-8bit .clock-face { font-size:1.4rem !important; }
 
   /* 移除圓角/模糊/光暈，改硬邊像素風 */
-  body.theme-8bit * { border-radius:0 !important; text-shadow:none !important; }
+  body.theme-8bit * { border-radius:0 !important; text-shadow:none !important; font-family:'Cubic 11','Press Start 2P',monospace !important; }
   body.theme-8bit header { backdrop-filter:none !important; border-bottom:3px solid var(--accent) !important; }
 
   /* 卡片：粗邊 + 硬陰影（像素立體感）、平塗背景 */
@@ -1176,8 +1176,7 @@
 
 </style>
 </head>
-<body>
-<script>try{if(localStorage.getItem("warhub-theme")==="8bit")document.body.classList.add("theme-8bit");}catch(e){}</script>
+<body class="theme-8bit">
 
 <div class="bg-grid"></div>
 
@@ -1189,7 +1188,6 @@
       <span><span class="live-dot"></span>LIVE DATA</span>
       <span id="clock">--:--:-- UTC</span>
       <span class="threat-badge" id="alert-badge">威脅等級 ELEVATED</span>
-      <button id="theme-toggle" type="button" title="切換 8-bit 像素風" aria-label="切換 8-bit 像素風">🎮 8-BIT</button>
     </div>
   </div>
 </header>
@@ -1802,24 +1800,6 @@
 </div><!-- /.container -->
 
 <script>
-// ─── 🎮 8-BIT 像素風切換（記憶於 localStorage）──────────────────
-(function () {
-  const btn = document.getElementById('theme-toggle');
-  const KEY = 'warhub-theme';
-  const sync = on => {
-    document.body.classList.toggle('theme-8bit', on);
-    if (btn) btn.textContent = on ? '🖥 一般模式' : '🎮 8-BIT';
-  };
-  let on = false;
-  try { on = localStorage.getItem(KEY) === '8bit'; } catch (e) {}
-  sync(on);
-  if (btn) btn.addEventListener('click', () => {
-    on = !on;
-    try { localStorage.setItem(KEY, on ? '8bit' : 'normal'); } catch (e) {}
-    sync(on);
-  });
-})();
-
 // ─── UTC Clock ────────────────────────────────────────────────
 function updateClock() {
   const now = new Date();
