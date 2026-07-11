@@ -12,7 +12,7 @@
 warhub/
 ├── index.html                     # 主頁面（戰爭預測儀表板）
 ├── data/
-│   └── data.json                  # 由 GitHub Actions 每 15 分鐘自動更新
+│   └── data.json                  # 由 GitHub Actions 自動更新（排程每 15 分鐘，GitHub 尖峰時實際約每小時）
 ├── scripts/
 │   ├── fetch_data.py              # 抓取 Polymarket + Pizza 指數
 │   ├── alerts.py                  # Telegram / Discord 警報推播
@@ -74,7 +74,7 @@ warhub/
 
 ## 警報推播（選用）
 
-如果想在指數突破閾值時自動推播到 Telegram / Discord，到 GitHub 倉庫 **Settings → Secrets and variables → Actions** 新增：
+`fetch_data.py` 每次更新資料時會比對前一份 `data.json` 的警戒等級，**等級升高**（如 NORMAL → ELEVATED）時自動推播到 Telegram / Discord。未設定 Secrets 則自動跳過。啟用方式：到 GitHub 倉庫 **Settings → Secrets and variables → Actions** 新增：
 
 | Secret | 用途 |
 |--------|------|
