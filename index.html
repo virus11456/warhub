@@ -1058,6 +1058,46 @@
   .card { padding: 1.3rem 1.4rem; }
   .main-grid, .bottom-grid { gap: 1.2rem; }
 
+  /* ══════════ 手機版排版優化（≤640px）══════════ */
+  @media (max-width: 640px) {
+    /* 卡片內距收斂 */
+    .card { padding: 1rem 1rem; }
+
+    /* WPI 七因子：改單列緊湊式（圖示+名稱｜長條｜數值 同一行）*/
+    .wpi-factors { gap: .4rem; }
+    .wpi-factor  { display: grid; grid-template-columns: 128px 1fr; align-items: center; gap: .5rem; padding: .5rem .6rem; }
+    .wpi-f-hdr   { margin-bottom: 0; }
+    .wpi-f-bar-wrap { margin-bottom: 0; }
+    .wpi-f-desc  { display: none; }
+    .wpi-f-name  { font-size: .68rem; }
+    .wpi-f-val   { font-size: .8rem; min-width: 22px; }
+    .wpi-f-wt    { font-size: .52rem; }
+
+    /* WPI 右欄的「各地區風險」迷你列與頂部 hero、下方看板重複 → 手機隱藏 */
+    .wpi-mini-regions { display: none; }
+    /* 多重驗證警戒改雙欄，較不佔高 */
+    .wpi-alerts { display: block; }
+    .wpi-al-sub { display: none; }
+    .wpi-al-item { padding: .45rem .55rem; }
+
+    /* 地區看板卡片緊湊 */
+    #region-board { grid-template-columns: 1fr !important; }
+    #region-board > div { padding: .7rem .8rem !important; }
+
+    /* 戰爭警報橫幅：標題不換行擠壓、副標手機隱藏、內距收斂 */
+    #pizza-war-alert { margin: -1rem -1rem 1rem !important; padding: 1rem 1rem !important; }
+    .alert-hdr-sub { display: none; }
+
+    /* 趨勢圖高度壓縮 */
+    #trend-chart svg { max-height: 150px; }
+  }
+
+  @media (max-width: 400px) {
+    /* 極窄：名稱欄縮短 */
+    .wpi-factor { grid-template-columns: 108px 1fr; }
+    .wpi-f-name { font-size: .62rem; }
+  }
+
 </style>
 </head>
 <body>
@@ -1310,9 +1350,11 @@
           <div><div class="wpi-al-name">高度警戒</div><div class="wpi-al-cond">以上皆有 + 大量加油機</div><div class="wpi-al-sub">軍事行動即將執行</div></div>
           <div class="wpi-al-status" id="html-wpi-al-high-st">—</div>
         </div>
-        <div class="wpi-al-title" style="margin-top:1rem">各地區風險（即時計算）</div>
-        <div id="region-mini-list" style="display:flex;flex-direction:column;gap:.3rem">
-          <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim)">⏳ 載入地區風險資料…</div>
+        <div class="wpi-mini-regions">
+          <div class="wpi-al-title" style="margin-top:1rem">各地區風險（即時計算）</div>
+          <div id="region-mini-list" style="display:flex;flex-direction:column;gap:.3rem">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim)">⏳ 載入地區風險資料…</div>
+          </div>
         </div>
       </div>
     </div>
@@ -1333,9 +1375,9 @@
     <!-- 警報橫幅 -->
     <div id="pizza-war-alert" style="display:none;position:relative;overflow:hidden;margin:-1.2rem -1.2rem 1.2rem;padding:1.2rem 1.5rem;background:linear-gradient(135deg,rgba(255,77,94,.15),rgba(255,68,0,.1));border-bottom:1px solid rgba(255,77,94,.4)">
       <div style="position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,77,94,.1),transparent);animation:scan 3s linear infinite"></div>
-      <div style="display:flex;align-items:center;gap:.7rem;margin-bottom:.7rem">
+      <div class="alert-hdr" style="display:flex;align-items:center;gap:.7rem;margin-bottom:.7rem;flex-wrap:wrap">
         <div style="font-family:'Orbitron',monospace;font-size:.7rem;font-weight:700;color:var(--accent2);letter-spacing:3px">⚠ WAR ALERT</div>
-        <div style="font-family:'Orbitron',monospace;font-size:.65rem;letter-spacing:2px;color:var(--accent2)">PIZZINT ANOMALY DETECTED</div>
+        <div class="alert-hdr-sub" style="font-family:'Orbitron',monospace;font-size:.65rem;letter-spacing:2px;color:var(--accent2)">PIZZINT ANOMALY DETECTED</div>
         <div style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--text-dim)" id="alert-timestamp">--:--:-- UTC</div>
       </div>
       <div style="font-family:'Share Tech Mono',monospace;font-size:.82rem;color:var(--accent2);line-height:1.6;margin-bottom:.8rem" id="alert-main-text">
