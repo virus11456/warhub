@@ -1056,7 +1056,7 @@
   <div class="wpi-section">
     <div class="wpi-topbar">
       <div>
-        <div class="wpi-title">WAR PRESSURE INDEX <span class="wpi-ver">v2.0</span></div>
+        <div class="wpi-title">WAR PRESSURE INDEX <span class="wpi-ver">v3.0</span></div>
         <div class="wpi-subtitle">加權多源 OSINT 綜合指數 · 每 10 分鐘自動重算</div>
       </div>
       <div class="wpi-badge medium" id="html-wpi-badge">⚠ <span id="html-wpi-badge-text">ELEVATED</span></div>
@@ -1066,22 +1066,32 @@
       <!-- 左：四子指標 -->
       <div class="wpi-factors">
         <div class="wpi-factor">
-          <div class="wpi-f-hdr"><span class="wpi-f-icon">📊</span><span class="wpi-f-name">Polymarket <em>P</em></span><span class="wpi-f-wt">×35%</span></div>
+          <div class="wpi-f-hdr"><span class="wpi-f-icon">📊</span><span class="wpi-f-name">Polymarket <em>P</em></span><span class="wpi-f-wt">×30%</span></div>
           <div class="wpi-f-bar-wrap"><div class="wpi-f-bar"><div class="wpi-f-fill" id="html-wpi-p-fill" style="width:0%"></div></div><div class="wpi-f-val" id="html-wpi-p-val">--</div></div>
           <div class="wpi-f-desc" id="html-wpi-p-desc">市場共識戰爭機率</div>
         </div>
         <div class="wpi-factor">
-          <div class="wpi-f-hdr"><span class="wpi-f-icon">✈️</span><span class="wpi-f-name">Aviation <em>A</em></span><span class="wpi-f-wt">×30%</span></div>
+          <div class="wpi-f-hdr"><span class="wpi-f-icon">✈️</span><span class="wpi-f-name">Aviation <em>A</em></span><span class="wpi-f-wt">×20%</span></div>
           <div class="wpi-f-bar-wrap"><div class="wpi-f-bar"><div class="wpi-f-fill" id="html-wpi-a-fill" style="width:0%"></div></div><div class="wpi-f-val" id="html-wpi-a-val">--</div></div>
           <div class="wpi-f-desc" id="html-wpi-a-desc">軍機異常活動頻率</div>
         </div>
         <div class="wpi-factor">
-          <div class="wpi-f-hdr"><span class="wpi-f-icon">🔥</span><span class="wpi-f-name">FIRMS <em>F</em></span><span class="wpi-f-wt">×15%</span></div>
+          <div class="wpi-f-hdr"><span class="wpi-f-icon">📰</span><span class="wpi-f-name">GDELT <em>G</em></span><span class="wpi-f-wt">×10%</span></div>
+          <div class="wpi-f-bar-wrap"><div class="wpi-f-bar"><div class="wpi-f-fill" id="html-wpi-g-fill" style="width:0%"></div></div><div class="wpi-f-val" id="html-wpi-g-val">--</div></div>
+          <div class="wpi-f-desc" id="html-wpi-g-desc">全球新聞衝突報導強度</div>
+        </div>
+        <div class="wpi-factor">
+          <div class="wpi-f-hdr"><span class="wpi-f-icon">🍕</span><span class="wpi-f-name">PizzINT <em>Z</em></span><span class="wpi-f-wt">×15%</span></div>
+          <div class="wpi-f-bar-wrap"><div class="wpi-f-bar"><div class="wpi-f-fill" id="html-wpi-z-fill" style="width:0%"></div></div><div class="wpi-f-val" id="html-wpi-z-val">--</div></div>
+          <div class="wpi-f-desc" id="html-wpi-z-desc">Pentagon Pizza 指數</div>
+        </div>
+        <div class="wpi-factor">
+          <div class="wpi-f-hdr"><span class="wpi-f-icon">🔥</span><span class="wpi-f-name">FIRMS <em>F</em></span><span class="wpi-f-wt">×10%</span></div>
           <div class="wpi-f-bar-wrap"><div class="wpi-f-bar"><div class="wpi-f-fill" id="html-wpi-f-fill" style="width:0%"></div></div><div class="wpi-f-val" id="html-wpi-f-val">--</div></div>
           <div class="wpi-f-desc" id="html-wpi-f-desc">衛星火點異常指數</div>
         </div>
         <div class="wpi-factor">
-          <div class="wpi-f-hdr"><span class="wpi-f-icon">💰</span><span class="wpi-f-name">Sentiment <em>S</em></span><span class="wpi-f-wt">×20%</span></div>
+          <div class="wpi-f-hdr"><span class="wpi-f-icon">💰</span><span class="wpi-f-name">Sentiment <em>S</em></span><span class="wpi-f-wt">×15%</span></div>
           <div class="wpi-f-bar-wrap"><div class="wpi-f-bar"><div class="wpi-f-fill" id="html-wpi-s-fill" style="width:0%"></div></div><div class="wpi-f-val" id="html-wpi-s-val">--</div></div>
           <div class="wpi-f-desc" id="html-wpi-s-desc">VIX · 黃金 · 油價避險情緒</div>
         </div>
@@ -1120,7 +1130,7 @@
           <span style="color:#ffaa00">50<br><small>MED</small></span>
           <span style="color:#ff2222">100<br><small>MAX</small></span>
         </div>
-        <div class="wpi-formula">WPI = 0.35<em>P</em> + 0.30<em>A</em> + 0.15<em>F</em> + 0.20<em>S</em></div>
+        <div class="wpi-formula">WPI = 0.30<em>P</em> + 0.20<em>A</em> + 0.10<em>G</em> + 0.15<em>Z</em> + 0.10<em>F</em> + 0.15<em>S</em></div>
       </div>
 
       <!-- 右：三級警戒 + 地區熱度 -->
@@ -1141,13 +1151,9 @@
           <div><div class="wpi-al-name">高度警戒</div><div class="wpi-al-cond">以上皆有 + 大量加油機</div><div class="wpi-al-sub">軍事行動即將執行</div></div>
           <div class="wpi-al-status" id="html-wpi-al-high-st">—</div>
         </div>
-        <div class="wpi-al-title" style="margin-top:1rem">各地區熱度</div>
-        <div style="display:flex;flex-direction:column;gap:.3rem">
-          <div style="display:grid;grid-template-columns:70px 1fr 36px;align-items:center;gap:.4rem;font-family:'Share Tech Mono',monospace;font-size:.62rem"><span>俄烏衝突</span><div style="height:4px;background:rgba(255,255,255,.08)"><div style="width:78%;height:100%;background:#ff4444"></div></div><span style="color:#ff4444">78%</span></div>
-          <div style="display:grid;grid-template-columns:70px 1fr 36px;align-items:center;gap:.4rem;font-family:'Share Tech Mono',monospace;font-size:.62rem"><span>美伊對峙</span><div style="height:4px;background:rgba(255,255,255,.08)"><div style="width:65%;height:100%;background:#ffaa00"></div></div><span style="color:#ffaa00">65%</span></div>
-          <div style="display:grid;grid-template-columns:70px 1fr 36px;align-items:center;gap:.4rem;font-family:'Share Tech Mono',monospace;font-size:.62rem"><span>台海緊張</span><div style="height:4px;background:rgba(255,255,255,.08)"><div style="width:42%;height:100%;background:#00aaff"></div></div><span style="color:#00aaff">42%</span></div>
-          <div style="display:grid;grid-template-columns:70px 1fr 36px;align-items:center;gap:.4rem;font-family:'Share Tech Mono',monospace;font-size:.62rem"><span>中東地區</span><div style="height:4px;background:rgba(255,255,255,.08)"><div style="width:70%;height:100%;background:#ff4444"></div></div><span style="color:#ff4444">70%</span></div>
-          <div style="display:grid;grid-template-columns:70px 1fr 36px;align-items:center;gap:.4rem;font-family:'Share Tech Mono',monospace;font-size:.62rem"><span>南海爭議</span><div style="height:4px;background:rgba(255,255,255,.08)"><div style="width:35%;height:100%;background:#00ff88"></div></div><span style="color:#00ff88">35%</span></div>
+        <div class="wpi-al-title" style="margin-top:1rem">各地區風險（即時計算）</div>
+        <div id="region-mini-list" style="display:flex;flex-direction:column;gap:.3rem">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim)">⏳ 載入地區風險資料…</div>
         </div>
       </div>
     </div>
@@ -1155,9 +1161,23 @@
     <div class="wpi-footer">
       <span id="html-wpi-updated">⟳ 計算中…</span>
       <span>·</span>
-      <span>Polymarket 35% · Aviation 30% · FIRMS 15% · Sentiment 20%</span>
+      <span>Polymarket 30% · Aviation 20% · GDELT 10% · PizzINT 15% · FIRMS 10% · Sentiment 15%</span>
       <span>·</span>
       <span style="color:rgba(255,255,255,.25)">僅供參考，非投資建議</span>
+    </div>
+  </div>
+
+  <!-- ══════════ 地區戰爭風險評估看板 ══════════ -->
+  <div class="card" style="border-top:2px solid #ff4444;margin-bottom:1.5rem">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-bottom:.3rem">
+      <div class="section-title" style="margin:0">⚔️ 地區戰爭風險評估</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim)" id="region-board-updated">依 Polymarket 盤口 + GDELT 新聞強度 + FIRMS 火點 + 軍機活動 即時計算</div>
+    </div>
+    <div id="region-board" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:.8rem;margin-top:.8rem">
+      <div style="grid-column:1/-1;text-align:center;padding:1.2rem;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 計算地區風險中…</div>
+    </div>
+    <div style="margin-top:.7rem;font-family:'Share Tech Mono',monospace;font-size:.56rem;color:var(--text-dim)">
+      計分：Polymarket 40%（停火盤反向）· GDELT 新聞衝突強度 30% · 衝突區衛星火點 15% · 該區軍機活動 15% ｜ ↑↓ = 與 24 小時前相比
     </div>
   </div>
 
@@ -1454,6 +1474,11 @@
         </div>
       </div>
 
+      <div class="section-title" style="margin-top:1rem">核試場地震監測（USGS 72h）</div>
+      <div id="nuclear-seismic" style="display:flex;flex-direction:column;gap:0.35rem;font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);">
+        ⏳ 載入 USGS 地震資料…
+      </div>
+
       <div style="margin-top:1rem;padding:0.7rem;background:rgba(170,0,255,0.05);border:1px solid rgba(170,0,255,0.2);font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);">
         ☢️ Polymarket 核武使用概率：5%（2026年）。低但非零。
       </div>
@@ -1607,6 +1632,7 @@
       <div class="fin-box"><div class="fin-ticker">BZ=F</div><div class="fin-price" id="html-fin-bz" style="color:var(--text-dim)">--</div><div class="fin-change" id="html-fin-bz-chg">載入中</div><div class="fin-ma" id="html-fin-bz-ma">--</div></div>
       <div class="fin-box"><div class="fin-ticker">USD/CHF</div><div class="fin-price" id="html-fin-chf" style="color:var(--text-dim)">--</div><div class="fin-change" id="html-fin-chf-chg">載入中</div><div class="fin-ma" id="html-fin-chf-ma">--</div></div>
       <div class="fin-box"><div class="fin-ticker">^VIX</div><div class="fin-price" id="html-fin-vix" style="color:var(--text-dim)">--</div><div class="fin-change" id="html-fin-vix-chg">載入中</div><div class="fin-ma" id="html-fin-vix-ma">--</div></div>
+      <div class="fin-box"><div class="fin-ticker">ZW=F 小麥</div><div class="fin-price" id="html-fin-zw" style="color:var(--text-dim)">--</div><div class="fin-change" id="html-fin-zw-chg">載入中</div><div class="fin-ma" id="html-fin-zw-ma">--</div></div>
     </div>
     <div class="fin-premium">
       ⛽ 油價戰爭溢價：布倫特較 30日均價高出
@@ -1713,15 +1739,25 @@ function renderPizzaShops(shops) {
   const grid = document.getElementById('pizza-shops-grid');
   grid.innerHTML = shops.map(shop => {
     const isClosed   = shop.is_open === false || shop.status === 'closed';
-    const isAnomaly  = !isClosed && shop.busyness >= THRESHOLD.ANOMALY;
+    const isAnomaly  = !isClosed && (shop.busyness >= THRESHOLD.ANOMALY || !!shop.spike_magnitude);
     const isHigh     = !isClosed && shop.busyness >= THRESHOLD.HIGH && !isAnomaly;
-    const deviation  = shop.baseline ? Math.round(((shop.busyness - shop.baseline) / shop.baseline) * 100) : 0;
-    const devStr     = deviation > 0 ? `+${deviation}%` : `${deviation}%`;
+    // 優先用 pizzint 的「相對平時 %」（100 = 正常），否則退回本地 baseline 估算
+    let devStr;
+    if (shop.percentage_of_usual != null && shop.percentage_of_usual > 0) {
+      const dev = Math.round(shop.percentage_of_usual - 100);
+      devStr = `較平時 ${dev > 0 ? '+' : ''}${dev}%`;
+    } else {
+      const deviation = shop.baseline ? Math.round(((shop.busyness - shop.baseline) / shop.baseline) * 100) : 0;
+      devStr = `vs 基準 ${deviation > 0 ? '+' : ''}${deviation}%`;
+    }
 
     let dotCls, statusColor, statusText;
     if (isClosed) {
       dotCls = 'normal'; statusColor = 'rgba(255,255,255,0.25)';
       statusText = '⬛ CLOSED';
+    } else if (shop.spike_magnitude) {
+      dotCls = 'high'; statusColor = 'var(--accent2)';
+      statusText = `🚨 ${shop.spike_magnitude} SPIKE (${shop.busyness}%)`;
     } else if (isAnomaly) {
       dotCls = 'high'; statusColor = 'var(--accent2)';
       statusText = `🚨 ANOMALY (${shop.busyness}%)`;
@@ -1746,8 +1782,9 @@ function renderPizzaShops(shops) {
         <div style="height:3px;background:var(--bg);border:1px solid var(--border);overflow:hidden;">
           <div style="height:100%;width:${isClosed ? 0 : shop.busyness}%;background:${barColor};transition:width 1s;"></div>
         </div>
+        ${sparklineSvg(shop.sparkline, barColor)}
         <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:rgba(255,255,255,0.25);margin-top:0.2rem;text-align:right;">
-          ${isClosed ? '目前未營業' : 'vs 基準 <span style=\"font-weight:700;\">' + devStr + '</span>'}
+          ${isClosed ? '目前未營業' : '<span style=\"font-weight:700;\">' + devStr + '</span>'}
         </div>
       </div>
     </div>`;
@@ -1874,9 +1911,9 @@ function simulateLiveUpdate() {
 
 // ═══════════════════════════════════════════════════════════════
 // 🧮 WPI — 戰爭壓力指數計算引擎（HTML 版）
-// WPI = 0.35*P + 0.30*A + 0.15*F + 0.20*S
+// WPI = 0.30*P + 0.20*A + 0.10*G + 0.15*Z + 0.10*F + 0.15*S
 // ═══════════════════════════════════════════════════════════════
-const HTML_WPI_WEIGHTS = { p:0.35, a:0.30, f:0.15, s:0.20 };
+const HTML_WPI_WEIGHTS = { p:0.30, a:0.20, g:0.10, z:0.15, f:0.10, s:0.15 };
 
 // 靜態初始數據（對應 STATIC_AVIATION / STATIC_FINANCE）
 const HTML_WPI_STATE = {
@@ -1884,7 +1921,10 @@ const HTML_WPI_STATE = {
   avi:     { summary:{ anomaly_pct:20 } },
   firms:   { fire_delta:'0%' },
   finance: { assets:[] },
-  pizza:   [{ busyness:89 },{ busyness:71 },{ busyness:76 },{ busyness:82 }]
+  pizza:   [{ busyness:89 },{ busyness:71 },{ busyness:76 },{ busyness:82 }],
+  gdelt:   null,       // {region: {latest, avg48h, delta_pct}} — 由 data.json 填入
+  pizzint: null,       // 後端 defcon_details.smoothed_index (0-100)
+  spikes:  false       // pizzint 是否有 active spike 事件
 };
 
 function htmlWpiComputeScores() {
@@ -1909,14 +1949,37 @@ function htmlWpiComputeScores() {
     if (a.ticker==='GC=F')     comps.push(Math.min(100,Math.max(0, 50+dev*2)));
     if (a.ticker==='BZ=F')     comps.push(Math.min(100,Math.max(0, 50+dev*1.5)));
     if (a.ticker==='USDCHF=X') comps.push(Math.min(100,Math.max(0, 50-dev*3)));
+    if (a.ticker==='ZW=F')     comps.push(Math.min(100,Math.max(0, 50+dev*1.5)));
   });
   const sScore = comps.length ? comps.reduce((s,v)=>s+v,0)/comps.length : 55;
 
-  return { p:pScore, a:aScore, f:fScore, s:sScore };
+  // G — GDELT 新聞衝突強度（各地區「目前 vs 全球報導佔比」平均，1% ≈ 40 分）
+  let gScore = null;
+  const gd = HTML_WPI_STATE.gdelt;
+  if (gd && Object.keys(gd).length) {
+    const vals = Object.values(gd).map(r => Math.min(100, (r.latest || 0) * 40));
+    gScore = vals.reduce((s,v)=>s+v,0) / vals.length;
+  }
+
+  // Z — PizzINT（後端 pizzint.watch 的 DEFCON 演算法 smoothed_index），
+  //     沒有後端資料時退回本地 busyness 平均
+  let zScore = HTML_WPI_STATE.pizzint;
+  if (zScore == null) {
+    const pz = HTML_WPI_STATE.pizza;
+    zScore = pz.length ? pz.reduce((s,x)=>s+(x.busyness||0),0)/pz.length : 0;
+  }
+
+  return { p:pScore, a:aScore, f:fScore, s:sScore, g:gScore, z:zScore };
 }
 
 function htmlWpiCalc(sc) {
-  return Math.round(sc.p*HTML_WPI_WEIGHTS.p + sc.a*HTML_WPI_WEIGHTS.a + sc.f*HTML_WPI_WEIGHTS.f + sc.s*HTML_WPI_WEIGHTS.s);
+  // 只用可用因子並重新正規化權重（例如 GDELT 尚未載入時）
+  let sum = 0, wsum = 0;
+  for (const [k, w] of Object.entries(HTML_WPI_WEIGHTS)) {
+    if (sc[k] == null) continue;
+    sum += sc[k] * w; wsum += w;
+  }
+  return Math.round(wsum ? sum / wsum : 0);
 }
 
 function htmlWpiLevel(wpi) {
@@ -1943,8 +2006,9 @@ function htmlWpiRender() {
   const wpi   = htmlWpiCalc(sc);
   const level = htmlWpiLevel(wpi);
   const pizza = HTML_WPI_STATE.pizza;
-  const pizzaHigh = pizza.some(s => (s.busyness||0) >= 70);
-  const alts  = { low: sc.p>=40, med: sc.p>=40 && pizzaHigh, high: sc.p>=40 && pizzaHigh && sc.a>=50 };
+  const pizzaHigh = HTML_WPI_STATE.spikes || pizza.some(s => (s.busyness||0) >= 70);
+  const tankersUp = (HTML_WPI_STATE.avi.summary?.tankers ?? 0) >= 8 || sc.a >= 50;
+  const alts  = { low: sc.p>=40, med: sc.p>=40 && pizzaHigh, high: sc.p>=40 && pizzaHigh && tankersUp };
 
   // 數字 + 錶盤
   htmlWpiAnimNum(wpi);
@@ -1965,14 +2029,21 @@ function htmlWpiRender() {
   [
     { key:'p', pfx:'html-wpi-p', desc:`Polymarket 加權平均 ${sc.p.toFixed(1)}%` },
     { key:'a', pfx:'html-wpi-a', desc:`航空異常指數 ${sc.a.toFixed(1)}%` },
+    { key:'g', pfx:'html-wpi-g', desc: sc.g == null ? '全球新聞衝突報導強度' : `新聞衝突強度 ${sc.g.toFixed(1)}%` },
+    { key:'z', pfx:'html-wpi-z', desc:`Pentagon Pizza 指數 ${(sc.z ?? 0).toFixed(1)}` },
     { key:'f', pfx:'html-wpi-f', desc:`FIRMS 火點異常 ${sc.f.toFixed(1)}%` },
     { key:'s', pfx:'html-wpi-s', desc:`金融情緒指數 ${sc.s.toFixed(1)}%` },
   ].forEach(f => {
     const score = sc[f.key];
-    const col   = score>=70?'#ff4444':score>=45?'#ffaa00':'#00ff88';
     const fill  = document.getElementById(`${f.pfx}-fill`);
     const val   = document.getElementById(`${f.pfx}-val`);
     const desc  = document.getElementById(`${f.pfx}-desc`);
+    if (score == null) {
+      if (val) { val.textContent = '--'; val.style.color = 'var(--text-dim)'; }
+      if (fill) fill.style.width = '0%';
+      return;
+    }
+    const col = score>=70?'#ff4444':score>=45?'#ffaa00':'#00ff88';
     if (fill) { fill.style.width=`${score}%`; fill.style.background=`linear-gradient(90deg,#004,${col})`; }
     if (val)  { val.textContent=Math.round(score); val.style.color=col; }
     if (desc) desc.textContent = f.desc;
@@ -2028,6 +2099,9 @@ async function fetchRealPizzaData() {
         shop.is_open  = incoming.is_open ?? false;
         shop.status   = incoming.status  ?? (incoming.is_open ? 'open' : 'closed');
         if (incoming.baseline) shop.baseline = incoming.baseline;
+        shop.percentage_of_usual = incoming.percentage_of_usual;
+        shop.spike_magnitude     = incoming.spike ? incoming.spike_magnitude : null;
+        shop.sparkline           = incoming.sparkline || null;
       });
 
       const status = evaluatePizzaStatus(PIZZA_SHOPS_DATA);
@@ -2049,6 +2123,25 @@ async function fetchRealPizzaData() {
         if (polyTs) polyTs.textContent = '上次更新：' + new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
       }
     } catch(err) { console.warn('[WARWATCH] polymarket render error:', err.message); }
+
+    // 歷史趨勢（供地區/WPI 趨勢箭頭）
+    try {
+      let hres = await fetch('data/history.json?t=' + Date.now(), { cache: 'no-store' }).catch(() => null);
+      if (!hres || !hres.ok) {
+        hres = await fetch('https://raw.githubusercontent.com/virus11456/warhub/main/data/history.json?t=' + Date.now(), { cache: 'no-store' }).catch(() => null);
+      }
+      if (hres && hres.ok) WW_HISTORY = await hres.json();
+    } catch(err) { console.warn('[WARWATCH] history fetch error:', err.message); }
+
+    // 地區風險看板 + WPI 新因子 + 核試監測 + PizzINT 深度情報
+    try {
+      if (json.gdelt && Object.keys(json.gdelt).length) HTML_WPI_STATE.gdelt = json.gdelt;
+      if (json.defcon_details?.smoothed_index != null) HTML_WPI_STATE.pizzint = json.defcon_details.smoothed_index;
+      HTML_WPI_STATE.spikes = !!(json.pizza_events && json.pizza_events.length);
+      if (Array.isArray(json.regions) && json.regions.length) renderRegions(json.regions);
+      if (json.nuclear_seismic) renderNuclearSeismic(json.nuclear_seismic);
+      applyPizzintIntel(json);
+    } catch(err) { console.warn('[WARWATCH] intel render error:', err.message); }
 
     // 用即時資料重建 INTEL FEED 跑馬燈
     try { renderTicker(json); }
@@ -2087,6 +2180,158 @@ async function fetchRealPizzaData() {
   }
 }
 
+// ─── 歷史趨勢 ─────────────────────────────────────────────────
+let WW_HISTORY = [];
+
+// 與 ~24 小時前比較，回傳趨勢箭頭 HTML（''=資料不足）
+function trendArrow(cur, regionKey) {
+  if (!Array.isArray(WW_HISTORY) || WW_HISTORY.length < 2 || cur == null) return '';
+  const target = Date.now() - 24 * 3600 * 1000;
+  let best = null, bestDiff = Infinity;
+  for (const h of WW_HISTORY) {
+    const diff = Math.abs(Date.parse(h.ts) - target);
+    if (diff < bestDiff) { bestDiff = diff; best = h; }
+  }
+  if (!best || bestDiff > 8 * 3600 * 1000) return '';
+  const prev = regionKey ? best.regions?.[regionKey] : best.combined;
+  if (prev == null) return '';
+  const d = cur - prev;
+  if (d >= 3)  return `<span style="color:#ff4444" title="24h 前 ${prev}">▲+${d.toFixed(0)}</span>`;
+  if (d <= -3) return `<span style="color:#00ff88" title="24h 前 ${prev}">▼${d.toFixed(0)}</span>`;
+  return `<span style="color:var(--text-dim)" title="24h 前 ${prev}">→</span>`;
+}
+
+// ─── 地區戰爭風險看板 ─────────────────────────────────────────
+const REGION_LEVEL_STYLE = {
+  CRITICAL: { color:'#ff00ff', zh:'一觸即發' },
+  HIGH:     { color:'#ff2222', zh:'高度風險' },
+  ELEVATED: { color:'#ffaa00', zh:'風險升高' },
+  WATCH:    { color:'#00aaff', zh:'觀察中' },
+};
+
+function renderRegions(regions) {
+  const board = document.getElementById('region-board');
+  if (board) {
+    board.innerHTML = regions.map(r => {
+      const st = REGION_LEVEL_STYLE[r.level] || REGION_LEVEL_STYLE.WATCH;
+      const f = r.factors || {};
+      const trend = trendArrow(r.score, r.key);
+      const gdeltDelta = f.gdelt_delta != null
+        ? `<span style="color:${f.gdelt_delta > 10 ? '#ff4444' : f.gdelt_delta < -10 ? '#00ff88' : 'var(--text-dim)'}">${f.gdelt_delta > 0 ? '+' : ''}${f.gdelt_delta}%</span>`
+        : '--';
+      const factorRow = (label, val, extra) => val == null ? '' :
+        `<div style="display:grid;grid-template-columns:58px 1fr 60px;align-items:center;gap:.4rem;font-size:.56rem">
+          <span style="color:var(--text-dim)">${label}</span>
+          <div style="height:3px;background:rgba(255,255,255,.08)"><div style="width:${Math.min(100,val)}%;height:100%;background:${st.color};opacity:.7"></div></div>
+          <span style="text-align:right;color:var(--text-dim)">${extra ?? Math.round(val)}</span>
+        </div>`;
+      return `<div style="background:var(--bg3);border:1px solid var(--border);border-left:3px solid ${st.color};padding:.7rem .8rem">
+        <div style="display:flex;align-items:baseline;gap:.5rem;margin-bottom:.35rem">
+          <span style="font-size:.85rem">${r.flag} ${escapeHtml(r.name)}</span>
+          <span style="margin-left:auto;font-family:'Orbitron',monospace;font-size:1.25rem;font-weight:900;color:${st.color}">${Math.round(r.score)}</span>
+          <span style="font-family:'Share Tech Mono',monospace;font-size:.6rem">${trend}</span>
+        </div>
+        <div style="font-family:'Orbitron',monospace;font-size:.55rem;letter-spacing:2px;color:${st.color};margin-bottom:.45rem">${r.level} · ${st.zh}</div>
+        <div style="display:flex;flex-direction:column;gap:.22rem;font-family:'Share Tech Mono',monospace">
+          ${factorRow('市場盤口', f.poly)}
+          ${factorRow('新聞強度', f.gdelt, gdeltDelta)}
+          ${factorRow('衛星火點', f.firms, (f.firms_hotspots ?? 0) + ' 處')}
+          ${factorRow('軍機活動', f.avi, (f.avi_count ?? 0) + ' 架')}
+        </div>
+        ${r.top_market ? `<div style="margin-top:.45rem;font-family:'Share Tech Mono',monospace;font-size:.54rem;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escapeHtml(r.top_market)}">📊 ${escapeHtml(r.top_market)}</div>` : ''}
+      </div>`;
+    }).join('');
+  }
+
+  // WPI 右欄迷你列表
+  const mini = document.getElementById('region-mini-list');
+  if (mini) {
+    mini.innerHTML = regions.map(r => {
+      const st = REGION_LEVEL_STYLE[r.level] || REGION_LEVEL_STYLE.WATCH;
+      return `<div style="display:grid;grid-template-columns:82px 1fr 34px 30px;align-items:center;gap:.4rem;font-family:'Share Tech Mono',monospace;font-size:.62rem">
+        <span>${r.flag} ${escapeHtml(r.name)}</span>
+        <div style="height:4px;background:rgba(255,255,255,.08)"><div style="width:${Math.min(100, r.score)}%;height:100%;background:${st.color}"></div></div>
+        <span style="color:${st.color};text-align:right">${Math.round(r.score)}</span>
+        <span style="font-size:.55rem">${trendArrow(r.score, r.key)}</span>
+      </div>`;
+    }).join('');
+  }
+
+  const upd = document.getElementById('region-board-updated');
+  if (upd) upd.textContent = '更新：' + new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'}) + ' · Polymarket + GDELT + FIRMS + ADS-B';
+}
+
+// ─── 核試場地震監測（USGS）──────────────────────────────────
+function renderNuclearSeismic(ns) {
+  const el = document.getElementById('nuclear-seismic');
+  if (!el) return;
+  const rows = (ns.sites || []).map(s => {
+    if (s.count == null) {
+      return `<div style="display:flex;justify-content:space-between"><span>${escapeHtml(s.name)}</span><span style="color:var(--text-dim)">資料不可用</span></div>`;
+    }
+    if (s.count === 0) {
+      return `<div style="display:flex;justify-content:space-between"><span>${escapeHtml(s.name)}</span><span style="color:var(--accent)">✓ 無異常</span></div>`;
+    }
+    // 深度 < 2km 的淺層事件 = 疑似人工爆炸特徵
+    const shallow = (s.events || []).some(e => e.depth_km != null && e.depth_km < 2);
+    const maxMag = Math.max(...(s.events || []).map(e => e.mag || 0));
+    const color = shallow ? 'var(--accent2)' : 'var(--accent3)';
+    const note  = shallow ? `🚨 淺層事件 M${maxMag}（疑似非天然）` : `${s.count} 筆天然地震 M${maxMag}`;
+    return `<div style="display:flex;justify-content:space-between"><span>${escapeHtml(s.name)}</span><span style="color:${color}">${note}</span></div>`;
+  });
+  el.innerHTML = rows.join('') +
+    `<div style="margin-top:.3rem;font-size:.52rem;color:rgba(255,255,255,.25)">核試驗特徵：淺層（&lt;2km）+ 試驗場 150km 內 · 資料：USGS</div>`;
+}
+
+// ─── PizzINT 深度情報：後端 DEFCON 演算法 + spike 事件 ────────
+function applyPizzintIntel(json) {
+  const dd = json.defcon_details;
+  if (dd?.smoothed_index != null) {
+    const idx = Math.round(dd.smoothed_index);
+    const gaugeEl  = document.getElementById('pizza-gauge-fill');
+    const gaugePct = document.getElementById('pizza-gauge-pct');
+    const levelNum = document.getElementById('pizza-level-num');
+    const levelLbl = document.getElementById('pizza-level-label');
+    const lv = json.defcon_level;
+    const color = lv <= 2 ? '#ff2200' : lv === 3 ? '#ff8800' : lv === 4 ? '#ffaa00' : '#00ff88';
+    if (gaugeEl)  gaugeEl.style.width = idx + '%';
+    if (gaugePct) { gaugePct.textContent = idx + '%'; gaugePct.style.color = color; }
+    if (levelNum && lv != null) { levelNum.textContent = `DEFCON ${lv}`; levelNum.style.color = color; }
+    if (levelLbl) {
+      levelLbl.textContent = `指數 ${idx} · 強度 ${dd.intensity_score ?? '--'} · 廣度 ${dd.breadth_score ?? '--'}`;
+      levelLbl.style.color = color;
+    }
+  }
+
+  // pizzint.watch 官方 spike 事件 → 顯示警報橫幅（只升級、不降級）
+  const events = json.pizza_events || [];
+  if (events.length) {
+    const alertEl = document.getElementById('pizza-war-alert');
+    const mainTxt = document.getElementById('alert-main-text');
+    const trigEl  = document.getElementById('triggered-shops');
+    const pctEl   = document.getElementById('anomaly-pct-1');
+    const top = [...events].sort((a,b) => (b.percentage_of_usual||0) - (a.percentage_of_usual||0))[0];
+    if (alertEl) alertEl.style.display = 'block';
+    if (mainTxt) mainTxt.innerHTML = `🍕 pizzint.watch 偵測到 <strong style="color:var(--accent2)">${escapeHtml(top.spike_magnitude || 'SPIKE')}</strong> 異常 — ${escapeHtml(top.place_name || '')} 繁忙度達平時 <strong>${Math.round(top.percentage_of_usual || 0)}%</strong>（${top.minutes_ago ?? '--'} 分鐘前）`;
+    if (trigEl) trigEl.textContent = `${events.length} / ${json.pizza?.length ?? '--'}`;
+    if (pctEl && top.percentage_of_usual != null) pctEl.textContent = Math.round(top.percentage_of_usual - 100);
+  }
+}
+
+// ─── 迷你 sparkline SVG（披薩店 24h 趨勢）─────────────────────
+function sparklineSvg(points, color) {
+  const vals = (points || []).map(v => v == null ? null : Math.max(0, Math.min(100, v)));
+  if (vals.filter(v => v != null).length < 2) return '';
+  const W = 100, H = 20, n = vals.length;
+  const pts = [];
+  vals.forEach((v, i) => {
+    if (v != null) pts.push(`${((i / (n - 1)) * W).toFixed(1)},${(H - 2 - (v / 100) * (H - 4)).toFixed(1)}`);
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:20px;display:block;margin-top:.3rem;opacity:.85">
+    <polyline points="${pts.join(' ')}" fill="none" stroke="${color}" stroke-width="1.5"/>
+  </svg>`;
+}
+
 // ─── INTEL FEED 跑馬燈：用 data.json 即時資料重建 ─────────────
 function renderTicker(json) {
   const el = document.getElementById('ticker');
@@ -2112,6 +2357,10 @@ function renderTicker(json) {
   }
   if (json.score?.combined_score != null) {
     items.push(`🎯 綜合威脅指數 <span class="hi">${json.score.combined_score}</span> / 100 · ${json.score.alert_level}`);
+  }
+  if (Array.isArray(json.regions) && json.regions.length) {
+    const r = json.regions[0];
+    items.push(`⚔️ 風險最高地區：${r.flag} ${escapeHtml(r.name)} <span class="red">${Math.round(r.score)}</span> 分 [${r.level}]`);
   }
   items.push(`末日時鐘距離午夜 <span class="red">89秒</span> — 史上最近`);
 
@@ -2355,6 +2604,7 @@ async function fetchFinanceData() {
     'BZ=F':    { el:'html-fin-bz',  chg:'html-fin-bz-chg',  ma:'html-fin-bz-ma',  ma30:67.5  },
     'USDCHF=X':{ el:'html-fin-chf', chg:'html-fin-chf-chg', ma:'html-fin-chf-ma', ma30:0.810 },
     '^VIX':    { el:'html-fin-vix', chg:'html-fin-vix-chg', ma:'html-fin-vix-ma', ma30:16.2  },
+    'ZW=F':    { el:'html-fin-zw',  chg:'html-fin-zw-chg',  ma:'html-fin-zw-ma',  ma30:590   },
   };
   const stkMap = { 'LMT':'lmt','RTX':'rtx','NOC':'noc','GD':'gd' };
   const tickers = [...Object.keys(idMap), ...Object.keys(stkMap)];

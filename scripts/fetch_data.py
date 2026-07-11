@@ -38,6 +38,12 @@ ADSB_MIL_FEEDS  = [
 FIRMS_CSV_URL   = "https://firms.modaps.eosdis.nasa.gov/data/active_fire/modis-c6.1/csv/MODIS_C6_1_Global_24h.csv"
 # NASA EONET — natural event feed (wildfires, volcanoes, etc.)
 EONET_API       = "https://eonet.gsfc.nasa.gov/api/v3/events?status=open&days=7&limit=100"
+# GDELT DOC 2.0 — 全球新聞衝突報導強度（免金鑰，限速每 5 秒 1 請求）
+GDELT_API       = "https://api.gdeltproject.org/api/v2/doc/doc"
+# USGS 地震 API — 核試驗場周邊淺層地震監測（免金鑰）
+USGS_API        = "https://earthquake.usgs.gov/fdsnws/event/1/query"
+# 歷史趨勢檔（供前端畫趨勢箭頭；保留 7 天）
+HISTORY_FILE    = Path(__file__).resolve().parent.parent / "data" / "history.json"
 DATA_DIR        = Path(__file__).resolve().parent.parent / "data"
 DATA_FILE       = DATA_DIR / "data.json"
 USER_AGENT      = "WarHub/1.0 (+https://github.com/virus11456/warhub)"
@@ -76,6 +82,62 @@ EXCLUDE_KEYWORDS = [
     "premier league", "champions league", "grammy", "oscar", "album",
     "box office", "bitcoin", "ethereum", "eurovision", "tiktok",
     "counter-strike", "esports", "valorant", "dota",
+]
+
+# ─────────────────────────────────────────────────────────────
+# 地區風險引擎設定
+# 每個地區的風險分數 = Polymarket 盤口 + GDELT 新聞強度
+#                     + FIRMS 衝突區火點 + 該區軍機活動 加權
+# ─────────────────────────────────────────────────────────────
+REGIONS = {
+    "ukraine": {
+        "name": "俄烏戰爭", "flag": "🇺🇦",
+        "poly_kw": ["ukraine", "russia", "putin", "zelensky", "kyiv", "moscow", "crimea"],
+        "gdelt_q": "(ukraine OR russia) (war OR strike OR attack OR offensive)",
+        "firms": ["ukraine", "russia"],
+        "avi_regions": ["歐洲"],
+    },
+    "mideast": {
+        "name": "美伊 / 中東", "flag": "🇮🇷",
+        "poly_kw": ["iran", "israel", "hormuz", "khamenei", "hezbollah", "gaza",
+                    "idf", "tehran", "strait"],
+        "gdelt_q": "(iran OR israel) (war OR strike OR attack OR nuclear)",
+        "firms": ["iran", "israel", "lebanon", "syria", "iraq", "yemen", "gaza"],
+        "avi_regions": ["中東", "歐亞 / 中東"],
+    },
+    "taiwan": {
+        "name": "台海", "flag": "🇹🇼",
+        "poly_kw": ["taiwan", "invade taiwan", "blockade taiwan", "xi jinping"],
+        "gdelt_q": "(taiwan china) (invasion OR military OR blockade OR war)",
+        "firms": ["taiwan"],
+        "avi_regions": ["西太平洋"],
+    },
+    "korea": {
+        "name": "朝鮮半島", "flag": "🇰🇵",
+        "poly_kw": ["north korea", "kim jong", "dprk", "pyongyang"],
+        "gdelt_q": '"north korea" (missile OR nuclear OR war OR attack)',
+        "firms": ["korea"],
+        "avi_regions": ["西太平洋"],
+    },
+    "southsea": {
+        "name": "南海爭議", "flag": "🌊",
+        "poly_kw": ["south china sea", "philippines", "scarborough", "spratly"],
+        "gdelt_q": '"south china sea" (conflict OR military OR clash OR standoff)',
+        "firms": [],
+        "avi_regions": ["西太平洋"],
+    },
+}
+
+# 和平方向的盤（停火/協議）— 機率高代表風險下降，計分時反向
+PEACE_MARKERS = ["ceasefire", "peace", "truce", "deal", "agreement", "normalization"]
+
+# 核試驗場座標（USGS 地震監測用）
+NUCLEAR_TEST_SITES = [
+    {"key": "punggye",  "name": "豐溪里（北韓）",     "lat": 41.28,  "lon": 129.09},
+    {"key": "novaya",   "name": "新地島（俄羅斯）",   "lat": 73.40,  "lon": 54.80},
+    {"key": "lopnur",   "name": "羅布泊（中國）",     "lat": 41.50,  "lon": 88.30},
+    {"key": "nevada",   "name": "內華達 NNSS（美國）", "lat": 37.12,  "lon": -116.05},
+    {"key": "semnan",   "name": "塞姆南（伊朗疑似）", "lat": 35.20,  "lon": 53.90},
 ]
 
 
@@ -139,6 +201,12 @@ def transform_pizza_shops(pizzint_payload: dict) -> list[dict]:
         else:
             status = "quiet"
 
+        # 24h sparkline：壓縮成純數值序列（null = 該小時無資料/打烊）
+        sparkline = [
+            (int(p["current_popularity"]) if p.get("current_popularity") is not None else None)
+            for p in (src.get("sparkline_24h") or [])
+        ][-24:]
+
         shops.append({
             "name":      display_name,
             "busyness":  busyness,
@@ -148,6 +216,8 @@ def transform_pizza_shops(pizzint_payload: dict) -> list[dict]:
             "spike":     bool(src.get("is_spike")),
             "spike_magnitude": src.get("spike_magnitude"),
             "percentage_of_usual": pct_usual,
+            "sparkline": sparkline,
+            "is_closed_now": bool(src.get("is_closed_now")),
             "place_id":  src.get("place_id"),
             "address":   src.get("address"),
             "data_source": src.get("data_source"),
@@ -567,6 +637,214 @@ async def fetch_eonet(session: aiohttp.ClientSession) -> list[dict]:
 
 
 # ─────────────────────────────────────────────────────────────
+# GDELT — 全球新聞衝突報導強度（早期預警的領先指標）
+# ─────────────────────────────────────────────────────────────
+async def fetch_gdelt(session: aiohttp.ClientSession) -> dict:
+    """
+    對每個地區查詢 GDELT 48h 新聞量強度（佔全球報導百分比）。
+    API 限速每 5 秒 1 請求 → 逐區串行 + 間隔 6 秒，失敗重試一次。
+    回傳 {region_key: {latest, avg48h, delta_pct}}
+    """
+    out = {}
+    first = True
+    for key, cfg in REGIONS.items():
+        if not first:
+            await asyncio.sleep(6)
+        first = False
+        params = {
+            "query": cfg["gdelt_q"],
+            "mode": "timelinevol", "timespan": "48h", "format": "json",
+        }
+        for attempt in (1, 2):
+            try:
+                async with session.get(
+                    GDELT_API, params=params,
+                    timeout=aiohttp.ClientTimeout(total=20),
+                    headers={"User-Agent": USER_AGENT},
+                ) as resp:
+                    text = await resp.text()
+                data = json.loads(text)  # 限速時會回純文字錯誤訊息 → 進 except
+                points = data["timeline"][0]["data"]
+                vals = [p["value"] for p in points if p.get("value") is not None]
+                if not vals:
+                    break
+                # 用最後 6 個點當「目前強度」，對比 48h 平均 → 上升/下降
+                latest = sum(vals[-6:]) / len(vals[-6:])
+                avg48  = sum(vals) / len(vals)
+                delta  = ((latest - avg48) / avg48 * 100) if avg48 else 0
+                out[key] = {
+                    "latest": round(latest, 3),
+                    "avg48h": round(avg48, 3),
+                    "delta_pct": round(delta, 1),
+                }
+                break
+            except Exception as e:
+                if attempt == 2:
+                    log.warning(f"GDELT {key} failed: {e}")
+                else:
+                    await asyncio.sleep(8)
+    log.info(f"GDELT: {len(out)}/{len(REGIONS)} regions ok")
+    return out
+
+
+# ─────────────────────────────────────────────────────────────
+# USGS — 核試驗場周邊地震監測（核試驗 = 淺層人工地震特徵）
+# ─────────────────────────────────────────────────────────────
+async def fetch_nuclear_seismic(session: aiohttp.ClientSession) -> dict:
+    """查詢過去 72h 各核試驗場 150km 內 M2.5+ 地震。正常應為 0。"""
+    from datetime import timedelta
+    start = (datetime.now(timezone.utc) - timedelta(hours=72)).strftime("%Y-%m-%dT%H:%M:%S")
+    sites_out = []
+    total = 0
+    for site in NUCLEAR_TEST_SITES:
+        params = {
+            "format": "geojson", "starttime": start, "minmagnitude": "2.5",
+            "latitude": str(site["lat"]), "longitude": str(site["lon"]),
+            "maxradiuskm": "150",
+        }
+        try:
+            async with session.get(
+                USGS_API, params=params,
+                timeout=aiohttp.ClientTimeout(total=15),
+                headers={"User-Agent": USER_AGENT},
+            ) as resp:
+                resp.raise_for_status()
+                data = await resp.json()
+            events = []
+            for f in (data.get("features") or [])[:5]:
+                p = f.get("properties") or {}
+                g = (f.get("geometry") or {}).get("coordinates") or [None, None, None]
+                events.append({
+                    "mag": p.get("mag"), "place": p.get("place"),
+                    "time": p.get("time"), "depth_km": g[2],
+                })
+            count = data.get("metadata", {}).get("count", len(events))
+            total += count
+            sites_out.append({**{k: site[k] for k in ("key", "name")},
+                              "count": count, "events": events})
+        except Exception as e:
+            log.warning(f"USGS {site['key']} failed: {e}")
+            sites_out.append({**{k: site[k] for k in ("key", "name")},
+                              "count": None, "events": []})
+    log.info(f"USGS nuclear seismic: {total} events near test sites (72h)")
+    return {"sites": sites_out, "total_72h": total, "window_hours": 72}
+
+
+# ─────────────────────────────────────────────────────────────
+# 地區風險引擎 — 「哪些地區快打起來」
+# ─────────────────────────────────────────────────────────────
+def _region_poly_score(cfg: dict, polymarket: list[dict]) -> tuple[float | None, str | None]:
+    """
+    該地區相關盤口的交易量加權戰爭機率（0-100）。
+    和平方向的盤（停火/協議）反向計分：停火機率低 = 戰爭持續。
+    回傳 (score, 最具代表性的盤口問題)
+    """
+    weighted = 0.0
+    vol_sum = 0.0
+    top_q, top_vol = None, 0.0
+    for m in polymarket:
+        if m.get("yes_price") is None:
+            continue
+        q = (m.get("question") or "").lower()
+        if not any(kw in q for kw in cfg["poly_kw"]):
+            continue
+        yes = float(m["yes_price"])
+        vol = float(m.get("volume") or 1)
+        risk = (1 - yes) if any(p in q for p in PEACE_MARKERS) else yes
+        weighted += risk * vol
+        vol_sum += vol
+        if vol > top_vol:
+            top_vol, top_q = vol, m.get("question")
+    if vol_sum <= 0:
+        return None, None
+    return min(100.0, weighted / vol_sum * 100), top_q
+
+
+def build_region_risks(polymarket: list[dict], gdelt: dict,
+                       firms: dict, aviation: dict) -> list[dict]:
+    by_region_hits = {}
+    for h in (firms.get("conflict_hotspots") or []):
+        by_region_hits[h["region"]] = by_region_hits.get(h["region"], 0) + 1
+
+    avi_by_region = {}
+    for a in (aviation.get("aircraft") or []):
+        avi_by_region[a.get("region")] = avi_by_region.get(a.get("region"), 0) + 1
+
+    regions_out = []
+    for key, cfg in REGIONS.items():
+        factors = {}
+        weights = {}
+
+        poly_score, top_q = _region_poly_score(cfg, polymarket)
+        if poly_score is not None:
+            factors["poly"] = round(poly_score, 1)
+            weights["poly"] = 0.40
+
+        g = gdelt.get(key)
+        if g:
+            # 新聞量佔全球 % → 0-100（1% 全球報導量 ≈ 40 分，重大戰事約 2-3%）
+            factors["gdelt"] = round(min(100.0, g["latest"] * 40), 1)
+            factors["gdelt_delta"] = g["delta_pct"]
+            weights["gdelt"] = 0.30
+
+        fire_n = sum(by_region_hits.get(r, 0) for r in cfg["firms"])
+        factors["firms"] = round(min(100.0, fire_n * 12), 1)
+        factors["firms_hotspots"] = fire_n
+        weights["firms"] = 0.15
+
+        avi_n = sum(avi_by_region.get(r, 0) for r in cfg["avi_regions"])
+        factors["avi"] = round(min(100.0, avi_n * 10), 1)
+        factors["avi_count"] = avi_n
+        weights["avi"] = 0.15
+
+        # 只用可用因子並重新正規化權重
+        usable = {k: w for k, w in weights.items() if k in factors}
+        wsum = sum(usable.values()) or 1
+        score = sum(factors[k] * w for k, w in usable.items()) / wsum
+
+        if score >= 65:  level = "CRITICAL"
+        elif score >= 45: level = "HIGH"
+        elif score >= 25: level = "ELEVATED"
+        else:             level = "WATCH"
+
+        regions_out.append({
+            "key": key, "name": cfg["name"], "flag": cfg["flag"],
+            "score": round(score, 1), "level": level,
+            "factors": factors, "top_market": top_q,
+        })
+
+    regions_out.sort(key=lambda r: -r["score"])
+    return regions_out
+
+
+# ─────────────────────────────────────────────────────────────
+# 歷史趨勢 — 供前端顯示「風險上升中/下降中」（提前預警的關鍵）
+# ─────────────────────────────────────────────────────────────
+def update_history(score: dict, pizza_index, regions: list[dict]) -> list[dict]:
+    from datetime import timedelta
+    history = []
+    try:
+        history = json.loads(HISTORY_FILE.read_text(encoding="utf-8"))
+        if not isinstance(history, list):
+            history = []
+    except Exception:
+        pass
+
+    now = datetime.now(timezone.utc)
+    history.append({
+        "ts": now.isoformat(timespec="minutes"),
+        "combined": score["combined_score"],
+        "poly": score["polymarket_score"],
+        "pizza": pizza_index,
+        "regions": {r["key"]: r["score"] for r in regions},
+    })
+    cutoff = (now - timedelta(days=7)).isoformat()
+    history = [h for h in history if h.get("ts", "") >= cutoff]
+    HISTORY_FILE.write_text(json.dumps(history, ensure_ascii=False), encoding="utf-8")
+    return history
+
+
+# ─────────────────────────────────────────────────────────────
 # Combined score
 # ─────────────────────────────────────────────────────────────
 def calculate_score(pizza_index: int, polymarket: list[dict]) -> dict:
@@ -609,8 +887,12 @@ async def main():
         aviation_task = asyncio.create_task(fetch_aviation(session))
         firms_task    = asyncio.create_task(fetch_firms(session))
         eonet_task    = asyncio.create_task(fetch_eonet(session))
-        pizzint_data, polymarket, aviation, firms, eonet = await asyncio.gather(
-            pizzint_task, poly_task, aviation_task, firms_task, eonet_task
+        gdelt_task    = asyncio.create_task(fetch_gdelt(session))
+        seismic_task  = asyncio.create_task(fetch_nuclear_seismic(session))
+        (pizzint_data, polymarket, aviation, firms, eonet,
+         gdelt, nuclear_seismic) = await asyncio.gather(
+            pizzint_task, poly_task, aviation_task, firms_task, eonet_task,
+            gdelt_task, seismic_task
         )
 
     pizza_shops  = transform_pizza_shops(pizzint_data)
@@ -625,23 +907,32 @@ async def main():
     except Exception:
         pass
 
+    regions = build_region_risks(polymarket, gdelt, firms, aviation)
+    update_history(score, pizza_index, regions)
+
     output = {
         "updated_at":    datetime.now(timezone.utc).isoformat(),
         "score":         score,
         "pizza":         pizza_shops,
         "pizza_index":   pizza_index,
+        "pizza_events":  pizzint_data.get("events") or [],
         "defcon_level":  defcon_level,
         "defcon_details": pizzint_data.get("defcon_details"),
         "polymarket":    polymarket[:20],
         "aviation":      aviation,
         "firms":         firms,
         "eonet":         eonet[:20],
+        "gdelt":         gdelt,
+        "nuclear_seismic": nuclear_seismic,
+        "regions":       regions,
         "sources": {
             "pizza":      "https://www.pizzint.watch/",
             "polymarket": "https://gamma-api.polymarket.com/",
             "aviation":   "https://api.adsb.lol/v2/mil",
             "firms":      "https://firms.modaps.eosdis.nasa.gov/",
             "eonet":      "https://eonet.gsfc.nasa.gov/",
+            "gdelt":      "https://www.gdeltproject.org/",
+            "usgs":       "https://earthquake.usgs.gov/",
         },
     }
 
