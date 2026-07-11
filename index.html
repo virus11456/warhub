@@ -1517,6 +1517,30 @@
       <div style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim);line-height:1.6;margin-bottom:.6rem">
         冷戰時 KGB 監視五角大廈深夜外送作為早期預警。<strong style="color:var(--accent4)">PizzINT</strong>：Pentagon 周邊披薩店突發爆單、深夜外送量暴增 → 五角大廈正在加班策劃。
       </div>
+
+      <!-- 🍺 加班指數（PizzINT × 酒吧反向 交叉判讀）-->
+      <div style="margin:.2rem 0 .4rem;padding:.7rem .8rem;background:rgba(0,207,232,.04);border:1px solid var(--border);border-left:3px solid var(--accent4)">
+        <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.5rem">
+          <span style="font-family:'Orbitron',monospace;font-size:.62rem;letter-spacing:2px;color:var(--accent4)">🍺 五角大廈加班指數</span>
+          <span style="font-family:'Share Tech Mono',monospace;font-size:.55rem;color:var(--text-dim)">PizzINT × 酒吧反向 · 交叉確認</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.5rem">
+          <div style="background:var(--bg3);border:1px solid var(--border);padding:.5rem .6rem">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:.56rem;color:var(--text-dim);margin-bottom:.2rem">🍕 披薩需求</div>
+            <div style="font-family:'Orbitron',monospace;font-size:.95rem;font-weight:700;color:var(--accent3)" id="overtime-pizza">--</div>
+          </div>
+          <div style="background:var(--bg3);border:1px solid var(--border);padding:.5rem .6rem">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:.56rem;color:var(--text-dim);margin-bottom:.2rem">🍺 酒吧人流（反向）</div>
+            <div style="font-family:'Orbitron',monospace;font-size:.72rem;font-weight:700;color:var(--text-dim)" id="overtime-bar">待接資料源</div>
+          </div>
+        </div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim);line-height:1.6" id="overtime-note">
+          判讀邏輯：披薩<strong style="color:var(--accent3)">爆單</strong> ＋ 酒吧下班後<strong style="color:var(--accent4)">異常冷清</strong>（幕僚沒去喝酒）＝ 五角大廈留守加班策劃。兩訊號同時異常時，偽陽性（財年截止、演習、賽事）大幅降低。
+        </div>
+        <div style="margin-top:.45rem;font-family:'Share Tech Mono',monospace;font-size:.54rem;color:rgba(255,255,255,.28)">
+          🍺 酒吧即時人流資料源建置中（Popular Times 無官方免費 API）。目前加班指數以披薩訊號為主，酒吧交叉驗證待接入。
+        </div>
+      </div>
     </div>
 
     <!-- 披薩店監控（全寬） -->
@@ -2549,6 +2573,19 @@ function applyPizzintIntel(json) {
     if (levelLbl) {
       levelLbl.textContent = `指數 ${idx} · 強度 ${dd.intensity_score ?? '--'} · 廣度 ${dd.breadth_score ?? '--'}`;
       levelLbl.style.color = color;
+    }
+
+    // 加班指數：披薩需求（真實，由 DEFCON 演算）；酒吧待接資料源
+    const otPizza = document.getElementById('overtime-pizza');
+    if (otPizza) {
+      const spike = !!(json.pizza_events && json.pizza_events.length);
+      const demand = spike ? { t: '🚨 爆單', c: 'var(--crit)' }
+        : lv <= 2 ? { t: '極高', c: '#ff2200' }
+        : lv === 3 ? { t: '偏高', c: 'var(--accent2)' }
+        : lv === 4 ? { t: '正常', c: 'var(--accent3)' }
+        : { t: '偏低', c: 'var(--accent)' };
+      otPizza.textContent = `${demand.t}（DEFCON ${lv ?? '--'}）`;
+      otPizza.style.color = demand.c;
     }
   }
 
