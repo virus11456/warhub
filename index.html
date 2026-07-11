@@ -17,20 +17,21 @@
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #050a0e;
-    --bg2: #080f14;
-    --bg3: #0c1820;
-    --accent: #00ff88;
-    --accent1: #00ff88;
-    --accent2: #ff4444;
-    --accent3: #ffaa00;
-    --accent4: #00aaff;
-    --text: #c8d8e8;
-    --text-primary: #dcebf8;
-    --text-dim: #6a8a9a;
-    --border: #1a3040;
-    --glow: 0 0 15px rgba(0,255,136,0.3);
-    --glow-red: 0 0 15px rgba(255,68,68,0.4);
+    --bg: #060a10;
+    --bg2: #0a1018;
+    --bg3: #0e1620;
+    --accent:  #00cfe8;   /* 單一結構主色（青）＝正常/低風險 */
+    --accent1: #00cfe8;
+    --accent4: #00cfe8;
+    --accent2: #ff4d5e;   /* 語意：危險/高風險 */
+    --accent3: #f5a623;   /* 語意：警戒/升高 */
+    --crit:    #ff2d6f;   /* 語意：一觸即發（最高階，紅粉）*/
+    --text: #c9d6e2;
+    --text-primary: #e4eef7;
+    --text-dim: #66788a;
+    --border: #17232f;
+    --glow: 0 0 12px rgba(0,207,232,0.22);
+    --glow-red: 0 0 12px rgba(255,77,94,0.35);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -61,7 +62,7 @@
 
   /* Header */
   header {
-    background: linear-gradient(180deg, rgba(0,255,136,0.05) 0%, transparent 100%);
+    background: linear-gradient(180deg, rgba(0,207,232,0.05) 0%, transparent 100%);
     border-bottom: 1px solid var(--accent);
     padding: 0 2rem;
     position: sticky;
@@ -191,7 +192,7 @@
     font-weight: 900;
     line-height: 1;
     color: var(--accent3);
-    text-shadow: 0 0 30px rgba(255,170,0,0.5);
+    text-shadow: 0 0 30px rgba(245,166,35,0.5);
     animation: flicker 8s infinite;
   }
 
@@ -214,8 +215,8 @@
   }
 
   @keyframes card-danger-pulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(255,68,68,0); border-color: var(--border); }
-    50%       { box-shadow: 0 0 25px 4px rgba(255,68,68,0.25); border-color: rgba(255,68,68,0.5); }
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255,77,94,0); border-color: var(--border); }
+    50%       { box-shadow: 0 0 25px 4px rgba(255,77,94,0.25); border-color: rgba(255,77,94,0.5); }
   }
 
   .pizza-card.anomaly {
@@ -277,10 +278,10 @@
     opacity: 0.8;
   }
 
-  .meter-fill.red { background: linear-gradient(90deg, #440000, var(--accent2)); box-shadow: 0 0 8px rgba(255,68,68,0.5); }
-  .meter-fill.orange { background: linear-gradient(90deg, #442200, var(--accent3)); box-shadow: 0 0 8px rgba(255,170,0,0.5); }
-  .meter-fill.blue { background: linear-gradient(90deg, #001144, var(--accent4)); box-shadow: 0 0 8px rgba(0,170,255,0.5); }
-  .meter-fill.green { background: linear-gradient(90deg, #001122, var(--accent)); box-shadow: 0 0 8px rgba(0,255,136,0.5); }
+  .meter-fill.red { background: linear-gradient(90deg, #440000, var(--accent2)); box-shadow: 0 0 8px rgba(255,77,94,0.5); }
+  .meter-fill.orange { background: linear-gradient(90deg, #442200, var(--accent3)); box-shadow: 0 0 8px rgba(245,166,35,0.5); }
+  .meter-fill.blue { background: linear-gradient(90deg, #001144, var(--accent4)); box-shadow: 0 0 8px rgba(0,207,232,0.5); }
+  .meter-fill.green { background: linear-gradient(90deg, #001122, var(--accent)); box-shadow: 0 0 8px rgba(0,207,232,0.5); }
 
   .meter-pct {
     font-family: 'Orbitron', monospace;
@@ -368,7 +369,7 @@
 
   .pizza-emoji {
     font-size: 2.5rem;
-    filter: drop-shadow(0 0 10px rgba(255,170,0,0.6));
+    filter: drop-shadow(0 0 10px rgba(245,166,35,0.6));
     animation: pizza-spin 3s ease-in-out infinite;
   }
 
@@ -386,7 +387,7 @@
     font-size: 2.5rem;
     font-weight: 900;
     color: var(--accent3);
-    text-shadow: 0 0 20px rgba(255,170,0,0.5);
+    text-shadow: 0 0 20px rgba(245,166,35,0.5);
   }
 
   .pizza-level-label {
@@ -397,8 +398,8 @@
   }
 
   .pizza-alert-box {
-    background: rgba(255,170,0,0.05);
-    border: 1px solid rgba(255,170,0,0.3);
+    background: rgba(245,166,35,0.05);
+    border: 1px solid rgba(245,166,35,0.3);
     padding: 0.8rem 1rem;
     margin: 1rem 0;
     font-family: 'Share Tech Mono', monospace;
@@ -585,10 +586,10 @@
     border: 1px solid;
   }
 
-  .risk-pill.critical { color: var(--accent2); border-color: var(--accent2); background: rgba(255,68,68,0.1); }
-  .risk-pill.high { color: var(--accent3); border-color: var(--accent3); background: rgba(255,170,0,0.1); }
-  .risk-pill.medium { color: var(--accent4); border-color: var(--accent4); background: rgba(0,170,255,0.1); }
-  .risk-pill.elevated { color: var(--accent); border-color: var(--accent); background: rgba(0,255,136,0.1); }
+  .risk-pill.critical { color: var(--accent2); border-color: var(--accent2); background: rgba(255,77,94,0.1); }
+  .risk-pill.high { color: var(--accent3); border-color: var(--accent3); background: rgba(245,166,35,0.1); }
+  .risk-pill.medium { color: var(--accent4); border-color: var(--accent4); background: rgba(0,207,232,0.1); }
+  .risk-pill.elevated { color: var(--accent); border-color: var(--accent); background: rgba(0,207,232,0.1); }
 
   /* Signal card */
   .signal-card { border-top: 2px solid var(--accent); }
@@ -616,7 +617,7 @@
   .signal-source { font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; color: var(--accent4); }
 
   /* Nuclear card */
-  .nuclear-card { border-top: 2px solid #aa00ff; }
+  .nuclear-card { border-top: 2px solid var(--accent); }
 
   .doomsday-display {
     text-align: center;
@@ -627,7 +628,7 @@
     font-family: 'Orbitron', monospace;
     font-size: 3rem;
     font-weight: 900;
-    color: #cc44ff;
+    color: var(--accent);
     text-shadow: 0 0 20px rgba(170,0,255,0.6);
     letter-spacing: 3px;
   }
@@ -661,7 +662,7 @@
   .midnight-marker {
     position: absolute;
     height: 100%;
-    background: linear-gradient(90deg, transparent, #cc44ff);
+    background: linear-gradient(90deg, transparent, var(--accent));
     right: 0;
     width: 14%; /* 90 seconds = ~14% of midnight */
   }
@@ -672,8 +673,8 @@
     top: -4px;
     width: 2px;
     height: 12px;
-    background: #cc44ff;
-    box-shadow: 0 0 8px #aa00ff;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
   }
 
   /* Scrolling ticker */
@@ -700,7 +701,7 @@
     height: 100%;
     display: flex;
     align-items: center;
-    background: rgba(255,68,68,0.1);
+    background: rgba(255,77,94,0.1);
   }
 
   .ticker-scroll {
@@ -923,8 +924,8 @@
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
     background-image:
-      linear-gradient(rgba(0,255,136,0.02) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,255,136,0.02) 1px, transparent 1px);
+      linear-gradient(rgba(0,207,232,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,207,232,0.02) 1px, transparent 1px);
     background-size: 40px 40px;
     pointer-events: none;
     z-index: 0;
@@ -969,7 +970,7 @@
   .hero-wpi-num {
     font-family: 'Orbitron', monospace;
     font-size: 3.4rem; font-weight: 900; line-height: 1;
-    background: linear-gradient(135deg, #fff, #00aaff);
+    background: linear-gradient(135deg, #fff, var(--accent));
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   }
   .hero-wpi-title { font-family: 'Orbitron', monospace; font-size: .62rem; letter-spacing: 2px; color: var(--text-dim); }
@@ -1033,6 +1034,30 @@
   .pizza-emoji { animation: none; }
   .wpi-badge   { animation: none; }
 
+  /* ══════════ 融合改版：統一寬度 + 卡片視覺 + 收斂色 ══════════ */
+  .container { max-width: 1600px; }
+  footer { max-width: 1600px; margin: 0 auto; border-top: 1px solid var(--border); }
+
+  /* 所有卡片統一：單一青色頂線、一致邊框，去除彩色雜邊 */
+  .card, .wpi-section, .hero-strip { border-top: 2px solid var(--accent) !important; }
+  .pizza-bar-card { border-image: none !important; border-top: 2px solid var(--accent) !important; }
+
+  /* 角落裝飾 & 背景網格收斂為青色微光 */
+  .card::before { border-top-color: var(--accent); border-left-color: var(--accent); opacity: .45; }
+  .bg-grid {
+    background-image:
+      linear-gradient(rgba(0,207,232,.018) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,207,232,.018) 1px, transparent 1px);
+  }
+  header { border-bottom-color: var(--accent); }
+
+  /* INTEL FEED 標籤改中性，不再紅底 */
+  .ticker-label { color: var(--accent); background: rgba(0,207,232,.08); }
+
+  /* 卡片間距與內距微調，資訊更透氣 */
+  .card { padding: 1.3rem 1.4rem; }
+  .main-grid, .bottom-grid { gap: 1.2rem; }
+
 </style>
 </head>
 <body>
@@ -1095,7 +1120,7 @@
   </div>
 
   <!-- ══════════ 地區戰爭風險評估看板 ══════════ -->
-  <div class="card" style="border-top:2px solid #ff4444;margin-bottom:1.5rem">
+  <div class="card" style="border-top:2px solid var(--accent2);margin-bottom:1.5rem">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-bottom:.3rem">
       <div class="section-title" style="margin:0">⚔️ 地區戰爭風險評估</div>
       <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim)" id="region-board-updated">依 Polymarket 盤口 + GDELT 新聞強度 + FIRMS 火點 + 軍機活動 即時計算</div>
@@ -1122,23 +1147,23 @@
   <style>
   .wpi-section {
     background: linear-gradient(135deg,rgba(10,18,30,.97),rgba(5,12,22,.99));
-    border: 1px solid rgba(0,170,255,.2); border-top: 2px solid rgba(0,170,255,.5);
+    border: 1px solid rgba(0,207,232,.2); border-top: 2px solid rgba(0,207,232,.5);
     padding: 1.2rem 1.5rem 1rem; margin-bottom: 1.5rem; position: relative; overflow: hidden;
   }
   .wpi-section::before {
     content:''; position:absolute; inset:0;
-    background:radial-gradient(ellipse at 50% -20%,rgba(0,170,255,.06) 0%,transparent 70%);
+    background:radial-gradient(ellipse at 50% -20%,rgba(0,207,232,.06) 0%,transparent 70%);
     pointer-events:none;
   }
-  .wpi-topbar { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.2rem; padding-bottom:.8rem; border-bottom:1px solid rgba(0,170,255,.15); }
-  .wpi-title  { font-family:'Orbitron',monospace; font-size:1rem; font-weight:900; color:#00aaff; letter-spacing:3px; }
+  .wpi-topbar { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.2rem; padding-bottom:.8rem; border-bottom:1px solid rgba(0,207,232,.15); }
+  .wpi-title  { font-family:'Orbitron',monospace; font-size:1rem; font-weight:900; color:var(--accent); letter-spacing:3px; }
   .wpi-ver    { font-size:.55rem; color:var(--text-dim); letter-spacing:2px; margin-left:.5rem; }
   .wpi-subtitle { font-family:'Share Tech Mono',monospace; font-size:.62rem; color:var(--text-dim); margin-top:.25rem; letter-spacing:1px; }
   .wpi-badge  { font-family:'Orbitron',monospace; font-size:.7rem; font-weight:700; padding:.4rem .9rem; border:1px solid; letter-spacing:2px; animation:wpi-blink 2s ease-in-out infinite; }
-  .wpi-badge.low      { color:#00ff88; border-color:#00ff88; background:rgba(0,255,136,.06); }
-  .wpi-badge.medium   { color:#ffaa00; border-color:#ffaa00; background:rgba(255,170,0,.06); }
-  .wpi-badge.high     { color:#ff2222; border-color:#ff2222; background:rgba(255,34,34,.08); }
-  .wpi-badge.critical { color:#ff00ff; border-color:#ff00ff; background:rgba(255,0,255,.08); }
+  .wpi-badge.low      { color:var(--accent); border-color:var(--accent); background:rgba(0,207,232,.06); }
+  .wpi-badge.medium   { color:var(--accent3); border-color:var(--accent3); background:rgba(245,166,35,.06); }
+  .wpi-badge.high     { color:var(--accent2); border-color:var(--accent2); background:rgba(255,77,94,.08); }
+  .wpi-badge.critical { color:var(--crit); border-color:var(--crit); background:rgba(255,0,255,.08); }
   @keyframes wpi-blink { 0%,100%{opacity:1} 50%{opacity:.6} }
 
   .wpi-body { display:grid; grid-template-columns:210px 1fr 230px; gap:1.5rem; align-items:center; }
@@ -1147,37 +1172,37 @@
   .wpi-f-hdr  { display:flex; align-items:center; gap:.4rem; margin-bottom:.3rem; }
   .wpi-f-icon { font-size:.82rem; }
   .wpi-f-name { font-family:'Share Tech Mono',monospace; font-size:.66rem; color:var(--text-primary); flex:1; }
-  .wpi-f-name em { color:#00aaff; font-style:normal; font-weight:700; }
+  .wpi-f-name em { color:var(--accent); font-style:normal; font-weight:700; }
   .wpi-f-wt   { font-family:'Orbitron',monospace; font-size:.5rem; color:var(--text-dim); }
   .wpi-f-bar-wrap { display:flex; align-items:center; gap:.4rem; margin-bottom:.18rem; }
   .wpi-f-bar  { flex:1; height:5px; background:rgba(255,255,255,.08); overflow:hidden; }
-  .wpi-f-fill { height:100%; background:linear-gradient(90deg,#00aaff,#ff6600); transition:width 1.5s ease; }
-  .wpi-f-val  { font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700; color:#ffaa00; min-width:26px; text-align:right; }
+  .wpi-f-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent3)); transition:width 1.5s ease; }
+  .wpi-f-val  { font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700; color:var(--accent3); min-width:26px; text-align:right; }
   .wpi-f-desc { font-family:'Share Tech Mono',monospace; font-size:.53rem; color:var(--text-dim); }
 
   .wpi-gauge-wrap { display:flex; flex-direction:column; align-items:center; }
   .wpi-arc { width:240px; height:140px; }
   .wpi-center { text-align:center; margin-top:-.8rem; }
-  .wpi-num { font-family:'Orbitron',monospace; font-size:3rem; font-weight:900; line-height:1; background:linear-gradient(135deg,#fff,#00aaff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; filter:drop-shadow(0 0 12px rgba(0,170,255,.4)); }
+  .wpi-num { font-family:'Orbitron',monospace; font-size:3rem; font-weight:900; line-height:1; background:linear-gradient(135deg,#fff,var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; filter:drop-shadow(0 0 12px rgba(0,207,232,.4)); }
   .wpi-num-lbl { font-family:'Share Tech Mono',monospace; font-size:.62rem; color:var(--text-dim); margin-top:.1rem; }
-  .wpi-level { font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700; letter-spacing:3px; margin-top:.35rem; color:#ffaa00; }
+  .wpi-level { font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700; letter-spacing:3px; margin-top:.35rem; color:var(--accent3); }
   .wpi-scale { display:flex; justify-content:space-between; width:240px; margin-top:.4rem; font-family:'Share Tech Mono',monospace; font-size:.54rem; text-align:center; line-height:1.3; }
   .wpi-formula { margin-top:.6rem; font-family:'Share Tech Mono',monospace; font-size:.58rem; color:var(--text-dim); background:rgba(0,0,0,.3); padding:.3rem .6rem; border:1px solid rgba(255,255,255,.07); }
-  .wpi-formula em { color:#00aaff; font-style:normal; }
+  .wpi-formula em { color:var(--accent); font-style:normal; }
 
   .wpi-alerts { display:flex; flex-direction:column; gap:.55rem; }
   .wpi-al-title { font-family:'Orbitron',monospace; font-size:.54rem; color:var(--text-dim); letter-spacing:3px; margin-bottom:.2rem; }
   .wpi-al-item { display:flex; align-items:flex-start; gap:.55rem; padding:.5rem .65rem; background:rgba(255,255,255,.02); border:1px solid rgba(255,255,255,.07); border-left:3px solid rgba(255,255,255,.1); transition:all .3s; }
   .wpi-al-item.triggered { background:rgba(255,255,255,.05); }
   .wpi-al-dot { width:8px; height:8px; border-radius:50%; margin-top:3px; flex-shrink:0; }
-  .wpi-al-dot.low  { background:#00ff88; }
-  .wpi-al-dot.med  { background:#ffaa00; }
-  .wpi-al-dot.high { background:#ff2222; box-shadow:0 0 6px #ff2222; }
+  .wpi-al-dot.low  { background:var(--accent); }
+  .wpi-al-dot.med  { background:var(--accent3); }
+  .wpi-al-dot.high { background:var(--accent2); box-shadow:0 0 6px var(--accent2); }
   .wpi-al-name { font-family:'Share Tech Mono',monospace; font-size:.68rem; color:var(--text-primary); font-weight:700; }
   .wpi-al-cond { font-family:'Share Tech Mono',monospace; font-size:.58rem; color:var(--text-dim); margin-top:.1rem; }
   .wpi-al-sub  { font-family:'Share Tech Mono',monospace; font-size:.53rem; color:rgba(255,255,255,.22); margin-top:.08rem; }
   .wpi-al-status { margin-left:auto; flex-shrink:0; font-family:'Orbitron',monospace; font-size:.56rem; font-weight:700; color:var(--text-dim); }
-  .wpi-footer { display:flex; gap:.8rem; align-items:center; flex-wrap:wrap; margin-top:1rem; padding-top:.7rem; border-top:1px solid rgba(0,170,255,.1); font-family:'Share Tech Mono',monospace; font-size:.57rem; color:var(--text-dim); }
+  .wpi-footer { display:flex; gap:.8rem; align-items:center; flex-wrap:wrap; margin-top:1rem; padding-top:.7rem; border-top:1px solid rgba(0,207,232,.1); font-family:'Share Tech Mono',monospace; font-size:.57rem; color:var(--text-dim); }
   @media(max-width:1100px){ .wpi-body{ grid-template-columns:1fr 1fr; } }
   @media(max-width:800px) { .wpi-body{ grid-template-columns:1fr; } .wpi-gauge-wrap{order:-1;} }
   </style>
@@ -1235,18 +1260,18 @@
       <div class="wpi-gauge-wrap">
         <svg class="wpi-arc" viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg">
           <path d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="#1a2535" stroke-width="18" stroke-linecap="round"/>
-          <path d="M 20 110 A 90 90 0 0 1 65 33"  fill="none" stroke="#00ff88" stroke-width="18" stroke-linecap="round" opacity=".3"/>
-          <path d="M 65 33 A 90 90 0 0 1 110 20"  fill="none" stroke="#ffaa00" stroke-width="18" stroke-linecap="round" opacity=".3"/>
-          <path d="M 110 20 A 90 90 0 0 1 155 33" fill="none" stroke="#ff6600" stroke-width="18" stroke-linecap="round" opacity=".3"/>
-          <path d="M 155 33 A 90 90 0 0 1 200 110" fill="none" stroke="#ff2222" stroke-width="18" stroke-linecap="round" opacity=".3"/>
+          <path d="M 20 110 A 90 90 0 0 1 65 33"  fill="none" stroke="var(--accent)" stroke-width="18" stroke-linecap="round" opacity=".3"/>
+          <path d="M 65 33 A 90 90 0 0 1 110 20"  fill="none" stroke="var(--accent3)" stroke-width="18" stroke-linecap="round" opacity=".3"/>
+          <path d="M 110 20 A 90 90 0 0 1 155 33" fill="none" stroke="var(--accent3)" stroke-width="18" stroke-linecap="round" opacity=".3"/>
+          <path d="M 155 33 A 90 90 0 0 1 200 110" fill="none" stroke="var(--accent2)" stroke-width="18" stroke-linecap="round" opacity=".3"/>
           <path d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="url(#htmlWpiGrad)" stroke-width="18" stroke-linecap="round"
             stroke-dasharray="0 283" id="html-wpi-arc" style="transition:stroke-dasharray 1.5s ease"/>
           <defs>
             <linearGradient id="htmlWpiGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%"   stop-color="#00ff88"/>
-              <stop offset="40%"  stop-color="#ffaa00"/>
-              <stop offset="70%"  stop-color="#ff6600"/>
-              <stop offset="100%" stop-color="#ff2222"/>
+              <stop offset="0%"   stop-color="var(--accent)"/>
+              <stop offset="40%"  stop-color="var(--accent3)"/>
+              <stop offset="70%"  stop-color="var(--accent3)"/>
+              <stop offset="100%" stop-color="var(--accent2)"/>
             </linearGradient>
           </defs>
           <line id="html-wpi-needle" x1="110" y1="110" x2="110" y2="28"
@@ -1260,9 +1285,9 @@
           <div class="wpi-level" id="html-wpi-level">COMPUTING...</div>
         </div>
         <div class="wpi-scale">
-          <span style="color:#00ff88">0<br><small>LOW</small></span>
-          <span style="color:#ffaa00">50<br><small>MED</small></span>
-          <span style="color:#ff2222">100<br><small>MAX</small></span>
+          <span style="color:var(--accent)">0<br><small>LOW</small></span>
+          <span style="color:var(--accent3)">50<br><small>MED</small></span>
+          <span style="color:var(--accent2)">100<br><small>MAX</small></span>
         </div>
         <div class="wpi-formula">WPI = 0.28<em>P</em> + 0.18<em>A</em> + 0.10<em>G</em> + 0.14<em>Z</em> + 0.10<em>F</em> + 0.12<em>S</em> + 0.08<em>W</em></div>
       </div>
@@ -1306,10 +1331,10 @@
   <div class="card pizza-bar-card" id="pizza-card">
 
     <!-- 警報橫幅 -->
-    <div id="pizza-war-alert" style="display:none;position:relative;overflow:hidden;margin:-1.2rem -1.2rem 1.2rem;padding:1.2rem 1.5rem;background:linear-gradient(135deg,rgba(255,0,68,.15),rgba(255,68,0,.1));border-bottom:1px solid rgba(255,0,68,.4)">
-      <div style="position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,0,68,.1),transparent);animation:scan 3s linear infinite"></div>
+    <div id="pizza-war-alert" style="display:none;position:relative;overflow:hidden;margin:-1.2rem -1.2rem 1.2rem;padding:1.2rem 1.5rem;background:linear-gradient(135deg,rgba(255,77,94,.15),rgba(255,68,0,.1));border-bottom:1px solid rgba(255,77,94,.4)">
+      <div style="position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,77,94,.1),transparent);animation:scan 3s linear infinite"></div>
       <div style="display:flex;align-items:center;gap:.7rem;margin-bottom:.7rem">
-        <div style="font-family:'Orbitron',monospace;font-size:.7rem;font-weight:700;color:#ff0044;letter-spacing:3px">⚠ WAR ALERT</div>
+        <div style="font-family:'Orbitron',monospace;font-size:.7rem;font-weight:700;color:var(--accent2);letter-spacing:3px">⚠ WAR ALERT</div>
         <div style="font-family:'Orbitron',monospace;font-size:.65rem;letter-spacing:2px;color:var(--accent2)">PIZZINT ANOMALY DETECTED</div>
         <div style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--text-dim)" id="alert-timestamp">--:--:-- UTC</div>
       </div>
@@ -1317,11 +1342,11 @@
         🍕 Pizza DEFCON 異常升高 — 歷史上此訊號出現後 2–48 小時內曾發生軍事行動
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.8rem">
-        <div style="background:rgba(255,68,68,.1);border:1px solid rgba(255,68,68,.3);padding:.6rem;border-radius:4px">
+        <div style="background:rgba(255,77,94,.1);border:1px solid rgba(255,77,94,.3);padding:.6rem;border-radius:4px">
           <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim);margin-bottom:.3rem">觸發店家</div>
           <div style="font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:700;color:var(--accent2)" id="triggered-shops">--</div>
         </div>
-        <div style="background:rgba(255,68,68,.1);border:1px solid rgba(255,68,68,.3);padding:.6rem;border-radius:4px">
+        <div style="background:rgba(255,77,94,.1);border:1px solid rgba(255,77,94,.3);padding:.6rem;border-radius:4px">
           <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim);margin-bottom:.3rem">歷史符合率</div>
           <div style="font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:700;color:var(--accent3)">~76%</div>
         </div>
@@ -1360,8 +1385,8 @@
           <div id="pizza-gauge-fill" style="height:100%;width:0%;background:linear-gradient(90deg,#004400,var(--accent3));border-radius:2px;transition:width .8s ease;position:relative">
             <div style="position:absolute;right:0;top:0;bottom:0;width:4px;background:white;opacity:.9;border-radius:0 2px 2px 0"></div>
           </div>
-          <div style="position:absolute;left:40%;top:0;bottom:0;width:1px;background:rgba(255,170,0,.5)"></div>
-          <div style="position:absolute;left:70%;top:0;bottom:0;width:1px;background:rgba(255,68,68,.5)"></div>
+          <div style="position:absolute;left:40%;top:0;bottom:0;width:1px;background:rgba(245,166,35,.5)"></div>
+          <div style="position:absolute;left:70%;top:0;bottom:0;width:1px;background:rgba(255,77,94,.5)"></div>
         </div>
         <div style="position:relative;height:28px;font-family:'Share Tech Mono',monospace;font-size:.52rem;color:var(--text-dim);margin-top:.2rem">
           <span style="position:absolute;left:0">DEFCON 5 正常</span>
@@ -1417,25 +1442,21 @@
         <span id="poly-updated-time">上次更新：載入中…</span>
       </div>
     </div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:.63rem;color:var(--text-dim);margin-bottom:.8rem;padding:.5rem .7rem;background:rgba(0,170,255,.05);border-left:2px solid var(--accent4)">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:.63rem;color:var(--text-dim);margin-bottom:.8rem;padding:.5rem .7rem;background:rgba(0,207,232,.05);border-left:2px solid var(--accent4)">
       真實資金下注 · 準確率 <span style="color:var(--accent1)">94%</span>（事件前一個月）· 2025 年地緣政治交易量 <span style="color:var(--accent3)">$33B+</span>
     </div>
     <div class="poly-grid" id="poly-list-container">
       <div style="grid-column:1/-1;text-align:center;padding:1.4rem;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">載入即時 Polymarket 戰爭預測市場…</div>
     </div>
-    <div style="margin-top:.8rem;padding:.6rem .8rem;background:rgba(0,170,255,.04);border:1px solid rgba(0,170,255,.15);font-family:'Share Tech Mono',monospace;font-size:.58rem;color:var(--text-dim)">
+    <div style="margin-top:.8rem;padding:.6rem .8rem;background:rgba(0,207,232,.04);border:1px solid rgba(0,207,232,.15);font-family:'Share Tech Mono',monospace;font-size:.58rem;color:var(--text-dim)">
       ⚠️ 僅供資訊參考，不構成投資建議。機率隨事件發展即時變動。
     </div>
   </div><!-- /.poly-card -->
 
-
-
-</div>
-
-<!-- ══════════ OSINT 進階三模組 ══════════ -->
+<!-- ══════════ 訊號源網格（AVI / FIRMS / FIN / 核威脅）══════════ -->
 <style>
 /* ── OSINT 三模組共用 ─── */
-.osint-adv-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1.5rem; margin:0 2rem 1.5rem; align-items:stretch; }
+.osint-adv-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.2rem; margin:0 0 1.5rem; align-items:stretch; }
 .osint-adv-hdr  { font-family:'Orbitron',monospace; font-size:.56rem; letter-spacing:3px; color:var(--text-dim); text-transform:uppercase; margin-bottom:1rem; padding-bottom:.5rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
 .osint-updated  { font-family:'Share Tech Mono',monospace; font-size:.54rem; color:var(--text-dim); letter-spacing:0; }
 /* Aviation */
@@ -1446,12 +1467,12 @@
 .avi-list       { display:flex; flex-direction:column; gap:.35rem; }
 .avi-item       { display:grid; grid-template-columns:12px 1fr auto; align-items:center; gap:.5rem; padding:.45rem .55rem; background:var(--bg3); border:1px solid var(--border); font-family:'Share Tech Mono',monospace; font-size:.65rem; }
 .avi-dot        { width:8px; height:8px; border-radius:50%; }
-.avi-dot.tanker { background:#cc44ff; box-shadow:0 0 5px #cc44ff; }
-.avi-dot.awacs  { background:#ffaa00; box-shadow:0 0 5px #ffaa00; animation:blink-dot 1.2s infinite; }
-.avi-dot.uav    { background:#00aaff; box-shadow:0 0 5px #00aaff; }
+.avi-dot.tanker { background:var(--accent); box-shadow:0 0 5px var(--accent); }
+.avi-dot.awacs  { background:var(--accent3); box-shadow:0 0 5px var(--accent3); animation:blink-dot 1.2s infinite; }
+.avi-dot.uav    { background:var(--accent); box-shadow:0 0 5px var(--accent); }
 @keyframes blink-dot { 0%,100%{opacity:1} 50%{opacity:.3} }
-.avi-trend.up   { color:#ff4444; }
-.avi-trend.down { color:#00ff88; }
+.avi-trend.up   { color:var(--accent2); }
+.avi-trend.down { color:var(--accent); }
 /* FIRMS */
 .fire-summary   { display:grid; grid-template-columns:1fr 1fr; gap:.5rem; margin-bottom:1rem; }
 .fire-box       { background:var(--bg3); border:1px solid var(--border); padding:.6rem; text-align:center; }
@@ -1461,10 +1482,10 @@
 .live-feed::-webkit-scrollbar { width:3px; }
 .live-feed::-webkit-scrollbar-thumb { background:var(--border); }
 .feed-item      { display:flex; gap:.6rem; padding:.45rem .55rem; background:var(--bg3); border:1px solid var(--border); border-left:2px solid var(--border); font-family:'Share Tech Mono',monospace; font-size:.63rem; }
-.feed-item.fire  { border-left-color:#ff4444; }
-.feed-item.air   { border-left-color:#00aaff; }
-.feed-item.move  { border-left-color:#ffaa00; }
-.feed-item.cyber { border-left-color:#aa44ff; }
+.feed-item.fire  { border-left-color:var(--accent2); }
+.feed-item.air   { border-left-color:var(--accent); }
+.feed-item.move  { border-left-color:var(--accent3); }
+.feed-item.cyber { border-left-color:var(--accent); }
 .feed-time { color:var(--text-dim); white-space:nowrap; min-width:38px; font-size:.58rem; }
 .feed-text { flex:1; color:var(--text-primary); line-height:1.4; }
 .event-tags { display:flex; gap:.4rem; flex-wrap:wrap; margin-top:.7rem; padding-top:.5rem; border-top:1px solid var(--border); }
@@ -1475,56 +1496,55 @@
 .fin-ticker { font-family:'Orbitron',monospace; font-size:.56rem; color:var(--text-dim); letter-spacing:2px; margin-bottom:.2rem; }
 .fin-price  { font-family:'Orbitron',monospace; font-size:1.05rem; font-weight:700; line-height:1; }
 .fin-change { font-family:'Share Tech Mono',monospace; font-size:.62rem; margin-top:.2rem; }
-.fin-change.up   { color:#ff4444; }
-.fin-change.down { color:#00ff88; }
+.fin-change.up   { color:var(--accent2); }
+.fin-change.down { color:var(--accent); }
 .fin-ma     { font-family:'Share Tech Mono',monospace; font-size:.53rem; color:var(--text-dim); margin-top:.15rem; }
-.fin-premium { margin-top:.7rem; padding:.55rem .65rem; background:rgba(255,170,0,.05); border:1px solid rgba(255,170,0,.2); font-family:'Share Tech Mono',monospace; font-size:.63rem; color:var(--text-dim); line-height:1.6; }
+.fin-premium { margin-top:.7rem; padding:.55rem .65rem; background:rgba(245,166,35,.05); border:1px solid rgba(245,166,35,.2); font-family:'Share Tech Mono',monospace; font-size:.63rem; color:var(--text-dim); line-height:1.6; }
 .fin-stocks  { display:flex; flex-direction:column; gap:.3rem; margin-top:.7rem; }
 .fin-stock-row { display:grid; grid-template-columns:55px 1fr auto auto; align-items:center; gap:.5rem; padding:.4rem .5rem; background:var(--bg3); border:1px solid var(--border); font-family:'Share Tech Mono',monospace; font-size:.62rem; }
-.fin-sym  { color:#00aaff; font-weight:700; }
+.fin-sym  { color:var(--accent); font-weight:700; }
 .fin-name { color:var(--text-dim); font-size:.56rem; }
 .fin-px   { text-align:right; }
 .fin-chg  { text-align:right; font-size:.6rem; }
-.fin-chg.up   { color:#ff4444; }
-.fin-chg.down { color:#00ff88; }
+.fin-chg.up   { color:var(--accent2); }
+.fin-chg.down { color:var(--accent); }
 /* RWD */
-@media(max-width:1100px) { .osint-adv-grid { grid-template-columns:1fr 1fr; } }
-@media(max-width:800px)  { .osint-adv-grid { grid-template-columns:1fr; margin:0 1rem 1.5rem; } }
+@media(max-width:800px)  { .osint-adv-grid { grid-template-columns:1fr; } }
 </style>
 
 <div class="osint-adv-grid">
 
   <!-- ✈️ A. 航空異常監控 -->
-  <div class="card" style="border-top:2px solid #cc44ff">
+  <div class="card" style="border-top:2px solid var(--accent)">
     <div class="osint-adv-hdr">
       <span>✈️ &nbsp;航空異常監控 (AVI)</span>
       <span class="osint-updated" id="avi-updated">OpenSky Network</span>
     </div>
     <div class="avi-counter">
-      <div class="avi-box"><div class="avi-box-val" id="avi-tankers" style="color:#cc44ff">--</div><div class="avi-box-lbl">加油機</div></div>
-      <div class="avi-box"><div class="avi-box-val" id="avi-awacs"   style="color:#ffaa00">--</div><div class="avi-box-lbl">預警機</div></div>
-      <div class="avi-box"><div class="avi-box-val" id="avi-uav"     style="color:#00aaff">--</div><div class="avi-box-lbl">偵察無人機</div></div>
+      <div class="avi-box"><div class="avi-box-val" id="avi-tankers" style="color:var(--accent)">--</div><div class="avi-box-lbl">加油機</div></div>
+      <div class="avi-box"><div class="avi-box-val" id="avi-awacs"   style="color:var(--accent3)">--</div><div class="avi-box-lbl">預警機</div></div>
+      <div class="avi-box"><div class="avi-box-val" id="avi-uav"     style="color:var(--accent)">--</div><div class="avi-box-lbl">偵察無人機</div></div>
     </div>
-    <div style="margin-bottom:.8rem;padding:.5rem .6rem;background:rgba(204,68,255,.06);border:1px solid rgba(204,68,255,.2);font-family:'Share Tech Mono',monospace;font-size:.63rem;color:var(--text-dim)">
-      較 7 日均值 <strong style="color:#ff4444;font-size:.82rem" id="avi-anomaly">--%</strong> &nbsp;·&nbsp; 7日均：<span id="avi-baseline">--</span> 架次/hr
+    <div style="margin-bottom:.8rem;padding:.5rem .6rem;background:rgba(0,207,232,.06);border:1px solid rgba(0,207,232,.2);font-family:'Share Tech Mono',monospace;font-size:.63rem;color:var(--text-dim)">
+      較 7 日均值 <strong style="color:var(--accent2);font-size:.82rem" id="avi-anomaly">--%</strong> &nbsp;·&nbsp; 7日均：<span id="avi-baseline">--</span> 架次/hr
     </div>
     <div class="avi-list" id="avi-list">
       <div style="text-align:center;padding:1.2rem;font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim)">⏳ 載入即時 ADS-B 軍機資料…</div>
     </div>
     <div style="display:flex;gap:.8rem;flex-wrap:wrap;margin-top:.8rem;padding-top:.6rem;border-top:1px solid var(--border);font-family:'Share Tech Mono',monospace;font-size:.56rem;color:var(--text-dim)">
-      <span><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#cc44ff;margin-right:3px"></i>加油機</span>
-      <span><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ffaa00;margin-right:3px"></i>預警機</span>
-      <span><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#00aaff;margin-right:3px"></i>無人機</span>
+      <span><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:3px"></i>加油機</span>
+      <span><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent3);margin-right:3px"></i>預警機</span>
+      <span><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:3px"></i>無人機</span>
     </div>
     <div style="margin-top:.5rem;text-align:right">
-      <a href="https://globe.adsbexchange.com" target="_blank" rel="noopener" style="font-family:'Share Tech Mono',monospace;font-size:.56rem;color:#00aaff">ADSB.Exchange ↗</a>
+      <a href="https://globe.adsbexchange.com" target="_blank" rel="noopener" style="font-family:'Share Tech Mono',monospace;font-size:.56rem;color:var(--accent)">ADSB.Exchange ↗</a>
       &nbsp;·&nbsp;
-      <a href="https://opensky-network.org" target="_blank" rel="noopener" style="font-family:'Share Tech Mono',monospace;font-size:.56rem;color:#00aaff">OpenSky ↗</a>
+      <a href="https://opensky-network.org" target="_blank" rel="noopener" style="font-family:'Share Tech Mono',monospace;font-size:.56rem;color:var(--accent)">OpenSky ↗</a>
     </div>
   </div>
 
   <!-- 🔥 B. 衝突熱點 FIRMS -->
-  <div class="card" style="border-top:2px solid #ff4444">
+  <div class="card" style="border-top:2px solid var(--accent2)">
     <div class="osint-adv-hdr">
       <span>🔥 &nbsp;衝突熱點 (FIRMS)</span>
       <span class="osint-updated" id="firms-updated">NASA FIRMS</span>
@@ -1537,20 +1557,20 @@
       <div style="text-align:center;padding:1rem;font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim)">⏳ 連接 NASA FIRMS…</div>
     </div>
     <div class="event-tags">
-      <span class="event-tag" style="color:#ff4444;border-color:#ff4444;background:rgba(255,68,68,.08)">砲擊/爆炸 45%</span>
-      <span class="event-tag" style="color:#ffaa00;border-color:#ffaa00;background:rgba(255,170,0,.08)">部隊移動 30%</span>
-      <span class="event-tag" style="color:#aa44ff;border-color:#aa44ff;background:rgba(170,68,255,.08)">網路攻擊 15%</span>
-      <span class="event-tag" style="color:#00aaff;border-color:#00aaff;background:rgba(0,170,255,.08)">防空啟動 10%</span>
+      <span class="event-tag" style="color:var(--accent2);border-color:var(--accent2);background:rgba(255,77,94,.08)">砲擊/爆炸 45%</span>
+      <span class="event-tag" style="color:var(--accent3);border-color:var(--accent3);background:rgba(245,166,35,.08)">部隊移動 30%</span>
+      <span class="event-tag" style="color:var(--accent);border-color:var(--accent);background:rgba(0,207,232,.08)">網路攻擊 15%</span>
+      <span class="event-tag" style="color:var(--accent);border-color:var(--accent);background:rgba(0,207,232,.08)">防空啟動 10%</span>
     </div>
     <div style="margin-top:.6rem;text-align:right">
-      <a href="https://firms.modaps.eosdis.nasa.gov/map/" target="_blank" rel="noopener" style="font-family:'Share Tech Mono',monospace;font-size:.56rem;color:#00aaff">NASA FIRMS 即時地圖 ↗</a>
+      <a href="https://firms.modaps.eosdis.nasa.gov/map/" target="_blank" rel="noopener" style="font-family:'Share Tech Mono',monospace;font-size:.56rem;color:var(--accent)">NASA FIRMS 即時地圖 ↗</a>
     </div>
     <!-- NASA FIRMS WMS 靜態衛星圖（新版端點格式） -->
     <a href="https://firms.modaps.eosdis.nasa.gov/map/" target="_blank" rel="noopener" style="display:block;margin-top:.8rem;text-decoration:none">
       <img
         src="https://firms.modaps.eosdis.nasa.gov/mapserver/wms/fires/a6f68613078dd3564264e6c72a298dcb/fires_viirs_snpp_24,fires_viirs_noaa20_24/triangle,triangle/3,2/255+50+50,255+180+0/?REQUEST=GetMap&WIDTH=600&HEIGHT=300&BBOX=-180,-90,180,90&version=1.1.1"
         alt="NASA FIRMS 全球即時火點"
-        style="width:100%;height:auto;display:block;opacity:.85;border:1px solid rgba(255,68,68,.2)"
+        style="width:100%;height:auto;display:block;opacity:.85;border:1px solid rgba(255,77,94,.2)"
         onerror="this.parentElement.style.display='none';document.getElementById('html-firms-fallback').style.display='block'"
       >
       <div style="font-family:'Share Tech Mono',monospace;font-size:.55rem;color:var(--text-dim);margin-top:.3rem;text-align:center">
@@ -1559,15 +1579,15 @@
     </a>
     <!-- 圖片載入失敗 fallback -->
     <a id="html-firms-fallback" href="https://firms.modaps.eosdis.nasa.gov/map/" target="_blank" rel="noopener"
-       style="display:none;margin-top:.8rem;padding:.8rem;background:rgba(255,68,68,.06);border:1px solid rgba(255,68,68,.25);text-align:center;text-decoration:none">
+       style="display:none;margin-top:.8rem;padding:.8rem;background:rgba(255,77,94,.06);border:1px solid rgba(255,77,94,.25);text-align:center;text-decoration:none">
       <div style="font-size:1.1rem;margin-bottom:.3rem">🛰️</div>
-      <div style="font-family:'Orbitron',monospace;font-size:.62rem;color:#ff4444;letter-spacing:2px">開啟 NASA FIRMS 即時火點圖</div>
+      <div style="font-family:'Orbitron',monospace;font-size:.62rem;color:var(--accent2);letter-spacing:2px">開啟 NASA FIRMS 即時火點圖</div>
       <div style="font-family:'Share Tech Mono',monospace;font-size:.56rem;color:var(--text-dim);margin-top:.2rem">VIIRS S-NPP · 24hr · 全球 ↗</div>
     </a>
   </div>
 
   <!-- 💰 C. 經濟避險指標 -->
-  <div class="card" style="border-top:2px solid #00ff88">
+  <div class="card" style="border-top:2px solid var(--accent)">
     <div class="osint-adv-hdr">
       <span>💰 &nbsp;經濟避險指標 (FIN)</span>
       <span class="osint-updated" id="fin-updated">Yahoo Finance</span>
@@ -1581,7 +1601,7 @@
     </div>
     <div class="fin-premium">
       ⛽ 油價戰爭溢價：布倫特較 30日均價高出
-      <strong style="color:#ffaa00;font-size:.82rem" id="fin-war-premium"> --</strong>
+      <strong style="color:var(--accent3);font-size:.82rem" id="fin-war-premium"> --</strong>
       &nbsp;— 溢價超過 $8 通常代表市場已預期軍事行動
     </div>
     <div style="font-family:'Share Tech Mono',monospace;font-size:.58rem;color:var(--text-dim);margin:.65rem 0 .3rem;letter-spacing:2px">DEFENSE STOCKS</div>
@@ -1595,7 +1615,7 @@
       🚨 = 無財報情況下異常漲幅，可能反映地緣政治張力
     </div>
     <div style="margin-top:.4rem;text-align:right">
-      <a href="https://finance.yahoo.com" target="_blank" rel="noopener" style="font-family:'Share Tech Mono',monospace;font-size:.56rem;color:#00aaff">Yahoo Finance ↗</a>
+      <a href="https://finance.yahoo.com" target="_blank" rel="noopener" style="font-family:'Share Tech Mono',monospace;font-size:.56rem;color:var(--accent)">Yahoo Finance ↗</a>
     </div>
   </div>
 
@@ -1618,7 +1638,7 @@
       </div>
 
       <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--text-dim);line-height:1.7;margin-bottom:1rem;">
-        由《原子科學家公報》設定。<span style="color:#cc44ff">2025年調整至 89 秒</span>，為1947年以來最接近午夜的紀錄。俄烏核威脅、AI軍備競賽及氣候危機為主要考量。
+        由《原子科學家公報》設定。<span style="color:var(--accent)">2025年調整至 89 秒</span>，為1947年以來最接近午夜的紀錄。俄烏核威脅、AI軍備競賽及氣候危機為主要考量。
       </div>
 
       <div class="section-title">核持有國警戒狀態</div>
@@ -1657,9 +1677,11 @@
 
 </div><!-- /.osint-adv-grid -->
 
-<footer>
-  WARWATCH // 戰爭預測情報中心 &nbsp;|&nbsp; 資料來源：Polymarket · pizzint.watch · adsb.fi · NASA FIRMS / EONET &nbsp;|&nbsp; 僅供資訊參考，不構成任何建議 &nbsp;|&nbsp; <span id="last-update-ts" style="color:var(--text-dim)">⏳ 等待後端資料…</span>
-</footer>
+  <footer>
+    WARWATCH // 戰爭預測情報中心 &nbsp;|&nbsp; 資料來源：Polymarket · pizzint.watch · adsb.fi · NASA FIRMS / EONET · GDELT · USGS · Wikipedia &nbsp;|&nbsp; 僅供資訊參考，不構成任何建議 &nbsp;|&nbsp; <span id="last-update-ts" style="color:var(--text-dim)">⏳ 等待後端資料…</span>
+  </footer>
+
+</div><!-- /.container -->
 
 <script>
 // ─── UTC Clock ────────────────────────────────────────────────
@@ -1727,9 +1749,9 @@ function evaluatePizzaStatus(shops) {
   } else if (anomalyShops.length === 1 || highShops.length >= 2) {
     level = 'HIGH'; levelZh = '⚠ 高度警戒'; gaugeColor = '#ff8800';
   } else if (avg >= THRESHOLD.ELEVATED) {
-    level = 'ELEVATED'; levelZh = '▲ 偏高'; gaugeColor = '#ffaa00';
+    level = 'ELEVATED'; levelZh = '▲ 偏高'; gaugeColor = 'var(--accent3)';
   } else {
-    level = 'NORMAL'; levelZh = '● 正常'; gaugeColor = '#00ff88';
+    level = 'NORMAL'; levelZh = '● 正常'; gaugeColor = 'var(--accent)';
   }
 
   return { level, levelZh, gaugeColor, anomalyShops, highShops, avg };
@@ -1773,7 +1795,7 @@ function renderPizzaShops(shops) {
     // Mini bar
     const barColor = isClosed ? 'rgba(255,255,255,0.1)' : isAnomaly ? 'var(--accent2)' : isHigh ? 'var(--accent3)' : 'var(--accent)';
 
-    return `<div class="pizza-shop" style="${isClosed ? 'opacity:0.7;' : isAnomaly ? 'border-color:rgba(255,68,68,0.4);background:rgba(255,30,0,0.05);' : ''}">
+    return `<div class="pizza-shop" style="${isClosed ? 'opacity:0.7;' : isAnomaly ? 'border-color:rgba(255,77,94,0.4);background:rgba(255,30,0,0.05);' : ''}">
       <div class="shop-name" style="${isClosed ? 'color:rgba(255,255,255,0.4);' : ''}">${shop.icon} ${shop.name}</div>
       <div class="shop-status">
         <div class="status-dot ${dotCls}"></div>
@@ -1985,11 +2007,11 @@ function htmlWpiCalc(sc) {
 }
 
 function htmlWpiLevel(wpi) {
-  if (wpi>=80) return { label:'CRITICAL', cls:'critical', color:'#ff00ff' };
-  if (wpi>=65) return { label:'HIGH',     cls:'high',     color:'#ff2222' };
-  if (wpi>=45) return { label:'ELEVATED', cls:'medium',   color:'#ffaa00' };
-  if (wpi>=25) return { label:'MODERATE', cls:'low',      color:'#ffcc44' };
-  return               { label:'LOW',     cls:'low',      color:'#00ff88' };
+  if (wpi>=80) return { label:'CRITICAL', cls:'critical', color:'var(--crit)' };
+  if (wpi>=65) return { label:'HIGH',     cls:'high',     color:'var(--accent2)' };
+  if (wpi>=45) return { label:'ELEVATED', cls:'medium',   color:'var(--accent3)' };
+  if (wpi>=25) return { label:'MODERATE', cls:'low',      color:'var(--accent3)' };
+  return               { label:'LOW',     cls:'low',      color:'var(--accent)' };
 }
 
 function htmlWpiAnimNum(target) {
@@ -2050,7 +2072,7 @@ function htmlWpiRender() {
       if (fill) fill.style.width = '0%';
       return;
     }
-    const col = score>=70?'#ff4444':score>=45?'#ffaa00':'#00ff88';
+    const col = score>=70?'var(--accent2)':score>=45?'var(--accent3)':'var(--accent)';
     if (fill) { fill.style.width=`${score}%`; fill.style.background=`linear-gradient(90deg,#004,${col})`; }
     if (val)  { val.textContent=Math.round(score); val.style.color=col; }
     if (desc) desc.textContent = f.desc;
@@ -2066,9 +2088,9 @@ function htmlWpiRender() {
     const st = document.getElementById(al.stId);
     if (el) {
       el.className = `wpi-al-item${al.trig?' triggered':''}`;
-      if (al.trig) el.style.borderLeftColor = al.hiCls ? '#ff4444' : '#ffaa00';
+      if (al.trig) el.style.borderLeftColor = al.hiCls ? 'var(--accent2)' : 'var(--accent3)';
     }
-    if (st) { st.textContent=al.st; st.style.color=al.trig?(al.hiCls?'#ff4444':'#ffaa00'):''; }
+    if (st) { st.textContent=al.st; st.style.color=al.trig?(al.hiCls?'var(--accent2)':'var(--accent3)'):''; }
   });
 
   // 時間戳
@@ -2208,13 +2230,13 @@ function trendArrow(cur, regionKey) {
   const prev = regionKey ? best.regions?.[regionKey] : best.combined;
   if (prev == null) return '';
   const d = cur - prev;
-  if (d >= 3)  return `<span style="color:#ff4444" title="24h 前 ${prev}">▲+${d.toFixed(0)}</span>`;
-  if (d <= -3) return `<span style="color:#00ff88" title="24h 前 ${prev}">▼${d.toFixed(0)}</span>`;
+  if (d >= 3)  return `<span style="color:var(--accent2)" title="24h 前 ${prev}">▲+${d.toFixed(0)}</span>`;
+  if (d <= -3) return `<span style="color:var(--accent)" title="24h 前 ${prev}">▼${d.toFixed(0)}</span>`;
   return `<span style="color:var(--text-dim)" title="24h 前 ${prev}">→</span>`;
 }
 
 // ─── 7 天風險趨勢圖（SVG 折線）───────────────────────────────
-const TREND_COLORS = ['#00aaff', '#ff4444', '#ffaa00', '#cc44ff'];
+const TREND_COLORS = ['var(--accent)', 'var(--accent2)', 'var(--accent3)', 'var(--accent)'];
 
 function renderTrendChart(regions) {
   const chartEl  = document.getElementById('trend-chart');
@@ -2312,10 +2334,10 @@ function renderHero(json) {
 
 // ─── 地區戰爭風險看板 ─────────────────────────────────────────
 const REGION_LEVEL_STYLE = {
-  CRITICAL: { color:'#ff00ff', zh:'一觸即發' },
-  HIGH:     { color:'#ff2222', zh:'高度風險' },
-  ELEVATED: { color:'#ffaa00', zh:'風險升高' },
-  WATCH:    { color:'#00aaff', zh:'觀察中' },
+  CRITICAL: { color:'var(--crit)', zh:'一觸即發' },
+  HIGH:     { color:'var(--accent2)', zh:'高度風險' },
+  ELEVATED: { color:'var(--accent3)', zh:'風險升高' },
+  WATCH:    { color:'var(--accent)', zh:'觀察中' },
 };
 
 function renderRegions(regions) {
@@ -2326,7 +2348,7 @@ function renderRegions(regions) {
       const f = r.factors || {};
       const trend = trendArrow(r.score, r.key);
       const gdeltDelta = f.gdelt_delta != null
-        ? `<span style="color:${f.gdelt_delta > 10 ? '#ff4444' : f.gdelt_delta < -10 ? '#00ff88' : 'var(--text-dim)'}">${f.gdelt_delta > 0 ? '+' : ''}${f.gdelt_delta}%</span>`
+        ? `<span style="color:${f.gdelt_delta > 10 ? 'var(--accent2)' : f.gdelt_delta < -10 ? 'var(--accent)' : 'var(--text-dim)'}">${f.gdelt_delta > 0 ? '+' : ''}${f.gdelt_delta}%</span>`
         : '--';
       const factorRow = (label, val, extra) => val == null ? '' :
         `<div style="display:grid;grid-template-columns:58px 1fr 60px;align-items:center;gap:.4rem;font-size:.56rem">
@@ -2403,7 +2425,7 @@ function applyPizzintIntel(json) {
     const levelNum = document.getElementById('pizza-level-num');
     const levelLbl = document.getElementById('pizza-level-label');
     const lv = json.defcon_level;
-    const color = lv <= 2 ? '#ff2200' : lv === 3 ? '#ff8800' : lv === 4 ? '#ffaa00' : '#00ff88';
+    const color = lv <= 2 ? '#ff2200' : lv === 3 ? '#ff8800' : lv === 4 ? 'var(--accent3)' : 'var(--accent)';
     if (gaugeEl)  gaugeEl.style.width = idx + '%';
     if (gaugePct) { gaugePct.textContent = idx + '%'; gaugePct.style.color = color; }
     if (levelNum && lv != null) { levelNum.textContent = `DEFCON ${lv}`; levelNum.style.color = color; }
@@ -2674,9 +2696,9 @@ function simulateFinance() {
     const chEl   = pid ? document.getElementById(pid+'-chg') : null;
     const maEl   = pid ? document.getElementById(pid+'-ma') : null;
     const fmtPx  = base.ticker === 'USDCHF=X' ? price.toFixed(4) : price.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2});
-    if (pxEl) { pxEl.textContent = fmtPx; pxEl.style.color = chg>=0?'#ffaa00':'#00ff88'; }
+    if (pxEl) { pxEl.textContent = fmtPx; pxEl.style.color = chg>=0?'var(--accent3)':'var(--accent)'; }
     if (chEl) { chEl.textContent = (chg>=0?'+':'')+chg+'% 24h'; chEl.className='fin-change '+(chg>=0?'up':'down'); }
-    if (maEl) { maEl.innerHTML = '30MA偏離 '+(devPct>=0?'+':'')+devPct+'%'+(Math.abs(devPct)>5?' <span style="color:#ffaa00">⚠</span>':''); }
+    if (maEl) { maEl.innerHTML = '30MA偏離 '+(devPct>=0?'+':'')+devPct+'%'+(Math.abs(devPct)>5?' <span style="color:var(--accent3)">⚠</span>':''); }
     if (HTML_WPI_STATE.finance.assets[i]) HTML_WPI_STATE.finance.assets[i].price = price;
   });
   // 軍工股（price=0 時跳過）
@@ -2773,16 +2795,16 @@ async function fetchFinanceData() {
       const ma30 = r.value.ma30 ?? m.ma30;
       const devPct = ma30 ? +((price-ma30)/ma30*100).toFixed(1) : 0;
       const fmt = symbol==='USDCHF=X' ? price.toFixed(4) : price.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2});
-      const col = chgPct>=0?'#ffaa00':'#00ff88';
+      const col = chgPct>=0?'var(--accent3)':'var(--accent)';
       const pxEl=document.getElementById(m.el), chEl=document.getElementById(m.chg), maEl=document.getElementById(m.ma);
       if (pxEl){pxEl.textContent=fmt; pxEl.style.color=col;}
       if (chEl){chEl.textContent=(chgPct>=0?'+':'')+chgPct+'% 24h'; chEl.className='fin-change '+(chgPct>=0?'up':'down');}
-      if (maEl){maEl.innerHTML='30MA偏離 '+(devPct>=0?'+':'')+devPct+'%'+(Math.abs(devPct)>5?' <span style=\"color:#ffaa00\">⚠</span>':'');}
+      if (maEl){maEl.innerHTML='30MA偏離 '+(devPct>=0?'+':'')+devPct+'%'+(Math.abs(devPct)>5?' <span style=\"color:var(--accent3)\">⚠</span>':'');}
       finAssets.push({ticker:symbol, price, ma30, change:chgPct});
       if (symbol==='BZ=F'&&ma30){
         const prem=+(price-ma30).toFixed(2);
         const el=document.getElementById('fin-war-premium');
-        if (el){el.textContent=(prem>=0?'+$':'-$')+Math.abs(prem)+'/bbl'; el.style.color=prem>5?'#ff4444':'#ffaa00';}
+        if (el){el.textContent=(prem>=0?'+$':'-$')+Math.abs(prem)+'/bbl'; el.style.color=prem>5?'var(--accent2)':'var(--accent3)';}
       }
     }
     if (stkMap[symbol]) {
@@ -2864,11 +2886,11 @@ function renderFirms(firms, eonetEvents) {
 
   if (countEl) {
     countEl.textContent = total.toLocaleString();
-    countEl.style.color = total > 7500 ? '#ff4444' : total > 5500 ? '#ffaa00' : 'var(--accent)';
+    countEl.style.color = total > 7500 ? 'var(--accent2)' : total > 5500 ? 'var(--accent3)' : 'var(--accent)';
   }
   if (deltaEl) {
     deltaEl.textContent = delta;
-    deltaEl.style.color = deltaUp ? '#ff4444' : delta.startsWith('-') ? '#00ff88' : 'var(--text-dim)';
+    deltaEl.style.color = deltaUp ? 'var(--accent2)' : delta.startsWith('-') ? 'var(--accent)' : 'var(--text-dim)';
   }
 
   HTML_WPI_STATE.firms = { fire_delta: delta };
