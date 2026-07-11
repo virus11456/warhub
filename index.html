@@ -2589,6 +2589,9 @@ function applyPizzintIntel(json) {
     }
 
     // 酒吧人流（反向）：由 BestTime 即時資料驅動
+    // 冷清度分級（前端統一常數：卡片與交叉判讀共用，避免各處門檻不一）
+    const EMPT_CRIT = 25;   // 異常冷清 → 加班強訊號
+    const EMPT_WARN = 12;   // 偏冷清 → 加班弱訊號
     const otBar = document.getElementById('overtime-bar');
     const b = json.bars;
     if (otBar) {
@@ -2602,26 +2605,30 @@ function applyPizzintIntel(json) {
       } else {
         const empt = b.emptiness ?? 0;   // 比平時安靜多少（%）
         const delta = b.avg_delta ?? 0;
+        const deltaTxt = `${delta >= 0 ? '+' : ''}${delta}%`;
         // 異常冷清 = 加班訊號（紅）；正常/熱鬧 = 綠
-        const s = empt >= 25 ? { t: `🚨 異常冷清 ${delta}%`, c: 'var(--crit)' }
-          : empt >= 10 ? { t: `偏冷清 ${delta}%`, c: 'var(--accent2)' }
-          : delta > 10 ? { t: `熱鬧 +${delta}%`, c: 'var(--accent)' }
-          : { t: `正常 ${delta >= 0 ? '+' : ''}${delta}%`, c: 'var(--accent3)' };
+        const s = empt >= EMPT_CRIT ? { t: `🚨 異常冷清 ${deltaTxt}`, c: 'var(--crit)' }
+          : empt >= EMPT_WARN ? { t: `偏冷清 ${deltaTxt}`, c: 'var(--accent2)' }
+          : delta > 10 ? { t: `熱鬧 ${deltaTxt}`, c: 'var(--accent)' }
+          : { t: `正常 ${deltaTxt}`, c: 'var(--accent3)' };
         otBar.innerHTML = `${s.t} <span style="font-size:.66rem;color:var(--text-dim)">（${b.open_count}/${b.total} 開）</span>`;
         otBar.style.color = s.c;
         otBar.style.fontSize = '.82rem';
       }
     }
 
-    // 加班交叉判讀：披薩爆單 + 酒吧異常冷清
+    // 加班交叉判讀：披薩爆單 + 酒吧異常冷清（分級：強確認／交叉成立／未觸發）
     const otNote = document.getElementById('overtime-note');
     if (otNote && b && b.available) {
-      const pizzaHot = (json.pizza_events && json.pizza_events.length) || lv <= 3;
-      const barsEmpty = (b.emptiness ?? 0) >= 15;
-      if (pizzaHot && barsEmpty) {
-        otNote.innerHTML = `🚨 <strong style="color:var(--crit)">交叉確認觸發</strong>：披薩需求偏高 ＋ 酒吧異常冷清（比平時安靜 ${b.emptiness}%）— 幕僚沒去喝酒、留守加班的訊號同時成立，偽陽性大幅降低。`;
+      const spike = !!(json.pizza_events && json.pizza_events.length);
+      const pizzaHot = spike || lv <= 3;
+      const empt = b.emptiness ?? 0;
+      if (pizzaHot && empt >= EMPT_CRIT) {
+        otNote.innerHTML = `🚨 <strong style="color:var(--crit)">強交叉確認</strong>：披薩需求${spike ? '爆單' : '偏高'} ＋ 酒吧異常冷清（比平時安靜 ${empt}%）— 幕僚沒去喝酒、留守加班的訊號同時強成立，偽陽性極低。`;
+      } else if (pizzaHot && empt >= EMPT_WARN) {
+        otNote.innerHTML = `⚠️ <strong style="color:var(--accent2)">交叉成立</strong>：披薩${spike ? '爆單' : '偏高'} ＋ 酒吧偏冷清（比平時安靜 ${empt}%）— 兩訊號同向，留守加班可能性上升。`;
       } else {
-        otNote.innerHTML = `判讀邏輯：披薩<strong style="color:var(--accent3)">爆單</strong> ＋ 酒吧下班後<strong style="color:var(--accent4)">異常冷清</strong>＝ 留守加班。目前：披薩${pizzaHot ? '偏高' : '正常'}、酒吧${barsEmpty ? '偏冷清' : '正常'} — 未同時觸發。`;
+        otNote.innerHTML = `判讀邏輯：披薩<strong style="color:var(--accent3)">爆單</strong> ＋ 酒吧下班後<strong style="color:var(--accent4)">異常冷清</strong>＝ 留守加班。目前：披薩${pizzaHot ? '偏高' : '正常'}、酒吧${empt >= EMPT_WARN ? '偏冷清' : '正常'} — 未同時觸發。`;
       }
     }
   }
