@@ -20,9 +20,15 @@ import asyncio
 import aiohttp
 import json
 import logging
+import os
 import re
 from datetime import datetime, timezone
 from pathlib import Path
+
+try:
+    from zoneinfo import ZoneInfo
+except ImportError:  # Python < 3.9
+    ZoneInfo = None
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 log = logging.getLogger("warhub")
@@ -46,6 +52,8 @@ USGS_API        = "https://earthquake.usgs.gov/fdsnws/event/1/query"
 WIKI_PV_API     = "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/user"
 # FAA NOTAM Search — 衝突區 FIR 領空限制/關閉（非官方端點，免金鑰）
 NOTAM_API       = "https://notams.aim.faa.gov/notamSearch/search"
+# BestTime.app Live Foot Traffic — Pentagon 周邊酒吧即時繁忙度（需 BESTTIME_API_KEY）
+BESTTIME_API    = "https://besttime.app/api/v1/forecasts/live"
 # 歷史趨勢檔（供前端畫趨勢箭頭；保留 7 天）
 HISTORY_FILE    = Path(__file__).resolve().parent.parent / "data" / "history.json"
 DATA_DIR        = Path(__file__).resolve().parent.parent / "data"
@@ -159,6 +167,17 @@ NOTAM_DANGER_RE = re.compile(
     re.IGNORECASE,
 )
 NOTAM_CLOSURE_RE = re.compile(r"AIRSPACE\s+(IS\s+)?(CLSD|CLOSED)", re.IGNORECASE)
+
+# Pentagon 周邊酒吧（反向指標：下班後異常冷清 = 幕僚留守加班）
+# BestTime Live API 只在酒吧營業且 Google 有即時資料時回傳 busyness
+PENTAGON_BARS = [
+    {"name": "Sine Irish Pub",          "address": "1301 S Joyce St, Arlington, VA"},
+    {"name": "Freddie's Beach Bar",     "address": "555 23rd St S, Arlington, VA"},
+    {"name": "Highline RxR",            "address": "2010 Crystal Dr, Arlington, VA"},
+    {"name": "Ireland's Four Courts",   "address": "2051 Wilson Blvd, Arlington, VA"},
+]
+# 只在美東傍晚下班時段查詢（省 API credit、也是訊號最關鍵的時段）
+BAR_QUERY_ET_HOURS = range(16, 24)  # 16:00–23:59 ET
 
 # 核試驗場座標（USGS 地震監測用）
 NUCLEAR_TEST_SITES = [
@@ -885,6 +904,75 @@ async def fetch_notams(session: aiohttp.ClientSession) -> dict:
 
 
 # ─────────────────────────────────────────────────────────────
+# BestTime — Pentagon 周邊酒吧即時人流（反向披薩指數）
+# 酒吧下班後「該忙卻異常冷清」= 幕僚沒去喝酒、留守加班
+# ─────────────────────────────────────────────────────────────
+async def fetch_bars(session: aiohttp.ClientSession) -> dict:
+    key = os.environ.get("BESTTIME_API_KEY", "").strip()
+    if not key:
+        return {"available": False, "reason": "未設定 BESTTIME_API_KEY", "bars": []}
+
+    # 只在美東傍晚下班時段查詢（省 credit）
+    et_hour = None
+    if ZoneInfo is not None:
+        try:
+            et_hour = datetime.now(ZoneInfo("America/New_York")).hour
+        except Exception:
+            et_hour = None
+    if et_hour is not None and et_hour not in BAR_QUERY_ET_HOURS:
+        return {"available": False, "reason": "非下班時段（僅美東 16–24 時查詢）",
+                "et_hour": et_hour, "bars": []}
+
+    async def one(bar):
+        params = {"api_key_private": key, "venue_name": bar["name"],
+                  "venue_address": bar["address"]}
+        try:
+            async with session.post(
+                BESTTIME_API, params=params,
+                timeout=aiohttp.ClientTimeout(total=25),
+                headers={"User-Agent": USER_AGENT},
+            ) as resp:
+                data = await resp.json(content_type=None)
+            an = data.get("analysis") or {}
+            live_ok = bool(an.get("venue_live_busyness_available"))
+            return {
+                "name": bar["name"],
+                "live_available": live_ok,
+                "live_busyness": an.get("venue_live_busyness") if live_ok else None,
+                "forecasted": an.get("venue_forecasted_busyness"),
+                "delta": an.get("venue_live_forecasted_delta") if live_ok else None,
+                "open": (data.get("venue_info") or {}).get("venue_open"),
+            }
+        except Exception as e:
+            log.warning(f"BestTime {bar['name']} failed: {e}")
+            return {"name": bar["name"], "live_available": False, "live_busyness": None,
+                    "forecasted": None, "delta": None, "open": None, "error": True}
+
+    bars = await asyncio.gather(*(one(b) for b in PENTAGON_BARS))
+    live_bars = [b for b in bars if b["live_available"] and b["live_busyness"] is not None]
+
+    result = {"available": bool(live_bars), "bars": bars,
+              "open_count": len(live_bars), "total": len(bars)}
+    if live_bars:
+        avg_live = sum(b["live_busyness"] for b in live_bars) / len(live_bars)
+        deltas = [b["delta"] for b in live_bars if b["delta"] is not None]
+        avg_delta = sum(deltas) / len(deltas) if deltas else 0
+        # 冷清度：比平時安靜多少（正值＝異常冷清＝加班訊號）
+        emptiness = max(0.0, -avg_delta)
+        result.update({
+            "avg_live_busyness": round(avg_live, 1),
+            "avg_delta": round(avg_delta, 1),
+            "emptiness": round(emptiness, 1),
+        })
+        log.info(f"Bars: {len(live_bars)}/{len(bars)} open, avg_live={avg_live:.0f}% "
+                 f"avg_delta={avg_delta:+.0f}% emptiness={emptiness:.0f}")
+    else:
+        result["reason"] = "目前無酒吧即時資料（可能皆未營業）"
+        log.info(f"Bars: no live data ({result.get('reason')})")
+    return result
+
+
+# ─────────────────────────────────────────────────────────────
 # 地區風險引擎 — 「哪些地區快打起來」
 # ─────────────────────────────────────────────────────────────
 def _region_poly_score(cfg: dict, polymarket: list[dict]) -> tuple[float | None, str | None]:
@@ -1055,10 +1143,11 @@ async def main():
         seismic_task  = asyncio.create_task(fetch_nuclear_seismic(session))
         wiki_task     = asyncio.create_task(fetch_wikipedia_anxiety(session))
         notam_task    = asyncio.create_task(fetch_notams(session))
+        bars_task     = asyncio.create_task(fetch_bars(session))
         (pizzint_data, polymarket, aviation, firms, eonet,
-         gdelt, nuclear_seismic, wikipedia, notams) = await asyncio.gather(
+         gdelt, nuclear_seismic, wikipedia, notams, bars) = await asyncio.gather(
             pizzint_task, poly_task, aviation_task, firms_task, eonet_task,
-            gdelt_task, seismic_task, wiki_task, notam_task
+            gdelt_task, seismic_task, wiki_task, notam_task, bars_task
         )
 
     pizza_shops  = transform_pizza_shops(pizzint_data)
@@ -1102,6 +1191,7 @@ async def main():
         "wikipedia":     wikipedia,
         "notams":        notams,
         "nuclear_seismic": nuclear_seismic,
+        "bars":          bars,
         "regions":       regions,
         "sources": {
             "pizza":      "https://www.pizzint.watch/",
@@ -1111,6 +1201,7 @@ async def main():
             "eonet":      "https://eonet.gsfc.nasa.gov/",
             "gdelt":      "https://www.gdeltproject.org/",
             "usgs":       "https://earthquake.usgs.gov/",
+            "bars":       "https://besttime.app/",
             "wikipedia":  "https://wikimedia.org/api/rest_v1/",
             "notam":      "https://notams.aim.faa.gov/",
         },

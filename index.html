@@ -1537,8 +1537,8 @@
         <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim);line-height:1.6" id="overtime-note">
           判讀邏輯：披薩<strong style="color:var(--accent3)">爆單</strong> ＋ 酒吧下班後<strong style="color:var(--accent4)">異常冷清</strong>（幕僚沒去喝酒）＝ 五角大廈留守加班策劃。兩訊號同時異常時，偽陽性（財年截止、演習、賽事）大幅降低。
         </div>
-        <div style="margin-top:.45rem;font-family:'Share Tech Mono',monospace;font-size:.54rem;color:rgba(255,255,255,.28)">
-          🍺 酒吧即時人流資料源建置中（Popular Times 無官方免費 API）。目前加班指數以披薩訊號為主，酒吧交叉驗證待接入。
+        <div id="overtime-footnote" style="margin-top:.45rem;font-family:'Share Tech Mono',monospace;font-size:.54rem;color:rgba(255,255,255,.28)">
+          🍺 酒吧即時人流由 BestTime 提供，僅美東傍晚下班時段（16–24 時）查詢。非該時段或未營業時顯示待接/無資料。
         </div>
       </div>
     </div>
@@ -2586,6 +2586,43 @@ function applyPizzintIntel(json) {
         : { t: '偏低', c: 'var(--accent)' };
       otPizza.textContent = `${demand.t}（DEFCON ${lv ?? '--'}）`;
       otPizza.style.color = demand.c;
+    }
+
+    // 酒吧人流（反向）：由 BestTime 即時資料驅動
+    const otBar = document.getElementById('overtime-bar');
+    const b = json.bars;
+    if (otBar) {
+      if (!b || !b.available) {
+        const reason = b?.reason || '';
+        otBar.textContent = reason.includes('BESTTIME') ? '待接資料源'
+          : reason.includes('非下班') ? '非下班時段'
+          : '無即時資料';
+        otBar.style.color = 'var(--text-dim)';
+        otBar.style.fontSize = '.72rem';
+      } else {
+        const empt = b.emptiness ?? 0;   // 比平時安靜多少（%）
+        const delta = b.avg_delta ?? 0;
+        // 異常冷清 = 加班訊號（紅）；正常/熱鬧 = 綠
+        const s = empt >= 25 ? { t: `🚨 異常冷清 ${delta}%`, c: 'var(--crit)' }
+          : empt >= 10 ? { t: `偏冷清 ${delta}%`, c: 'var(--accent2)' }
+          : delta > 10 ? { t: `熱鬧 +${delta}%`, c: 'var(--accent)' }
+          : { t: `正常 ${delta >= 0 ? '+' : ''}${delta}%`, c: 'var(--accent3)' };
+        otBar.innerHTML = `${s.t} <span style="font-size:.6rem;color:var(--text-dim)">（${b.open_count}/${b.total} 開）</span>`;
+        otBar.style.color = s.c;
+        otBar.style.fontSize = '.82rem';
+      }
+    }
+
+    // 加班交叉判讀：披薩爆單 + 酒吧異常冷清
+    const otNote = document.getElementById('overtime-note');
+    if (otNote && b && b.available) {
+      const pizzaHot = (json.pizza_events && json.pizza_events.length) || lv <= 3;
+      const barsEmpty = (b.emptiness ?? 0) >= 15;
+      if (pizzaHot && barsEmpty) {
+        otNote.innerHTML = `🚨 <strong style="color:var(--crit)">交叉確認觸發</strong>：披薩需求偏高 ＋ 酒吧異常冷清（比平時安靜 ${b.emptiness}%）— 幕僚沒去喝酒、留守加班的訊號同時成立，偽陽性大幅降低。`;
+      } else {
+        otNote.innerHTML = `判讀邏輯：披薩<strong style="color:var(--accent3)">爆單</strong> ＋ 酒吧下班後<strong style="color:var(--accent4)">異常冷清</strong>＝ 留守加班。目前：披薩${pizzaHot ? '偏高' : '正常'}、酒吧${barsEmpty ? '偏冷清' : '正常'} — 未同時觸發。`;
+      }
     }
   }
 
