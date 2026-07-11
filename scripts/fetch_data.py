@@ -642,9 +642,18 @@ async def fetch_eonet(session: aiohttp.ClientSession) -> list[dict]:
 async def fetch_gdelt(session: aiohttp.ClientSession) -> dict:
     """
     對每個地區查詢 GDELT 48h 新聞量強度（佔全球報導百分比）。
-    API 限速每 5 秒 1 請求 → 逐區串行 + 間隔 6 秒，失敗重試一次。
-    回傳 {region_key: {latest, avg48h, delta_pct}}
+    API 限速每 5 秒 1 請求（共享 IP 上更嚴）→ 逐區串行 + 重試遞增退避；
+    仍失敗的地區沿用上一輪 data.json 的數值（標記 stale），確保
+    地區風險分數不會因單次限流缺新聞因子。
+    回傳 {region_key: {latest, avg48h, delta_pct[, stale]}}
     """
+    # 上一輪的數值作為 fallback
+    prev = {}
+    try:
+        prev = json.loads(DATA_FILE.read_text(encoding="utf-8")).get("gdelt") or {}
+    except Exception:
+        pass
+
     out = {}
     first = True
     for key, cfg in REGIONS.items():
@@ -655,7 +664,7 @@ async def fetch_gdelt(session: aiohttp.ClientSession) -> dict:
             "query": cfg["gdelt_q"],
             "mode": "timelinevol", "timespan": "48h", "format": "json",
         }
-        for attempt in (1, 2):
+        for attempt, backoff in ((1, 10), (2, 20), (3, 0)):
             try:
                 async with session.get(
                     GDELT_API, params=params,
@@ -679,11 +688,16 @@ async def fetch_gdelt(session: aiohttp.ClientSession) -> dict:
                 }
                 break
             except Exception as e:
-                if attempt == 2:
-                    log.warning(f"GDELT {key} failed: {e}")
+                if backoff:
+                    await asyncio.sleep(backoff)
                 else:
-                    await asyncio.sleep(8)
-    log.info(f"GDELT: {len(out)}/{len(REGIONS)} regions ok")
+                    log.warning(f"GDELT {key} failed after retries: {e}")
+
+        if key not in out and key in prev:
+            out[key] = {**prev[key], "stale": True}
+
+    fresh = sum(1 for v in out.values() if not v.get("stale"))
+    log.info(f"GDELT: {fresh}/{len(REGIONS)} fresh, {len(out) - fresh} carried over")
     return out
 
 
@@ -782,8 +796,8 @@ def build_region_risks(polymarket: list[dict], gdelt: dict,
 
         g = gdelt.get(key)
         if g:
-            # 新聞量佔全球 % → 0-100（1% 全球報導量 ≈ 40 分，重大戰事約 2-3%）
-            factors["gdelt"] = round(min(100.0, g["latest"] * 40), 1)
+            # 新聞量佔全球 % → 0-100（1% ≈ 25 分；重大戰事平時 2-3%，激增 4%+ 滿分）
+            factors["gdelt"] = round(min(100.0, g["latest"] * 25), 1)
             factors["gdelt_delta"] = g["delta_pct"]
             weights["gdelt"] = 0.30
 
@@ -906,6 +920,16 @@ async def main():
         prev_level = json.loads(DATA_FILE.read_text(encoding="utf-8"))["score"]["alert_level"]
     except Exception:
         pass
+
+    # FIRMS 抓取失敗時沿用上一輪（全球 24h 火點數不可能真的為 0）
+    if not firms.get("total_24h"):
+        try:
+            prev_firms = json.loads(DATA_FILE.read_text(encoding="utf-8")).get("firms") or {}
+            if prev_firms.get("total_24h"):
+                firms = {**prev_firms, "stale": True}
+                log.warning("FIRMS unavailable, carried over previous data")
+        except Exception:
+            pass
 
     regions = build_region_risks(polymarket, gdelt, firms, aviation)
     update_history(score, pizza_index, regions)
