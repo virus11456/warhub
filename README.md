@@ -84,6 +84,7 @@ warhub/
 | `TELEGRAM_BOT_TOKEN` | 推播到 Telegram |
 | `TELEGRAM_CHAT_ID` | Telegram 接收頻道 |
 | `DISCORD_WEBHOOK_URL` | 推播到 Discord |
+| `BESTTIME_API_KEY` | Pentagon 周邊酒吧即時人流（BestTime.app 私鑰，選用）|
 
 ---
 
