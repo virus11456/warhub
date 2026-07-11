@@ -1347,17 +1347,15 @@
           <div style="font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:700;color:var(--accent2)" id="triggered-shops">--</div>
         </div>
         <div style="background:rgba(255,77,94,.1);border:1px solid rgba(255,77,94,.3);padding:.6rem;border-radius:4px">
-          <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim);margin-bottom:.3rem">歷史符合率</div>
-          <div style="font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:700;color:var(--accent3)">~76%</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim);margin-bottom:.3rem">異常等級</div>
+          <div style="font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:700;color:var(--accent3)" id="alert-magnitude">--</div>
         </div>
       </div>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim);line-height:1.8">
-        <div style="color:var(--accent2)">▶ Domino's Arlington 繁忙度較基準高出 <span id="anomaly-pct-1">--</span>%</div>
-        <div style="color:var(--accent3)">▶ Pentagon 周邊多店同步出現下班異常</div>
-        <div style="color:var(--accent3)">▶ 同時段 Polymarket 戰爭機率同步上升</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim);line-height:1.8" id="alert-bullets">
+        <div>▶ 等待 pizzint.watch spike 事件…</div>
       </div>
       <div style="margin-top:.8rem;padding:.5rem .8rem;background:rgba(0,0,0,.3);font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim)">
-        ⚠ 偽陽性風險：財年截止、演習、重大體育賽事皆可能觸發。請交叉驗證 Polymarket 與 GDELT 數據。
+        ⚠ 偽陽性風險：財年截止、演習、重大體育賽事皆可能觸發。請交叉驗證右方地區風險看板與 GDELT 新聞強度。資料來源：pizzint.watch
       </div>
     </div>
 
@@ -1734,8 +1732,6 @@ const THRESHOLD = {
 // 多少家店異常才觸發紅色警報
 const ANOMALY_SHOPS_REQUIRED = 2;
 
-// 歷史符合率（依觸發店家數）
-const HISTORICAL_MATCH = { 1: '~42%', 2: '~63%', 3: '~76%', 4: '~91%' };
 
 // ─── 評估當前披薩狀態 ────────────────────────────────────────
 function evaluatePizzaStatus(shops) {
@@ -1853,20 +1849,18 @@ function renderWarAlert(status, shops) {
     if (cardEl)  cardEl.classList.add('anomaly');
 
     const anomCount = status.anomalyShops.length;
-    const histMatch = HISTORICAL_MATCH[anomCount] || '~76%';
 
     if (levelLbl) levelLbl.textContent = `CRITICAL ANOMALY — ${anomCount} 家店觸發`;
     if (mainTxt)  mainTxt.innerHTML = `🍕 披薩指數<strong style="color:var(--accent2)">嚴重異常</strong> — 歷史上此訊號出現後 <strong>2–48 小時</strong>內曾有軍事行動發生`;
     if (shopsCnt) shopsCnt.textContent = `${anomCount} / ${shops.length}`;
 
-    // 動態 bullet 列表
+    // 動態 bullet 列表（離線 fallback；有後端資料時由 applyPizzintIntel 覆蓋）
     const topShop = [...shops].sort((a,b) => b.busyness - a.busyness)[0];
     const topDev  = Math.round(((topShop.busyness - topShop.baseline) / topShop.baseline) * 100);
     if (bullets) bullets.innerHTML = `
       <div style="color:var(--accent2);">▶ ${topShop.name} 繁忙度較基準高出 <strong>+${topDev}%</strong></div>
       <div style="color:var(--accent3);">▶ ${anomCount} 家店同時出現深夜異常高峰，交叉確認可信度提升</div>
-      <div style="color:var(--accent3);">▶ 歷史符合率：${histMatch}（${anomCount} 家店同時觸發時）</div>
-      <div style="color:var(--text-dim);">▶ 建議同步觀察：Polymarket 戰爭機率、FlightRadar24 軍機動態</div>`;
+      <div style="color:var(--text-dim);">▶ 建議同步觀察：右方地區風險看板與 GDELT 新聞強度</div>`;
 
     // 更新 header 警戒狀態
     if (badgeEl) {
@@ -2435,18 +2429,53 @@ function applyPizzintIntel(json) {
     }
   }
 
-  // pizzint.watch 官方 spike 事件 → 顯示警報橫幅（只升級、不降級）
-  const events = json.pizza_events || [];
-  if (events.length) {
-    const alertEl = document.getElementById('pizza-war-alert');
-    const mainTxt = document.getElementById('alert-main-text');
-    const trigEl  = document.getElementById('triggered-shops');
-    const pctEl   = document.getElementById('anomaly-pct-1');
-    const top = [...events].sort((a,b) => (b.percentage_of_usual||0) - (a.percentage_of_usual||0))[0];
-    if (alertEl) alertEl.style.display = 'block';
-    if (mainTxt) mainTxt.innerHTML = `🍕 pizzint.watch 偵測到 <strong style="color:var(--accent2)">${escapeHtml(top.spike_magnitude || 'SPIKE')}</strong> 異常 — ${escapeHtml(top.place_name || '')} 繁忙度達平時 <strong>${Math.round(top.percentage_of_usual || 0)}%</strong>（${top.minutes_ago ?? '--'} 分鐘前）`;
-    if (trigEl) trigEl.textContent = `${events.length} / ${json.pizza?.length ?? '--'}`;
-    if (pctEl && top.percentage_of_usual != null) pctEl.textContent = Math.round(top.percentage_of_usual - 100);
+  // ── 警報橫幅：完全由 pizzint.watch 官方 spike 事件驅動 ──
+  // 沒有 spike 事件時隱藏（此函式在真實資料路徑最後執行，覆蓋 renderWarAlert 的判斷）
+  const alertEl = document.getElementById('pizza-war-alert');
+  const events = [...(json.pizza_events || [])]
+    .sort((a, b) => (b.percentage_of_usual || 0) - (a.percentage_of_usual || 0));
+
+  if (!events.length) {
+    if (alertEl) alertEl.style.display = 'none';
+    document.getElementById('pizza-card')?.classList.remove('anomaly');
+    return;
+  }
+
+  const top = events[0];
+  const mag = top.spike_magnitude || 'SPIKE';
+  const magColor = mag === 'EXTREME' ? 'var(--crit)' : mag === 'HIGH' ? 'var(--accent2)' : 'var(--accent3)';
+
+  if (alertEl) alertEl.style.display = 'block';
+  document.getElementById('pizza-card')?.classList.add('anomaly');
+
+  const mainTxt = document.getElementById('alert-main-text');
+  if (mainTxt) mainTxt.innerHTML = `🍕 pizzint.watch 偵測到 <strong style="color:${magColor}">${escapeHtml(mag)}</strong> 異常 — ${escapeHtml(top.place_name || '')} 繁忙度達平時 <strong>${Math.round(top.percentage_of_usual || 0)}%</strong>（${top.minutes_ago ?? '--'} 分鐘前）`;
+
+  const trigEl = document.getElementById('triggered-shops');
+  if (trigEl) trigEl.textContent = `${events.length} / ${json.pizza?.length ?? '--'}`;
+
+  const magEl = document.getElementById('alert-magnitude');
+  if (magEl) { magEl.textContent = mag; magEl.style.color = magColor; }
+
+  // 逐一列出真實 spike 事件 + 交叉驗證線索（用我們自己算的地區風險/新聞強度）
+  const bulletsEl = document.getElementById('alert-bullets');
+  if (bulletsEl) {
+    const evLines = events.slice(0, 4).map(e => {
+      const pct = Math.round(e.percentage_of_usual || 0);
+      const dev = pct - 100;
+      const c = (e.spike_magnitude === 'EXTREME') ? 'var(--crit)' : 'var(--accent2)';
+      return `<div style="color:${c}">▶ ${escapeHtml(e.place_name || '?')} 達平時 ${pct}%（較基準 ${dev >= 0 ? '+' : ''}${dev}%${e.minutes_ago != null ? `，${e.minutes_ago} 分前` : ''}）</div>`;
+    });
+    const mideast = (json.regions || []).find(r => r.key === 'mideast');
+    const gAvg = json.gdelt ? (() => {
+      const v = Object.values(json.gdelt).map(x => x.latest || 0);
+      return v.length ? (v.reduce((s, x) => s + x, 0) / v.length).toFixed(2) : null;
+    })() : null;
+    const cross = [];
+    if (mideast) cross.push(`中東地區風險 ${Math.round(mideast.score)} 分 [${mideast.level}]`);
+    if (gAvg) cross.push(`全球新聞衝突強度 ${gAvg}%`);
+    if (cross.length) evLines.push(`<div style="color:var(--text-dim)">▶ 交叉參照：${cross.join(' · ')}</div>`);
+    bulletsEl.innerHTML = evLines.join('');
   }
 }
 
