@@ -1115,11 +1115,8 @@
     line-height:1.85;
   }
   /* 像素字型只套在數字/標題/徽章（中文缺像素字型會 fallback，這樣最可讀）*/
-  body.theme-8bit :is(.logo, .section-title, .wpi-title, .wpi-num, #hero-wpi-num, .hero-wpi-title,
-    .threat-badge, #alert-badge, .wpi-f-val, .avi-box-val, .fire-val, .fin-price, .clock-face,
-    .osint-adv-hdr, .risk-pill, .wpi-badge, .ticker-label, #theme-toggle, .pizza-level-num,
-    .ph-chip-year, .wpi-al-status, .hero-region-pill b) {
-    font-family:'Press Start 2P','Cubic 11','Orbitron',monospace !important;
+  body.theme-8bit :is(.wpi-num, #hero-wpi-num, .threat-number) {
+    font-family:'Press Start 2P','Cubic 11',monospace !important;
     letter-spacing:0 !important; line-height:1.4 !important;
   }
   /* 大數字縮一點，像素字較寬 */
@@ -1173,6 +1170,10 @@
     content:''; position:fixed; inset:0; pointer-events:none; z-index:9998;
     background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.14) 2px,rgba(0,0,0,.14) 3px);
   }
+
+  /* 溢位防護：任何情況都不橫向捲動 */
+  html, body { overflow-x:hidden !important; max-width:100%; }
+  body.theme-8bit .wpi-formula { overflow-x:auto; white-space:nowrap; }
 
 </style>
 </head>
@@ -1504,11 +1505,11 @@
           <div style="position:absolute;left:40%;top:0;bottom:0;width:1px;background:rgba(245,166,35,.5)"></div>
           <div style="position:absolute;left:70%;top:0;bottom:0;width:1px;background:rgba(255,77,94,.5)"></div>
         </div>
-        <div style="position:relative;height:28px;font-family:'Share Tech Mono',monospace;font-size:.52rem;color:var(--text-dim);margin-top:.2rem">
-          <span style="position:absolute;left:0">DEFCON 5 正常</span>
-          <span style="position:absolute;left:38%">DEFCON 4 偏高</span>
-          <span style="position:absolute;left:68%">DEFCON 3 警戒</span>
-          <span style="position:absolute;right:0">DEFCON 1 危機</span>
+        <div class="pizza-zones" style="position:relative;height:20px;font-family:'Share Tech Mono',monospace;font-size:.52rem;color:var(--text-dim);margin-top:.2rem">
+          <span style="position:absolute;left:0">5 正常</span>
+          <span style="position:absolute;left:38%">4 偏高</span>
+          <span style="position:absolute;left:68%">3 警戒</span>
+          <span style="position:absolute;right:0">1 危機</span>
         </div>
       </div>
 
@@ -2462,13 +2463,17 @@ function renderRegions(regions) {
       const gdeltDelta = f.gdelt_delta != null
         ? `<span style="color:${f.gdelt_delta > 10 ? 'var(--accent2)' : f.gdelt_delta < -10 ? 'var(--accent)' : 'var(--text-dim)'}">${f.gdelt_delta > 0 ? '+' : ''}${f.gdelt_delta}%</span>`
         : '--';
-      const factorRow = (label, val, extra) => val == null ? '' :
-        `<div style="display:grid;grid-template-columns:58px 1fr 60px;align-items:center;gap:.4rem;font-size:.56rem">
+      // 每列都渲染（缺值顯示 --），確保各卡高度一致
+      const factorRow = (label, val, extra) => {
+        const has = val != null;
+        const right = has ? (extra ?? Math.round(val)) : '--';
+        return `<div style="display:grid;grid-template-columns:58px 1fr 62px;align-items:center;gap:.4rem;font-size:.56rem">
           <span style="color:var(--text-dim)">${label}</span>
-          <div style="height:3px;background:rgba(255,255,255,.08)"><div style="width:${Math.min(100,val)}%;height:100%;background:${st.color};opacity:.7"></div></div>
-          <span style="text-align:right;color:var(--text-dim)">${extra ?? Math.round(val)}</span>
+          <div style="height:3px;background:rgba(255,255,255,.08)"><div style="width:${has ? Math.min(100,val) : 0}%;height:100%;background:${st.color};opacity:.7"></div></div>
+          <span style="text-align:right;color:var(--text-dim)">${right}</span>
         </div>`;
-      return `<div style="background:var(--bg3);border:1px solid var(--border);border-left:3px solid ${st.color};padding:.7rem .8rem">
+      };
+      return `<div style="display:flex;flex-direction:column;background:var(--bg3);border:1px solid var(--border);border-left:3px solid ${st.color};padding:.7rem .8rem">
         <div style="display:flex;align-items:baseline;gap:.5rem;margin-bottom:.35rem">
           <span style="font-size:.85rem">${r.flag} ${escapeHtml(r.name)}</span>
           <span style="margin-left:auto;font-family:'Orbitron',monospace;font-size:1.25rem;font-weight:900;color:${st.color}">${Math.round(r.score)}</span>
@@ -2478,11 +2483,11 @@ function renderRegions(regions) {
         <div style="display:flex;flex-direction:column;gap:.22rem;font-family:'Share Tech Mono',monospace">
           ${factorRow('市場盤口', f.poly)}
           ${factorRow('新聞強度', f.gdelt, gdeltDelta)}
-          ${factorRow('領空NOTAM', f.notam, f.notam_closure ? '⛔ 關閉' : (f.notam_danger ?? 0) + ' 警戒')}
+          ${factorRow('領空NOTAM', f.notam, f.notam == null ? null : (f.notam_closure ? '⛔ 關閉' : (f.notam_danger ?? 0) + ' 警戒'))}
           ${factorRow('衛星火點', f.firms, (f.firms_hotspots ?? 0) + ' 處')}
           ${factorRow('軍機活動', f.avi, (f.avi_count ?? 0) + ' 架')}
         </div>
-        ${r.top_market ? `<div style="margin-top:.45rem;font-family:'Share Tech Mono',monospace;font-size:.54rem;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escapeHtml(r.top_market)}">📊 ${escapeHtml(r.top_market)}</div>` : ''}
+        <div style="margin-top:auto;padding-top:.45rem;font-family:'Share Tech Mono',monospace;font-size:.54rem;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.top_market ? escapeHtml(r.top_market) : ''}">${r.top_market ? '📊 ' + escapeHtml(r.top_market) : '&nbsp;'}</div>
       </div>`;
     }).join('');
   }
