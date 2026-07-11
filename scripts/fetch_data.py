@@ -42,6 +42,10 @@ EONET_API       = "https://eonet.gsfc.nasa.gov/api/v3/events?status=open&days=7&
 GDELT_API       = "https://api.gdeltproject.org/api/v2/doc/doc"
 # USGS 地震 API — 核試驗場周邊淺層地震監測（免金鑰）
 USGS_API        = "https://earthquake.usgs.gov/fdsnws/event/1/query"
+# Wikimedia Pageviews — 戰爭相關條目瀏覽量（公眾焦慮指數，免金鑰）
+WIKI_PV_API     = "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/user"
+# FAA NOTAM Search — 衝突區 FIR 領空限制/關閉（非官方端點，免金鑰）
+NOTAM_API       = "https://notams.aim.faa.gov/notamSearch/search"
 # 歷史趨勢檔（供前端畫趨勢箭頭；保留 7 天）
 HISTORY_FILE    = Path(__file__).resolve().parent.parent / "data" / "history.json"
 DATA_DIR        = Path(__file__).resolve().parent.parent / "data"
@@ -130,6 +134,31 @@ REGIONS = {
 
 # 和平方向的盤（停火/協議）— 機率高代表風險下降，計分時反向
 PEACE_MARKERS = ["ceasefire", "peace", "truce", "deal", "agreement", "normalization"]
+
+# 公眾焦慮指數：監控的維基百科條目（瀏覽量激增 = 大眾感知風險上升）
+WIKI_ANXIETY_PAGES = [
+    "World_War_III",
+    "Nuclear_warfare",
+    "Doomsday_Clock",
+    "Fallout_shelter",
+    "Emergency_Alert_System",
+]
+
+# 各地區監控的 FIR（飛航情報區）— NOTAM 領空限制/關閉監測
+REGION_FIRS = {
+    "ukraine":  ["UKBV"],           # 基輔
+    "mideast":  ["OIIX", "LLLL"],   # 德黑蘭、特拉維夫
+    "taiwan":   ["RCAA"],           # 台北
+    "korea":    ["ZKKP"],           # 平壤
+    "southsea": ["RPHI"],           # 馬尼拉
+}
+
+# NOTAM 內容的警戒關鍵字
+NOTAM_DANGER_RE = re.compile(
+    r"\b(CLSD|CLOSED|PROHIBITED|DANGER|RESTRICTED|MILITARY EXER|MISSILE|GPS JAMMING|CONFLICT ZONE)\b",
+    re.IGNORECASE,
+)
+NOTAM_CLOSURE_RE = re.compile(r"AIRSPACE\s+(IS\s+)?(CLSD|CLOSED)", re.IGNORECASE)
 
 # 核試驗場座標（USGS 地震監測用）
 NUCLEAR_TEST_SITES = [
@@ -745,6 +774,117 @@ async def fetch_nuclear_seismic(session: aiohttp.ClientSession) -> dict:
 
 
 # ─────────────────────────────────────────────────────────────
+# Wikipedia — 公眾焦慮指數（戰爭條目瀏覽量 vs 30 日基準）
+# ─────────────────────────────────────────────────────────────
+async def fetch_wikipedia_anxiety(session: aiohttp.ClientSession) -> dict:
+    from datetime import timedelta
+    now = datetime.now(timezone.utc)
+    end   = (now - timedelta(days=1)).strftime("%Y%m%d") + "00"   # 資料延遲 ~1 天
+    start = (now - timedelta(days=31)).strftime("%Y%m%d") + "00"
+
+    async def one(title: str):
+        url = f"{WIKI_PV_API}/{title}/daily/{start}/{end}"
+        try:
+            async with session.get(
+                url, timeout=aiohttp.ClientTimeout(total=15),
+                headers={"User-Agent": USER_AGENT, "Accept": "application/json"},
+            ) as resp:
+                resp.raise_for_status()
+                data = await resp.json()
+            views = [it["views"] for it in data.get("items", [])]
+            if len(views) < 10:
+                return None
+            latest = sum(views[-2:]) / 2                     # 最近 2 天平均
+            base_v = sorted(views[:-2])
+            baseline = base_v[len(base_v) // 2] or 1        # 前 28 天中位數
+            return {"title": title, "latest": round(latest),
+                    "baseline": baseline,
+                    "ratio": round(latest / baseline, 2)}
+        except Exception as e:
+            log.warning(f"Wiki pageviews {title} failed: {e}")
+            return None
+
+    pages = [p for p in await asyncio.gather(*(one(t) for t in WIKI_ANXIETY_PAGES)) if p]
+    if not pages:
+        return {}
+    mean_ratio = sum(p["ratio"] for p in pages) / len(pages)
+    # ratio 1.0（正常）≈ 25 分；2 倍 ≈ 50；4 倍以上 → 100
+    score = round(min(100.0, mean_ratio * 25), 1)
+    top = max(pages, key=lambda p: p["ratio"])
+    log.info(f"Wiki anxiety: score={score} mean_ratio={mean_ratio:.2f} top={top['title']} x{top['ratio']}")
+    return {"score": score, "mean_ratio": round(mean_ratio, 2), "pages": pages}
+
+
+# ─────────────────────────────────────────────────────────────
+# FAA NOTAM — 衝突區 FIR 領空限制/關閉監測
+# ─────────────────────────────────────────────────────────────
+async def fetch_notams(session: aiohttp.ClientSession) -> dict:
+    """
+    查詢各地區 FIR 的有效 NOTAM，統計警戒類（限制/危險/關閉）數量。
+    回傳 {region_key: {firs, total, danger, closure, score}}
+    """
+    # 上一輪數值作為 fallback（非官方端點偶發 503）
+    prev = {}
+    try:
+        prev = json.loads(DATA_FILE.read_text(encoding="utf-8")).get("notams") or {}
+    except Exception:
+        pass
+
+    headers = {
+        "User-Agent": ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                       "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126 Safari/537.36"),
+        "Accept": "application/json, text/javascript, */*; q=0.01",
+        "X-Requested-With": "XMLHttpRequest",
+        "Origin": "https://notams.aim.faa.gov",
+        "Referer": "https://notams.aim.faa.gov/notamSearch/nsapp.html",
+    }
+
+    out = {}
+    for key, firs in REGION_FIRS.items():
+        total = danger = 0
+        closure = False
+        ok = False
+        for fir in firs:
+            for attempt in (1, 2):
+                try:
+                    async with session.post(
+                        NOTAM_API,
+                        data={"searchType": "0", "designatorsForLocation": fir},
+                        timeout=aiohttp.ClientTimeout(total=20),
+                        headers=headers,
+                    ) as resp:
+                        resp.raise_for_status()
+                        data = await resp.json(content_type=None)
+                    notams = data.get("notamList") or []
+                    ok = True
+                    total += len(notams)
+                    for n in notams:
+                        msg = (n.get("icaoMessage") or "") + " " + (n.get("traditionalMessage") or "")
+                        if NOTAM_DANGER_RE.search(msg):
+                            danger += 1
+                        if NOTAM_CLOSURE_RE.search(msg):
+                            closure = True
+                    break
+                except Exception as e:
+                    if attempt == 2:
+                        log.warning(f"NOTAM {fir} failed: {e}")
+                    else:
+                        await asyncio.sleep(5)
+            await asyncio.sleep(1.5)
+        if ok:
+            score = min(100.0, danger * 8 + (40 if closure else 0))
+            out[key] = {"firs": firs, "total": total, "danger": danger,
+                        "closure": closure, "score": round(score, 1)}
+        elif key in prev:
+            out[key] = {**prev[key], "stale": True}
+
+    fresh = sum(1 for v in out.values() if not v.get("stale"))
+    dangers = {k: v["danger"] for k, v in out.items()}
+    log.info(f"NOTAM: {fresh}/{len(REGION_FIRS)} fresh ({len(out) - fresh} carried), danger={dangers}")
+    return out
+
+
+# ─────────────────────────────────────────────────────────────
 # 地區風險引擎 — 「哪些地區快打起來」
 # ─────────────────────────────────────────────────────────────
 def _region_poly_score(cfg: dict, polymarket: list[dict]) -> tuple[float | None, str | None]:
@@ -775,7 +915,9 @@ def _region_poly_score(cfg: dict, polymarket: list[dict]) -> tuple[float | None,
 
 
 def build_region_risks(polymarket: list[dict], gdelt: dict,
-                       firms: dict, aviation: dict) -> list[dict]:
+                       firms: dict, aviation: dict,
+                       notams: dict | None = None) -> list[dict]:
+    notams = notams or {}
     by_region_hits = {}
     for h in (firms.get("conflict_hotspots") or []):
         by_region_hits[h["region"]] = by_region_hits.get(h["region"], 0) + 1
@@ -792,24 +934,31 @@ def build_region_risks(polymarket: list[dict], gdelt: dict,
         poly_score, top_q = _region_poly_score(cfg, polymarket)
         if poly_score is not None:
             factors["poly"] = round(poly_score, 1)
-            weights["poly"] = 0.40
+            weights["poly"] = 0.35
 
         g = gdelt.get(key)
         if g:
             # 新聞量佔全球 % → 0-100（1% ≈ 25 分；重大戰事平時 2-3%，激增 4%+ 滿分）
             factors["gdelt"] = round(min(100.0, g["latest"] * 25), 1)
             factors["gdelt_delta"] = g["delta_pct"]
-            weights["gdelt"] = 0.30
+            weights["gdelt"] = 0.25
+
+        nt = notams.get(key)
+        if nt:
+            factors["notam"] = nt["score"]
+            factors["notam_danger"] = nt["danger"]
+            factors["notam_closure"] = nt["closure"]
+            weights["notam"] = 0.15
 
         fire_n = sum(by_region_hits.get(r, 0) for r in cfg["firms"])
         factors["firms"] = round(min(100.0, fire_n * 12), 1)
         factors["firms_hotspots"] = fire_n
-        weights["firms"] = 0.15
+        weights["firms"] = 0.12
 
         avi_n = sum(avi_by_region.get(r, 0) for r in cfg["avi_regions"])
         factors["avi"] = round(min(100.0, avi_n * 10), 1)
         factors["avi_count"] = avi_n
-        weights["avi"] = 0.15
+        weights["avi"] = 0.13
 
         # 只用可用因子並重新正規化權重
         usable = {k: w for k, w in weights.items() if k in factors}
@@ -834,7 +983,7 @@ def build_region_risks(polymarket: list[dict], gdelt: dict,
 # ─────────────────────────────────────────────────────────────
 # 歷史趨勢 — 供前端顯示「風險上升中/下降中」（提前預警的關鍵）
 # ─────────────────────────────────────────────────────────────
-def update_history(score: dict, pizza_index, regions: list[dict]) -> list[dict]:
+def update_history(score: dict, pizza_index, regions: list[dict], wiki_score=None) -> list[dict]:
     from datetime import timedelta
     history = []
     try:
@@ -850,6 +999,7 @@ def update_history(score: dict, pizza_index, regions: list[dict]) -> list[dict]:
         "combined": score["combined_score"],
         "poly": score["polymarket_score"],
         "pizza": pizza_index,
+        "wiki": wiki_score,
         "regions": {r["key"]: r["score"] for r in regions},
     })
     cutoff = (now - timedelta(days=7)).isoformat()
@@ -903,10 +1053,12 @@ async def main():
         eonet_task    = asyncio.create_task(fetch_eonet(session))
         gdelt_task    = asyncio.create_task(fetch_gdelt(session))
         seismic_task  = asyncio.create_task(fetch_nuclear_seismic(session))
+        wiki_task     = asyncio.create_task(fetch_wikipedia_anxiety(session))
+        notam_task    = asyncio.create_task(fetch_notams(session))
         (pizzint_data, polymarket, aviation, firms, eonet,
-         gdelt, nuclear_seismic) = await asyncio.gather(
+         gdelt, nuclear_seismic, wikipedia, notams) = await asyncio.gather(
             pizzint_task, poly_task, aviation_task, firms_task, eonet_task,
-            gdelt_task, seismic_task
+            gdelt_task, seismic_task, wiki_task, notam_task
         )
 
     pizza_shops  = transform_pizza_shops(pizzint_data)
@@ -931,8 +1083,8 @@ async def main():
         except Exception:
             pass
 
-    regions = build_region_risks(polymarket, gdelt, firms, aviation)
-    update_history(score, pizza_index, regions)
+    regions = build_region_risks(polymarket, gdelt, firms, aviation, notams)
+    update_history(score, pizza_index, regions, (wikipedia or {}).get("score"))
 
     output = {
         "updated_at":    datetime.now(timezone.utc).isoformat(),
@@ -947,6 +1099,8 @@ async def main():
         "firms":         firms,
         "eonet":         eonet[:20],
         "gdelt":         gdelt,
+        "wikipedia":     wikipedia,
+        "notams":        notams,
         "nuclear_seismic": nuclear_seismic,
         "regions":       regions,
         "sources": {
@@ -957,6 +1111,8 @@ async def main():
             "eonet":      "https://eonet.gsfc.nasa.gov/",
             "gdelt":      "https://www.gdeltproject.org/",
             "usgs":       "https://earthquake.usgs.gov/",
+            "wikipedia":  "https://wikimedia.org/api/rest_v1/",
+            "notam":      "https://notams.aim.faa.gov/",
         },
     }
 
