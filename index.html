@@ -1987,7 +1987,11 @@ setInterval(htmlWpiRender, 10 * 60 * 1000);
 // 若 GOOGLE_MAPS_API_KEY 未設定，後端會回傳模擬資料
 async function fetchRealPizzaData() {
   try {
-    const res = await fetch('data/data.json?t=' + Date.now(), { cache: 'no-store' });
+    // 先抓同站的 data/data.json；不存在時（如 Vercel 鏡像部署）改抓 GitHub 上的資料
+    let res = await fetch('data/data.json?t=' + Date.now(), { cache: 'no-store' }).catch(() => null);
+    if (!res || !res.ok) {
+      res = await fetch('https://raw.githubusercontent.com/virus11456/warhub/main/data/data.json?t=' + Date.now(), { cache: 'no-store' });
+    }
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const json = await res.json();
     if (!Array.isArray(json.pizza) || json.pizza.length === 0) {
