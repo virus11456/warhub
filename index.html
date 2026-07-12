@@ -808,8 +808,9 @@
 
     /* Header */
     .logo          { font-size: 1rem; letter-spacing: 1px; }
-    .threat-badge  { font-size: 0.58rem; padding: 2px 7px; letter-spacing: 1px; }
-    .header-status { gap: .7rem; }
+    .threat-badge  { display:none; }  /* 手機：騰出空間給三時區時鐘；警報同時顯示於下方 WPI Hero */
+    #clock{ font-size:.62rem; } #clock .clk{ margin-left:.5rem; } #clock .clk i{ font-size:.85em; margin-left:.1rem; } .live-lbl{ display:none; }
+    .header-status { gap: .6rem; }
 
     /* Pizza */
     .pizza-emoji   { font-size: 2rem; }
@@ -1179,6 +1180,12 @@
   html, body { overflow-x:hidden !important; max-width:100%; }
   body.theme-8bit .wpi-formula { overflow-x:auto; white-space:nowrap; }
 
+
+#clock{ display:inline-flex; gap:.1rem; align-items:baseline; }
+#clock .clk{ margin-left:.7rem; white-space:nowrap; }
+#clock .clk:first-child{ margin-left:0; }
+#clock .clk b{ color:var(--text); }
+#clock .clk i{ color:var(--text-dim); font-style:normal; font-size:.9em; margin-left:.15rem; }
 </style>
 </head>
 <body class="theme-8bit">
@@ -1191,7 +1198,7 @@
   <div class="header-inner">
     <div class="logo">WAR<span>WATCH</span> <span style="font-size:0.7rem;color:var(--text-dim);font-weight:400;letter-spacing:2px">戰爭預測情報中心</span></div>
     <div class="header-status">
-      <span><span class="live-dot"></span>即時連線 LIVE DATA</span>
+      <span class="live-ind"><span class="live-dot"></span><span class="live-lbl">即時連線 LIVE DATA</span></span>
       <span id="clock">--:--:-- UTC</span>
       <span class="threat-badge" id="alert-badge">威脅等級 ELEVATED</span>
     </div>
@@ -1879,10 +1886,22 @@
 function updateClock() {
   const now = new Date();
   const pad = n => String(n).padStart(2,'0');
-  const str = `${pad(now.getUTCHours())}:${pad(now.getUTCMinutes())}:${pad(now.getUTCSeconds())} UTC`;
-  document.getElementById('clock').textContent = str;
+  const narrow = !!(window.matchMedia && window.matchMedia('(max-width:640px)').matches);
+  const utc = narrow
+    ? `${pad(now.getUTCHours())}:${pad(now.getUTCMinutes())}`
+    : `${pad(now.getUTCHours())}:${pad(now.getUTCMinutes())}:${pad(now.getUTCSeconds())}`;
+  let et = '--:--';
+  try { et = new Intl.DateTimeFormat('en-GB',{timeZone:'America/New_York',hour:'2-digit',minute:'2-digit',hour12:false}).format(now); } catch(e){}
+  const loc = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  let locTz = '本地';
+  try { const ps=new Intl.DateTimeFormat('en-US',{timeZoneName:'short'}).formatToParts(now); const t=ps.find(x=>x.type==='timeZoneName'); if(t) locTz=t.value; } catch(e){}
+  const seg = (val,lbl,title)=>`<span class="clk"${title?` title="${title}"`:''}><b>${val}</b> <i>${lbl}</i></span>`;
+  const cl = document.getElementById('clock');
+  if (cl) cl.innerHTML = seg(utc,'UTC')
+    + seg(et, narrow?'五角':'五角大廈', '五角大廈／華盛頓 · 美東 (ET)')
+    + seg(loc, narrow?'本地':locTz, '你的本地時區');
   const alertTs = document.getElementById('alert-timestamp');
-  if (alertTs) alertTs.textContent = str;
+  if (alertTs) alertTs.textContent = `${pad(now.getUTCHours())}:${pad(now.getUTCMinutes())}:${pad(now.getUTCSeconds())} UTC`;
 }
 setInterval(updateClock, 1000);
 updateClock();
