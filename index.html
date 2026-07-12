@@ -1191,7 +1191,7 @@
   <div class="header-inner">
     <div class="logo">WAR<span>WATCH</span> <span style="font-size:0.7rem;color:var(--text-dim);font-weight:400;letter-spacing:2px">戰爭預測情報中心</span></div>
     <div class="header-status">
-      <span><span class="live-dot"></span>LIVE DATA</span>
+      <span><span class="live-dot"></span>即時連線 LIVE DATA</span>
       <span id="clock">--:--:-- UTC</span>
       <span class="threat-badge" id="alert-badge">威脅等級 ELEVATED</span>
     </div>
@@ -1200,7 +1200,7 @@
 
 <!-- Ticker -->
 <div class="ticker-wrap">
-  <div class="ticker-label">INTEL FEED</div>
+  <div class="ticker-label">情報快訊 INTEL FEED</div>
   <div style="overflow:hidden;flex:1;">
     <div class="ticker-scroll" id="ticker">
       <div class="ticker-item"><svg class="px-ic"><use href="#ic-pizza"/></svg> 五角大廈披薩指數 <span class="hi">↑ 異常偏高</span> &nbsp;•&nbsp;</div>
@@ -1231,7 +1231,7 @@
     <div class="hero-wpi">
       <div class="hero-wpi-num" id="hero-wpi-num">--</div>
       <div class="hero-wpi-meta">
-        <div class="hero-wpi-title">WAR PRESSURE INDEX</div>
+        <div class="hero-wpi-title">戰爭壓力指數 WAR PRESSURE INDEX</div>
         <div class="hero-wpi-level" id="hero-wpi-level">計算中…</div>
       </div>
     </div>
@@ -1380,7 +1380,7 @@
   <div class="wpi-section">
     <div class="wpi-topbar">
       <div>
-        <div class="wpi-title">WAR PRESSURE INDEX <span class="wpi-ver">v3.0</span></div>
+        <div class="wpi-title">戰爭壓力指數 WAR PRESSURE INDEX <span class="wpi-ver">v3.0</span></div>
         <div class="wpi-subtitle">加權多源 OSINT 綜合指數 · 每 10 分鐘自動重算</div>
       </div>
       <div class="wpi-badge medium" id="html-wpi-badge">⚠ <span id="html-wpi-badge-text">ELEVATED</span></div>
@@ -1493,7 +1493,7 @@
     <div id="pizza-war-alert" style="display:none;position:relative;overflow:hidden;margin:-1.2rem -1.2rem 1.2rem;padding:1.2rem 1.5rem;background:linear-gradient(135deg,rgba(255,77,94,.15),rgba(255,68,0,.1));border-bottom:1px solid rgba(255,77,94,.4)">
       <div style="position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,77,94,.1),transparent);animation:scan 3s linear infinite"></div>
       <div class="alert-hdr" style="display:flex;align-items:center;gap:.7rem;margin-bottom:.7rem;flex-wrap:wrap">
-        <div style="font-family:'Orbitron',monospace;font-size:.7rem;font-weight:700;color:var(--accent2);letter-spacing:3px">⚠ WAR ALERT</div>
+        <div style="font-family:'Orbitron',monospace;font-size:.7rem;font-weight:700;color:var(--accent2);letter-spacing:3px">⚠ 戰爭警報 WAR ALERT</div>
         <div class="alert-hdr-sub" style="font-family:'Orbitron',monospace;font-size:.7rem;letter-spacing:2px;color:var(--accent2)">PIZZINT ANOMALY DETECTED</div>
         <div style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)" id="alert-timestamp">--:--:-- UTC</div>
       </div>
@@ -1522,11 +1522,11 @@
     <div class="pbi-header">
       <div class="pbi-title-row">
         <div>
-          <div class="section-title" style="margin:0 0 .2rem"><svg class="px-ic"><use href="#ic-pizza"/></svg> Pentagon Pizza Index (PizzINT)</div>
+          <div class="section-title" style="margin:0 0 .2rem"><svg class="px-ic"><use href="#ic-pizza"/></svg> 五角大廈披薩指數 Pentagon Pizza Index (PizzINT)</div>
           <div style="font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim)">KGB 代號 PIZZINT · Google Maps Popular Times · 每小時更新 · Pentagon / 白宮 / CIA HQ 3英里</div>
         </div>
         <div style="text-align:right;flex-shrink:0">
-          <div style="font-family:'Orbitron',monospace;font-size:.62rem;color:var(--text-dim);letter-spacing:2px">PIZZA DEFCON</div>
+          <div style="font-family:'Orbitron',monospace;font-size:.62rem;color:var(--text-dim);letter-spacing:2px">披薩戰備等級 PIZZA DEFCON</div>
           <div class="pizza-level-num" id="pizza-level-num" style="font-size:1.6rem;line-height:1">--</div>
           <div class="pizza-level-label" id="pizza-level-label">--</div>
         </div>
@@ -1682,7 +1682,7 @@
 @media (max-width:640px){ .warmap-view { aspect-ratio:4/5; max-height:82vh; } }
 /* 像素圖示（披薩等）：內嵌 SVG symbol，隨文字大小縮放 */
 .px-ic { width:1.05em; height:1.05em; display:inline-block; vertical-align:-0.16em; image-rendering:pixelated; }
-.px-fl { width:1.5em; height:1em; vertical-align:-0.12em; box-shadow:0 0 0 1px rgba(255,255,255,.16); }
+.px-fl { width:1.5em; height:1em; vertical-align:-0.12em; margin:0 .22em; box-shadow:0 0 0 1px rgba(255,255,255,.16); }
 /* FIRMS */
 .fire-summary   { display:grid; grid-template-columns:1fr 1fr; gap:.5rem; margin-bottom:1rem; }
 .fire-box       { background:var(--bg3); border:1px solid var(--border); padding:.6rem; text-align:center; }
@@ -2078,7 +2078,7 @@ function renderWarAlert(status, shops) {
     if (badgeEl) {
       badgeEl.style.borderColor = 'var(--accent2)';
       badgeEl.style.color = 'var(--accent2)';
-      badgeEl.innerHTML = '<svg class="px-ic"><use href="#ic-pizza"/></svg> PIZZA ANOMALY';
+      badgeEl.innerHTML = '<svg class="px-ic"><use href="#ic-pizza"/></svg> 披薩異常 PIZZA ANOMALY';
     }
 
   } else if (status.level === 'HIGH') {
