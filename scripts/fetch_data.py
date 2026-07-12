@@ -550,7 +550,9 @@ def _firms_region(lat: float, lon: float) -> str:
 # Conflict regions of interest, for hotspot tagging
 _CONFLICT_BBOX = {
     "ukraine":  (44, 53, 22, 41),    # lat_min, lat_max, lon_min, lon_max
-    "russia":   (44, 70, 30, 180),
+    # 只框「與烏克蘭戰爭相關的俄羅斯西部」（含烏軍無人機常打的伏爾加加勒/薩馬拉/
+    # 韃靼斯坦煉油廠），排除西伯利亞——否則夏季西伯利亞野火(FRP 上千 MW)會被誤標為衝突火點
+    "russia":   (46, 56, 30, 52),
     "israel":   (29, 34, 33, 36),
     "lebanon":  (33, 35, 35, 37),
     "syria":    (32, 38, 35, 42),
