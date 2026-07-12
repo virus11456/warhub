@@ -1082,7 +1082,8 @@ def build_region_risks(polymarket: list[dict], gdelt: dict,
 # ─────────────────────────────────────────────────────────────
 # 歷史趨勢 — 供前端顯示「風險上升中/下降中」（提前預警的關鍵）
 # ─────────────────────────────────────────────────────────────
-def update_history(score: dict, pizza_index, regions: list[dict], wiki_score=None) -> list[dict]:
+def update_history(score: dict, pizza_index, regions: list[dict], wiki_score=None,
+                   aviation: dict | None = None) -> list[dict]:
     from datetime import timedelta
     history = []
     try:
@@ -1093,18 +1094,64 @@ def update_history(score: dict, pizza_index, regions: list[dict], wiki_score=Non
         pass
 
     now = datetime.now(timezone.utc)
-    history.append({
+    rec = {
         "ts": now.isoformat(timespec="minutes"),
         "combined": score["combined_score"],
         "poly": score["polymarket_score"],
         "pizza": pizza_index,
         "wiki": wiki_score,
         "regions": {r["key"]: r["score"] for r in regions},
-    })
-    cutoff = (now - timedelta(days=7)).isoformat()
+    }
+    # 記錄軍機各機型架數（供 AVI 卡片 24h/7d/30d 歷史變化；短鍵省空間）
+    s = (aviation or {}).get("summary") or {}
+    rec["avi"] = {"t": s.get("tankers", 0), "a": s.get("awacs", 0),
+                  "u": s.get("uav", 0), "tot": s.get("total", 0)}
+    history.append(rec)
+    # 保留 31 天（30 天變化需要）
+    cutoff = (now - timedelta(days=31)).isoformat()
     history = [h for h in history if h.get("ts", "") >= cutoff]
     HISTORY_FILE.write_text(json.dumps(history, ensure_ascii=False), encoding="utf-8")
     return history
+
+
+def compute_avi_trends(history: list[dict]) -> dict | None:
+    """
+    由 history 計算軍機三機型（加油機/預警機/偵察無人機）相對過去 24h/7d/30d
+    平均的變化%。資料不足時回傳 None（前端顯示「累積中」）。
+    """
+    from datetime import timedelta
+    pts = []
+    for h in history:
+        avi = h.get("avi")
+        if not avi:
+            continue
+        try:
+            pts.append((datetime.fromisoformat(h["ts"]), avi))
+        except Exception:
+            continue
+    if not pts:
+        return None
+    now, cur = pts[-1][0], pts[-1][1]
+    past = pts[:-1]  # 排除當前點
+
+    def pct(days, key, min_pts):
+        cutoff = now - timedelta(days=days)
+        vals = [a.get(key, 0) for (t, a) in past if t >= cutoff]
+        if len(vals) < min_pts:
+            return None
+        avg = sum(vals) / len(vals)
+        if avg <= 0:
+            return None
+        return round((cur.get(key, 0) - avg) / avg * 100)
+
+    out = {}
+    for name, key in (("tankers", "t"), ("awacs", "a"), ("uav", "u")):
+        out[name] = {
+            "d1":  pct(1,  key, 3),    # 24h：至少 3 點
+            "d7":  pct(7,  key, 12),   # 7天：至少 12 點
+            "d30": pct(30, key, 24),   # 30天：至少 24 點
+        }
+    return out
 
 
 # ─────────────────────────────────────────────────────────────
@@ -1184,7 +1231,11 @@ async def main():
             pass
 
     regions = build_region_risks(polymarket, gdelt, firms, aviation, notams)
-    update_history(score, pizza_index, regions, (wikipedia or {}).get("score"))
+    history = update_history(score, pizza_index, regions,
+                             (wikipedia or {}).get("score"), aviation)
+    # 軍機機型 24h/7d/30d 歷史變化（資料累積後自動填入）
+    if isinstance(aviation, dict):
+        aviation["trends"] = compute_avi_trends(history)
 
     output = {
         "updated_at":    datetime.now(timezone.utc).isoformat(),
