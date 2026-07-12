@@ -3203,11 +3203,11 @@ async function fetchPolymarketLive() {
 // ─── 🌍 全球戰爭熱點世界地圖（FIRMS 火點 × 監測地區風險）───────────
 // 等距柱狀投影（equirectangular）：viewBox 1000×500 對應全球經緯度
 const WARMAP_REGION_GEO = {
-  ukraine:  [32,  48.5, '俄烏'],
-  mideast:  [47,  32,   '中東'],
-  taiwan:   [121, 24,   '台海'],
-  korea:    [127, 39.5, '朝鮮'],
-  southsea: [114, 13,   '南海'],
+  ukraine:  [32,  48.5, '俄烏', 'up'],    // 標籤朝上
+  mideast:  [47,  32,   '中東', 'down'],  // 標籤朝下，避開俄烏
+  taiwan:   [121, 24,   '台海', 'left'],  // 東亞三區標籤朝左（壓在陸地上、避免右緣被裁）
+  korea:    [127, 39.5, '朝鮮', 'left'],
+  southsea: [114, 13,   '南海', 'left'],
 };
 function warmapPx(lon, lat){ return [ (lon + 180) / 360 * 1000, (90 - lat) / 180 * 500 ]; }
 function warmapRegionColor(level){
@@ -3241,12 +3241,16 @@ function renderWarMap(json){
     if (!geo) return;
     const [x, y] = warmapPx(geo[0], geo[1]);
     const c = warmapRegionColor(r.level);
-    const rad = 11 + Math.min(12, (r.score || 0) / 5);
+    const rad = 9 + Math.min(8, (r.score || 0) / 8);
     pins += `<g class="wm-pin" onclick="document.getElementById('region-board').scrollIntoView({behavior:'smooth',block:'center'})">`
          +  `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${rad.toFixed(1)}" fill="${c}" opacity=".14"/>`
          +  `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${rad.toFixed(1)}" fill="none" stroke="${c}" stroke-width="3" opacity=".95"/>`
          +  `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.5" fill="${c}"/>`
-         +  `<text class="wm-pin-label" x="${x.toFixed(1)}" y="${(y - rad - 8).toFixed(1)}" fill="${c}" font-size="22" text-anchor="middle">${escapeHtml(geo[2])} ${Math.round(r.score || 0)}</text>`
+         +  (()=>{ const dir=geo[3]||'up'; let lx=x, ly=y-rad-6, anc='middle';
+              if(dir==='down'){ ly=y+rad+17; }
+              else if(dir==='right'){ lx=x+rad+5; ly=y+6; anc='start'; }
+              else if(dir==='left'){ lx=x-rad-5; ly=y+6; anc='end'; }
+              return `<text class="wm-pin-label" x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" fill="${c}" font-size="22" text-anchor="${anc}">${escapeHtml(geo[2])} ${Math.round(r.score || 0)}</text>`; })()
          +  `<title>${escapeHtml(r.name)} · 風險 ${Math.round(r.score || 0)} · ${r.level}</title></g>`;
   });
   regG.innerHTML = pins;
