@@ -1775,25 +1775,6 @@
     <div style="margin-top:.6rem;text-align:right">
       <a href="https://firms.modaps.eosdis.nasa.gov/map/" target="_blank" rel="noopener" style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--accent)">NASA FIRMS 即時地圖 ↗</a>
     </div>
-    <!-- NASA FIRMS WMS 靜態衛星圖（新版端點格式） -->
-    <a href="https://firms.modaps.eosdis.nasa.gov/map/" target="_blank" rel="noopener" style="display:block;margin-top:.8rem;text-decoration:none">
-      <img
-        src="https://firms.modaps.eosdis.nasa.gov/mapserver/wms/fires/a6f68613078dd3564264e6c72a298dcb/fires_viirs_snpp_24,fires_viirs_noaa20_24/triangle,triangle/3,2/255+50+50,255+180+0/?REQUEST=GetMap&WIDTH=600&HEIGHT=300&BBOX=-180,-90,180,90&version=1.1.1"
-        alt="NASA FIRMS 全球即時火點"
-        style="width:100%;height:auto;display:block;opacity:.85;border:1px solid rgba(255,77,94,.2)"
-        onerror="this.parentElement.style.display='none';document.getElementById('html-firms-fallback').style.display='block'"
-      >
-      <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);margin-top:.3rem;text-align:center">
-        🛰️ VIIRS S-NPP + NOAA-20 · 24hr · 全球 · 點擊開啟互動地圖 ↗
-      </div>
-    </a>
-    <!-- 圖片載入失敗 fallback -->
-    <a id="html-firms-fallback" href="https://firms.modaps.eosdis.nasa.gov/map/" target="_blank" rel="noopener"
-       style="display:none;margin-top:.8rem;padding:.8rem;background:rgba(255,77,94,.06);border:1px solid rgba(255,77,94,.25);text-align:center;text-decoration:none">
-      <div style="font-size:1.1rem;margin-bottom:.3rem">🛰️</div>
-      <div style="font-family:'Orbitron',monospace;font-size:.68rem;color:var(--accent2);letter-spacing:2px">開啟 NASA FIRMS 即時火點圖</div>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);margin-top:.2rem">VIIRS S-NPP · 24hr · 全球 ↗</div>
-    </a>
   </div>
 
   <!-- 💰 C. 經濟避險指標 -->
