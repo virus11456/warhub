@@ -1015,7 +1015,7 @@ USDA_WANT = {"Soybeans": "大豆", "Wheat": "小麥", "Corn": "玉米"}
 async def _usda_get(session, path, key):
     try:
         async with session.get(USDA_ESR + path,
-                headers={"API_KEY": key, "Accept": "application/json"},
+                headers={"X-Api-Key": key, "Accept": "application/json"},
                 timeout=aiohttp.ClientTimeout(total=25)) as r:
             if r.status != 200:
                 log.warning(f"USDA {path} -> HTTP {r.status}")
