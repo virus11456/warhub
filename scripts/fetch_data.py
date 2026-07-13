@@ -1096,7 +1096,7 @@ async def fetch_usda_esr(session: aiohttp.ClientSession) -> dict | None:
             continue
         recs = []
         for my in (yr, yr - 1, yr + 1):
-            d = await _usda_get(session, f"/exports/commodityCode/{cc}/country/{china}/marketYear/{my}", key)
+            d = await _usda_get(session, f"/exports/commodityCode/{cc}/countryCode/{china}/marketYear/{my}", key)
             if d:
                 recs.extend(d)
         if not recs:
