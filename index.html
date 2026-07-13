@@ -1676,7 +1676,38 @@
     <div id="food-grid">
       <div style="padding:1rem;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 連接 UN Comtrade…</div>
     </div>
+    <div id="food-hist-wrap" class="fh-wrap" style="display:none">
+      <div class="fh-controls">
+        <div class="fh-tabs" id="fh-cmd"></div>
+        <div class="fh-tabs" id="fh-range"></div>
+      </div>
+      <div class="fh-chart"><svg id="fh-svg" viewBox="0 0 720 240" preserveAspectRatio="xMidYMid meet"></svg></div>
+      <div class="fh-legend" id="fh-legend"></div>
+    </div>
   </div>
+
+<style>
+/* ── 🌾 糧食月度趨勢圖 ── */
+.fh-wrap { margin-top:.9rem; padding-top:.7rem; border-top:1px dashed rgba(255,255,255,.12); }
+.fh-controls { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.5rem; margin-bottom:.5rem; }
+.fh-tabs { display:flex; gap:.35rem; flex-wrap:wrap; }
+.fh-tab { font-family:'Share Tech Mono',monospace; font-size:.66rem; letter-spacing:.5px;
+  padding:.22rem .6rem; border:1px solid var(--border); border-radius:3px; color:var(--text-dim);
+  background:transparent; cursor:pointer; transition:all .15s; }
+.fh-tab:hover { color:var(--text); border-color:var(--accent); }
+.fh-tab.on { color:#04121a; background:var(--accent); border-color:var(--accent); font-weight:700; }
+.fh-chart { width:100%; overflow-x:auto; }
+.fh-chart svg { width:100%; height:auto; display:block; }
+.fh-svg-grid { stroke:rgba(255,255,255,.06); stroke-width:1; }
+.fh-svg-axis { fill:var(--text-dim); font-family:'Share Tech Mono',monospace; font-size:11px; }
+.fh-svg-line { fill:none; stroke:var(--accent); stroke-width:2; }
+.fh-svg-area { fill:var(--accent); opacity:.10; }
+.fh-svg-mline { stroke-dasharray:3 3; }
+.fh-svg-dot { fill:var(--accent); }
+.fh-legend { font-family:'Share Tech Mono',monospace; font-size:.6rem; color:var(--text-dim);
+  margin-top:.45rem; line-height:1.5; }
+.fh-legend b { color:var(--accent); }
+</style>
 
 <!-- ══════════ 訊號源網格（AVI / FIRMS / FIN / 核威脅）══════════ -->
 <style>
@@ -2464,6 +2495,9 @@ async function fetchRealPizzaData() {
     try { renderFood(json); }
     catch(err) { console.warn('[WARHUBS] renderFood error:', err.message); }
 
+    try { renderFoodHistory(json); }
+    catch(err) { console.warn('[WARHUBS] renderFoodHistory error:', err.message); }
+
     // 同步渲染 AVI 軍機資料
     if (json.aviation) {
       try { renderAviation(json.aviation); }
@@ -2886,6 +2920,81 @@ function renderFood(json){
   if(sub && f.breadth_up>=2){
     sub.innerHTML=sub.innerHTML.split(' · <strong')[0]
       +' · <strong style="color:#ff4d5e">\u26A0 '+f.breadth_up+'/3 項主糧年增≥15%（囤積訊號偏強，須交叉印證）</strong>';
+  }
+}
+// ── 🌾 糧食月度趨勢圖（1/3/5 年）──
+var FH_STATE={cmd:'soy', range:36};
+var FH_JSON=null;
+var FH_CMDS=[['soy','大豆'],['wheat','小麥'],['corn','玉米']];
+var FH_RANGES=[[12,'近1年'],[36,'近3年'],[60,'近5年']];
+function fhFmt(v){ return Math.round(v).toLocaleString(); }
+function renderFoodHistory(json){
+  FH_JSON=json;
+  var wrap=document.getElementById('food-hist-wrap'); if(!wrap) return;
+  var all=json.food_hist||[];
+  if(!all.length){ wrap.style.display='none'; return; }
+  wrap.style.display='';
+  var cmdEl=document.getElementById('fh-cmd');
+  if(cmdEl && !cmdEl.dataset.built){
+    cmdEl.dataset.built='1';
+    cmdEl.innerHTML=FH_CMDS.map(function(c){return '<button class="fh-tab" data-cmd="'+c[0]+'">'+c[1]+'</button>';}).join('');
+    cmdEl.querySelectorAll('.fh-tab').forEach(function(b){ b.onclick=function(){FH_STATE.cmd=b.dataset.cmd; drawFoodHistory();}; });
+  }
+  var rEl=document.getElementById('fh-range');
+  if(rEl && !rEl.dataset.built){
+    rEl.dataset.built='1';
+    rEl.innerHTML=FH_RANGES.map(function(r){return '<button class="fh-tab" data-range="'+r[0]+'">'+r[1]+'</button>';}).join('');
+    rEl.querySelectorAll('.fh-tab').forEach(function(b){ b.onclick=function(){FH_STATE.range=+b.dataset.range; drawFoodHistory();}; });
+  }
+  drawFoodHistory();
+}
+function drawFoodHistory(){
+  var json=FH_JSON; if(!json) return;
+  var svg=document.getElementById('fh-svg'); if(!svg) return;
+  document.querySelectorAll('#fh-cmd .fh-tab').forEach(function(b){b.classList.toggle('on', b.dataset.cmd===FH_STATE.cmd);});
+  document.querySelectorAll('#fh-range .fh-tab').forEach(function(b){b.classList.toggle('on', +b.dataset.range===FH_STATE.range);});
+  var data=(json.food_hist||[]).slice(-FH_STATE.range);
+  var key=FH_STATE.cmd;
+  var W=720,H=240,padL=46,padR=14,padT=14,padB=28;
+  var n=data.length;
+  var maxV=Math.max.apply(null, data.map(function(d){return d[key]||0;}).concat([1]))*1.12;
+  function X(i){ return n<=1?padL:padL+(W-padL-padR)*i/(n-1); }
+  function Y(v){ return padT+(H-padT-padB)*(1-v/maxV); }
+  var p=[];
+  for(var g=0;g<=4;g++){
+    var gy=padT+(H-padT-padB)*g/4, gv=maxV*(1-g/4);
+    p.push('<line class="fh-svg-grid" x1="'+padL+'" y1="'+gy+'" x2="'+(W-padR)+'" y2="'+gy+'"/>');
+    p.push('<text class="fh-svg-axis" x="'+(padL-6)+'" y="'+(gy+4)+'" text-anchor="end">'+fhFmt(gv)+'</text>');
+  }
+  var lastYr=null;
+  data.forEach(function(d,i){ var yr=d.ym.slice(0,4);
+    if(yr!==lastYr){ lastYr=yr; p.push('<text class="fh-svg-axis" x="'+X(i)+'" y="'+(H-8)+'" text-anchor="middle">'+yr+'</text>'); }
+  });
+  var pts=data.map(function(d,i){ return {x:X(i), y:Y(d[key]||0), src:d.src}; });
+  if(pts.length){
+    var ap='M'+pts[0].x+','+Y(0);
+    pts.forEach(function(pt){ ap+=' L'+pt.x+','+pt.y; });
+    ap+=' L'+pts[pts.length-1].x+','+Y(0)+' Z';
+    p.push('<path class="fh-svg-area" d="'+ap+'"/>');
+  }
+  for(var i=1;i<pts.length;i++){
+    var seg='M'+pts[i-1].x+','+pts[i-1].y+' L'+pts[i].x+','+pts[i].y;
+    p.push('<path class="fh-svg-line'+(pts[i].src==='mirror'?' fh-svg-mline':'')+'" d="'+seg+'"/>');
+  }
+  if(pts.length){
+    var last=pts[pts.length-1], lv=data[data.length-1];
+    p.push('<circle class="fh-svg-dot" cx="'+last.x+'" cy="'+last.y+'" r="3"/>');
+    p.push('<text class="fh-svg-axis" x="'+last.x+'" y="'+(last.y-8)+'" text-anchor="end" style="fill:var(--accent);font-weight:700">'+fhFmt(lv[key]||0)+'</text>');
+  }
+  svg.innerHTML=p.join('');
+  var leg=document.getElementById('fh-legend');
+  if(leg){
+    var nm=({soy:'大豆',wheat:'小麥',corn:'玉米'})[key];
+    var f=data.length?data[0].ym:'', l=data.length?data[data.length-1].ym:'';
+    var hasMirror=data.some(function(d){return d.src==='mirror';});
+    leg.innerHTML='中國每月<b>'+nm+'</b>進口量（萬噸）· '+f+' → '+l
+      +'　—— 實線＝中國海關直報，- - 虛線＝鏡像估計（最近幾個月中國停報 Comtrade）'
+      +(hasMirror?'':'　·　近月資料累積中…');
   }
 }
 function renderNews(json){

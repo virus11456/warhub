@@ -58,6 +58,8 @@ BESTTIME_API    = "https://besttime.app/api/v1/forecasts/live"
 HISTORY_FILE    = Path(__file__).resolve().parent.parent / "data" / "history.json"
 DATA_DIR        = Path(__file__).resolve().parent.parent / "data"
 DATA_FILE       = DATA_DIR / "data.json"
+# 糧食進口月度歷史（近 5 年，供前端畫 1/3/5 年趨勢；逐步累積）
+FOOD_HISTORY_FILE = DATA_DIR / "food_history.json"
 USER_AGENT      = "WarHub/1.0 (+https://github.com/virus11456/warhub)"
 
 # index.html 上要顯示哪幾家店（pizzint.watch 列了 14 家，我們挑 6 家披薩店）
@@ -1004,6 +1006,105 @@ async def fetch_food_imports(session: aiohttp.ClientSession) -> dict:
     }
 
 
+# ─────────────────────────────────────────────────────────────
+# 🌾 糧食進口「月度歷史」— 近 5 年逐月序列（1/3/5 年趨勢）
+#   ≤2024-12：中國海關直報（reporter=中國, partner=全世界，1 呼叫/月，永久快取）
+#   ≥2025-01：中國停報 Comtrade → 改用鏡像（主要出口國對中出口合計，7 呼叫/月）
+#   每次執行只回填有限筆數，尊重 Comtrade 限速與 12 分鐘工時上限，逐步補齊。
+# ─────────────────────────────────────────────────────────────
+FOOD_HIST_MONTHS    = 60        # 視窗：近 5 年
+CHINA_REPORT_CUTOFF = 202412    # 中國自 2025 起停報 Comtrade
+HIST_MIRROR_BUDGET  = 3         # 每次最多回填幾個「鏡像」月（每月 7 呼叫）
+HIST_CHINA_BUDGET   = 15        # 每次最多回填幾個「中國直報」月（每月 1 呼叫）
+
+async def _comtrade_china_import(session, period: int):
+    """中國該月自全世界進口三主糧 {cmd: netWgt kg}；失敗回 None。"""
+    params = {"reporterCode": "156", "flowCode": "M", "partnerCode": "0",
+              "cmdCode": "1201,1001,1005", "period": str(period),
+              "partner2Code": "0", "motCode": "0"}
+    for attempt, bk in ((1, 8), (2, 15), (3, 0)):
+        try:
+            async with session.get(COMTRADE_URL, params=params,
+                    headers={"User-Agent": USER_AGENT},
+                    timeout=aiohttp.ClientTimeout(total=30)) as r:
+                if r.status == 429:
+                    if bk: await asyncio.sleep(bk); continue
+                    return None
+                txt = await r.text()
+            data = json.loads(txt)
+            out = {}
+            for row in (data.get("data") or []):
+                cmd = str(row.get("cmdCode"))
+                out[cmd] = out.get(cmd, 0) + (row.get("netWgt") or 0)
+            return out
+        except Exception:
+            if bk: await asyncio.sleep(bk)
+            else: return None
+    return None
+
+async def _food_mirror_total(session, month: int):
+    """主要出口國該月對中出口三主糧合計 {cmd: netWgt kg}, ok=成功國數。"""
+    tot = {c: 0 for c, _ in FOOD_CMDS}; ok = 0
+    for rep, _ in FOOD_EXPORTERS:
+        r = await _comtrade_month(session, rep, month)
+        await asyncio.sleep(3)
+        if r:
+            ok += 1
+            for c, _ in FOOD_CMDS:
+                tot[c] += r.get(c, 0)
+    return tot, ok
+
+async def fetch_food_history(session: aiohttp.ClientSession) -> list:
+    store = {}
+    try:
+        raw = json.loads(FOOD_HISTORY_FILE.read_text(encoding="utf-8"))
+        store = (raw.get("months") if isinstance(raw, dict) else {}) or {}
+    except Exception:
+        store = {}
+
+    now = datetime.now(timezone.utc)
+    cur = now.year * 100 + now.month
+    targets = [_ym_add(cur, -k) for k in range(1, FOOD_HIST_MONTHS + 1)]
+    def key(ym): return f"{ym // 100}-{ym % 100:02d}"
+
+    missing_mirror = [ym for ym in targets if ym > CHINA_REPORT_CUTOFF and key(ym) not in store]
+    missing_china  = [ym for ym in targets if ym <= CHINA_REPORT_CUTOFF and key(ym) not in store]
+    # 最近一個已存鏡像月也重抓一次（月資料會回修）
+    stored_mirror = sorted([ym for ym in targets
+                            if ym > CHINA_REPORT_CUTOFF and key(ym) in store], reverse=True)
+    refresh = stored_mirror[:1]
+
+    try:
+        # 先補最近的鏡像月（使用者最先想看「近一年」），再補中國直報深歷史
+        for ym in sorted(set(missing_mirror + refresh), reverse=True)[:HIST_MIRROR_BUDGET]:
+            tot, ok = await _food_mirror_total(session, ym)
+            if ok:
+                store[key(ym)] = {"soy": round(tot["1201"] / 1e7, 1),
+                                  "wheat": round(tot["1001"] / 1e7, 1),
+                                  "corn": round(tot["1005"] / 1e7, 1), "src": "mirror"}
+        for ym in sorted(missing_china, reverse=True)[:HIST_CHINA_BUDGET]:
+            r = await _comtrade_china_import(session, ym)
+            await asyncio.sleep(3)
+            if r:
+                store[key(ym)] = {"soy": round(r.get("1201", 0) / 1e7, 1),
+                                  "wheat": round(r.get("1001", 0) / 1e7, 1),
+                                  "corn": round(r.get("1005", 0) / 1e7, 1), "src": "china"}
+    except Exception as e:
+        log.warning(f"food history backfill error: {e}")
+
+    keep = {key(ym) for ym in targets}
+    store = {k: v for k, v in store.items() if k in keep}
+    try:
+        FOOD_HISTORY_FILE.write_text(json.dumps({"months": store}, ensure_ascii=False),
+                                     encoding="utf-8")
+    except Exception as e:
+        log.warning(f"food history write error: {e}")
+
+    series = [{"ym": k, **store[k]} for k in sorted(store.keys())]
+    remaining = len([ym for ym in targets if key(ym) not in store])
+    log.info(f"food history: {len(store)}/{len(targets)} months filled, {remaining} remaining")
+    return series
+
 
 # ─────────────────────────────────────────────────────────────
 # 🇺🇸→🇨🇳 USDA FAS ESR — 美國對中國每週穀物出口銷售（最即時，需 API key）
@@ -1590,6 +1691,11 @@ async def main():
         )
         food = await food_task
         usda = await usda_task
+        try:
+            food_hist = await fetch_food_history(session)
+        except Exception as e:
+            log.warning(f"food history skipped: {e}")
+            food_hist = []
 
     pizza_shops  = transform_pizza_shops(pizzint_data)
     pizza_index  = pizzint_data.get("overall_index", 0)
@@ -1638,6 +1744,7 @@ async def main():
         "gdelt":         gdelt,
         "news":          news,
         "food":          food,
+        "food_hist":     food_hist,
         "usda":          usda,
         "wikipedia":     wikipedia,
         "notams":        notams,
