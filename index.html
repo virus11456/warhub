@@ -493,6 +493,13 @@
   .food-val { font-size:.95rem; color:var(--accent); font-family:'Orbitron',monospace; }
   .food-unit { font-size:.6rem; color:var(--text-dim); margin-left:.15rem; }
   .food-yoy { font-size:.78rem; font-weight:700; text-align:right; white-space:nowrap; }
+  .usda-block { margin-top:.8rem; padding-top:.6rem; border-top:1px dashed rgba(255,255,255,.12); }
+  .usda-hd { font-family:'Orbitron','Share Tech Mono',monospace; font-size:.66rem; font-weight:700; color:var(--accent1); letter-spacing:1px; margin-bottom:.4rem; }
+  .usda-row { display:grid; grid-template-columns:4.5em 1fr 1fr; gap:.5rem; align-items:baseline; padding:.4rem .2rem; border-bottom:1px solid rgba(255,255,255,.05); font-family:'Share Tech Mono',monospace; font-size:.72rem; }
+  .usda-row:last-child { border-bottom:none; }
+  .usda-row .u-name { font-weight:700; color:var(--text); }
+  .usda-row .u-v { color:var(--text-dim); }
+  .usda-row .u-v b { color:var(--accent); font-family:'Orbitron',monospace; }
   /* ── 區段可折疊 ── */
   .fold-caret { color:var(--accent); font-size:.8rem; margin-right:.5rem; display:inline-block; width:1em; flex:none; }
   .fold-head { cursor:pointer; user-select:none; }
@@ -2863,6 +2870,16 @@ function renderFood(json){
       +'<div class="food-val">'+w+'<span class="food-unit">萬噸</span></div>'
       +'<div class="food-yoy" style="color:'+col+'">'+(y==null?'—':arr+Math.abs(y)+'% 年增')+'</div></div>';
   }).join('');
+  // 🇺🇸→🇨🇳 USDA 每週銷售（有 key 才有）
+  var u=json.usda;
+  if(u && u.items && u.items.length){
+    var rows=u.items.map(function(it){
+      return '<div class="usda-row"><div class="u-name">'+escapeHtml(it.name)+'</div>'
+        +'<div class="u-v">本週淨銷售 <b>'+(it.week_net_kt||0).toLocaleString()+'</b> 千噸</div>'
+        +'<div class="u-v">未裝運 <b>'+(it.outstanding_kt||0).toLocaleString()+'</b> 千噸</div></div>';
+    }).join('');
+    el.innerHTML += '<div class="usda-block"><div class="usda-hd">🇺🇸→🇨🇳 美對中每週穀物銷售 · USDA ESR（截至 '+escapeHtml(u.week_ending||'')+'）</div>'+rows+'</div>';
+  }
   var upd=document.getElementById('food-updated');
   if(upd) upd.textContent='參考月 '+(f.ref_month||'—')+'（對比 '+(f.prev_year_month||'')+'）';
   var sub=document.getElementById('food-sub');
