@@ -753,8 +753,8 @@ async def fetch_gdelt(session: aiohttp.ClientSession) -> dict:
 
 
 # ─────────────────────────────────────────────────────────────
-# GDELT ArtList — 即時戰情快訊（早期預警：白宮/中國/戰爭升級相關頭條）
-# 與 fetch_gdelt 共用 GDELT（限速每 5 秒 1 請求）→ 串接在其後執行
+# Google News RSS — 即時戰情快訊（早期預警：白宮/中國/戰爭升級相關頭條）
+# 免金鑰、持續更新、不受 GDELT 對 GitHub runner IP 的限速影響
 # ─────────────────────────────────────────────────────────────
 # 需同時命中「升級動作」與「地緣主角」，過濾成與開戰預測相關的頭條
 NEWS_QUERY = (
@@ -763,6 +763,7 @@ NEWS_QUERY = (
     '(Ukraine OR Russia OR China OR Taiwan OR Iran OR Israel OR "North Korea" OR '
     '"White House" OR Pentagon)'
 )
+GNEWS_RSS = "https://news.google.com/rss/search"
 # 主題標記關鍵字（依序比對，先命中者為準）
 NEWS_TOPICS = [
     ("俄烏",  ["ukrain", "russia", "russian", "kyiv", "kiev", "moscow", "putin", "zelensk", "crimea"]),
@@ -781,85 +782,78 @@ def _news_topic(title: str) -> str:
             return label
     return "全球"
 
-def _news_iso(seendate: str) -> str:
-    # GDELT seendate: 20260713T061500Z → ISO8601
+def _news_iso(pubdate: str) -> str:
+    # RFC822 pubDate: "Mon, 13 Jul 2026 08:02:00 GMT" → ISO8601 (UTC)
     try:
-        dt = datetime.strptime(seendate, "%Y%m%dT%H%M%SZ").replace(tzinfo=timezone.utc)
-        return dt.isoformat()
+        from email.utils import parsedate_to_datetime
+        dt = parsedate_to_datetime(pubdate)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt.astimezone(timezone.utc).isoformat()
     except Exception:
         return ""
 
-async def fetch_gdelt_news(session: aiohttp.ClientSession) -> list[dict]:
+async def fetch_gnews(session: aiohttp.ClientSession) -> list[dict]:
     """
-    以 GDELT DOC 2.0 ArtList 取最近 24h、與戰爭升級相關的英文頭條。
-    免金鑰、約 15 分鐘更新一次（與本站 15 分排程同步 → 近即時）。
+    以 Google News RSS 取與戰爭升級相關的即時頭條（免金鑰、持續更新）。
+    query 需同時命中「升級動作」與「地緣主角」→ 篩成開戰預測的領先訊號。
     失敗時沿用上一輪 data.json 的 news，避免版面空白。
     """
-    params = {
-        "query": NEWS_QUERY, "mode": "artlist", "maxrecords": "40",
-        "sort": "datedesc", "timespan": "24h", "format": "json",
-    }
-    for attempt, backoff in ((1, 8), (2, 15), (3, 25), (4, 0)):
+    import urllib.parse, xml.etree.ElementTree as ET
+    url = (GNEWS_RSS + "?q=" + urllib.parse.quote(NEWS_QUERY)
+           + "&hl=en-US&gl=US&ceid=US:en")
+    for attempt, backoff in ((1, 4), (2, 8), (3, 0)):
         try:
             async with session.get(
-                GDELT_API, params=params,
-                timeout=aiohttp.ClientTimeout(total=25),
-                headers={"User-Agent": USER_AGENT},
+                url, timeout=aiohttp.ClientTimeout(total=25),
+                headers={"User-Agent": "Mozilla/5.0 (compatible; warhub/1.0)"},
             ) as resp:
-                text = await resp.text()
-            data = json.loads(text)  # 限速時回純文字 → 進 except
-            arts = data.get("articles") or []
+                raw = await resp.read()
+            root = ET.fromstring(raw)
             out, seen = [], set()
-            for a in arts:
-                lang = (a.get("language") or "").lower()
-                if lang and lang != "english":   # 缺 language 欄位時不丟棄，避免版面空白
+            for it in root.findall(".//item"):
+                title = (it.findtext("title") or "").strip()
+                link  = (it.findtext("link") or "").strip()
+                pub   = (it.findtext("pubDate") or "").strip()
+                src_el = it.find("source")
+                source = (src_el.text or "").strip() if src_el is not None else ""
+                if not title or not link:
                     continue
-                title = (a.get("title") or "").strip()
-                url = a.get("url") or ""
-                if not title or not url:
-                    continue
+                # 標題常為「Headline - Source」→ 去掉結尾來源
+                if source and title.endswith(" - " + source):
+                    title = title[: -(len(source) + 3)].strip()
                 key = title.lower()[:80]
                 if key in seen:
                     continue
                 seen.add(key)
                 out.append({
                     "title":  title,
-                    "url":    url,
-                    "domain": a.get("domain") or "",
-                    "ts":     _news_iso(a.get("seendate") or ""),
+                    "url":    link,
+                    "domain": source,
+                    "ts":     _news_iso(pub),
                     "topic":  _news_topic(title),
                 })
                 if len(out) >= 15:
                     break
             if out:
-                log.info(f"GDELT news: {len(out)} headlines")
+                log.info(f"GNews: {len(out)} headlines")
                 return out
         except Exception as e:
             if backoff:
                 await asyncio.sleep(backoff)
             else:
-                log.warning(f"GDELT news failed after retries: {e}")
+                log.warning(f"GNews failed after retries: {e}")
     # fallback：沿用上一輪
     try:
         prev = json.loads(DATA_FILE.read_text(encoding="utf-8")).get("news") or []
         if prev:
-            log.warning("GDELT news unavailable, carried over previous headlines")
+            log.warning("GNews unavailable, carried over previous headlines")
             for n in prev:
                 n["stale"] = True
             return prev
     except Exception:
         pass
     return []
-
-
-async def fetch_gdelt_all(session: aiohttp.ClientSession) -> tuple[dict, list[dict]]:
-    """串接 GDELT 強度 + 即時頭條，避免兩者並發觸發 GDELT 限速。
-    先抓新聞（拿最新鮮的 GDELT 配額，最容易被限速的是靠後的請求），
-    再抓地區強度（強度有沿用上一輪的 fallback，較能容忍失敗）。"""
-    news = await fetch_gdelt_news(session)
-    await asyncio.sleep(6)
-    gdelt = await fetch_gdelt(session)
-    return gdelt, news
 
 
 # ─────────────────────────────────────────────────────────────
@@ -1308,17 +1302,17 @@ async def main():
         aviation_task = asyncio.create_task(fetch_aviation(session))
         firms_task    = asyncio.create_task(fetch_firms(session))
         eonet_task    = asyncio.create_task(fetch_eonet(session))
-        gdelt_task    = asyncio.create_task(fetch_gdelt_all(session))
+        gdelt_task    = asyncio.create_task(fetch_gdelt(session))
+        news_task     = asyncio.create_task(fetch_gnews(session))
         seismic_task  = asyncio.create_task(fetch_nuclear_seismic(session))
         wiki_task     = asyncio.create_task(fetch_wikipedia_anxiety(session))
         notam_task    = asyncio.create_task(fetch_notams(session))
         bars_task     = asyncio.create_task(fetch_bars(session))
         (pizzint_data, polymarket, aviation, firms, eonet,
-         gdelt_bundle, nuclear_seismic, wikipedia, notams, bars) = await asyncio.gather(
+         gdelt, news, nuclear_seismic, wikipedia, notams, bars) = await asyncio.gather(
             pizzint_task, poly_task, aviation_task, firms_task, eonet_task,
-            gdelt_task, seismic_task, wiki_task, notam_task, bars_task
+            gdelt_task, news_task, seismic_task, wiki_task, notam_task, bars_task
         )
-    gdelt, news = gdelt_bundle
 
     pizza_shops  = transform_pizza_shops(pizzint_data)
     pizza_index  = pizzint_data.get("overall_index", 0)
