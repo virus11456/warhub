@@ -1319,10 +1319,13 @@ async def main():
     defcon_level = pizzint_data.get("defcon_level")
     score        = calculate_score(pizza_index, polymarket)
 
-    # 前一份 data.json 的警戒等級（供 alerts.py 判斷是否「升級」）
+    # 前一份 data.json 的警戒等級 + 推播狀態（供 alerts.py 判斷升級/去重）
     prev_level = "NORMAL"
+    prev_notify = {}
     try:
-        prev_level = json.loads(DATA_FILE.read_text(encoding="utf-8"))["score"]["alert_level"]
+        _prev = json.loads(DATA_FILE.read_text(encoding="utf-8"))
+        prev_level = _prev["score"]["alert_level"]
+        prev_notify = _prev.get("_notify") or {}
     except Exception:
         pass
 
@@ -1377,6 +1380,18 @@ async def main():
     }
 
     DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+    # 推播：每小時定時回報 + 即時異常（未設定 Secrets 則自動跳過）；狀態寫回 _notify
+    try:
+        from alerts import run_notifications
+        import os as _os
+        force_test = (_os.environ.get("TEST_PUSH", "").strip().lower()
+                      in ("1", "true", "yes", "on"))
+        output["_notify"] = await run_notifications(
+            output, prev_notify, prev_level, force_test=force_test)
+    except Exception as e:
+        log.warning(f"notify skipped: {e}")
+
     DATA_FILE.write_text(json.dumps(output, ensure_ascii=False, indent=2), encoding="utf-8")
 
     open_count = sum(1 for s in pizza_shops if s["is_open"])
@@ -1384,13 +1399,6 @@ async def main():
              f"pizza_index={pizza_index}, defcon={defcon_level}, "
              f"open_shops={open_count}/{len(pizza_shops)}, "
              f"combined={score['combined_score']} [{score['alert_level']}]")
-
-    # 等級升高時推播 Telegram / Discord（未設定 Secrets 則自動跳過）
-    try:
-        from alerts import maybe_alert
-        await maybe_alert(score, pizza_shops, polymarket, prev_level)
-    except Exception as e:
-        log.warning(f"alert push skipped: {e}")
 
 
 if __name__ == "__main__":

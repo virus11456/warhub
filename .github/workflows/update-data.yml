@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: '*/15 * * * *'  # every 15 minutes
   workflow_dispatch:
+    inputs:
+      test_push:
+        description: '傳一則測試推播到 Telegram/Discord（驗證連線）'
+        type: boolean
+        default: false
   push:
     branches: [main]
     paths:
@@ -40,6 +45,14 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           BESTTIME_API_KEY: ${{ secrets.BESTTIME_API_KEY }}
+          TEST_PUSH: ${{ inputs.test_push }}
+          # 選填：到 Settings → Secrets and variables → Actions → Variables 設定可調整推播行為
+          DIGEST_EVERY_HOURS: ${{ vars.DIGEST_EVERY_HOURS }}
+          ALERT_ESCALATION: ${{ vars.ALERT_ESCALATION }}
+          ALERT_PIZZA: ${{ vars.ALERT_PIZZA }}
+          ALERT_HOTSPOT: ${{ vars.ALERT_HOTSPOT }}
+          HOTSPOT_SURGE_RATIO: ${{ vars.HOTSPOT_SURGE_RATIO }}
+          HOTSPOT_SURGE_MIN: ${{ vars.HOTSPOT_SURGE_MIN }}
         run: python scripts/fetch_data.py
 
       - name: Commit data.json
