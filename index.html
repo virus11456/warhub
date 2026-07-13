@@ -486,6 +486,13 @@
   .news-title { font-size:.78rem; color:var(--text); text-decoration:none; line-height:1.4; }
   .news-title:hover { color:var(--accent); text-decoration:underline; }
   .news-src { color:var(--text-dim); font-size:.6rem; white-space:nowrap; }
+  .food-card { border-top:2px solid var(--accent3); }
+  .food-row { display:grid; grid-template-columns:4.5em 1fr auto; align-items:baseline; gap:.6rem; padding:.55rem .2rem; border-bottom:1px solid rgba(255,255,255,.05); font-family:'Share Tech Mono',monospace; }
+  .food-row:last-child { border-bottom:none; }
+  .food-name { font-weight:700; color:var(--text); }
+  .food-val { font-size:.95rem; color:var(--accent); font-family:'Orbitron',monospace; }
+  .food-unit { font-size:.6rem; color:var(--text-dim); margin-left:.15rem; }
+  .food-yoy { font-size:.78rem; font-weight:700; text-align:right; white-space:nowrap; }
   /* ── 區段可折疊 ── */
   .fold-caret { color:var(--accent); font-size:.8rem; margin-right:.5rem; display:inline-block; width:1em; flex:none; }
   .fold-head { cursor:pointer; user-select:none; }
@@ -1649,6 +1656,20 @@
     </div>
   </div><!-- /.poly-card -->
 
+  <!-- ══════════ 🌾 中國糧食進口監測（結構性背景指標）══════════ -->
+  <div class="card food-card" id="food-card" style="margin-bottom:1.5rem">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-bottom:.4rem">
+      <div class="section-title" style="margin:0">🌾 中國糧食進口監測</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim)"><span id="food-updated">結構性背景指標</span></div>
+    </div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim);margin-bottom:.6rem" id="food-sub">
+      鏡像數據（主要出口國對中出口合計）· 觀察是否異常囤糧——備戰的<strong>佐證</strong>訊號，非即時、須與其他指標交叉印證
+    </div>
+    <div id="food-grid">
+      <div style="padding:1rem;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 連接 UN Comtrade…</div>
+    </div>
+  </div>
+
 <!-- ══════════ 訊號源網格（AVI / FIRMS / FIN / 核威脅）══════════ -->
 <style>
 /* ── OSINT 三模組共用 ─── */
@@ -2432,6 +2453,9 @@ async function fetchRealPizzaData() {
     try { renderNews(json); }
     catch(err) { console.warn('[WARHUBS] renderNews error:', err.message); }
 
+    try { renderFood(json); }
+    catch(err) { console.warn('[WARHUBS] renderFood error:', err.message); }
+
     // 同步渲染 AVI 軍機資料
     if (json.aviation) {
       try { renderAviation(json.aviation); }
@@ -2821,6 +2845,30 @@ function newsAgo(ts){
   if(m<60) return Math.floor(m)+' 分前';
   const hh=m/60; if(hh<24) return Math.floor(hh)+' 時前';
   return Math.floor(hh/24)+' 天前';
+}
+function renderFood(json){
+  var el=document.getElementById('food-grid'); if(!el) return;
+  var f=json.food;
+  if(!f || !f.items || !f.items.length){
+    el.innerHTML='<div style="padding:1rem;text-align:center;font-family:\'Share Tech Mono\',monospace;font-size:.7rem;color:var(--text-dim)">暫無資料（每日更新一次）</div>';
+    return;
+  }
+  el.innerHTML=f.items.map(function(it){
+    var y=it.yoy_pct;
+    var col=(y==null)?'var(--text-dim)':(y>=15?'#ff4d5e':(y>0?'#f5a623':(y<0?'#35e08a':'var(--text-dim)')));
+    var arr=(y==null)?'':(y>0?'▲':(y<0?'▼':''));
+    var w=it.wan_ton>=100?Math.round(it.wan_ton).toLocaleString():it.wan_ton;
+    return '<div class="food-row"><div class="food-name">'+escapeHtml(it.name)+'</div>'
+      +'<div class="food-val">'+w+'<span class="food-unit">萬噸</span></div>'
+      +'<div class="food-yoy" style="color:'+col+'">'+(y==null?'—':arr+Math.abs(y)+'% 年增')+'</div></div>';
+  }).join('');
+  var upd=document.getElementById('food-updated');
+  if(upd) upd.textContent='參考月 '+(f.ref_month||'—')+'（對比 '+(f.prev_year_month||'')+'）';
+  var sub=document.getElementById('food-sub');
+  if(sub && f.breadth_up>=2){
+    sub.innerHTML=sub.innerHTML.split(' · <strong')[0]
+      +' · <strong style="color:#ff4d5e">\u26A0 '+f.breadth_up+'/3 項主糧年增≥15%（囤積訊號偏強，須交叉印證）</strong>';
+  }
 }
 function renderNews(json){
   const el=document.getElementById('news-list'); if(!el) return;
@@ -3579,7 +3627,7 @@ async function fetchFirmsEvents() { /* no-op: 改由 fetchRealPizzaData 從 data
 (function(){
   var KEY='warhub_fold_v1', store={}, firstVisit=true;
   try{ var s=localStorage.getItem(KEY); if(s){ store=JSON.parse(s)||{}; firstVisit=false; } }catch(e){}
-  var DEFAULT_FOLD=['披薩','Polymarket','WAR PRESSURE'];
+  var DEFAULT_FOLD=['披薩','Polymarket','WAR PRESSURE','糧食'];
   function persist(){ try{ localStorage.setItem(KEY,JSON.stringify(store)); }catch(e){} }
   function clean(t){ return (t||'').replace(/\s+/g,' ').trim().slice(0,26); }
   function caret(f){ var c=document.createElement('span'); c.className='fold-caret'; c.textContent=f?'\u25B8':'\u25BE'; return c; }
