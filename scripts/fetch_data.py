@@ -890,6 +890,120 @@ async def fetch_gnews(session: aiohttp.ClientSession) -> list[dict]:
     return []
 
 
+
+# ─────────────────────────────────────────────────────────────
+# 🌾 中國糧食進口監測（鏡像數據：主要出口國對中國出口合計）
+# 中國自報 Comtrade 落後 ~18 個月 → 改用出口國「對中出口」當即時代理值
+# 免金鑰 public preview 端點；限速嚴 → 逐一請求＋退避，且每日只更新一次
+# ─────────────────────────────────────────────────────────────
+COMTRADE_URL = "https://comtradeapi.un.org/public/v1/preview/C/M/HS"
+FOOD_EXPORTERS = [("76","巴西"),("842","美國"),("32","阿根廷"),
+                  ("36","澳洲"),("124","加拿大"),("804","烏克蘭"),("251","法國")]
+FOOD_CMDS = [("1201","大豆"),("1001","小麥"),("1005","玉米")]
+
+def _ym_add(ym: int, d: int) -> int:
+    y, m = ym // 100, ym % 100
+    i = y * 12 + (m - 1) + d
+    return (i // 12) * 100 + (i % 12) + 1
+
+async def _comtrade_month(session, reporter: str, period: int):
+    """某出口國該月對中國(156)出口的 {cmd: 淨重kg}；失敗回 None。"""
+    params = {"reporterCode": reporter, "flowCode": "X", "partnerCode": "156",
+              "cmdCode": "1201,1001,1005", "period": str(period),
+              "partner2Code": "0", "motCode": "0"}
+    for attempt, bk in ((1, 8), (2, 15), (3, 0)):
+        try:
+            async with session.get(COMTRADE_URL, params=params,
+                    headers={"User-Agent": USER_AGENT},
+                    timeout=aiohttp.ClientTimeout(total=30)) as r:
+                if r.status == 429:
+                    if bk: await asyncio.sleep(bk); continue
+                    return None
+                txt = await r.text()
+            data = json.loads(txt)
+            out = {}
+            for row in (data.get("data") or []):
+                cmd = str(row.get("cmdCode"))
+                out[cmd] = out.get(cmd, 0) + (row.get("netWgt") or 0)
+            return out
+        except Exception:
+            if bk: await asyncio.sleep(bk)
+            else: return None
+    return None
+
+async def fetch_food_imports(session: aiohttp.ClientSession) -> dict:
+    """
+    中國三大主糧（大豆/小麥/玉米）進口的鏡像代理值＋年增率（結構性背景指標）。
+    每日只更新一次（Comtrade 限速嚴、月資料變動慢）；其餘時間沿用 data.json 的 food。
+    """
+    from datetime import timedelta
+    prev = {}
+    try:
+        prev = json.loads(DATA_FILE.read_text(encoding="utf-8")).get("food") or {}
+    except Exception:
+        pass
+    if prev.get("updated_at"):
+        try:
+            age = (datetime.now(timezone.utc) -
+                   datetime.fromisoformat(prev["updated_at"])).total_seconds()
+            if age < 22 * 3600:
+                log.info("food: fresh (<22h), carried over")
+                return prev
+        except Exception:
+            pass
+
+    now = datetime.now(timezone.utc)
+    cur = now.year * 100 + now.month
+    # 找最新有資料的參考月（用美國大豆探路）
+    L = None
+    for k in range(2, 9):
+        p = _ym_add(cur, -k)
+        r = await _comtrade_month(session, "842", p)
+        await asyncio.sleep(5)
+        if r and r.get("1201", 0) > 0:
+            L = p; break
+    if not L:
+        log.warning("food: no reference month found")
+        return {**prev, "stale": True} if prev else {}
+    L12 = _ym_add(L, -12)
+
+    async def collect(month):
+        tot = {c: 0 for c, _ in FOOD_CMDS}; ok = 0
+        for rep, _ in FOOD_EXPORTERS:
+            r = await _comtrade_month(session, rep, month)
+            await asyncio.sleep(5)
+            if r:
+                ok += 1
+                for c, _ in FOOD_CMDS:
+                    tot[c] += r.get(c, 0)
+        return tot, ok
+    cur_t, ok1 = await collect(L)
+    prev_t, ok2 = await collect(L12)
+    if ok1 == 0:
+        return {**prev, "stale": True} if prev else {}
+
+    items, breadth = [], 0
+    for c, name in FOOD_CMDS:
+        a = cur_t[c] / 1e7           # 萬噸
+        b = prev_t[c] / 1e7
+        yoy = round((a - b) / b * 100, 1) if b > 0 else None
+        if yoy is not None and yoy >= 15:
+            breadth += 1
+        items.append({"cmd": c, "name": name,
+                      "wan_ton": round(a, 1), "prev_wan_ton": round(b, 1),
+                      "yoy_pct": yoy})
+    log.info(f"food: ref={L} soy={items[0]['wan_ton']}萬噸 yoy={items[0]['yoy_pct']} breadth={breadth}")
+    return {
+        "updated_at": now.isoformat(),
+        "ref_month": f"{L//100}-{L%100:02d}",
+        "prev_year_month": f"{L12//100}-{L12%100:02d}",
+        "exporters": [n for _, n in FOOD_EXPORTERS],
+        "items": items,
+        "breadth_up": breadth,
+        "note": "鏡像代理值（主要出口國對中出口合計）· 月資料約 3–4 月落差 · 結構性背景指標",
+    }
+
+
 # ─────────────────────────────────────────────────────────────
 # USGS — 核試驗場周邊地震監測（核試驗 = 淺層人工地震特徵）
 # ─────────────────────────────────────────────────────────────
@@ -1338,6 +1452,7 @@ async def main():
         eonet_task    = asyncio.create_task(fetch_eonet(session))
         gdelt_task    = asyncio.create_task(fetch_gdelt(session))
         news_task     = asyncio.create_task(fetch_gnews(session))
+        food_task     = asyncio.create_task(fetch_food_imports(session))
         seismic_task  = asyncio.create_task(fetch_nuclear_seismic(session))
         wiki_task     = asyncio.create_task(fetch_wikipedia_anxiety(session))
         notam_task    = asyncio.create_task(fetch_notams(session))
@@ -1347,6 +1462,7 @@ async def main():
             pizzint_task, poly_task, aviation_task, firms_task, eonet_task,
             gdelt_task, news_task, seismic_task, wiki_task, notam_task, bars_task
         )
+        food = await food_task
 
     pizza_shops  = transform_pizza_shops(pizzint_data)
     pizza_index  = pizzint_data.get("overall_index", 0)
@@ -1394,6 +1510,7 @@ async def main():
         "eonet":         eonet[:20],
         "gdelt":         gdelt,
         "news":          news,
+        "food":          food,
         "wikipedia":     wikipedia,
         "notams":        notams,
         "nuclear_seismic": nuclear_seismic,
@@ -1406,6 +1523,7 @@ async def main():
             "firms":      "https://firms.modaps.eosdis.nasa.gov/",
             "eonet":      "https://eonet.gsfc.nasa.gov/",
             "gdelt":      "https://www.gdeltproject.org/",
+            "food":       "https://comtradeapi.un.org/",
             "usgs":       "https://earthquake.usgs.gov/",
             "bars":       "https://besttime.app/",
             "wikipedia":  "https://wikimedia.org/api/rest_v1/",
