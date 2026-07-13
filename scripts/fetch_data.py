@@ -1048,29 +1048,51 @@ async def fetch_usda_esr(session: aiohttp.ClientSession) -> dict | None:
     commodities = await _usda_get(session, "/commodities", key)
     countries = await _usda_get(session, "/countries", key)
     if not commodities or not countries:
+        log.warning(f"USDA ESR: commodities={commodities is not None} countries={countries is not None}")
         return {**prev, "stale": True} if prev else None
+    log.info(f"USDA ESR: {len(commodities)} commodities, {len(countries)} countries")
 
-    # 找中國國家代碼（排除香港/台灣）
+    # 找中國國家代碼（排除香港/台灣/澳門）— 不分大小寫，容忍 "CHINA, PEOPLES REPUBLIC OF"
     china = None
     for c in countries:
-        nm = (c.get("countryName") or "").strip()
-        if nm.startswith("China") and "Hong" not in nm and "Taiwan" not in nm and "Macau" not in nm:
-            china = c.get("countryCode"); break
+        nm = (c.get("countryName") or "").strip().lower()
+        if "china" in nm and "hong" not in nm and "taiwan" not in nm and "macau" not in nm:
+            china = c.get("countryCode")
+            log.info(f"USDA ESR: matched China -> code={china} name={c.get('countryName')!r}")
+            break
     if china is None:
+        sample = [ (c.get("countryName") or "") for c in countries if "china" in (c.get("countryName") or "").lower() ]
+        log.warning(f"USDA ESR: no China country matched; china-like={sample[:5]}")
         return {**prev, "stale": True} if prev else None
 
-    # 對映想要的商品代碼
+    # 對映想要的商品代碼 — 以關鍵字比對（ESR 小麥可能拆成 "All Wheat" 或分級），不分大小寫
+    # USDA_WANT: {"Soybeans":..,"Wheat":..,"Corn":..}
     cmap = {}
-    for c in commodities:
-        nm = (c.get("commodityName") or "").strip()
-        if nm in USDA_WANT and nm not in cmap:
-            cmap[nm] = c.get("commodityCode")
+    for want in USDA_WANT:  # Soybeans / Wheat / Corn
+        kw = want.lower()
+        best = None
+        for c in commodities:
+            nm = (c.get("commodityName") or "").strip()
+            low = nm.lower()
+            if kw in low:
+                # 小麥優先取彙總 "All Wheat"，避免只抓到單一分級
+                if want == "Wheat":
+                    if low.startswith("all wheat") or "all wheat" in low:
+                        best = c.get("commodityCode"); break
+                    if best is None:
+                        best = c.get("commodityCode")
+                else:
+                    best = c.get("commodityCode"); break
+        if best is not None:
+            cmap[want] = best
+    log.info(f"USDA ESR: commodity codes -> {cmap}")
 
     yr = datetime.now(timezone.utc).year
     items, latest_week = [], ""
     for nm, zh in USDA_WANT.items():
         cc = cmap.get(nm)
         if cc is None:
+            log.warning(f"USDA ESR: no commodity code for {nm}")
             continue
         recs = []
         for my in (yr, yr - 1, yr + 1):
@@ -1078,9 +1100,11 @@ async def fetch_usda_esr(session: aiohttp.ClientSession) -> dict | None:
             if d:
                 recs.extend(d)
         if not recs:
+            log.warning(f"USDA ESR: {nm} (code={cc}) no records for MY {yr-1}/{yr}/{yr+1}")
             continue
         recs = [r for r in recs if r.get("weekEndingDate")]
         if not recs:
+            log.warning(f"USDA ESR: {nm} records missing weekEndingDate")
             continue
         r = max(recs, key=lambda x: x.get("weekEndingDate", ""))
         wk = (r.get("weekEndingDate") or "")[:10]
@@ -1094,6 +1118,7 @@ async def fetch_usda_esr(session: aiohttp.ClientSession) -> dict | None:
             "week": wk,
         })
     if not items:
+        log.warning("USDA ESR: matched China+commodities but assembled 0 items")
         return {**prev, "stale": True} if prev else None
     log.info(f"USDA ESR: week {latest_week}, {len(items)} commodities")
     return {
