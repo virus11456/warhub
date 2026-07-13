@@ -1483,7 +1483,7 @@
       </div>
     </div>
     <div style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim);margin-bottom:.5rem">
-      GDELT 全球新聞監測 · 篩選白宮／中國／戰爭升級相關頭條，作為開戰預測的領先訊號（點擊看原文）
+      Google News 全球監測 · 篩選白宮／中國／戰爭升級相關頭條，依時間排序，作為開戰預測的領先訊號（點擊看原文）
     </div>
     <div id="news-list">
       <div style="padding:1rem;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 連接 GDELT 新聞流…</div>
@@ -2813,7 +2813,7 @@ function newsAgo(ts){
 }
 function renderNews(json){
   const el=document.getElementById('news-list'); if(!el) return;
-  const items=(json.news||[]).slice(0,12);
+  const items=(json.news||[]).slice().sort((a,b)=>(b.ts||'').localeCompare(a.ts||'')).slice(0,12);
   if(!items.length){
     el.innerHTML='<div style="padding:1rem;text-align:center;font-family:\'Share Tech Mono\',monospace;font-size:.7rem;color:var(--text-dim)">暫無即時新聞（下次更新重試）</div>';
     return;

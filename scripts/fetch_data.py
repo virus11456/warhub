@@ -863,8 +863,11 @@ async def fetch_gnews(session: aiohttp.ClientSession) -> list[dict]:
                     "ts":     _news_iso(pub),
                     "topic":  _news_topic(title),
                 })
-                if len(out) >= 15:
+                if len(out) >= 40:      # 先多收一些，稍後依時間挑最新 15 則
                     break
+            # 依發布時間新→舊排序，取最新 15 則（ISO 字串可直接字典序排）
+            out.sort(key=lambda a: a.get("ts") or "", reverse=True)
+            out = out[:15]
             if out:
                 await _translate_titles(session, out)   # 標題翻成繁中（_news_topic 已先用英文標好）
                 log.info(f"GNews: {len(out)} headlines")
