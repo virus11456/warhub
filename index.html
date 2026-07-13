@@ -1704,6 +1704,8 @@
 .fh-svg-area { fill:var(--accent); opacity:.10; }
 .fh-svg-mline { stroke-dasharray:3 3; }
 .fh-svg-dot { fill:var(--accent); }
+.fh-bar-c { fill:var(--accent); opacity:.75; }
+.fh-bar-m { fill:var(--accent); opacity:.30; stroke:var(--accent); stroke-width:1; stroke-dasharray:2 2; }
 .fh-legend { font-family:'Share Tech Mono',monospace; font-size:.6rem; color:var(--text-dim);
   margin-top:.45rem; line-height:1.5; }
 .fh-legend b { color:var(--accent); }
@@ -2958,8 +2960,11 @@ function drawFoodHistory(){
   var W=720,H=240,padL=46,padR=14,padT=14,padB=28;
   var n=data.length;
   var maxV=Math.max.apply(null, data.map(function(d){return d[key]||0;}).concat([1]))*1.12;
-  function X(i){ return n<=1?padL:padL+(W-padL-padR)*i/(n-1); }
   function Y(v){ return padT+(H-padT-padB)*(1-v/maxV); }
+  var slot=(n>0)?(W-padL-padR)/n:0;
+  function CX(i){ return n<=1?(padL+(W-padL-padR)/2):(padL+slot*(i+0.5)); }
+  var bw=Math.max(1.5, Math.min(24, slot*0.72));
+  var y0=Y(0);
   var p=[];
   for(var g=0;g<=4;g++){
     var gy=padT+(H-padT-padB)*g/4, gv=maxV*(1-g/4);
@@ -2968,23 +2973,19 @@ function drawFoodHistory(){
   }
   var lastYr=null;
   data.forEach(function(d,i){ var yr=d.ym.slice(0,4);
-    if(yr!==lastYr){ lastYr=yr; p.push('<text class="fh-svg-axis" x="'+X(i)+'" y="'+(H-8)+'" text-anchor="middle">'+yr+'</text>'); }
+    if(yr!==lastYr){ lastYr=yr; p.push('<text class="fh-svg-axis" x="'+CX(i)+'" y="'+(H-8)+'" text-anchor="middle">'+yr+'</text>'); }
   });
-  var pts=data.map(function(d,i){ return {x:X(i), y:Y(d[key]||0), src:d.src}; });
-  if(pts.length){
-    var ap='M'+pts[0].x+','+Y(0);
-    pts.forEach(function(pt){ ap+=' L'+pt.x+','+pt.y; });
-    ap+=' L'+pts[pts.length-1].x+','+Y(0)+' Z';
-    p.push('<path class="fh-svg-area" d="'+ap+'"/>');
-  }
-  for(var i=1;i<pts.length;i++){
-    var seg='M'+pts[i-1].x+','+pts[i-1].y+' L'+pts[i].x+','+pts[i].y;
-    p.push('<path class="fh-svg-line'+(pts[i].src==='mirror'?' fh-svg-mline':'')+'" d="'+seg+'"/>');
-  }
-  if(pts.length){
-    var last=pts[pts.length-1], lv=data[data.length-1];
-    p.push('<circle class="fh-svg-dot" cx="'+last.x+'" cy="'+last.y+'" r="3"/>');
-    p.push('<text class="fh-svg-axis" x="'+last.x+'" y="'+(last.y-8)+'" text-anchor="end" style="fill:var(--accent);font-weight:700">'+fhFmt(lv[key]||0)+'</text>');
+  // 每月一根柱：實心＝中國海關直報，淡色虛邊＝近月鏡像估計
+  data.forEach(function(d,i){
+    var v=d[key]||0, by=Y(v), h=Math.max(0, y0-by), cx=CX(i);
+    p.push('<rect class="'+(d.src==='mirror'?'fh-bar-m':'fh-bar-c')+'" x="'+(cx-bw/2).toFixed(1)
+      +'" y="'+by.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+h.toFixed(1)+'"><title>'
+      +d.ym+'：'+fhFmt(v)+' 萬噸</title></rect>');
+  });
+  var lv=data.length?data[data.length-1]:null;
+  if(lv){
+    var lx=CX(n-1), ly=Y(lv[key]||0);
+    p.push('<text class="fh-svg-axis" x="'+lx+'" y="'+(Math.max(padT+9,ly-6))+'" text-anchor="middle" style="fill:var(--accent);font-weight:700">'+fhFmt(lv[key]||0)+'</text>');
   }
   svg.innerHTML=p.join('');
   var leg=document.getElementById('fh-legend');
@@ -2992,8 +2993,8 @@ function drawFoodHistory(){
     var nm=({soy:'大豆',wheat:'小麥',corn:'玉米'})[key];
     var f=data.length?data[0].ym:'', l=data.length?data[data.length-1].ym:'';
     var hasMirror=data.some(function(d){return d.src==='mirror';});
-    leg.innerHTML='中國每月<b>'+nm+'</b>進口量（萬噸）· '+f+' → '+l
-      +'　—— 實線＝中國海關直報，- - 虛線＝鏡像估計（最近幾個月中國停報 Comtrade）'
+    leg.innerHTML='中國每月<b>'+nm+'</b>進口量（萬噸，每月一根）· '+f+' → '+l
+      +'　▮ 實心＝中國海關直報，▯ 淡色虛邊＝鏡像估計（最近幾個月中國停報 Comtrade）'
       +(hasMirror?'':'　·　近月資料累積中…');
   }
 }
