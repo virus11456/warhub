@@ -47,5 +47,13 @@ jobs:
           git config user.name  "warhub-bot"
           git config user.email "bot@warhub.local"
           git add data/
-          git diff --staged --quiet || git commit -m "data: update $(date -u +'%Y-%m-%dT%H:%MZ')"
-          git push
+          git diff --staged --quiet && { echo "no data changes"; exit 0; }
+          git commit -m "data: update $(date -u +'%Y-%m-%dT%H:%MZ')"
+          # 併發推送競態：另一個 run 先推了會被 rejected → rebase 後重試，避免整批資料遺失
+          for i in 1 2 3 4 5; do
+            if git push; then echo "pushed on attempt $i"; exit 0; fi
+            echo "push rejected, rebasing (attempt $i)…"
+            git pull --rebase --autostash origin main || true
+            sleep $(( (RANDOM % 4) + 2 ))
+          done
+          echo "push still failing after retries"; exit 1
