@@ -1004,6 +1004,106 @@ async def fetch_food_imports(session: aiohttp.ClientSession) -> dict:
     }
 
 
+
+# ─────────────────────────────────────────────────────────────
+# 🇺🇸→🇨🇳 USDA FAS ESR — 美國對中國每週穀物出口銷售（最即時，需 API key）
+# 需 GitHub Secret USDA_FAS_API_KEY；未設定則自動略過
+# ─────────────────────────────────────────────────────────────
+USDA_ESR = "https://api.fas.usda.gov/api/esr"
+USDA_WANT = {"Soybeans": "大豆", "Wheat": "小麥", "Corn": "玉米"}
+
+async def _usda_get(session, path, key):
+    try:
+        async with session.get(USDA_ESR + path,
+                headers={"API_KEY": key, "Accept": "application/json"},
+                timeout=aiohttp.ClientTimeout(total=25)) as r:
+            if r.status != 200:
+                log.warning(f"USDA {path} -> HTTP {r.status}")
+                return None
+            return json.loads(await r.text())
+    except Exception as e:
+        log.warning(f"USDA {path} failed: {e}")
+        return None
+
+async def fetch_usda_esr(session: aiohttp.ClientSession) -> dict | None:
+    import os
+    key = (os.environ.get("USDA_FAS_API_KEY") or "").strip()
+    if not key:
+        return None
+    prev = {}
+    try:
+        prev = json.loads(DATA_FILE.read_text(encoding="utf-8")).get("usda") or {}
+    except Exception:
+        pass
+    if prev.get("updated_at"):
+        try:
+            age = (datetime.now(timezone.utc) -
+                   datetime.fromisoformat(prev["updated_at"])).total_seconds()
+            if age < 6 * 3600:
+                log.info("USDA ESR: fresh (<6h), carried over")
+                return prev
+        except Exception:
+            pass
+
+    commodities = await _usda_get(session, "/commodities", key)
+    countries = await _usda_get(session, "/countries", key)
+    if not commodities or not countries:
+        return {**prev, "stale": True} if prev else None
+
+    # 找中國國家代碼（排除香港/台灣）
+    china = None
+    for c in countries:
+        nm = (c.get("countryName") or "").strip()
+        if nm.startswith("China") and "Hong" not in nm and "Taiwan" not in nm and "Macau" not in nm:
+            china = c.get("countryCode"); break
+    if china is None:
+        return {**prev, "stale": True} if prev else None
+
+    # 對映想要的商品代碼
+    cmap = {}
+    for c in commodities:
+        nm = (c.get("commodityName") or "").strip()
+        if nm in USDA_WANT and nm not in cmap:
+            cmap[nm] = c.get("commodityCode")
+
+    yr = datetime.now(timezone.utc).year
+    items, latest_week = [], ""
+    for nm, zh in USDA_WANT.items():
+        cc = cmap.get(nm)
+        if cc is None:
+            continue
+        recs = []
+        for my in (yr, yr - 1, yr + 1):
+            d = await _usda_get(session, f"/exports/commodityCode/{cc}/country/{china}/marketYear/{my}", key)
+            if d:
+                recs.extend(d)
+        if not recs:
+            continue
+        recs = [r for r in recs if r.get("weekEndingDate")]
+        if not recs:
+            continue
+        r = max(recs, key=lambda x: x.get("weekEndingDate", ""))
+        wk = (r.get("weekEndingDate") or "")[:10]
+        if wk > latest_week:
+            latest_week = wk
+        items.append({
+            "name": zh,
+            "week_net_kt": round((r.get("currentMYNetSales") or 0) / 1000, 1),
+            "outstanding_kt": round((r.get("outstandingSales") or 0) / 1000, 1),
+            "commit_kt": round((r.get("currentMYTotalCommitment") or 0) / 1000, 1),
+            "week": wk,
+        })
+    if not items:
+        return {**prev, "stale": True} if prev else None
+    log.info(f"USDA ESR: week {latest_week}, {len(items)} commodities")
+    return {
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+        "week_ending": latest_week,
+        "items": items,
+        "note": "美國對中國每週出口銷售（USDA FAS ESR）· 週更 · 淨銷售=本週新訂單、未裝運=已訂未運",
+    }
+
+
 # ─────────────────────────────────────────────────────────────
 # USGS — 核試驗場周邊地震監測（核試驗 = 淺層人工地震特徵）
 # ─────────────────────────────────────────────────────────────
@@ -1453,6 +1553,7 @@ async def main():
         gdelt_task    = asyncio.create_task(fetch_gdelt(session))
         news_task     = asyncio.create_task(fetch_gnews(session))
         food_task     = asyncio.create_task(fetch_food_imports(session))
+        usda_task     = asyncio.create_task(fetch_usda_esr(session))
         seismic_task  = asyncio.create_task(fetch_nuclear_seismic(session))
         wiki_task     = asyncio.create_task(fetch_wikipedia_anxiety(session))
         notam_task    = asyncio.create_task(fetch_notams(session))
@@ -1463,6 +1564,7 @@ async def main():
             gdelt_task, news_task, seismic_task, wiki_task, notam_task, bars_task
         )
         food = await food_task
+        usda = await usda_task
 
     pizza_shops  = transform_pizza_shops(pizzint_data)
     pizza_index  = pizzint_data.get("overall_index", 0)
@@ -1511,6 +1613,7 @@ async def main():
         "gdelt":         gdelt,
         "news":          news,
         "food":          food,
+        "usda":          usda,
         "wikipedia":     wikipedia,
         "notams":        notams,
         "nuclear_seismic": nuclear_seismic,
