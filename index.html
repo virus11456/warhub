@@ -1662,7 +1662,11 @@
 .avi-dot        { width:8px; height:8px; border-radius:50%; }
 .avi-dot.tanker { background:var(--accent); box-shadow:0 0 5px var(--accent); }
 .avi-dot.awacs  { background:var(--accent3); box-shadow:0 0 5px var(--accent3); animation:blink-dot 1.2s infinite; }
-.avi-dot.uav    { background:var(--accent); box-shadow:0 0 5px var(--accent); }
+.avi-dot.uav    { background:#a374ff; box-shadow:0 0 5px #a374ff; }
+.avi-dot.c4isr  { background:#35e08a; box-shadow:0 0 5px #35e08a; }
+.avi-dot.transport { background:#6b7a8c; }
+.avi-dot.fighter { background:var(--accent2); box-shadow:0 0 5px var(--accent2); }
+.avi-dot.other  { background:#44525f; }
 @keyframes blink-dot { 0%,100%{opacity:1} 50%{opacity:.3} }
 .avi-trend.up   { color:var(--accent2); }
 .avi-trend.down { color:var(--accent); }
@@ -1744,7 +1748,9 @@
     <div style="display:flex;gap:.8rem;flex-wrap:wrap;margin-top:.8rem;padding-top:.6rem;border-top:1px solid var(--border);font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim)">
       <span><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:3px"></i>加油機</span>
       <span><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent3);margin-right:3px"></i>預警機</span>
-      <span><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:3px"></i>無人機</span>
+      <span><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#a374ff;margin-right:3px"></i>無人機</span>
+      <span><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#35e08a;margin-right:3px"></i>偵察機</span>
+      <span><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#6b7a8c;margin-right:3px"></i>運輸機</span>
     </div>
     <div style="margin-top:.5rem;text-align:right">
       <a href="https://globe.adsbexchange.com" target="_blank" rel="noopener" style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--accent)">ADSB.Exchange ↗</a>
