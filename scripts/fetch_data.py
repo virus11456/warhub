@@ -799,7 +799,7 @@ async def fetch_gdelt_news(session: aiohttp.ClientSession) -> list[dict]:
         "query": NEWS_QUERY, "mode": "artlist", "maxrecords": "40",
         "sort": "datedesc", "timespan": "24h", "format": "json",
     }
-    for attempt, backoff in ((1, 10), (2, 20), (3, 0)):
+    for attempt, backoff in ((1, 8), (2, 15), (3, 25), (4, 0)):
         try:
             async with session.get(
                 GDELT_API, params=params,
@@ -853,10 +853,12 @@ async def fetch_gdelt_news(session: aiohttp.ClientSession) -> list[dict]:
 
 
 async def fetch_gdelt_all(session: aiohttp.ClientSession) -> tuple[dict, list[dict]]:
-    """串接 GDELT 強度 + 即時頭條，避免兩者並發觸發 GDELT 限速。"""
-    gdelt = await fetch_gdelt(session)
-    await asyncio.sleep(6)
+    """串接 GDELT 強度 + 即時頭條，避免兩者並發觸發 GDELT 限速。
+    先抓新聞（拿最新鮮的 GDELT 配額，最容易被限速的是靠後的請求），
+    再抓地區強度（強度有沿用上一輪的 fallback，較能容忍失敗）。"""
     news = await fetch_gdelt_news(session)
+    await asyncio.sleep(6)
+    gdelt = await fetch_gdelt(session)
     return gdelt, news
 
 
