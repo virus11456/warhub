@@ -486,6 +486,17 @@
   .news-title { font-size:.78rem; color:var(--text); text-decoration:none; line-height:1.4; }
   .news-title:hover { color:var(--accent); text-decoration:underline; }
   .news-src { color:var(--text-dim); font-size:.6rem; white-space:nowrap; }
+  /* ── 區段可折疊 ── */
+  .fold-caret { color:var(--accent); font-size:.8rem; margin-right:.5rem; display:inline-block; width:1em; flex:none; }
+  .fold-head { cursor:pointer; user-select:none; }
+  .fold-head:hover { filter:brightness(1.25); }
+  .folded > .fold-body { display:none; }
+  .card.folded { align-self:start; padding-bottom:.85rem; }
+  .osint-adv-grid.folded { display:none; }
+  .fold-bar { display:flex; align-items:center; width:100%; background:transparent; border:0; cursor:pointer; padding:.15rem 0; margin:.2rem 0 1.5rem; color:var(--text); font-family:'Orbitron','Share Tech Mono',monospace; font-size:.72rem; font-weight:700; letter-spacing:1px; text-align:left; }
+  .fold-bar:hover .fold-title { color:var(--accent); }
+  .fold-head-syn { display:flex; align-items:center; cursor:pointer; user-select:none; padding:.1rem 0 .55rem; font-family:'Orbitron','Share Tech Mono',monospace; font-size:.72rem; font-weight:700; letter-spacing:1px; }
+  .fold-head-syn:hover .fold-title { color:var(--accent); }
 
   .poly-market-list { display: flex; flex-direction: column; gap: 0.8rem; }
 
@@ -3563,5 +3574,71 @@ async function fetchFirmsEvents() { /* no-op: 改由 fetchRealPizzaData 從 data
 
 </script>
 
+<script>
+/* 區段折疊：點卡片標題即可收合；狀態記在 localStorage；披薩/Polymarket/進階指標預設收合 */
+(function(){
+  var KEY='warhub_fold_v1', store={}, firstVisit=true;
+  try{ var s=localStorage.getItem(KEY); if(s){ store=JSON.parse(s)||{}; firstVisit=false; } }catch(e){}
+  var DEFAULT_FOLD=['披薩','Polymarket','WAR PRESSURE'];
+  function persist(){ try{ localStorage.setItem(KEY,JSON.stringify(store)); }catch(e){} }
+  function clean(t){ return (t||'').replace(/\s+/g,' ').trim().slice(0,26); }
+  function caret(f){ var c=document.createElement('span'); c.className='fold-caret'; c.textContent=f?'\u25B8':'\u25BE'; return c; }
+
+  function foldWrapAll(card, title){
+    if(card.dataset.fold) return; card.dataset.fold='1';
+    var id='c:'+title;
+    var body=document.createElement('div'); body.className='fold-body';
+    while(card.firstChild) body.appendChild(card.firstChild);
+    var folded=(id in store)?store[id]:(firstVisit && DEFAULT_FOLD.some(function(k){return title.indexOf(k)>=0;}));
+    var b=document.createElement('div'); b.className='fold-head-syn';
+    var cw=caret(folded), t=document.createElement('span'); t.className='fold-title'; t.textContent=title;
+    b.appendChild(cw); b.appendChild(t); card.appendChild(b); card.appendChild(body);
+    card.classList.toggle('folded', !!folded); store[id]=!!folded;
+    b.addEventListener('click',function(){ var f=!card.classList.contains('folded'); card.classList.toggle('folded',f); cw.textContent=f?'\u25B8':'\u25BE'; store[id]=f; persist(); });
+  }
+  function foldCard(card){
+    if(card.dataset.fold) return;
+    if(card.querySelector('.pbi-header')){ var pt=card.querySelector('.section-title'); return foldWrapAll(card, clean(pt?pt.textContent:'五角大廈披薩指數')); }
+    var titleEl=card.querySelector('.section-title, .osint-adv-hdr, .pbi-header, .pbi-title-row, .wpi-topbar');
+    if(!titleEl) return;
+    var H=titleEl; while(H && H.parentElement!==card) H=H.parentElement;
+    if(!H || !H.nextSibling) return;
+    card.dataset.fold='1';
+    var tsrc=card.querySelector('.section-title, .osint-adv-hdr span')||titleEl;
+    var title=clean(tsrc.textContent)||'區段', id='c:'+title;
+    var body=document.createElement('div'); body.className='fold-body';
+    var n=H.nextSibling; while(n){ var nx=n.nextSibling; body.appendChild(n); n=nx; }
+    card.appendChild(body);
+    var folded=(id in store)?store[id]:(firstVisit && DEFAULT_FOLD.some(function(k){return title.indexOf(k)>=0;}));
+    var cw=caret(folded); H.insertBefore(cw, H.firstChild); H.classList.add('fold-head');
+    card.classList.toggle('folded', !!folded); store[id]=!!folded;
+    H.addEventListener('click', function(ev){
+      if(ev.target.closest('a,button')) return;
+      var f=!card.classList.contains('folded');
+      card.classList.toggle('folded',f); cw.textContent=f?'\u25B8':'\u25BE'; store[id]=f; persist();
+    });
+  }
+  function foldGrid(grid){
+    if(grid.dataset.fold) return; grid.dataset.fold='1';
+    var id='g:osint', folded=(id in store)?store[id]:firstVisit;
+    var b=document.createElement('button'); b.type='button'; b.className='fold-bar';
+    var c=caret(folded), t=document.createElement('span'); t.className='fold-title';
+    t.textContent='進階 OSINT 指標（航空 · 避險 · 核威脅）';
+    b.appendChild(c); b.appendChild(t);
+    grid.parentNode.insertBefore(b, grid); grid.classList.toggle('folded', !!folded); store[id]=!!folded;
+    b.addEventListener('click', function(){
+      var f=!grid.classList.contains('folded');
+      grid.classList.toggle('folded',f); c.textContent=f?'\u25B8':'\u25BE'; store[id]=f; persist();
+    });
+  }
+  function init(){
+    document.querySelectorAll('.container > .card').forEach(foldCard);
+    document.querySelectorAll('.container > .wpi-section').forEach(foldCard);
+    document.querySelectorAll('.container > .osint-adv-grid').forEach(foldGrid);
+    persist();
+  }
+  if(document.readyState!=='loading') init(); else document.addEventListener('DOMContentLoaded', init);
+})();
+</script>
 </body>
 </html>
