@@ -59,14 +59,16 @@ jobs:
         run: |
           git config user.name  "warhub-bot"
           git config user.email "bot@warhub.local"
-          git add data/
-          git diff --staged --quiet && { echo "no data changes"; exit 0; }
-          git commit -m "data: update $(date -u +'%Y-%m-%dT%H:%MZ')"
-          # 併發推送競態：另一個 run 先推了會被 rejected → rebase 後重試，避免整批資料遺失
+          # data 皆為整份重算 → 併發競態時「我們的最新資料直接勝出」，不做 rebase/merge
+          # （避免兩個 run 同時重算 data.json 造成 merge conflict 卡死）
           for i in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --soft origin/main      # HEAD 移到遠端最新，工作區的新資料保留
+            git add data/
+            if git diff --staged --quiet; then echo "no data changes"; exit 0; fi
+            git commit -m "data: update $(date -u +'%Y-%m-%dT%H:%MZ')"
             if git push; then echo "pushed on attempt $i"; exit 0; fi
-            echo "push rejected, rebasing (attempt $i)…"
-            git pull --rebase --autostash origin main || true
+            echo "push rejected by concurrent run, re-syncing (attempt $i)…"
             sleep $(( (RANDOM % 4) + 2 ))
           done
           echo "push still failing after retries"; exit 1
