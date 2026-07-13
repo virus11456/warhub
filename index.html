@@ -504,6 +504,7 @@
   .fold-bar:hover .fold-title { color:var(--accent); }
   .fold-head-syn { display:flex; align-items:center; cursor:pointer; user-select:none; padding:.1rem 0 .55rem; font-family:'Orbitron','Share Tech Mono',monospace; font-size:.72rem; font-weight:700; letter-spacing:1px; }
   .fold-head-syn:hover .fold-title { color:var(--accent); }
+  .card:not(.folded) > .fold-head-syn { display:none; }   /* 展開時隱藏精簡列，改用卡片原標題，不重複 */
 
   .poly-market-list { display: flex; flex-direction: column; gap: 0.8rem; }
 
@@ -3642,7 +3643,12 @@ async function fetchFirmsEvents() { /* no-op: 改由 fetchRealPizzaData 從 data
     var cw=caret(folded), t=document.createElement('span'); t.className='fold-title'; t.textContent=title;
     b.appendChild(cw); b.appendChild(t); card.appendChild(b); card.appendChild(body);
     card.classList.toggle('folded', !!folded); store[id]=!!folded;
-    b.addEventListener('click',function(){ var f=!card.classList.contains('folded'); card.classList.toggle('folded',f); cw.textContent=f?'\u25B8':'\u25BE'; store[id]=f; persist(); });
+    // \u5C55\u958B\u6642\u7528\u5361\u7247\u300C\u539F\u672C\u7684\u6A19\u984C\u300D\u7576\u958B\u95DC\uFF08\u907F\u514D\u8207\u7CBE\u7C21\u5217\u6A19\u984C\u91CD\u8907\uFF09\uFF1B\u6536\u5408\u6642\u624D\u986F\u793A\u7CBE\u7C21\u5217
+    var realHead=body.querySelector('.section-title'), cw2=null;
+    if(realHead){ cw2=caret(folded); realHead.insertBefore(cw2, realHead.firstChild); realHead.classList.add('fold-head'); }
+    function setF(f){ card.classList.toggle('folded',f); cw.textContent=f?'\u25B8':'\u25BE'; if(cw2) cw2.textContent=f?'\u25B8':'\u25BE'; store[id]=f; persist(); }
+    b.addEventListener('click',function(){ setF(!card.classList.contains('folded')); });
+    if(realHead) realHead.addEventListener('click',function(ev){ if(ev.target.closest('a,button')) return; setF(!card.classList.contains('folded')); });
   }
   function foldCard(card){
     if(card.dataset.fold) return;
