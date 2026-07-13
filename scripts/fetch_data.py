@@ -793,10 +793,40 @@ def _news_iso(pubdate: str) -> str:
     except Exception:
         return ""
 
+async def _translate_titles(session, items, tl="zh-TW"):
+    """把英文標題批次翻成繁中（Google Translate 免費端點）；保留原文於 title_en。
+    失敗或段落數對不上時保留英文，不影響版面。"""
+    import urllib.parse
+    titles = [it.get("title", "") for it in items]
+    if not any(titles):
+        return
+    try:
+        joined = "\n".join(titles)
+        url = ("https://translate.googleapis.com/translate_a/single"
+               "?client=gtx&sl=auto&tl=" + tl + "&dt=t&q=" + urllib.parse.quote(joined))
+        async with session.get(url, timeout=aiohttp.ClientTimeout(total=20),
+                               headers={"User-Agent": "Mozilla/5.0"}) as resp:
+            data = json.loads(await resp.text())
+        merged = "".join(seg[0] for seg in data[0] if seg and seg[0])
+        zh = merged.split("\n")
+        if len(zh) == len(titles):
+            for it, t in zip(items, zh):
+                t = t.strip()
+                if t:
+                    it["title_en"] = it["title"]
+                    it["title"] = t
+            log.info("news titles translated → zh-TW")
+        else:
+            log.warning(f"translate segments {len(zh)} != {len(titles)}, keep EN")
+    except Exception as e:
+        log.warning(f"translate failed, keep EN titles: {e}")
+
+
 async def fetch_gnews(session: aiohttp.ClientSession) -> list[dict]:
     """
     以 Google News RSS 取與戰爭升級相關的即時頭條（免金鑰、持續更新）。
     query 需同時命中「升級動作」與「地緣主角」→ 篩成開戰預測的領先訊號。
+    標題以 Google Translate 翻成繁中（原文留在 title_en）。
     失敗時沿用上一輪 data.json 的 news，避免版面空白。
     """
     import urllib.parse, xml.etree.ElementTree as ET
@@ -836,6 +866,7 @@ async def fetch_gnews(session: aiohttp.ClientSession) -> list[dict]:
                 if len(out) >= 15:
                     break
             if out:
+                await _translate_titles(session, out)   # 標題翻成繁中（_news_topic 已先用英文標好）
                 log.info(f"GNews: {len(out)} headlines")
                 return out
         except Exception as e:
