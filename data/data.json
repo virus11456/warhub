@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-07-13T21:09:01.521355+00:00",
+  "updated_at": "2026-07-13T22:15:42.632231+00:00",
   "score": {
-    "pizza_score": 13.0,
-    "polymarket_score": 21.62,
-    "combined_score": 18.17,
+    "pizza_score": 20.0,
+    "polymarket_score": 21.14,
+    "combined_score": 20.69,
     "alert_level": "NORMAL"
   },
   "pizza": [
@@ -15,7 +15,7 @@
       "baseline": 35,
       "spike": false,
       "spike_magnitude": null,
-      "percentage_of_usual": 12,
+      "percentage_of_usual": 13,
       "sparkline": [
         65,
         71,
@@ -56,7 +56,7 @@
       "baseline": 35,
       "spike": false,
       "spike_magnitude": null,
-      "percentage_of_usual": 58,
+      "percentage_of_usual": 71,
       "sparkline": [
         49,
         49,
@@ -179,7 +179,7 @@
       "baseline": 35,
       "spike": false,
       "spike_magnitude": null,
-      "percentage_of_usual": 3,
+      "percentage_of_usual": 4,
       "sparkline": [
         6,
         1,
@@ -220,7 +220,7 @@
       "baseline": 35,
       "spike": true,
       "spike_magnitude": "EXTREME",
-      "percentage_of_usual": 294,
+      "percentage_of_usual": 357,
       "sparkline": [
         12,
         21,
@@ -264,40 +264,40 @@
       "address": null
     }
   ],
-  "pizza_index": 13,
+  "pizza_index": 20,
   "pizza_events": [
     {
       "place_id": "ChIJ42QeLXu3t4kRnArvcaz2o3A",
       "place_name": "District Pizza Palace",
       "current_popularity": 100,
-      "percentage_of_usual": 294,
+      "percentage_of_usual": 357,
       "spike_magnitude": "EXTREME",
       "data_source": "live",
       "recorded_at": "2026-07-13T20:10:46.734+00:00",
-      "minutes_ago": 50
+      "minutes_ago": 49
     }
   ],
   "defcon_level": 4,
   "defcon_details": {
-    "at_time": "2026-07-13T21:00:00.000Z",
-    "defcon_severity_decimal": 0.1328,
-    "raw_index": 0,
-    "smoothed_index": 13.28,
-    "open_places": 0,
+    "at_time": "2026-07-13T20:00:00.000Z",
+    "defcon_severity_decimal": 0.2044,
+    "raw_index": 28.92,
+    "smoothed_index": 20.44,
+    "open_places": 6,
     "total_places": 6,
-    "intensity_score": 0,
-    "breadth_score": 0,
-    "night_multiplier": 0.98,
+    "intensity_score": 80,
+    "breadth_score": 15,
+    "night_multiplier": 0.9,
     "persistence_factor": 1,
-    "places_above_150": 0,
-    "places_above_200": 0,
-    "high_count": 0,
-    "extreme_count": 0,
-    "max_pct": 0,
-    "max_current_popularity": 0,
+    "places_above_150": 1,
+    "places_above_200": 1,
+    "high_count": 1,
+    "extreme_count": 1,
+    "max_pct": 357,
+    "max_current_popularity": 100,
     "sustained": false,
     "sentinel": false,
-    "reason": "compute_doughcon_v9: quiet"
+    "reason": "compute_doughcon_v9: 1 signals, top=District Pizza Palace, high=1, extreme=1"
   },
   "polymarket": [
     {
@@ -305,7 +305,7 @@
       "question": "Will the U.S. invade Iran before 2027?",
       "yes_price": 0.195,
       "no_price": 0.805,
-      "volume": 41342175.35825914,
+      "volume": 41346266.95825914,
       "category": "geopolitics",
       "slug": "will-the-us-invade-iran-before-2027",
       "end_date": "2026-12-31T00:00:00Z"
@@ -313,61 +313,51 @@
     {
       "id": "0x6c486242e79252cc0bb57163a3b8d95e3b9538ea6a1de2e91848beeb5c6ad986",
       "question": "Iran full airspace closure by July 15?",
-      "yes_price": 0.1315,
-      "no_price": 0.8685,
-      "volume": 2348972.0953280074,
+      "yes_price": 0.076,
+      "no_price": 0.924,
+      "volume": 2378205.681807008,
       "category": "geopolitics",
       "slug": "iran-full-airspace-closure-by-july-15-20260625195254149",
       "end_date": "2026-07-15T23:59:00Z"
     },
     {
-      "id": "0xce41e10b3c9b3764cfe3b54691b411a4565ac4ee6ced9a810ee629bbfbffce89",
-      "question": "Kharg Island no longer under Iranian control by August 31?",
-      "yes_price": 0.0655,
-      "no_price": 0.9345,
-      "volume": 1193884.438486002,
+      "id": "0x6169a5cf74516d65914ddf6b254c65d68dd2bfaab725c056d5db2ad65b9482c2",
+      "question": "Israel closes its airspace by July 15?",
+      "yes_price": 0.039,
+      "no_price": 0.961,
+      "volume": 1557220.3898399966,
       "category": "geopolitics",
-      "slug": "kharg-island-no-longer-under-iranian-control-by-august-31",
-      "end_date": "2026-06-30T23:55:00Z"
+      "slug": "israel-closes-its-airspace-by-july-15-182",
+      "end_date": "2026-07-15T00:00:00Z"
     },
     {
       "id": "0xbb4d51e6364066d92eb6f9b8413dd7193de70966736044463b205834805a1f3b",
       "question": "Will the Iranian regime fall before 2027?",
       "yes_price": 0.095,
       "no_price": 0.905,
-      "volume": 21799113.780266352,
+      "volume": 21799223.780266352,
       "category": "geopolitics",
       "slug": "will-the-iranian-regime-fall-by-the-end-of-2026",
       "end_date": "2026-12-31T00:00:00Z"
-    },
-    {
-      "id": "0x6169a5cf74516d65914ddf6b254c65d68dd2bfaab725c056d5db2ad65b9482c2",
-      "question": "Israel closes its airspace by July 15?",
-      "yes_price": 0.0405,
-      "no_price": 0.9595,
-      "volume": 1534855.3421739966,
-      "category": "geopolitics",
-      "slug": "israel-closes-its-airspace-by-july-15-182",
-      "end_date": "2026-07-15T00:00:00Z"
     },
     {
       "id": "0xd4e77ba6f29fc093509d24f508631abd445ecf506bbdc9c4c80e60256a318527",
       "question": "Will no Fed rate cuts happen in 2026?",
       "yes_price": 0.802,
       "no_price": 0.198,
-      "volume": 6118711.733805004,
+      "volume": 6119265.343779003,
       "category": "geopolitics",
       "slug": "will-no-fed-rate-cuts-happen-in-2026",
       "end_date": "2026-12-31T00:00:00Z"
     },
     {
-      "id": "0x7162118722a6abe965c964e8c694ff0f232221d9bb2263bd92e5902633381893",
-      "question": "Kharg Island no longer under Iranian control by July 31?",
-      "yes_price": 0.0345,
-      "no_price": 0.9655,
-      "volume": 2263794.032382002,
+      "id": "0xce41e10b3c9b3764cfe3b54691b411a4565ac4ee6ced9a810ee629bbfbffce89",
+      "question": "Kharg Island no longer under Iranian control by August 31?",
+      "yes_price": 0.0605,
+      "no_price": 0.9395,
+      "volume": 1195664.747903002,
       "category": "geopolitics",
-      "slug": "kharg-island-no-longer-under-iranian-control-by-july-31",
+      "slug": "kharg-island-no-longer-under-iranian-control-by-august-31",
       "end_date": "2026-06-30T23:55:00Z"
     },
     {
@@ -381,11 +371,21 @@
       "end_date": "2026-09-30T00:00:00Z"
     },
     {
+      "id": "0x7162118722a6abe965c964e8c694ff0f232221d9bb2263bd92e5902633381893",
+      "question": "Kharg Island no longer under Iranian control by July 31?",
+      "yes_price": 0.036,
+      "no_price": 0.964,
+      "volume": 2265885.907012002,
+      "category": "geopolitics",
+      "slug": "kharg-island-no-longer-under-iranian-control-by-july-31",
+      "end_date": "2026-06-30T23:55:00Z"
+    },
+    {
       "id": "0xc0aed6d5d893988b4bef5a8242435bbc7c3b45b1e438bcffc9e9bf71d173ae46",
       "question": "US-Iran Final Nuclear Deal by August 18, 2026?",
       "yes_price": 0.045,
       "no_price": 0.955,
-      "volume": 1411433.0003280032,
+      "volume": 1413953.0003280032,
       "category": "geopolitics",
       "slug": "us-iran-final-nuclear-deal-by-august-18-2026-20260621201255153",
       "end_date": "2026-08-18T23:59:00Z"
@@ -393,9 +393,9 @@
     {
       "id": "0xb12f5e328a7d9f7a26e0a074625ea775025104e673c776d575dab422a472ef59",
       "question": "Israel closes its airspace by July 31?",
-      "yes_price": 0.19,
-      "no_price": 0.81,
-      "volume": 1318715.8299760032,
+      "yes_price": 0.165,
+      "no_price": 0.835,
+      "volume": 1328365.9117390034,
       "category": "geopolitics",
       "slug": "israel-closes-its-airspace-by-july-31-287",
       "end_date": "2026-07-31T00:00:00Z"
@@ -403,8 +403,8 @@
     {
       "id": "0x7cff26b00a03b31be433d246702afb71622ab248e21447151ad04569730fc984",
       "question": "Will an international court find Israel or its leaders guilty of Genocide by December 31, 2027?",
-      "yes_price": 0.09,
-      "no_price": 0.91,
+      "yes_price": 0.085,
+      "no_price": 0.915,
       "volume": 91159.84078100005,
       "category": "geopolitics",
       "slug": "will-an-international-court-find-israel-or-its-leaders-guilty-of-genocide-by-december-31-2027-20260629142909679",
@@ -413,9 +413,9 @@
     {
       "id": "0x3953c85ab5e965cb5b3b4deaa2a5294daa6b1165ff83b586804c04a7abf51a13",
       "question": "Iran full airspace closure by July 31?",
-      "yes_price": 0.345,
-      "no_price": 0.655,
-      "volume": 695122.6537089986,
+      "yes_price": 0.35,
+      "no_price": 0.65,
+      "volume": 700890.466326999,
       "category": "geopolitics",
       "slug": "iran-full-airspace-closure-by-july-31-20260625195254150",
       "end_date": "2026-07-31T23:59:00Z"
@@ -425,7 +425,7 @@
       "question": "US-Iran Final Nuclear Deal by August 31, 2026?",
       "yes_price": 0.075,
       "no_price": 0.925,
-      "volume": 2709701.992985995,
+      "volume": 2709908.552112995,
       "category": "geopolitics",
       "slug": "us-iran-final-nuclear-deal-by-august-31-2026-20260621201255154",
       "end_date": "2026-08-31T23:59:00Z"
@@ -435,7 +435,7 @@
       "question": "US-Iran Final Nuclear Deal by July 31, 2026?",
       "yes_price": 0.0065,
       "no_price": 0.9935,
-      "volume": 968120.1812140049,
+      "volume": 969764.2153550049,
       "category": "geopolitics",
       "slug": "us-iran-final-nuclear-deal-by-july-31-2026-20260621201255151",
       "end_date": "2026-07-31T23:59:00Z"
@@ -443,9 +443,9 @@
     {
       "id": "0x79b7408f02df2eba4034ca4c06ddf17b8dbeacc5adbe8595969e7573912c4e3b",
       "question": "US-Iran Final Nuclear Deal by December 31, 2026?",
-      "yes_price": 0.295,
-      "no_price": 0.705,
-      "volume": 625255.7586830017,
+      "yes_price": 0.305,
+      "no_price": 0.695,
+      "volume": 626457.8116300018,
       "category": "geopolitics",
       "slug": "us-iran-final-nuclear-deal-by-december-31-2026",
       "end_date": "2026-09-30T23:59:00Z"
@@ -473,8 +473,8 @@
     {
       "id": "0x75dd98fa62a51db40b0349e5db1f6b5d0da7481287586752db91278a7822ef15",
       "question": "Iran charges Hormuz fees by July 15?",
-      "yes_price": 0.061,
-      "no_price": 0.939,
+      "yes_price": 0.0605,
+      "no_price": 0.9395,
       "volume": 536001.5664159991,
       "category": "geopolitics",
       "slug": "iran-charges-hormuz-fees-by-july-15-20260625175039061",
@@ -483,9 +483,9 @@
     {
       "id": "0x518df6d694ad4658fe6c284850c029c6f00c9b3609cf05f7757d1fecba1641f8",
       "question": "US-Iran 60 day negotiation period extended?",
-      "yes_price": 0.385,
-      "no_price": 0.615,
-      "volume": 513716.54830100207,
+      "yes_price": 0.395,
+      "no_price": 0.605,
+      "volume": 516450.65346100205,
       "category": "geopolitics",
       "slug": "us-iran-60-day-negotiation-period-extended-20260624044855448",
       "end_date": "2026-08-20T23:59:00Z"
@@ -493,9 +493,9 @@
     {
       "id": "0x0d3ad3afe0e01075d00e6869a09f1982742fba950b4cae8fff452b282b5a80fc",
       "question": "Iran leadership change by July 31?",
-      "yes_price": 0.0555,
-      "no_price": 0.9445,
-      "volume": 223126.4489969999,
+      "yes_price": 0.0515,
+      "no_price": 0.9485,
+      "volume": 224377.8962609999,
       "category": "geopolitics",
       "slug": "iran-leadership-change-by-july-31-20260629143932628",
       "end_date": "2026-07-31T00:00:00Z"
@@ -503,36 +503,58 @@
   ],
   "aviation": {
     "summary": {
-      "tankers": 9,
-      "awacs": 0,
+      "tankers": 10,
+      "awacs": 1,
       "uav": 1,
-      "transport": 33,
+      "transport": 24,
       "fighter": 0,
-      "c4isr": 1,
-      "total": 260
+      "c4isr": 6,
+      "total": 225
     },
     "aircraft": [
+      {
+        "icao24": "7CF8F5",
+        "callsign": "WGTL04",
+        "type": "E-7A Wedgetail",
+        "type_code": "E737",
+        "role": "awacs",
+        "alt_ft": 2675,
+        "lat": -32.744339,
+        "lon": 151.764258,
+        "region": "南太平洋"
+      },
       {
         "icao24": "AF8421",
         "callsign": "TROY709",
         "type": "MQ-9 Reaper",
         "type_code": "Q9",
         "role": "uav",
-        "alt_ft": 20000,
-        "lat": 48.856507,
-        "lon": -97.412006,
+        "alt_ft": 1800,
+        "lat": 47.004547,
+        "lon": -96.814682,
         "region": "北美"
       },
       {
-        "icao24": "480C43",
-        "callsign": "MMF69",
+        "icao24": "43C700",
+        "callsign": "RRR9961",
         "type": "A332",
         "type_code": "A332",
         "role": "tanker",
-        "alt_ft": 33000,
-        "lat": 39.128413,
-        "lon": 17.642944,
+        "alt_ft": 32025,
+        "lat": 35.750565,
+        "lon": 35.314007,
         "region": "歐洲"
+      },
+      {
+        "icao24": "896C72",
+        "callsign": "SKY02",
+        "type": "A332",
+        "type_code": "A332",
+        "role": "tanker",
+        "alt_ft": 9125,
+        "lat": 24.277634,
+        "lon": 54.911143,
+        "region": "中東"
       },
       {
         "icao24": "896C3C",
@@ -541,53 +563,9 @@
         "type_code": "A332",
         "role": "tanker",
         "alt_ft": 23000,
-        "lat": null,
-        "lon": null,
-        "region": "未知"
-      },
-      {
-        "icao24": "AE0139",
-        "callsign": "—",
-        "type": "KC-135R",
-        "type_code": "K35R",
-        "role": "tanker",
-        "alt_ft": 11150,
-        "lat": 31.92684,
-        "lon": 35.201919,
+        "lat": 24.116384,
+        "lon": 55.072303,
         "region": "中東"
-      },
-      {
-        "icao24": "AE0629",
-        "callsign": "—",
-        "type": "KC-135R",
-        "type_code": "K35R",
-        "role": "tanker",
-        "alt_ft": 19150,
-        "lat": null,
-        "lon": null,
-        "region": "未知"
-      },
-      {
-        "icao24": "AE0591",
-        "callsign": "—",
-        "type": "KC-135R",
-        "type_code": "K35R",
-        "role": "tanker",
-        "alt_ft": 19000,
-        "lat": null,
-        "lon": null,
-        "region": "未知"
-      },
-      {
-        "icao24": "AE0163",
-        "callsign": "—",
-        "type": "KC-135R",
-        "type_code": "K35R",
-        "role": "tanker",
-        "alt_ft": 21975,
-        "lat": null,
-        "lon": null,
-        "region": "未知"
       },
       {
         "icao24": "AE0149",
@@ -596,42 +574,141 @@
         "type_code": "K35R",
         "role": "tanker",
         "alt_ft": 22475,
-        "lat": null,
-        "lon": null,
-        "region": "未知"
+        "lat": 25.069553,
+        "lon": 55.202842,
+        "region": "中東"
       },
       {
-        "icao24": "AE023C",
+        "icao24": "AE04CD",
         "callsign": "—",
         "type": "KC-135R",
         "type_code": "K35R",
         "role": "tanker",
-        "alt_ft": 24000,
+        "alt_ft": 17525,
         "lat": null,
         "lon": null,
         "region": "未知"
       },
       {
-        "icao24": "ADFF10",
+        "icao24": "AE014A",
         "callsign": "—",
         "type": "KC-135R",
         "type_code": "K35R",
         "role": "tanker",
-        "alt_ft": 35975,
+        "alt_ft": 0,
         "lat": null,
         "lon": null,
         "region": "未知"
       },
       {
-        "icao24": "7CF9D6",
-        "callsign": "BLKT107",
+        "icao24": "AE0387",
+        "callsign": "—",
+        "type": "KC-135R",
+        "type_code": "K35R",
+        "role": "tanker",
+        "alt_ft": 0,
+        "lat": null,
+        "lon": null,
+        "region": "未知"
+      },
+      {
+        "icao24": "AE0500",
+        "callsign": "—",
+        "type": "KC-135R",
+        "type_code": "K35R",
+        "role": "tanker",
+        "alt_ft": 0,
+        "lat": null,
+        "lon": null,
+        "region": "未知"
+      },
+      {
+        "icao24": "AE065D",
+        "callsign": "—",
+        "type": "KC-135R",
+        "type_code": "K35R",
+        "role": "tanker",
+        "alt_ft": 0,
+        "lat": null,
+        "lon": null,
+        "region": "未知"
+      },
+      {
+        "icao24": "AE013A",
+        "callsign": "—",
+        "type": "KC-135R",
+        "type_code": "K35R",
+        "role": "tanker",
+        "alt_ft": 0,
+        "lat": null,
+        "lon": null,
+        "region": "未知"
+      },
+      {
+        "icao24": "AE0413",
+        "callsign": "—",
+        "type": "E-6B Mercury",
+        "type_code": "E6",
+        "role": "c4isr",
+        "alt_ft": 2875,
+        "lat": 35.380055,
+        "lon": -97.233945,
+        "region": "北美"
+      },
+      {
+        "icao24": "AE57CB",
+        "callsign": "—",
         "type": "P-8 Poseidon",
         "type_code": "P8",
         "role": "c4isr",
-        "alt_ft": 15925,
-        "lat": 20.714905,
-        "lon": -157.992227,
-        "region": "20.7,-158.0"
+        "alt_ft": 30525,
+        "lat": 30.767996,
+        "lon": -85.482173,
+        "region": "北美"
+      },
+      {
+        "icao24": "AE749D",
+        "callsign": "—",
+        "type": "P-8 Poseidon",
+        "type_code": "P8",
+        "role": "c4isr",
+        "alt_ft": 30125,
+        "lat": 26.754405,
+        "lon": -82.359295,
+        "region": "北美"
+      },
+      {
+        "icao24": "AE749E",
+        "callsign": "—",
+        "type": "P-8 Poseidon",
+        "type_code": "P8",
+        "role": "c4isr",
+        "alt_ft": 12800,
+        "lat": 29.118177,
+        "lon": -82.087504,
+        "region": "北美"
+      },
+      {
+        "icao24": "AE5F3A",
+        "callsign": "—",
+        "type": "P-8 Poseidon",
+        "type_code": "P8",
+        "role": "c4isr",
+        "alt_ft": 9875,
+        "lat": 30.352557,
+        "lon": -81.937202,
+        "region": "北美"
+      },
+      {
+        "icao24": "C2B215",
+        "callsign": "—",
+        "type": "P3",
+        "type_code": "P3",
+        "role": "c4isr",
+        "alt_ft": 12700,
+        "lat": null,
+        "lon": null,
+        "region": "未知"
       },
       {
         "icao24": "43C5E3",
@@ -639,65 +716,10 @@
         "type": "A400M",
         "type_code": "A400",
         "role": "transport",
-        "alt_ft": 2025,
-        "lat": 50.872833,
-        "lon": -3.454532,
+        "alt_ft": 3275,
+        "lat": 52.610732,
+        "lon": -3.693996,
         "region": "歐洲"
-      },
-      {
-        "icao24": "AE1462",
-        "callsign": "BLINR17",
-        "type": "C-17 Globemaster III",
-        "type_code": "C17",
-        "role": "transport",
-        "alt_ft": 2250,
-        "lat": null,
-        "lon": null,
-        "region": "未知"
-      },
-      {
-        "icao24": "AE10EB",
-        "callsign": "C2005",
-        "type": "C-130J",
-        "type_code": "C30J",
-        "role": "transport",
-        "alt_ft": 20000,
-        "lat": 59.478118,
-        "lon": -151.380142,
-        "region": "59.5,-151.4"
-      },
-      {
-        "icao24": "AE57D5",
-        "callsign": "C2011",
-        "type": "C-130J",
-        "type_code": "C30J",
-        "role": "transport",
-        "alt_ft": 19775,
-        "lat": 20.61438,
-        "lon": -156.812177,
-        "region": "20.6,-156.8"
-      },
-      {
-        "icao24": "C2B57B",
-        "callsign": "CFC2567",
-        "type": "C-130J",
-        "type_code": "C30J",
-        "role": "transport",
-        "alt_ft": 26000,
-        "lat": 47.619965,
-        "lon": -71.925362,
-        "region": "北美"
-      },
-      {
-        "icao24": "C2B3FF",
-        "callsign": "CFC4079",
-        "type": "C-17 Globemaster III",
-        "type_code": "C17",
-        "role": "transport",
-        "alt_ft": 36000,
-        "lat": 49.823417,
-        "lon": -74.398523,
-        "region": "北美"
       },
       {
         "icao24": "AE1532",
@@ -705,42 +727,9 @@
         "type": "C-130J",
         "type_code": "C30J",
         "role": "transport",
-        "alt_ft": 1550,
-        "lat": 32.280625,
-        "lon": -84.965683,
-        "region": "北美"
-      },
-      {
-        "icao24": "C2BD41",
-        "callsign": "CRDO10",
-        "type": "C295",
-        "type_code": "C295",
-        "role": "transport",
-        "alt_ft": 5325,
-        "lat": 49.10907,
-        "lon": -124.151212,
-        "region": "北美"
-      },
-      {
-        "icao24": "AE1233",
-        "callsign": "FAMUS99",
-        "type": "C-17 Globemaster III",
-        "type_code": "C17",
-        "role": "transport",
-        "alt_ft": 38000,
-        "lat": 31.971588,
-        "lon": -96.437439,
-        "region": "北美"
-      },
-      {
-        "icao24": "AE2F9B",
-        "callsign": "GROG73",
-        "type": "C-130J",
-        "type_code": "C30J",
-        "role": "transport",
-        "alt_ft": 7900,
-        "lat": 34.836319,
-        "lon": -77.175536,
+        "alt_ft": 1525,
+        "lat": 32.249954,
+        "lon": -85.005176,
         "region": "北美"
       },
       {
@@ -749,31 +738,20 @@
         "type": "A400M",
         "type_code": "A400",
         "role": "transport",
-        "alt_ft": 1475,
-        "lat": 51.743045,
-        "lon": -1.664047,
+        "alt_ft": 2550,
+        "lat": 51.817156,
+        "lon": -1.461563,
         "region": "歐洲"
       },
       {
-        "icao24": "AE02FA",
-        "callsign": "HAWG21",
-        "type": "C-130",
-        "type_code": "C130",
+        "icao24": "C2B5AD",
+        "callsign": "JILL41",
+        "type": "C-130J",
+        "type_code": "C30J",
         "role": "transport",
-        "alt_ft": 1400,
-        "lat": 34.954605,
-        "lon": -92.118456,
-        "region": "北美"
-      },
-      {
-        "icao24": "ADFE5F",
-        "callsign": "JESSE96",
-        "type": "C-130",
-        "type_code": "C130",
-        "role": "transport",
-        "alt_ft": 20200,
-        "lat": 39.536862,
-        "lon": -95.662659,
+        "alt_ft": 2875,
+        "lat": 35.060725,
+        "lon": -78.64563,
         "region": "北美"
       },
       {
@@ -782,10 +760,65 @@
         "type": "C-5M Super Galaxy",
         "type_code": "C5M",
         "role": "transport",
-        "alt_ft": 26950,
-        "lat": 43.521408,
-        "lon": -95.65155,
+        "alt_ft": 11025,
+        "lat": 38.923096,
+        "lon": -104.278107,
         "region": "北美"
+      },
+      {
+        "icao24": "AE4BE3",
+        "callsign": "KING86",
+        "type": "C-130J",
+        "type_code": "C30J",
+        "role": "transport",
+        "alt_ft": 23025,
+        "lat": 32.853021,
+        "lon": -113.372627,
+        "region": "北美"
+      },
+      {
+        "icao24": "C87F36",
+        "callsign": "KNG50",
+        "type": "B350",
+        "type_code": "B350",
+        "role": "transport",
+        "alt_ft": 18425,
+        "lat": -40.607391,
+        "lon": 175.303223,
+        "region": "南太平洋"
+      },
+      {
+        "icao24": "C87F38",
+        "callsign": "KNG52",
+        "type": "B350",
+        "type_code": "B350",
+        "role": "transport",
+        "alt_ft": 23000,
+        "lat": -43.713776,
+        "lon": 172.397844,
+        "region": "南太平洋"
+      },
+      {
+        "icao24": "43C5EB",
+        "callsign": "LAMBDA30",
+        "type": "A400M",
+        "type_code": "A400",
+        "role": "transport",
+        "alt_ft": 0,
+        "lat": 35.23646,
+        "lon": -120.636589,
+        "region": "北美"
+      },
+      {
+        "icao24": "AE1463",
+        "callsign": "MOOSE51",
+        "type": "C-17 Globemaster III",
+        "type_code": "C17",
+        "role": "transport",
+        "alt_ft": 31000,
+        "lat": 49.042108,
+        "lon": 16.001715,
+        "region": "歐洲"
       },
       {
         "icao24": "AE07F7",
@@ -793,87 +826,54 @@
         "type": "C-17 Globemaster III",
         "type_code": "C17",
         "role": "transport",
-        "alt_ft": 34000,
+        "alt_ft": 36000,
         "lat": null,
         "lon": null,
         "region": "未知"
       },
       {
-        "icao24": "AE07DB",
-        "callsign": "RCH294",
-        "type": "C-17 Globemaster III",
-        "type_code": "C17",
+        "icao24": "AE5B67",
+        "callsign": "RANGR11",
+        "type": "C-130J",
+        "type_code": "C30J",
         "role": "transport",
-        "alt_ft": 12075,
-        "lat": 43.046437,
-        "lon": -70.077457,
+        "alt_ft": 20000,
+        "lat": 35.054859,
+        "lon": -100.970707,
         "region": "北美"
-      },
-      {
-        "icao24": "AE4F14",
-        "callsign": "RCH349",
-        "type": "C-17 Globemaster III",
-        "type_code": "C17",
-        "role": "transport",
-        "alt_ft": 3100,
-        "lat": 35.896926,
-        "lon": 139.314976,
-        "region": "歐亞 / 中東"
-      },
-      {
-        "icao24": "AE117D",
-        "callsign": "RCH431",
-        "type": "C-17 Globemaster III",
-        "type_code": "C17",
-        "role": "transport",
-        "alt_ft": 36000,
-        "lat": 44.783707,
-        "lon": 22.686832,
-        "region": "歐洲"
-      },
-      {
-        "icao24": "AE4F13",
-        "callsign": "RCH490",
-        "type": "C-17 Globemaster III",
-        "type_code": "C17",
-        "role": "transport",
-        "alt_ft": 29975,
-        "lat": 55.321152,
-        "lon": -4.106463,
-        "region": "歐洲"
       }
     ],
     "source": "https://opendata.adsb.fi/api/v2/mil",
     "trends": {
       "tankers": {
-        "d1": -13,
-        "d7": -8,
-        "d30": -8
+        "d1": -5,
+        "d7": 2,
+        "d30": 2
       },
       "awacs": {
-        "d1": -100,
-        "d7": -100,
-        "d30": -100
+        "d1": -29,
+        "d7": -9,
+        "d30": -9
       },
       "uav": {
-        "d1": 140,
-        "d7": 200,
-        "d30": 200
+        "d1": 118,
+        "d7": 182,
+        "d30": 182
       }
     }
   },
   "firms": {
-    "total_24h": 19580,
-    "high_conf_count": 4709,
-    "delta_pct": "+201%",
-    "delta_ratio": 2.0123,
+    "total_24h": 19751,
+    "high_conf_count": 4759,
+    "delta_pct": "+203%",
+    "delta_ratio": 2.0386,
     "by_region": {
-      "south_america": 402,
+      "south_america": 508,
       "oceania": 1268,
       "asia": 479,
-      "other": 8805,
-      "africa": 7057,
-      "europe_russia": 863,
+      "other": 8816,
+      "africa": 7109,
+      "europe_russia": 865,
       "middle_east": 262,
       "north_america": 444
     },
@@ -1216,9 +1216,9 @@
   ],
   "gdelt": {
     "ukraine": {
-      "latest": 2.695,
-      "avg48h": 3.261,
-      "delta_pct": -17.4
+      "latest": 2.982,
+      "avg48h": 3.288,
+      "delta_pct": -9.3
     },
     "mideast": {
       "latest": 3.187,
@@ -1229,15 +1229,80 @@
     "korea": {
       "latest": 0.043,
       "avg48h": 0.076,
-      "delta_pct": -43.0
+      "delta_pct": -43.0,
+      "stale": true
     },
     "southsea": {
-      "latest": 0.019,
-      "avg48h": 0.144,
-      "delta_pct": -86.6
+      "latest": 0.025,
+      "avg48h": 0.141,
+      "delta_pct": -82.0
     }
   },
   "news": [
+    {
+      "title": "在川普表示將對使用霍爾木茲海峽的船隻收取費用後，美國開始對伊朗進行新的打擊",
+      "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxNQXlDMHpMczFma2paOVJQMzZuZzVNVFZLeS04V0VXUk1zUFBSTGRaelYzaU1fQlg0azEwQ1dQQ2lfV2VmOFBMZ0ZGa0tjSWJGUWVFdDhhUTdCbmpKMy1QRHVOdE5YRnliNmJfVkRKU09zdVhYSm1hQW94MDlUbEp1OXB0ZjIzZlFtYUdZZHBQb2pHT1V5bjZtbVE0QVN3cTg?oc=5",
+      "domain": "AP News",
+      "ts": "2026-07-13T21:47:00+00:00",
+      "topic": "中東",
+      "title_en": "US begins new Iran strikes after Trump says ships will be charged to use the Strait of Hormuz"
+    },
+    {
+      "title": "川普稱美國將打擊伊朗鎬山核設施",
+      "url": "https://news.google.com/rss/articles/CBMiowFBVV95cUxQWm9oYlhYdGlQcjdUNjJwYV9QSEpYS3F4M0paRnZXUWRhdTMxZmVNLXpQaklaMnUzenZjLVpmd2ZISDFYUVlJMEFJMFpNNVNwMnBtczZIR2pFM1c1Xy1vUjY3SVV5bG91ejB0eGp2THhKX2swM0hBMVdNLUY3cEV3ZlZhZDIzR0VfTTdhZHRUUnpMdUt6UjMxajFqY2tuODVwTjdn?oc=5",
+      "domain": "Al-Monitor",
+      "ts": "2026-07-13T21:36:55+00:00",
+      "topic": "中東",
+      "title_en": "Trump says US to strike Iran's Pickaxe Mountain nuclear site"
+    },
+    {
+      "title": "美國和伊朗在霍爾木茲海峽附近相互攻擊",
+      "url": "https://news.google.com/rss/articles/CBMirwFBVV95cUxPNGVRSUxGa2g1WWtrM2NsRy02Q1NoUjMtR2oxQ2hPS20talhlRXlDZ0pWRFgyVnFnQmVxeUhVTXpQb3hSdFFMeWU0Wklqck8yUmRhZW1fUHI4WEtibjRWdTlPaHJCLUNmWUhXbjltSjBoMTRNTWprRlpRNmVFSDFUU3JKelprTTYtR01mQ3QxSE84NnMzRmYwSzViZ1oxejhvd0VrM1Fub3Y3ZjhyOUdz0gG0AUFVX3lxTE0yUWdleHdLN3dkdURxNkxESFdBMVhZS1dESjlLalg5NDhyT1JXSHl2ekhtSlg5alM5Y3FSaU1CRHZYN3N0dVh5eGhIekJSRzlQU3VzZExXNzJ6cGJyU0NxQmVFYkp2cGJQRWJaVy03bWUwNnIwZi1DV1lSQjhscnEyd2gtYzRTRFRlM25FZGwzZVZZRVEtWk9zX0RJdmVSQUpXNWUxclNzdFRXOXBPR1JsMnJhaA?oc=5",
+      "domain": "Al Jazeera",
+      "ts": "2026-07-13T21:26:46+00:00",
+      "topic": "中東",
+      "title_en": "US, Iran exchange attacks around Strait of Hormuz"
+    },
+    {
+      "title": "川普考慮攻擊核設施，美國對伊朗發動新的打擊",
+      "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxQQlZqdjBzQ3ZJejNoRm9ycHFSZ2s1UU9SYlRWWUtWdHR1Xy10YUVUZEpMaWdBX1NCcWdKbjhtbi0tU3AzNWxVRURNX0pDcU40eW52ZmxPaGZENWFQZkhaMThzZ1AwRTRKOW05LTZXTlA4bEVuNTQ2Nng3ZTNMTGR0ZG9KVVhkQk9DNTN1TmE1dllBVlF5Q1FPbF9CbjhJNXZ1RW55YmI2UGplekk4Y19FN3VnZHV0QQ?oc=5",
+      "domain": "WSJ",
+      "ts": "2026-07-13T21:22:00+00:00",
+      "topic": "中東",
+      "title_en": "U.S. Launches New Iran Strikes, as Trump Weighs Attacking Nuclear Site"
+    },
+    {
+      "title": "川普稱美軍將重新封鎖伊朗港口",
+      "url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxOT1J3QWlHWUJEUmItQkgxVWFPTTNiU3BhaUFZdXZjYU1fcFdHRml4M2lMMWxPZ1dSY3MwSzRPbm94ZklZSy11NGRnZWR5NGdVNGdSQTVMWi02dWJDQnBvUm5UVjFhRFEtRVAxNDlJeXR5cjNiZlBVQkZ1UFJzR29feEEzMjJFUTU1QnRkYXln?oc=5",
+      "domain": "The Washington Post",
+      "ts": "2026-07-13T21:20:06+00:00",
+      "topic": "中東",
+      "title_en": "Trump says U.S. military will reimpose blockade on Iranian ports"
+    },
+    {
+      "title": "伊朗戰爭真的要爆發了嗎？",
+      "url": "https://news.google.com/rss/articles/CBMif0FVX3lxTE5YM0otaTAyWlRjSWp0MkY5RFg3WENocVlmOVZCamFQWW9CSE5ib2xTaU1zenlDaWdfTFpoSXJOdnFMRWZlcDQwdGdmaXFlWFVuTjl5VEhHWU1xMFRncy1xZVFjUTB1ZGZHWk1qRng0ZlJrcjQ0T2FsMVZRTEtrOWM?oc=5",
+      "domain": "vox.com",
+      "ts": "2026-07-13T21:20:00+00:00",
+      "topic": "中東",
+      "title_en": "Is the Iran war back on for real?"
+    },
+    {
+      "title": "林賽·格雷厄姆的遺產：以色列倡議者、川普盟友、伊朗戰爭支持者",
+      "url": "https://news.google.com/rss/articles/CBMirgFBVV95cUxNNzN5TUt5WnZPMVZKT1pidDNZc0R6MWJJTWkyZk43S3dXanBibWdwSWkteWNCNnpFdXp3WFVnN2tVS0pKeGFtZ1hXUnZ4TktTWE9KYnp2S2VhbUR0WTg2cTZmMnBQajJNY21FaGR3X3lxYVVVbnZ6Q0RSbUFUMklOQmtiTjRnVnNtS09EM2RqMzNuaTdjTk1uVzJ1QjNGNnhUV1Q0em1wbFpCNk14RXfSAbMBQVVfeXFMTUpjdlpKRkVrUDJldEFOeVgtZV90Z2x4eVM5YWdHNHNoeEtvYjNqSzBHLVR3TVYxRDR2eTcybS00bXVWZ3NEYzY3bDVaYTZTMzZHRENRNzE0QWd4bkpGNHd0OTU5Y180M3BYZEc5ZzMyeG9TcENFOHFWYzgyMHZodDJxdUpjWFlMVWx4WlV0aXhHclFPeWN2ZGp6Y1FmZTZKQ3FrSy01Zjd4MTJZZnRwMlBaRTA?oc=5",
+      "domain": "Al Jazeera",
+      "ts": "2026-07-13T21:06:42+00:00",
+      "topic": "中東",
+      "title_en": "Lindsey Graham’s legacy: Israel advocate, Trump ally, Iran war supporter"
+    },
+    {
+      "title": "川普表示他將重新實施美國對伊朗的封鎖",
+      "url": "https://news.google.com/rss/articles/CBMisAFBVV95cUxPb3JKVjY4ME8zU2ZPQ01zeWZnZjdodjZfNWRUcnlSc2EzdVBIRE5zdzZtNjFLVnhpSXE4Ti1pQkhkNjM1a1o2VnQwbmtuTEdQRFdWX0RzZlhmWjdTYnRtc2NQUUpzZEs4c0Z1X3NlQ1ZSRVNncTJsMi1WTWZaanN1dzBUeHRDTXVGRU9nMnU5YkEzNWVmZDJseFNkSHYydWlDS0g5OXBVM0xpdU1tVHFoRA?oc=5",
+      "domain": "WSJ",
+      "ts": "2026-07-13T20:53:00+00:00",
+      "topic": "中東",
+      "title_en": "Trump Says He Is Reimposing the U.S. Blockade of Iran"
+    },
     {
       "title": "即時更新：來自以色列、伊朗和中東的最新消息",
       "url": "https://news.google.com/rss/articles/CBMif0FVX3lxTFBySUtHRzlsVDVUV1dYdkQ3eWI1cEhTLXhnTFk4VWx2WjUxWjdCZjBlVkotbXNpNjZud3J3RTQyWFlmc19Hb1lZenZmUGZVNlRFenY5ektjNGtkZmtXeGtvVERKdEM1MHg1ZklsbEhFcmowWXAxMnFqblR0cUd3ams?oc=5",
@@ -1247,26 +1312,34 @@
       "title_en": "Live Updates: Latest from Israel, Iran, and Middle East"
     },
     {
-      "title": "川普稱美國將成為霍爾木茲海峽的「守護者」並收取通行費",
-      "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxQX3V0UENXaG9RNEpIY0ZoZkJtbmZlVDlxRGpCeUZYaWFKUW5KbEdVUll0MkcwZkpVSkFBcU40akxOLVFWUmQ5Smt2MkdoMUJfYXJ0dzFmbWlGcDBuengxQkVMeGVabzBqN0FyTWJYZklYb2RWbDJGV2o5dDBjMmNZYmV6SU5WZ1hVM1lyck9XUE1TN29ZMjdZN2NPM3VFaTczaTRZN2ZIUDY4d2NhemZpSlhnc9IBuAFBVV95cUxORFMyaTZOMWlNcWlGeGV4TGhibXNGWHRUUmpiRmZUbWpBZzNRLXUwV1FLY1c0NjNsMjZ4Nk00T2M3THJWdFJHR05zZXd2Mjl4SExucUNhMUJmWFZCWmtvdHdBak9rMXYwbFo0Uzl0N2paUkZaTTl3SU04Y1d4SDdvaC0wdlZCSHREVkxheUdaMS12Umw4bzkwbWd6U1EwbjR1NFNMUTk3dEdSVEZfaTU3SkFYYXUwZWNl?oc=5",
-      "domain": "Al Jazeera",
-      "ts": "2026-07-13T20:48:45+00:00",
-      "topic": "白宮",
-      "title_en": "Trump says US will become ‘guardian’ of Strait of Hormuz and collect tolls"
+      "title": "沙烏地阿拉伯與也門的新戰鬥威脅將胡塞武裝捲入伊朗戰爭",
+      "url": "https://news.google.com/rss/articles/CBMisAFBVV95cUxPcU1QSDBqcmFnLVlncjhnS010Q2QwZ0pMMnozQ09FZFZVVkRyNHJDelJDSEw1NVEwNVNjalNtV0lsUXJFYUJkRDVoRGt2OHBwWExTbzhycVY0Yk9uYkpiRndhbm5OTG1DanFSRGNaYWFVMXNWcGhmX25IdjUyUV91a1lOWmpEOWxUWTFhWWUtczFDekQyaDdhOW9BSERwOG5RSjZhS1dGMEhXaUdSQ1Q3Tw?oc=5",
+      "domain": "WSJ",
+      "ts": "2026-07-13T20:52:00+00:00",
+      "topic": "中東",
+      "title_en": "New Saudi-Yemen Fighting Threatens to Pull Houthis Into Iran War"
     },
     {
-      "title": "烏克蘭及其盟國組成聯盟應對俄羅斯彈道飛彈",
-      "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxNZDdPMDIyS29Db1dtbkRuejN0RGJuelZFU3NDY0szbmQtajJZR3BRQTVPU2dzSmctOHVkdjVYdUgyc25JNEhBOGVIZ1B3LW5sUGZ0em5xVTNPVnRPNUV3U0ZfN3kxeVRucGdJaDRtSm9UbDZpSjByTGFONU5HMXV4WVNDUU55UGRFNi1DZGJUQ3BsbXZtV0ptT0xMUDd3WkduSXlMczgyS0ZjS0Rub2laZ0w4QdIBuAFBVV95cUxNOGxXbjhvOWpYX1Mwd3pBZHpkSjJ4emlsT1oxSG1uenlaTExNUV9xb3RCT0xZR2E0djdjM1JZRnVtSkl3WXQzbGpEb2FjR3JUVG9QSzEycjAwUjFWQnVxTFMyd0d1MkdrRVROdG14T1l1NU12UVdIZi1Mb2ZwOHVLN21TNWx2Zjg3ZGEtUVZabDEwNVJmRk41SjlnYzVqYTQyeUpZNUFuMURHOG44UC1LNEJjQ0RjOFlm?oc=5",
-      "domain": "Al Jazeera",
-      "ts": "2026-07-13T20:47:04+00:00",
-      "topic": "俄烏",
-      "title_en": "Ukraine and allies launch coalition to tackle Russia’s ballistic missiles"
+      "title": "川普告訴議員，針對伊朗的軍事行動上周正式重啟",
+      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxOU3JLeW9Nc2RwdlZudVVRT2dVZHBvLXREd09rSDRWT05HOEZCekVOczg5T2lJQjFfR0xkaVM0TE5uVXo1Sm43VjBNS1dOa0JuWUo4VFRidm8taWowTjE1QlVIcWtYcmlMT0R5dnl4ZmdtT2plbVRBQ2R6bHFfbXVSYzIzbHhwSXUta3dKVGNiWjgyeTQ0MjFKZnN3WE0?oc=5",
+      "domain": "CBS News",
+      "ts": "2026-07-13T20:44:00+00:00",
+      "topic": "中東",
+      "title_en": "Military action against Iran formally restarted last week, Trump told lawmakers"
+    },
+    {
+      "title": "美軍使用海盜船海上無人機攻擊伊朗",
+      "url": "https://news.google.com/rss/articles/CBMifEFVX3lxTFB1ZTk1bmxLRmcxclFfbU01VlNSaHA3Y2cyNUNUYlNWb0RjbFRTamx3UVVoYTh4NGxTc2hIdzBaSnlxblhtckxTX29RNVczMms3OUhFd2x4SDlOV0s2ZXlHWHUyNG1lQUd3T3h5ZFpUUi1zZ0pId2pGUnhjeDk?oc=5",
+      "domain": "DefenseScoop",
+      "ts": "2026-07-13T20:36:00+00:00",
+      "topic": "中東",
+      "title_en": "U.S. military uses Corsair maritime drones to attack Iran"
     },
     {
       "title": "唐納德·川普表示，諒解備忘錄破裂後，美國軍隊今晚將「嚴厲」打擊伊朗",
       "url": "https://news.google.com/rss/articles/CBMiakFVX3lxTFBTZGhzUVRWUXZ3LVBnWHlZMEhlVTVPUmlzNDJVOTg3dWFucXcxMDhmT1hvSTBIRXZjdDFPdnMtWXZZRjF1YkIxaWhxNy14Z2xXYnJPTFA4TkR1UEZ5bmt3dGNrRm9vNGMxZFE?oc=5",
       "domain": "The Jerusalem Post",
-      "ts": "2026-07-13T20:33:36+00:00",
+      "ts": "2026-07-13T20:32:29+00:00",
       "topic": "中東",
       "title_en": "Donald Trump says US military will strike Iran 'hard' tonight after MoU collapses"
     },
@@ -1279,84 +1352,12 @@
       "title_en": "Trump formally informs Congress of Iran war resumption"
     },
     {
-      "title": "在美伊戰爭期間價格上漲的情況下，德州石油公司增加產量",
-      "url": "https://news.google.com/rss/articles/CBMi6AJBVV95cUxOYUdnZFZGcVBJQWZPSkhBYVBSR3pmc1NYMk9SN0UwemdqSnJsWVZhbjFEbGhZcjhTcXN2SmdEamxJbUVXbTlYdmQ0d3RtQWxrQ1FkQXVMOWhhLUZMVTJrUGpSRzY0ZnpLNVQwdFM4V2gxc0hTelFJd1pHWF8tTVhHYWlfcm1MWUVVY0I1NWpuTWN4Wm5sNnlLVUJhaWtBT3hwTi1WcUpCT0hZTmxnTlJsZVNnRmNfOHhaVHNEM1ZPMWNVZ05vc3JjNHRZTjhZOHhXZjRLTFBPX1hscGQyeGI2NEFxZEd4d1ZZTExZdzM5WjUzNVhCMERXYldmcmg0clh0Uy1WUm5TdDNueHNHeUpGeUpJYWRfTjNaX0dkZ3FRWFd1SHBUSXBOMV93UVc4M2VaclZXTU1lNklER0pfZDdRSE5PZVRSbnA5U24wZmVJaUU2OFdJbHRpYlYxdGtxVndSczBZUEZEV0rSAfACQVVfeXFMUDNkV3lOQ3l3RHpCV19YZzJ3bC16YWVybUtOck05Nm15enpfVThtXzVfNzBRZnZhU1BIVTk1MmtKSXgtR1pnaUJoYmNUb1JIM0JIZ2R4eF80OElfYnlyaGlodnNDbDUzLThCa2F5SGVIYmpPQVlSNG1wb0tjZWFUWlJCbUNBaXNzTkRtRDZxTUVfWERzcVM5SU8wZEJwQkFET19fYVc4NkNEM2stWDVTdnNTZXJ4UENFZ0U2ZFNsNk9FUE03SFpPbGkyOWdRNFNacFFVWk5nMnpUbGw5NUN6ZkhvZk10cFV4MXNMUURrWmZmakJ6X25ieUh4TFU1Y1M4S1FqLUNGTmd3WTNMOF9VY3Z2eElhTW9XWVlYcUx6S1NDOGFXQy1zaWF6MEhyWi0zUnV4c2JRZGVZTkJwWlRyZVNELVZfaklUeG93a1RjcUNCMWFibXdhU3hJdW43UW9Td1J2eEF5ZTdPWnlfWDlMVV8?oc=5",
-      "domain": "Houston Public Media",
-      "ts": "2026-07-13T20:25:20+00:00",
+      "title": "川普表示美國將在今晚週二嚴厲打擊伊朗",
+      "url": "https://news.google.com/rss/articles/CBMihwFBVV95cUxNTGZtWWhOVUdGN1Rla0VQVkFIRlJfc0M1QkcyQ2dEZnl2TlNDUkNqTERDbVhNVjRMSVJvMjVCaWkwMjJIYjJFMnlKd1BzWnVJVFd1NTFMNV8yZzRONFJFVVk0UkF5SzRtdGw0N1NIajFXUm9QanJUenZ4RVpZM05rY2lCdHpkdjjSAYwBQVVfeXFMTTZYb1kxbHpsMEdTRlNLQzVsN2RJOU1zLVA5MGU0TXllSFRqNEEzX3NUemFFNHBSOGY0TVBvUWlSYjBnRTVTQXJRcWJ0RWxxaUlycFZDaUwyY0xnVmlaS1Y3R1hHTHpVdmtTRlhVUmppdVhxa2xvWjlKeGwxQlFwQWp2NWRTT2hnM2lKUEE?oc=5",
+      "domain": "NewsNation",
+      "ts": "2026-07-13T20:28:41+00:00",
       "topic": "中東",
-      "title_en": "Texas oil firms increase production, amidst elevated prices during U.S.-Iran War"
-    },
-    {
-      "title": "川普稱美軍將重新封鎖伊朗港口",
-      "url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxOT1J3QWlHWUJEUmItQkgxVWFPTTNiU3BhaUFZdXZjYU1fcFdHRml4M2lMMWxPZ1dSY3MwSzRPbm94ZklZSy11NGRnZWR5NGdVNGdSQTVMWi02dWJDQnBvUm5UVjFhRFEtRVAxNDlJeXR5cjNiZlBVQkZ1UFJzR29feEEzMjJFUTU1QnRkYXln?oc=5",
-      "domain": "The Washington Post",
-      "ts": "2026-07-13T20:17:58+00:00",
-      "topic": "中東",
-      "title_en": "Trump says U.S. military will reimpose blockade on Iranian ports"
-    },
-    {
-      "title": "由於伊朗緊張局勢抑制風險偏好，華爾街收低；晶片製造商下降",
-      "url": "https://news.google.com/rss/articles/CBMisAFBVV95cUxPSUxJelN2M2lFYXd0QzZIdkhQVGdKTFl2clAtSllTMzIxZ0xudk9CeFpNNVV5MVNVSTdhb251ZjZYbWZ3UFQxWGl0ZWRBRXc3NFVvbXpRT1pPUjZxWUw5VDhtZ2s0bDZVT2VrWEp6M01qeTgwcWFtdmxOcFBYdmQxU1J6anlGbURld1ZmdnloOFBOaTJYbUFxNGo0dTFvbEl1bFdZTXIwcjMtRldFd1BMTw?oc=5",
-      "domain": "Reuters",
-      "ts": "2026-07-13T20:16:50+00:00",
-      "topic": "中東",
-      "title_en": "Wall Street ends lower as Iran tensions dampen risk appetite; chipmakers drop"
-    },
-    {
-      "title": "立法者要求五角大廈公佈伊朗學校罷工調查結果",
-      "url": "https://news.google.com/rss/articles/CBMivAFBVV95cUxPaFpXV2hLVHVQMmdvSC1Zd2JjNjZRMlFXN3ltcFFMOVRobWdwUjNKb1hkUnlyUnZ2RUZ1MEtqbTNkUkp3RkxIaEh5N3Fzb290QnhjeWdrVVJJNFlGNGJPLURERnpnM09tTVF5T0tDQ3ZoWEdHdngxQlVhcXA2cGN4MWVhT3kta245Sm5LN3dqT1ZVcGdtbS1GQ2sxMmJ0Q2xUaXZTXzNIWXNaYUlGODlwX0ZwbUtPSnRjbm1TMg?oc=5",
-      "domain": "Reuters",
-      "ts": "2026-07-13T19:43:44+00:00",
-      "topic": "中東",
-      "title_en": "Lawmakers demand Pentagon release findings from probe of Iran school strike"
-    },
-    {
-      "title": "美軍使用海盜船海上無人機攻擊伊朗",
-      "url": "https://news.google.com/rss/articles/CBMifEFVX3lxTFB1ZTk1bmxLRmcxclFfbU01VlNSaHA3Y2cyNUNUYlNWb0RjbFRTamx3UVVoYTh4NGxTc2hIdzBaSnlxblhtckxTX29RNVczMms3OUhFd2x4SDlOV0s2ZXlHWHUyNG1lQUd3T3h5ZFpUUi1zZ0pId2pGUnhjeDk?oc=5",
-      "domain": "DefenseScoop",
-      "ts": "2026-07-13T19:40:30+00:00",
-      "topic": "中東",
-      "title_en": "U.S. military uses Corsair maritime drones to attack Iran"
-    },
-    {
-      "title": "川普向國會通報針對伊朗的新戰爭",
-      "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxQUU9ieHhBZnpPM195b0pyRmt5amMtOURxWmtDRzZmVnBLMWhmXzNJTWotZkhpckc3YzNfSGZuZUtNV1luSEZNdnJ2SGYyS2RuM2Qzdk5tWFBZM1BPUjdOcEFrSjhDcmFlZWcwbXZfaGx5WG5Zd0xSTlJYcWxOSV9FU1FqUDZmVjE4UU0xdjluN3VMQ1FZT2hjMEoxTVkyZw?oc=5",
-      "domain": "Politico",
-      "ts": "2026-07-13T19:39:00+00:00",
-      "topic": "中東",
-      "title_en": "Trump notifies Congress of new war against Iran"
-    },
-    {
-      "title": "川普支持葛拉漢主導的俄羅斯制裁方案",
-      "url": "https://news.google.com/rss/articles/CBMieEFVX3lxTFBuczNUeUJYMEVuSXFrV0NFR1RrRGZmemN3Z05DZmh5YVVEQU81bGFoTXBmQVNKYkhyS3c4QmRJeUpUcGRMWTFuUjlPRnZDaDRCbXNXazkzek92blNTNzFycDQ1MEtLR0xra18tS3RKaUJ6dG51SEYwTw?oc=5",
-      "domain": "CNN",
-      "ts": "2026-07-13T19:27:15+00:00",
-      "topic": "俄烏",
-      "title_en": "Trump backs Russia sanctions package spearheaded by Graham"
-    },
-    {
-      "title": "川普稱美國將在霍爾木茲海峽封鎖伊朗並向船隻收取安全通行費",
-      "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxNQXlDMHpMczFma2paOVJQMzZuZzVNVFZLeS04V0VXUk1zUFBSTGRaelYzaU1fQlg0azEwQ1dQQ2lfV2VmOFBMZ0ZGa0tjSWJGUWVFdDhhUTdCbmpKMy1QRHVOdE5YRnliNmJfVkRKU09zdVhYSm1hQW94MDlUbEp1OXB0ZjIzZlFtYUdZZHBQb2pHT1V5bjZtbVE0QVN3cTg?oc=5",
-      "domain": "AP News",
-      "ts": "2026-07-13T19:07:00+00:00",
-      "topic": "中東",
-      "title_en": "Trump says US will blockade Iran in the Strait of Hormuz and charge ships for safe passage"
-    },
-    {
-      "title": "川普表示他將重新實施美國對伊朗的封鎖",
-      "url": "https://news.google.com/rss/articles/CBMisAFBVV95cUxPb3JKVjY4ME8zU2ZPQ01zeWZnZjdodjZfNWRUcnlSc2EzdVBIRE5zdzZtNjFLVnhpSXE4Ti1pQkhkNjM1a1o2VnQwbmtuTEdQRFdWX0RzZlhmWjdTYnRtc2NQUUpzZEs4c0Z1X3NlQ1ZSRVNncTJsMi1WTWZaanN1dzBUeHRDTXVGRU9nMnU5YkEzNWVmZDJseFNkSHYydWlDS0g5OXBVM0xpdU1tVHFoRA?oc=5",
-      "domain": "WSJ",
-      "ts": "2026-07-13T18:55:00+00:00",
-      "topic": "中東",
-      "title_en": "Trump Says He Is Reimposing the U.S. Blockade of Iran"
-    },
-    {
-      "title": "川普正式通知國會恢復對伊朗的軍事行動",
-      "url": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxOcGxfejc0dWZ3Y2RiUlAxMWxOZnZ1N1Nwb3FFMW5ZeklIWThSZzdpTDhsNnB6WUk4MlFrVXBBMVpHX1hRY0hoN2hpb3NFMnRNUnp3QjZtXy1hNy1Ja0xfWURMQWlqV0xhQlY3TDc4TW9vNEdvbUk2WmNBYnZhOWxNUnhCMzJ3Sm5f?oc=5",
-      "domain": "Deseret News",
-      "ts": "2026-07-13T18:44:55+00:00",
-      "topic": "中東",
-      "title_en": "Trump formally notifies Congress of resumed military action in Iran"
+      "title_en": "Trump says US will hit Iran hard tonight, Tuesday"
     }
   ],
   "food": {
@@ -1814,7 +1815,7 @@
     }
   ],
   "usda": {
-    "updated_at": "2026-07-13T16:07:56.833906+00:00",
+    "updated_at": "2026-07-13T22:09:29.704582+00:00",
     "week_ending": "2026-07-02",
     "items": [
       {
@@ -1989,15 +1990,15 @@
         "name": "Freddie's Beach Bar",
         "live_available": true,
         "live_busyness": 5,
-        "forecasted": 20,
-        "delta": -15,
+        "forecasted": 30,
+        "delta": -25,
         "open": "Open"
       },
       {
         "name": "Highline RxR",
         "live_available": false,
         "live_busyness": null,
-        "forecasted": 50,
+        "forecasted": 70,
         "delta": null,
         "open": "Open"
       },
@@ -2005,28 +2006,28 @@
         "name": "Ireland's Four Courts",
         "live_available": true,
         "live_busyness": 5,
-        "forecasted": 40,
-        "delta": -35,
+        "forecasted": 55,
+        "delta": -50,
         "open": "Open"
       }
     ],
     "open_count": 2,
     "total": 4,
     "avg_live_busyness": 5.0,
-    "avg_delta": -25.0,
-    "max_emptiness": 35,
-    "emptiness": 29.0,
-    "overtime_score": 72.5
+    "avg_delta": -37.5,
+    "max_emptiness": 50,
+    "emptiness": 42.5,
+    "overtime_score": 100.0
   },
   "regions": [
     {
       "key": "mideast",
       "name": "美伊 / 中東",
       "flag": "🇮🇷",
-      "score": 46.2,
+      "score": 47.4,
       "level": "HIGH",
       "factors": {
-        "poly": 23.1,
+        "poly": 22.9,
         "gdelt": 79.7,
         "gdelt_delta": -31.9,
         "notam": 24,
@@ -2034,8 +2035,8 @@
         "notam_closure": false,
         "firms": 100.0,
         "firms_hotspots": 9,
-        "avi": 20,
-        "avi_count": 2
+        "avi": 30,
+        "avi_count": 3
       },
       "top_market": "Will the U.S. invade Iran before 2027?"
     },
@@ -2043,19 +2044,19 @@
       "key": "ukraine",
       "name": "俄烏戰爭",
       "flag": "🇺🇦",
-      "score": 39.6,
+      "score": 40.1,
       "level": "ELEVATED",
       "factors": {
-        "poly": 4.7,
-        "gdelt": 67.4,
-        "gdelt_delta": -17.4,
+        "poly": 4.6,
+        "gdelt": 74.6,
+        "gdelt_delta": -9.3,
         "notam": 40,
         "notam_danger": 5,
         "notam_closure": false,
         "firms": 72,
         "firms_hotspots": 6,
-        "avi": 50,
-        "avi_count": 5
+        "avi": 40,
+        "avi_count": 4
       },
       "top_market": "Will Russia enter Zaporizhia by December 31, 2026?"
     },
@@ -2085,8 +2086,8 @@
       "score": 0.2,
       "level": "WATCH",
       "factors": {
-        "gdelt": 0.5,
-        "gdelt_delta": -86.6,
+        "gdelt": 0.6,
+        "gdelt_delta": -82.0,
         "notam": 0,
         "notam_danger": 0,
         "notam_closure": false,
@@ -2129,7 +2130,7 @@
     "notam": "https://notams.aim.faa.gov/"
   },
   "_notify": {
-    "bucket": 495549,
+    "bucket": 495550,
     "level": "NORMAL",
     "pizza_extreme": true,
     "hotspots": 15
