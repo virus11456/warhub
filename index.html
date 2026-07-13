@@ -478,6 +478,14 @@
 
   /* Polymarket Card */
   .poly-card { border-top: 2px solid var(--accent4); }
+  .news-card { border-top: 2px solid var(--accent4); }
+  .news-item { display:flex; gap:.55rem; align-items:baseline; padding:.5rem .1rem; border-bottom:1px solid rgba(255,255,255,.05); font-family:'Share Tech Mono',monospace; }
+  .news-item:last-child { border-bottom:none; }
+  .news-topic { flex:none; font-size:.58rem; font-weight:700; padding:.08rem .38rem; border:1px solid currentColor; letter-spacing:1px; opacity:.95; }
+  .news-time { flex:none; font-size:.62rem; color:var(--text-dim); min-width:56px; }
+  .news-title { font-size:.78rem; color:var(--text); text-decoration:none; line-height:1.4; }
+  .news-title:hover { color:var(--accent); text-decoration:underline; }
+  .news-src { color:var(--text-dim); font-size:.6rem; white-space:nowrap; }
 
   .poly-market-list { display: flex; flex-direction: column; gap: 0.8rem; }
 
@@ -1465,6 +1473,23 @@
   </div>
 
 
+  <!-- ══════════ 即時戰情快訊（GDELT 早期預警）══════════ -->
+  <div class="card news-card" id="news-card" style="margin-bottom:1.5rem">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-bottom:.4rem">
+      <div class="section-title" style="margin:0">📡 即時戰情快訊 · 早期預警</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);display:flex;gap:.8rem;align-items:center">
+        <span style="color:var(--accent1)">⟳ 每 15 分鐘</span>
+        <span id="news-updated">載入中…</span>
+      </div>
+    </div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim);margin-bottom:.5rem">
+      GDELT 全球新聞監測 · 篩選白宮／中國／戰爭升級相關頭條，作為開戰預測的領先訊號（點擊看原文）
+    </div>
+    <div id="news-list">
+      <div style="padding:1rem;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 連接 GDELT 新聞流…</div>
+    </div>
+  </div>
+
   <!-- ══════════ PIZZINT 整合卡片 ══════════ -->
   <div class="card pizza-bar-card" id="pizza-card" style="margin-bottom:1.5rem">
 
@@ -2386,6 +2411,10 @@ async function fetchRealPizzaData() {
     try { renderTicker(json); }
     catch(err) { console.warn('[WARHUBS] ticker render error:', err.message); }
 
+    // 即時戰情快訊（GDELT 頭條）
+    try { renderNews(json); }
+    catch(err) { console.warn('[WARHUBS] renderNews error:', err.message); }
+
     // 同步渲染 AVI 軍機資料
     if (json.aviation) {
       try { renderAviation(json.aviation); }
@@ -2766,6 +2795,35 @@ function sparklineSvg(points, color) {
 }
 
 // ─── INTEL FEED 跑馬燈：用 data.json 即時資料重建 ─────────────
+const NEWS_TOPIC_COLOR = { '俄烏':'#ff4d5e','中東':'#f5a623','台海':'#00cfe8','朝鮮':'#a374ff','南海':'#35e08a','白宮':'#7fb2ff','中國':'#ff7a7a','全球':'#8fa6b8' };
+function newsAgo(ts){
+  if(!ts) return '';
+  const m=(Date.now()-Date.parse(ts))/60000;
+  if(!isFinite(m)) return '';
+  if(m<1) return '剛剛';
+  if(m<60) return Math.floor(m)+' 分前';
+  const hh=m/60; if(hh<24) return Math.floor(hh)+' 時前';
+  return Math.floor(hh/24)+' 天前';
+}
+function renderNews(json){
+  const el=document.getElementById('news-list'); if(!el) return;
+  const items=(json.news||[]).slice(0,12);
+  if(!items.length){
+    el.innerHTML='<div style="padding:1rem;text-align:center;font-family:\'Share Tech Mono\',monospace;font-size:.7rem;color:var(--text-dim)">暫無即時新聞（下次更新重試）</div>';
+    return;
+  }
+  el.innerHTML=items.map(function(n){
+    const c=NEWS_TOPIC_COLOR[n.topic]||'#8fa6b8';
+    return '<div class="news-item">'
+      +'<span class="news-topic" style="color:'+c+'">'+escapeHtml(n.topic||'全球')+'</span>'
+      +'<span class="news-time">'+newsAgo(n.ts)+'</span>'
+      +'<a class="news-title" href="'+escapeHtml(n.url||'#')+'" target="_blank" rel="noopener">'
+      +escapeHtml(n.title||'')+' <span class="news-src">— '+escapeHtml(n.domain||'')+'</span></a>'
+      +'</div>';
+  }).join('');
+  const upd=document.getElementById('news-updated');
+  if(upd) upd.textContent = items[0].ts ? ('最新 '+newsAgo(items[0].ts)) : '';
+}
 function renderTicker(json) {
   const el = document.getElementById('ticker');
   if (!el) return;
@@ -3289,9 +3347,7 @@ const WarGlobe = (function(){
       ctx.strokeText(lbl,p.x,p.y-rad-6); ctx.fillStyle=rg.color; ctx.fillText(lbl,p.x,p.y-rad-6);
       ctx.globalAlpha=1;
     }
-    ctx.strokeStyle='rgba(96,176,255,0.55)'; ctx.lineWidth=1.4;
-    ctx.shadowColor='rgba(80,160,255,0.9)'; ctx.shadowBlur=14;
-    ctx.beginPath(); ctx.arc(cx,cy,R,0,7); ctx.stroke(); ctx.shadowBlur=0;
+    // 邊緣不再畫硬線，改由大氣光暈自然收邊（更像真實星球）
   }
   function loop(ts){
     raf=null;
