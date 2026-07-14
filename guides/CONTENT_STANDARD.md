@@ -94,9 +94,8 @@ PY
 | 戰爭前 | cash-finance.html | ✅ 完整版（2,010 字）|
 | 戰爭前 | children-prep.html | ✅ 完整版（2,008 字）|
 | 戰爭前 | community-mutual-aid.html | ✅ 完整版（2,034 字）|
-| 戰爭前 | crypto-payments.html | ✅ 完整版（2,230 字）|
 
-> **全部 19 篇皆已達標**（純中文 >2000、表格、FAQPage、≥2 外部權威、CC 圖片、三層內鏈、站內查重 <15%）。
+> **全部 18 篇皆已達標**（純中文 >2000、表格、FAQPage、≥2 外部權威、CC 圖片、三層內鏈、站內查重 <15%）。
 
 > 追加圖片授權：
 > - `img/power-outage.jpg` — ViajeroExtraviado，CC0（公有領域）
@@ -115,6 +114,5 @@ PY
 > - `img/community.jpg` — Jocelyn Augustino／FEMA，公有領域（community-mutual-aid）
 > - `img/cash.jpg` — 臺灣銀行（1954 新臺幣壹圓券），公有領域（cash-finance）
 > - `img/children.jpg` — David Bibo／FEMA，公有領域（children-prep）
-> - `img/crypto.jpg` — Satheesh Sankaran，CC BY 2.0（crypto-payments）
 
 > 圖片授權：`guides/img/boiling-water.jpg` — 作者 GRAN，CC BY 3.0，來源 https://commons.wikimedia.org/wiki/File:Boiling_water.jpg
