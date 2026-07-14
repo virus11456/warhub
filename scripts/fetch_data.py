@@ -892,6 +892,72 @@ async def fetch_gnews(session: aiohttp.ClientSession) -> list[dict]:
     return []
 
 
+# ─────────────────────────────────────────────────────────────
+# 🇹🇼 台海軍事動態新聞（共軍擾台/軍演/軍艦穿越/國防部戰報）
+#   直接用中文查詢 + hl=zh-TW，標題已是繁中免翻譯；為「新聞訊號」非精確計數。
+# ─────────────────────────────────────────────────────────────
+TW_MIL_QUERY = ("共軍 OR 解放軍 OR 擾台 OR 台海 OR 台灣海峽 OR 軍演 OR 國防部 "
+                "OR 航空母艦 OR 軍艦 OR 穿越台灣海峽")
+
+def _tw_topic(title: str) -> str:
+    t = title or ""
+    if any(k in t for k in ("擾台", "架次", "戰機", "軍機", "殲")): return "共軍機艦"
+    if any(k in t for k in ("軍演", "演習", "演訓", "operation")):   return "軍演"
+    if any(k in t for k in ("穿越", "台灣海峽", "航行", "軍艦", "驅逐艦", "航空母艦")): return "海峽航行"
+    if "國防部" in t: return "國防部"
+    return "台海"
+
+async def fetch_tw_military_news(session: aiohttp.ClientSession) -> list[dict]:
+    import urllib.parse, xml.etree.ElementTree as ET
+    url = (GNEWS_RSS + "?q=" + urllib.parse.quote(TW_MIL_QUERY)
+           + "&hl=zh-TW&gl=TW&ceid=TW:zh-Hant")
+    for attempt, backoff in ((1, 4), (2, 8), (3, 0)):
+        try:
+            async with session.get(
+                url, timeout=aiohttp.ClientTimeout(total=25),
+                headers={"User-Agent": "Mozilla/5.0 (compatible; warhub/1.0)"},
+            ) as resp:
+                raw = await resp.read()
+            root = ET.fromstring(raw)
+            out, seen = [], set()
+            for it in root.findall(".//item"):
+                title = (it.findtext("title") or "").strip()
+                link  = (it.findtext("link") or "").strip()
+                pub   = (it.findtext("pubDate") or "").strip()
+                src_el = it.find("source")
+                source = (src_el.text or "").strip() if src_el is not None else ""
+                if not title or not link:
+                    continue
+                if source and title.endswith(" - " + source):
+                    title = title[: -(len(source) + 3)].strip()
+                key = title[:40]
+                if key in seen:
+                    continue
+                seen.add(key)
+                out.append({"title": title, "url": link, "domain": source,
+                            "ts": _news_iso(pub), "topic": _tw_topic(title)})
+                if len(out) >= 30:
+                    break
+            out.sort(key=lambda a: a.get("ts") or "", reverse=True)
+            out = out[:12]
+            if out:
+                log.info(f"TW military news: {len(out)} headlines")
+                return out
+        except Exception as e:
+            if backoff:
+                await asyncio.sleep(backoff)
+            else:
+                log.warning(f"TW news failed after retries: {e}")
+    try:
+        prev = json.loads(DATA_FILE.read_text(encoding="utf-8")).get("tw_news") or []
+        if prev:
+            for n in prev: n["stale"] = True
+            return prev
+    except Exception:
+        pass
+    return []
+
+
 
 # ─────────────────────────────────────────────────────────────
 # 🌾 中國糧食進口監測（鏡像數據：主要出口國對中國出口合計）
@@ -1104,6 +1170,121 @@ async def fetch_food_history(session: aiohttp.ClientSession) -> list:
     remaining = len([ym for ym in targets if key(ym) not in store])
     log.info(f"food history: {len(store)}/{len(targets)} months filled, {remaining} remaining")
     return series
+
+
+# ─────────────────────────────────────────────────────────────
+# ⚙️ 戰略物資進口監測（軍工必需、中國高度依賴進口的原物料）
+#   方法同糧食：中國自 2025 起停報 Comtrade → 用「主要出口國對中出口」鏡像加總。
+#   觀察「異常高」（突然囤積＝可能備戰）或「異常低」（可能改用儲備、降低國際牽制）。
+#   石油刻意不納入：中國最大油源（俄、沙、伊拉克）皆不報 Comtrade，鏡像抓不到。
+# ─────────────────────────────────────────────────────────────
+STRAT_MATERIALS = [
+    {"cmd": "4001", "name": "天然橡膠", "use": "輪胎・密封件",
+     "exp": [("764", "泰國"), ("360", "印尼"), ("458", "馬來西亞"), ("704", "越南")],
+     "hi": "輪胎、履帶、密封件等軍需橡膠需求突增，可能擴大車輛與裝備生產",
+     "lo": "轉用戰備儲備或民用需求萎縮，須留意產線與經濟訊號"},
+    {"cmd": "2604", "name": "鎳礦砂", "use": "特殊鋼・超合金",
+     "exp": [("608", "菲律賓"), ("360", "印尼"), ("36", "澳洲")],
+     "hi": "不鏽鋼、噴射引擎超合金、電池用鎳需求升高，指向軍工/國防產能擴張",
+     "lo": "改用庫存或冶煉調整，也可能反映製造業放緩"},
+    {"cmd": "2610", "name": "鉻礦砂", "use": "裝甲鋼・不鏽鋼",
+     "exp": [("710", "南非"), ("792", "土耳其"), ("398", "哈薩克")],
+     "hi": "裝甲鋼、槍砲耐蝕鋼需求升高，是典型的軍備擴張訊號",
+     "lo": "改用儲備或不鏽鋼需求下滑"},
+    {"cmd": "2601", "name": "鐵礦砂", "use": "鋼鐵（戰爭核心）",
+     "exp": [("36", "澳洲"), ("76", "巴西"), ("710", "南非"), ("699", "印度")],
+     "hi": "鋼鐵產能全開（造艦、彈藥、基建），強烈的備戰/擴產訊號",
+     "lo": "經濟走弱，或改用國內礦與儲備、降低海運遭封鎖的曝險（戰前也可能出現）"},
+]
+
+async def _comtrade_one(session, reporter: str, cmd: str, period: int):
+    """某出口國該月對中國(156)出口某 HS 商品的淨重(kg)；失敗回 None。"""
+    params = {"reporterCode": reporter, "flowCode": "X", "partnerCode": "156",
+              "cmdCode": cmd, "period": str(period), "partner2Code": "0", "motCode": "0"}
+    for attempt, bk in ((1, 8), (2, 15), (3, 0)):
+        try:
+            async with session.get(COMTRADE_URL, params=params,
+                    headers={"User-Agent": USER_AGENT},
+                    timeout=aiohttp.ClientTimeout(total=30)) as r:
+                if r.status == 429:
+                    if bk: await asyncio.sleep(bk); continue
+                    return None
+                txt = await r.text()
+            data = json.loads(txt)
+            return sum((row.get("netWgt") or 0) for row in (data.get("data") or []))
+        except Exception:
+            if bk: await asyncio.sleep(bk)
+            else: return None
+    return None
+
+async def fetch_strategic_imports(session: aiohttp.ClientSession) -> dict:
+    """中國戰略物資（橡膠/鎳/鉻/鐵礦）鏡像進口量＋年增率＋異常旗標。每日更新一次。"""
+    prev = {}
+    try:
+        prev = json.loads(DATA_FILE.read_text(encoding="utf-8")).get("strat") or {}
+    except Exception:
+        pass
+    if prev.get("updated_at"):
+        try:
+            age = (datetime.now(timezone.utc) -
+                   datetime.fromisoformat(prev["updated_at"])).total_seconds()
+            if age < 22 * 3600:
+                log.info("strat: fresh (<22h), carried over")
+                return prev
+        except Exception:
+            pass
+
+    now = datetime.now(timezone.utc)
+    cur = now.year * 100 + now.month
+    # 用鐵礦砂（澳洲，量大且穩定回報）探最新有資料的參考月
+    L = None
+    for k in range(2, 9):
+        p = _ym_add(cur, -k)
+        v = await _comtrade_one(session, "36", "2601", p)
+        await asyncio.sleep(3)
+        if v and v > 0:
+            L = p; break
+    if not L:
+        log.warning("strat: no reference month found")
+        return {**prev, "stale": True} if prev else {}
+    L12 = _ym_add(L, -12)
+
+    async def collect(cmd, exps, month):
+        tot, ok = 0, 0
+        for rep, _ in exps:
+            v = await _comtrade_one(session, rep, cmd, month)
+            await asyncio.sleep(3)
+            if v is not None:
+                if v > 0: ok += 1
+                tot += v
+        return tot, ok
+
+    items = []
+    for m in STRAT_MATERIALS:
+        cur_t, ok1 = await collect(m["cmd"], m["exp"], L)
+        prev_t, _ = await collect(m["cmd"], m["exp"], L12)
+        if ok1 == 0:
+            continue
+        a, b = cur_t / 1e7, prev_t / 1e7          # 萬噸
+        yoy = round((a - b) / b * 100, 1) if b > 0 else None
+        anomaly = ""
+        if yoy is not None:
+            if yoy >= 25: anomaly = "high"
+            elif yoy <= -25: anomaly = "low"
+        items.append({"cmd": m["cmd"], "name": m["name"], "use": m["use"],
+                      "wan_ton": round(a, 1), "prev_wan_ton": round(b, 1),
+                      "yoy_pct": yoy, "anomaly": anomaly,
+                      "hi": m["hi"], "lo": m["lo"]})
+    if not items:
+        return {**prev, "stale": True} if prev else {}
+    log.info(f"strat: ref={L} materials={len(items)}")
+    return {
+        "updated_at": now.isoformat(),
+        "ref_month": f"{L // 100}-{L % 100:02d}",
+        "prev_year_month": f"{L12 // 100}-{L12 % 100:02d}",
+        "items": items,
+        "note": "鏡像代理值（主要出口國對中出口合計）· 月資料約 3–4 月落差 · 異常高＝突然囤積、異常低＝改用儲備，皆須交叉印證",
+    }
 
 
 # ─────────────────────────────────────────────────────────────
@@ -1696,6 +1877,16 @@ async def main():
         except Exception as e:
             log.warning(f"food history skipped: {e}")
             food_hist = []
+        try:
+            strat = await fetch_strategic_imports(session)
+        except Exception as e:
+            log.warning(f"strategic imports skipped: {e}")
+            strat = {}
+        try:
+            tw_news = await fetch_tw_military_news(session)
+        except Exception as e:
+            log.warning(f"tw military news skipped: {e}")
+            tw_news = []
 
     pizza_shops  = transform_pizza_shops(pizzint_data)
     pizza_index  = pizzint_data.get("overall_index", 0)
@@ -1745,6 +1936,8 @@ async def main():
         "news":          news,
         "food":          food,
         "food_hist":     food_hist,
+        "strat":         strat,
+        "tw_news":       tw_news,
         "usda":          usda,
         "wikipedia":     wikipedia,
         "notams":        notams,
