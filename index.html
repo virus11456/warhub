@@ -1877,7 +1877,8 @@
 .avi-tr .row .down { color:var(--accent); }
 .avi-tr .row .flat { color:var(--text-dim); }
 .avi-tr .row .na   { color:rgba(255,255,255,.3); }
-.avi-list       { display:flex; flex-direction:column; gap:.35rem; }
+.avi-list       { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.35rem; }
+@media (max-width: 640px) { .avi-list { grid-template-columns:1fr; } }
 .avi-item       { display:grid; grid-template-columns:12px 1fr auto; align-items:center; gap:.5rem; padding:.45rem .55rem; background:var(--bg3); border:1px solid var(--border); font-family:'Share Tech Mono',monospace; font-size:.7rem; }
 .avi-dot        { width:8px; height:8px; border-radius:50%; }
 .avi-dot.tanker { background:var(--accent); box-shadow:0 0 5px var(--accent); }
