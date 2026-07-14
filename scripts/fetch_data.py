@@ -898,8 +898,20 @@ async def fetch_gnews(session: aiohttp.ClientSession) -> list[dict]:
 # 🇹🇼 台海軍事動態新聞（共軍擾台/軍演/軍艦穿越/國防部戰報）
 #   直接用中文查詢 + hl=zh-TW，標題已是繁中免翻譯；為「新聞訊號」非精確計數。
 # ─────────────────────────────────────────────────────────────
-TW_MIL_QUERY = ("共軍 OR 解放軍 OR 擾台 OR 台海 OR 台灣海峽 OR 軍演 OR 國防部 "
-                "OR 航空母艦 OR 軍艦 OR 穿越台灣海峽")
+TW_MIL_QUERY = ("共軍 OR 解放軍 OR 擾台 OR 繞台 OR 台海 OR 台灣海峽 OR 防空識別區 "
+                "OR 共機 OR 共艦 OR 東部戰區 OR 穿越台灣海峽")
+# 只保留「台海／共軍動態」相關；濾掉混進來的他戰區與國內雜訊
+TW_KEEP = ("台海", "臺海", "台灣海峽", "臺灣海峽", "穿越台灣海峽", "共軍", "解放軍",
+           "中共軍", "共機", "共艦", "擾台", "繞台", "中線", "防空識別", "ADIZ",
+           "東部戰區", "圍台", "國機國艦")
+TW_DROP = ("伊朗", "以色列", "加薩", "加沙", "烏克蘭", "俄羅斯", "俄烏", "葉門",
+           "胡塞", "黎巴嫩", "敘利亞", "哈瑪斯", "毒油", "福利站", "站哨", "外包")
+
+def _tw_relevant(title: str) -> bool:
+    t = title or ""
+    if any(k in t for k in TW_DROP):
+        return False
+    return any(k in t for k in TW_KEEP)
 
 def _tw_topic(title: str) -> str:
     t = title or ""
@@ -932,6 +944,8 @@ async def fetch_tw_military_news(session: aiohttp.ClientSession) -> list[dict]:
                     continue
                 if source and title.endswith(" - " + source):
                     title = title[: -(len(source) + 3)].strip()
+                if not _tw_relevant(title):      # 濾掉他戰區（伊朗等）與國內雜訊
+                    continue
                 key = title[:40]
                 if key in seen:
                     continue
