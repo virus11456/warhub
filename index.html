@@ -1693,7 +1693,7 @@
       <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim)"><span id="food-updated">結構性背景指標</span></div>
     </div>
     <div style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim);margin-bottom:.6rem" id="food-sub">
-      鏡像數據（主要出口國對中出口合計）· 觀察是否異常囤糧——備戰的<strong>佐證</strong>訊號，非即時、須與其他指標交叉印證
+      鏡像數據（主要出口國對中出口合計）· <strong>異常高＝囤糧備戰</strong>；<strong>異常低≠自給提升</strong>，可能是糧食產量或人口下降（內政因素）· 備戰佐證訊號，非即時、須交叉印證
     </div>
     <div id="food-grid">
       <div style="padding:1rem;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 連接 UN Comtrade…</div>
@@ -1743,8 +1743,12 @@
 .cn-banner-t { font-family:'Orbitron',monospace; font-size:1.05rem; font-weight:900; letter-spacing:2px; color:var(--text-primary); }
 .cn-banner-s { font-family:'Share Tech Mono',monospace; font-size:.66rem; color:var(--text-dim); margin-top:.35rem; line-height:1.6; }
 /* 戰略物資列 */
-.strat-row { display:grid; grid-template-columns:1fr auto auto; gap:.6rem; align-items:baseline; padding:.55rem .2rem; border-bottom:1px solid rgba(255,255,255,.05); }
-.strat-row:last-child { border-bottom:none; }
+.strat-item { padding:.5rem .2rem; border-bottom:1px solid rgba(255,255,255,.05); }
+.strat-item:last-child { border-bottom:none; }
+.strat-row { display:grid; grid-template-columns:1fr auto auto; gap:.6rem; align-items:baseline; }
+.strat-note { font-family:'Share Tech Mono',monospace; font-size:.62rem; color:var(--text-dim); line-height:1.5; margin-top:.35rem; padding-left:.1rem; }
+.strat-note.hi { color:#ff8a95; }
+.strat-note.lo { color:#ffcf7a; }
 .strat-name { font-family:'Orbitron',monospace; font-weight:700; color:var(--text); font-size:.82rem; }
 .strat-name small { display:block; font-family:'Share Tech Mono',monospace; font-weight:400; font-size:.6rem; color:var(--text-dim); letter-spacing:0; margin-top:.1rem; }
 .strat-val { font-family:'Share Tech Mono',monospace; color:var(--text); font-size:.8rem; }
@@ -3086,10 +3090,18 @@ function renderStrat(json){
     var w=it.wan_ton>=100?Math.round(it.wan_ton).toLocaleString():it.wan_ton;
     var flag=it.anomaly==='high'?'<span class="strat-flag high">異常高</span>'
             :it.anomaly==='low'?'<span class="strat-flag low">異常低</span>':'';
-    return '<div class="strat-row"><div class="strat-name">'+escapeHtml(it.name)
+    // 判讀備註：異常時醒目標出對應解讀，平常則兩種都列供參
+    var note='';
+    if(it.hi||it.lo){
+      if(it.anomaly==='high') note='<div class="strat-note hi">⚑ 異常高判讀：'+escapeHtml(it.hi||'')+'</div>';
+      else if(it.anomaly==='low') note='<div class="strat-note lo">⚑ 異常低判讀：'+escapeHtml(it.lo||'')+'</div>';
+      else note='<div class="strat-note">▲高→'+escapeHtml(it.hi||'')+'　▼低→'+escapeHtml(it.lo||'')+'</div>';
+    }
+    return '<div class="strat-item"><div class="strat-row"><div class="strat-name">'+escapeHtml(it.name)
       +'<small>'+escapeHtml(it.use||'')+'</small></div>'
       +'<div class="strat-val">'+w+'<span class="u">萬噸</span></div>'
-      +'<div class="strat-yoy" style="color:'+col+'">'+(y==null?'—':arr+Math.abs(y)+'%')+flag+'</div></div>';
+      +'<div class="strat-yoy" style="color:'+col+'">'+(y==null?'—':arr+Math.abs(y)+'%')+flag+'</div></div>'
+      +note+'</div>';
   }).join('');
   var upd=document.getElementById('strat-updated');
   if(upd) upd.textContent='參考月 '+(s.ref_month||'—')+'（對比 '+(s.prev_year_month||'')+'）';

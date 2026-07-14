@@ -1180,13 +1180,21 @@ async def fetch_food_history(session: aiohttp.ClientSession) -> list:
 # ─────────────────────────────────────────────────────────────
 STRAT_MATERIALS = [
     {"cmd": "4001", "name": "天然橡膠", "use": "輪胎・密封件",
-     "exp": [("764", "泰國"), ("360", "印尼"), ("458", "馬來西亞"), ("704", "越南")]},
+     "exp": [("764", "泰國"), ("360", "印尼"), ("458", "馬來西亞"), ("704", "越南")],
+     "hi": "輪胎、履帶、密封件等軍需橡膠需求突增，可能擴大車輛與裝備生產",
+     "lo": "轉用戰備儲備或民用需求萎縮，須留意產線與經濟訊號"},
     {"cmd": "2604", "name": "鎳礦砂", "use": "特殊鋼・超合金",
-     "exp": [("608", "菲律賓"), ("360", "印尼"), ("36", "澳洲")]},
+     "exp": [("608", "菲律賓"), ("360", "印尼"), ("36", "澳洲")],
+     "hi": "不鏽鋼、噴射引擎超合金、電池用鎳需求升高，指向軍工/國防產能擴張",
+     "lo": "改用庫存或冶煉調整，也可能反映製造業放緩"},
     {"cmd": "2610", "name": "鉻礦砂", "use": "裝甲鋼・不鏽鋼",
-     "exp": [("710", "南非"), ("792", "土耳其"), ("398", "哈薩克")]},
+     "exp": [("710", "南非"), ("792", "土耳其"), ("398", "哈薩克")],
+     "hi": "裝甲鋼、槍砲耐蝕鋼需求升高，是典型的軍備擴張訊號",
+     "lo": "改用儲備或不鏽鋼需求下滑"},
     {"cmd": "2601", "name": "鐵礦砂", "use": "鋼鐵（戰爭核心）",
-     "exp": [("36", "澳洲"), ("76", "巴西"), ("710", "南非"), ("699", "印度")]},
+     "exp": [("36", "澳洲"), ("76", "巴西"), ("710", "南非"), ("699", "印度")],
+     "hi": "鋼鐵產能全開（造艦、彈藥、基建），強烈的備戰/擴產訊號",
+     "lo": "經濟走弱，或改用國內礦與儲備、降低海運遭封鎖的曝險（戰前也可能出現）"},
 ]
 
 async def _comtrade_one(session, reporter: str, cmd: str, period: int):
@@ -1265,7 +1273,8 @@ async def fetch_strategic_imports(session: aiohttp.ClientSession) -> dict:
             elif yoy <= -25: anomaly = "low"
         items.append({"cmd": m["cmd"], "name": m["name"], "use": m["use"],
                       "wan_ton": round(a, 1), "prev_wan_ton": round(b, 1),
-                      "yoy_pct": yoy, "anomaly": anomaly})
+                      "yoy_pct": yoy, "anomaly": anomaly,
+                      "hi": m["hi"], "lo": m["lo"]})
     if not items:
         return {**prev, "stale": True} if prev else {}
     log.info(f"strat: ref={L} materials={len(items)}")
