@@ -62,8 +62,6 @@ DATA_FILE       = DATA_DIR / "data.json"
 FOOD_HISTORY_FILE = DATA_DIR / "food_history.json"
 # 共軍每日擾台架次歷史（過去 30 天，從國防部戰報新聞擷取；逐日累積）
 PLA_HISTORY_FILE = DATA_DIR / "pla_adiz.json"
-# 全指標每日快照長期封存（每日一筆、保留 ~2 年，供未來畫各指標長期趨勢）
-METRICS_DAILY_FILE = DATA_DIR / "metrics_daily.json"
 USER_AGENT      = "WarHub/1.0 (+https://github.com/virus11456/warhub)"
 
 # index.html 上要顯示哪幾家店（pizzint.watch 列了 14 家，我們挑 6 家披薩店）
@@ -1977,55 +1975,6 @@ def update_history(score: dict, pizza_index, regions: list[dict], wiki_score=Non
     return history
 
 
-def update_daily_metrics(score: dict, pizza_index, defcon_level, firms: dict,
-                         aviation: dict | None, wiki_score, nuclear_seismic: dict | None,
-                         regions: list[dict]) -> None:
-    """把所有伺服器端指標每日封存一筆到 metrics_daily.json（台北日期為 key、
-    當日最後一次執行覆蓋、保留 ~2 年）。供未來繪製各指標長期趨勢圖。
-    金融避險（油/金/VIX 等）由前端直接向 Yahoo 取歷史、末日時鐘為靜態值，
-    故不在此封存。"""
-    from datetime import timedelta
-    store = {}
-    try:
-        store = json.loads(METRICS_DAILY_FILE.read_text(encoding="utf-8")).get("days") or {}
-    except Exception:
-        store = {}
-    # 防呆：若歷史檔一時讀不到，至少沿用上一份 data.json 內嵌的封存
-    if not store:
-        try:
-            store = (json.loads(DATA_FILE.read_text(encoding="utf-8"))
-                     .get("metrics_daily") or {}).get("days") or {}
-        except Exception:
-            store = {}
-
-    tp = (datetime.now(timezone.utc) + timedelta(hours=8)).date().isoformat()
-    s = (aviation or {}).get("summary") or {}
-    rec = {
-        "combined": score.get("combined_score"),
-        "poly":     score.get("polymarket_score"),
-        "level":    score.get("alert_level"),
-        "pizza":    pizza_index,
-        "defcon":   defcon_level,
-        "wiki":     wiki_score,
-        "firms":    (firms or {}).get("total_24h"),
-        "avi_total": s.get("total"),
-        "avi_tank":  s.get("tankers"),
-        "avi_awacs": s.get("awacs"),
-        "avi_uav":   s.get("uav"),
-        "seismic":  (nuclear_seismic or {}).get("total"),
-        "regions":  {r["key"]: round(r.get("score", 0)) for r in (regions or [])},
-    }
-    store[tp] = rec  # 當日最後一次執行覆蓋
-    # 保留約 2 年
-    cutoff = (datetime.now(timezone.utc) + timedelta(hours=8) - timedelta(days=730)).date().isoformat()
-    store = {d: v for d, v in store.items() if d >= cutoff}
-    try:
-        METRICS_DAILY_FILE.write_text(json.dumps({"days": store}, ensure_ascii=False), encoding="utf-8")
-    except Exception as e:
-        log.warning(f"metrics_daily write error: {e}")
-    return store
-
-
 def compute_avi_trends(history: list[dict]) -> dict | None:
     """
     由 history 計算軍機三機型（加油機/預警機/偵察無人機）相對過去 24h/7d/30d
@@ -2181,10 +2130,6 @@ async def main():
     # 軍機機型 24h/7d/30d 歷史變化（資料累積後自動填入）
     if isinstance(aviation, dict):
         aviation["trends"] = compute_avi_trends(history)
-    # 全指標每日長期封存（每日一筆、保留 ~2 年）
-    metrics_daily = update_daily_metrics(
-        score, pizza_index, defcon_level, firms, aviation,
-        (wikipedia or {}).get("score"), nuclear_seismic, regions)
 
     output = {
         "updated_at":    datetime.now(timezone.utc).isoformat(),

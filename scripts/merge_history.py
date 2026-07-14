@@ -94,25 +94,8 @@ def merge_months(rel: str, path: Path):
     path.write_text(json.dumps({"months": months}, ensure_ascii=False), encoding="utf-8")
 
 
-def merge_metrics_daily():
-    """每日指標長期封存：遠端有而本地無的日期補上（本地為準，只補缺），保留 ~2 年。"""
-    from datetime import timedelta
-    path = DATA_DIR / "metrics_daily.json"
-    remote = _remote("data/metrics_daily.json")
-    local = _load(path)
-    if remote is None and local is None:
-        return
-    days = dict((remote or {}).get("days") or {})
-    for k, v in ((local or {}).get("days") or {}).items():
-        days[k] = v  # 本地（這次執行）為準
-    cutoff = (datetime.now(timezone.utc) + timedelta(hours=8) - timedelta(days=730)).date().isoformat()
-    days = {d: v for d, v in days.items() if d >= cutoff}
-    path.write_text(json.dumps({"days": days}, ensure_ascii=False), encoding="utf-8")
-
-
 if __name__ == "__main__":
     merge_pla()
     merge_months("data/food_history.json", DATA_DIR / "food_history.json")
     merge_months("data/strat_history.json", DATA_DIR / "strat_history.json")
-    merge_metrics_daily()
     print("history merge guard applied")
