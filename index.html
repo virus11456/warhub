@@ -100,6 +100,12 @@
     color: var(--text-dim);
   }
 
+  .hdr-left {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    min-width: 0;
+  }
   .nav-guides {
     font-family: 'Orbitron', monospace;
     font-size: 0.68rem;
@@ -112,6 +118,7 @@
     border-radius: 3px;
     transition: all .15s;
     white-space: nowrap;
+    flex-shrink: 0;
   }
   .nav-guides:hover { background: var(--accent); color: #04121a; box-shadow: var(--glow); }
 
@@ -860,6 +867,9 @@
     .threat-badge  { display:none; }  /* 手機：騰出空間給三時區時鐘；警報同時顯示於下方 WPI Hero */
     #clock{ font-size:.62rem; } #clock .clk{ margin-left:.5rem; } #clock .clk i{ font-size:.85em; margin-left:.1rem; } .live-lbl{ display:none; }
     .header-status { gap: .6rem; }
+    .hdr-left { gap: .85rem; }   /* 手機：logo 與避難指南保持清楚間距但更緊湊 */
+    .nav-guides { font-size:.62rem; padding:3px 9px; }
+    #clock .clk:first-child { display:none; }   /* 手機：騰出空間給避難指南，隱藏 UTC，保留五角+本地 */
 
     /* Pizza */
     .pizza-emoji   { font-size: 2rem; }
@@ -1248,9 +1258,11 @@
 <!-- Header -->
 <header>
   <div class="header-inner">
-    <div class="logo">WAR<span>HUBS</span> <span style="font-size:0.7rem;color:var(--text-dim);font-weight:400;letter-spacing:2px">戰爭預測情報中心</span></div>
-    <div class="header-status">
+    <div class="hdr-left">
+      <div class="logo">WAR<span>HUBS</span> <span style="font-size:0.7rem;color:var(--text-dim);font-weight:400;letter-spacing:2px">戰爭預測情報中心</span></div>
       <a href="guides/" class="nav-guides">🛡️ 避難指南</a>
+    </div>
+    <div class="header-status">
       <span class="live-ind"><span class="live-dot"></span><span class="live-lbl">即時連線 LIVE DATA</span></span>
       <span id="clock">--:--:-- UTC</span>
       <span class="threat-badge" id="alert-badge">威脅等級 ELEVATED</span>
