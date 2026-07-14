@@ -3791,9 +3791,16 @@ async function fetchFirmsEvents() { /* no-op: 改由 fetchRealPizzaData 從 data
     var n=H.nextSibling; while(n){ var nx=n.nextSibling; body.appendChild(n); n=nx; }
     card.appendChild(body);
     var folded=(id in store)?store[id]:(firstVisit && DEFAULT_FOLD.some(function(k){return title.indexOf(k)>=0;}));
-    var cw=caret(folded); H.insertBefore(cw, H.firstChild); H.classList.add('fold-head');
+    // \u63D2\u5728\u300C\u6A19\u984C\u6587\u5B57\u5143\u7D20\u300D\u5167\uFF08\u800C\u975E\u6574\u5217\uFF09\uFF0C\u907F\u514D\u6A19\u984C\u5217 space-between \u628A\u63D2\u5165\u7684 caret
+    // \u7576\u7B2C\u4E09\u500B flex \u9805\u76EE\u3001\u628A\u6A19\u984C\u63A8\u5230\u7F6E\u4E2D\uFF1B\u7D71\u4E00\u6240\u6709\u5340\u6BB5\u6A19\u984C\u9760\u5DE6\u3002
+    // \u82E5\u6A19\u984C\u5BB9\u5668\u672C\u8EAB\u662F\u5DE6\u53F3\u5169\u6B04\uFF08\u6A19\u984C\uFF0B\u53F3\u5074\u5FBD\u7AE0/\u6642\u9593\uFF09\uFF0Ccaret \u8981\u653E\u9032\u5DE6\u6B04\u7684\u6A19\u984C\u6587\u5B57\u3002
+    var caretHost = titleEl;
+    if(titleEl.classList.contains('wpi-topbar') || titleEl.classList.contains('osint-adv-hdr')){
+      caretHost = titleEl.querySelector('.wpi-title, .osint-adv-hdr > span, span') || titleEl.firstElementChild || titleEl;
+    }
+    var cw=caret(folded); caretHost.insertBefore(cw, caretHost.firstChild); caretHost.classList.add('fold-head');
     card.classList.toggle('folded', !!folded); store[id]=!!folded;
-    H.addEventListener('click', function(ev){
+    caretHost.addEventListener('click', function(ev){
       if(ev.target.closest('a,button')) return;
       var f=!card.classList.contains('folded');
       card.classList.toggle('folded',f); cw.textContent=f?'\u25B8':'\u25BE'; store[id]=f; persist();
