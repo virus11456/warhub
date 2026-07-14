@@ -68,6 +68,9 @@ jobs:
           for i in 1 2 3 4 5; do
             git fetch origin main
             git reset --soft origin/main      # HEAD 移到遠端最新，工作區的新資料保留
+            # 防覆蓋守門員：把遠端已累積的歷史聯集回工作區，避免舊 checkout 的 run
+            # 用「git add data/」把較完整的累積歷史（如回填的共軍架次舊日期）蓋掉。
+            python scripts/merge_history.py || echo "merge guard skipped"
             git add data/
             if git diff --staged --quiet; then echo "no data changes"; exit 0; fi
             git commit -m "data: update $(date -u +'%Y-%m-%dT%H:%MZ')"
