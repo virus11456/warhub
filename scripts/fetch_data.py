@@ -1981,7 +1981,32 @@ def update_history(score: dict, pizza_index, regions: list[dict], wiki_score=Non
 # 💰 經濟避險指標（伺服器端抓 Yahoo，供長期封存；前端另有即時版本）
 #   與前端 FIN 卡片相同標的：金/布油/瑞郎/VIX/小麥 + 四檔國防股
 # ─────────────────────────────────────────────────────────────
-FIN_TICKERS = ["GC=F", "BZ=F", "USDCHF=X", "^VIX", "ZW=F", "LMT", "RTX", "NOC", "GD"]
+FIN_TICKERS = ["GC=F", "BZ=F", "USDCHF=X", "^VIX", "ZW=F", "LMT", "RTX", "NOC", "GD",
+               "^TNX", "^FVX", "^TYX"]   # 美 10/5/30 年公債殖利率（資金逃向安全資產）
+
+# FRED 免費 API（信用利差代理；需設定 FRED_API_KEY 環境變數才啟用）
+FRED_API_KEY = os.environ.get("FRED_API_KEY", "")
+FRED_SERIES = {"em_oas": "BAMLEMCBPIOAS",   # ICE BofA 新興市場公司債利差（廣義 EM 風險）
+               "hy_oas": "BAMLH0A0HYM2"}    # ICE BofA 美國高收益債利差（信用壓力）
+
+async def fetch_fred(session: aiohttp.ClientSession) -> dict:
+    """抓 FRED 信用利差（最新一筆）。未設定 FRED_API_KEY 時回傳空 dict（優雅略過）。"""
+    if not FRED_API_KEY:
+        return {}
+    out = {}
+    for name, sid in FRED_SERIES.items():
+        url = ("https://api.stlouisfed.org/fred/series/observations?series_id=" + sid
+               + "&api_key=" + FRED_API_KEY + "&file_type=json&sort_order=desc&limit=1")
+        try:
+            async with session.get(url, timeout=aiohttp.ClientTimeout(total=15)) as resp:
+                j = await resp.json(content_type=None)
+            obs = (j or {}).get("observations") or []
+            v = obs[0].get("value") if obs else None
+            out[name] = float(v) if v not in (None, "", ".") else None
+        except Exception as e:
+            log.warning(f"FRED {sid} fetch failed: {e}")
+    log.info(f"FRED: fetched {len(out)}/{len(FRED_SERIES)} series")
+    return out
 
 async def fetch_finance(session: aiohttp.ClientSession) -> dict:
     import urllib.parse
@@ -2019,7 +2044,8 @@ async def fetch_finance(session: aiohttp.ClientSession) -> dict:
 
 def update_daily_metrics(score: dict, pizza_index, defcon_level, firms: dict,
                          aviation: dict | None, wiki_score, nuclear_seismic: dict | None,
-                         regions: list[dict], finance: dict | None = None) -> None:
+                         regions: list[dict], finance: dict | None = None,
+                         fred: dict | None = None) -> None:
     """把所有伺服器端指標每日封存一筆到 metrics_daily.json（台北日期為 key、
     當日最後一次執行覆蓋、保留 ~2 年）。供未來繪製各指標長期趨勢圖。
     含經濟避險指標（金/油/瑞郎/VIX/小麥＋國防股，伺服器端抓 Yahoo）；
@@ -2059,8 +2085,9 @@ def update_daily_metrics(score: dict, pizza_index, defcon_level, firms: dict,
     # 經濟避險指標（僅存價格，供長期趨勢；油價戰爭溢價＝布油現價−30日均）
     f = finance or {}
     def _px(sym): return (f.get(sym) or {}).get("price")
+    def _dev(sym): return (f.get(sym) or {}).get("dev")   # 相對 30MA 偏離%
     oil = _px("BZ=F"); oil_ma = (f.get("BZ=F") or {}).get("ma30")
-    rec["fin"] = {
+    fin_rec = {
         "gold":   _px("GC=F"),
         "oil":    oil,
         "usdchf": _px("USDCHF=X"),
@@ -2068,7 +2095,24 @@ def update_daily_metrics(score: dict, pizza_index, defcon_level, firms: dict,
         "wheat":  _px("ZW=F"),
         "oil_premium": (round(oil - oil_ma, 2) if (oil and oil_ma) else None),
         "lmt": _px("LMT"), "rtx": _px("RTX"), "noc": _px("NOC"), "gd": _px("GD"),
+        "ust10": _px("^TNX"), "ust5": _px("^FVX"), "ust30": _px("^TYX"),
     }
+    # 信用利差（FRED；未設 key 時為 None）
+    fr = fred or {}
+    fin_rec["em_oas"] = fr.get("em_oas")
+    fin_rec["hy_oas"] = fr.get("hy_oas")
+    # 「避險群聚」訊號：同時往避險方向明顯偏離 30MA 的指標數（單一指標沒意義、群聚才有）
+    THRESH = 5.0   # 偏離 30MA 逾 5% 才算明顯
+    cluster = 0
+    if (_dev("GC=F") or 0) >= THRESH:  cluster += 1   # 金 ↑
+    if (_dev("BZ=F") or 0) >= THRESH:  cluster += 1   # 油 ↑
+    if (_dev("^VIX") or 0) >= THRESH:  cluster += 1   # VIX ↑
+    if (_dev("USDCHF=X") or 0) >= THRESH: cluster += 1  # 瑞郎走強（USDCHF ↑ 代表美元強；避險時瑞郎/美元皆可能強）
+    for stk in ("LMT", "RTX", "NOC", "GD"):
+        if (_dev(stk) or 0) >= THRESH: cluster += 1; break   # 國防股整體 ↑（四檔任一達標算一票）
+    if (_dev("^TNX") or 0) <= -THRESH: cluster += 1   # 殖利率 ↓（資金逃向安全資產）
+    fin_rec["risk_off_cluster"] = cluster              # 0–6，越高代表避險訊號越群聚
+    rec["fin"] = fin_rec
     store[tp] = rec  # 當日最後一次執行覆蓋
     # 保留約 2 年
     cutoff = (datetime.now(timezone.utc) + timedelta(hours=8) - timedelta(days=730)).date().isoformat()
@@ -2208,6 +2252,11 @@ async def main():
         except Exception as e:
             log.warning(f"finance skipped: {e}")
             finance = {}
+        try:
+            fred = await fetch_fred(session)
+        except Exception as e:
+            log.warning(f"fred skipped: {e}")
+            fred = {}
 
     pizza_shops  = transform_pizza_shops(pizzint_data)
     pizza_index  = pizzint_data.get("overall_index", 0)
@@ -2243,7 +2292,7 @@ async def main():
     # 全指標每日長期封存（每日一筆、保留 ~2 年）
     metrics_daily = update_daily_metrics(
         score, pizza_index, defcon_level, firms, aviation,
-        (wikipedia or {}).get("score"), nuclear_seismic, regions, finance)
+        (wikipedia or {}).get("score"), nuclear_seismic, regions, finance, fred)
 
     output = {
         "updated_at":    datetime.now(timezone.utc).isoformat(),
