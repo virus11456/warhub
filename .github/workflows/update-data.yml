@@ -67,11 +67,17 @@ jobs:
           # （避免兩個 run 同時重算 data.json 造成 merge conflict 卡死）
           for i in 1 2 3 4 5; do
             git fetch origin main
-            git reset --soft origin/main      # HEAD 移到遠端最新，工作區的新資料保留
+            # 只提交 data/：先把這次算好的 data/ 暫存，工作區「完全對齊」遠端最新
+            # （含所有已合併的 PR），再放回我們的 data/。這樣這次 commit 只會動到
+            # data/，永遠不會用舊 checkout 的工作區把別人剛合併的檔案（文章、程式）
+            # 回捲——修正先前 git reset --soft + git add data/ 會連帶提交過時樹的問題。
+            rm -rf /tmp/newdata && cp -r data /tmp/newdata
+            git reset --hard origin/main
+            rm -rf data && cp -r /tmp/newdata data
             # 防覆蓋守門員：把遠端已累積的歷史聯集回工作區，避免舊 checkout 的 run
-            # 用「git add data/」把較完整的累積歷史（如回填的共軍架次舊日期）蓋掉。
+            # 把較完整的累積歷史（如回填的共軍架次舊日期）蓋掉。
             python scripts/merge_history.py || echo "merge guard skipped"
-            git add data/
+            git add -A data/
             if git diff --staged --quiet; then echo "no data changes"; exit 0; fi
             git commit -m "data: update $(date -u +'%Y-%m-%dT%H:%MZ')"
             if git push; then echo "pushed on attempt $i"; exit 0; fi
