@@ -89,8 +89,13 @@ PY
 | 戰爭前 | pet-preparedness.html | ✅ 完整版（2,086 字）|
 | 資訊與心理 | misinfo-defense.html | ✅ 完整版（2,064 字）|
 | 資訊與心理 | mental-resilience.html | ✅ 完整版（2,021 字）|
+| 災難生存 | fire-safety.html | ✅ 完整版（2,072 字）|
+| 災難生存 | earthquake.html | ✅ 完整版（2,006 字）|
+| 戰爭前 | cash-finance.html | ✅ 完整版（2,010 字）|
+| 戰爭前 | children-prep.html | ✅ 完整版（2,008 字）|
+| 戰爭前 | community-mutual-aid.html | ✅ 完整版（2,034 字）|
 
-> **全部 13 篇皆已達標**（純中文 >2000、表格、FAQPage、≥2 外部權威、CC 圖片、三層內鏈、站內查重 <15%）。
+> **全部 18 篇皆已達標**（純中文 >2000、表格、FAQPage、≥2 外部權威、CC 圖片、三層內鏈、站內查重 <15%）。
 
 > 追加圖片授權：
 > - `img/power-outage.jpg` — ViajeroExtraviado，CC0（公有領域）
@@ -104,5 +109,10 @@ PY
 > - `img/pet.jpg` — Anthony Baratier，CC BY-SA 4.0（pet-preparedness）
 > - `img/misinfo.jpg` — 英國新聞部二戰反謠言海報（作者不詳），公有領域（misinfo-defense）
 > - `img/mental.jpg` — paul morris（Unsplash），CC0（mental-resilience）
+> - `img/fire-safety.jpg` — Biswarup Ganguly，CC BY 3.0（fire-safety）
+> - `img/earthquake.jpg` — Oregon DOT，CC BY 2.0（earthquake）
+> - `img/community.jpg` — Jocelyn Augustino／FEMA，公有領域（community-mutual-aid）
+> - `img/cash.jpg` — 臺灣銀行（1954 新臺幣壹圓券），公有領域（cash-finance）
+> - `img/children.jpg` — David Bibo／FEMA，公有領域（children-prep）
 
 > 圖片授權：`guides/img/boiling-water.jpg` — 作者 GRAN，CC BY 3.0，來源 https://commons.wikimedia.org/wiki/File:Boiling_water.jpg
