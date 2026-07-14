@@ -86,8 +86,11 @@ PY
 | 災難生存 | power-water-outage.html | ✅ 完整版（2,285 字）|
 | 災難生存 | first-aid-basics.html | ✅ 完整版（2,123 字）|
 | 災難生存 | nbc-basics.html | ✅ 完整版（2,063 字）|
+| 戰爭前 | pet-preparedness.html | ✅ 完整版（2,086 字）|
+| 資訊與心理 | misinfo-defense.html | ✅ 完整版（2,064 字）|
+| 資訊與心理 | mental-resilience.html | ✅ 完整版（2,021 字）|
 
-> **全部 10 篇皆已達標**（純中文 >2000、表格、FAQPage、≥2 外部權威、CC 圖片、三層內鏈、站內查重 <15%）。
+> **全部 13 篇皆已達標**（純中文 >2000、表格、FAQPage、≥2 外部權威、CC 圖片、三層內鏈、站內查重 <15%）。
 
 > 追加圖片授權：
 > - `img/power-outage.jpg` — ViajeroExtraviado，CC0（公有領域）
@@ -98,5 +101,8 @@ PY
 > - `img/assembly.jpg` — Philip Mallis，CC BY-SA 4.0（family-plan）
 > - `img/air-raid.jpg` — Alex Blokha，CC BY-SA 4.0（air-raid，烏克蘭第聶伯羅防空避難標示）
 > - `img/evacuate.jpg` — DimiTalen，CC0（evacuate-or-stay）
+> - `img/pet.jpg` — Anthony Baratier，CC BY-SA 4.0（pet-preparedness）
+> - `img/misinfo.jpg` — 英國新聞部二戰反謠言海報（作者不詳），公有領域（misinfo-defense）
+> - `img/mental.jpg` — paul morris（Unsplash），CC0（mental-resilience）
 
 > 圖片授權：`guides/img/boiling-water.jpg` — 作者 GRAN，CC BY 3.0，來源 https://commons.wikimedia.org/wiki/File:Boiling_water.jpg
