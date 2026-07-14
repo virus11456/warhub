@@ -43,6 +43,9 @@ jobs:
           GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # 公開頻道（選填；未設定則預設 @warhubss、範圍 all）
+          TELEGRAM_CHANNEL_ID: ${{ vars.TELEGRAM_CHANNEL_ID }}
+          TELEGRAM_CHANNEL_SCOPE: ${{ vars.TELEGRAM_CHANNEL_SCOPE }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           BESTTIME_API_KEY: ${{ secrets.BESTTIME_API_KEY }}
           USDA_FAS_API_KEY: ${{ secrets.USDA_FAS_API_KEY }}

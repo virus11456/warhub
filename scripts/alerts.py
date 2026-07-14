@@ -17,6 +17,10 @@ from datetime import datetime, timezone
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_CHAT_ID   = os.environ.get("TELEGRAM_CHAT_ID", "")
 DISCORD_WEBHOOK    = os.environ.get("DISCORD_WEBHOOK_URL", "")
+# 公開頻道（任何人可免費加入收通知）；bot 須為該頻道管理員
+TELEGRAM_CHANNEL_ID = os.environ.get("TELEGRAM_CHANNEL_ID") or "@warhubss"
+# 公開頻道推播範圍：all＝定時摘要＋異常警報（頻道有規律內容不會像死掉）；alerts＝只推異常
+TELEGRAM_CHANNEL_SCOPE = (os.environ.get("TELEGRAM_CHANNEL_SCOPE") or "all").strip().lower()
 
 # ── 可由 GitHub Variables 覆寫的設定（未設定則用預設）────────────
 def _int(name, default):
@@ -119,17 +123,17 @@ def build_hotspot_alert(data: dict, now_cnt: int, prev_cnt: int) -> str:
 
 
 # ─── 發送 ──────────────────────────────────────────────────
-async def send_telegram(session, text):
-    if not (TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID):
+async def send_telegram(session, text, chat_id):
+    if not (TELEGRAM_BOT_TOKEN and chat_id):
         return
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-    payload = {"chat_id": TELEGRAM_CHAT_ID, "text": text,
+    payload = {"chat_id": chat_id, "text": text,
                "parse_mode": "Markdown", "disable_web_page_preview": True}
     async with session.post(url, json=payload) as resp:
         if resp.status == 200:
-            print("✅ Telegram 推播成功")
+            print(f"✅ Telegram 推播成功 → {chat_id}")
         else:
-            print(f"❌ Telegram 失敗: {await resp.text()}")
+            print(f"❌ Telegram 失敗 ({chat_id}): {await resp.text()}")
 
 
 async def send_discord(session, text, level="NORMAL"):
@@ -149,19 +153,27 @@ async def send_discord(session, text, level="NORMAL"):
             print(f"❌ Discord 失敗: {await resp.text()}")
 
 
-async def _send_all(messages, level="NORMAL"):
+async def _send_all(messages, level="NORMAL", tg_chats=None):
+    """把每則訊息送到指定的 Telegram 對象（可多個）＋ Discord。
+    tg_chats 未給時預設只送個人 chat。"""
     if not messages:
         return
-    if not (TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID) and not DISCORD_WEBHOOK:
+    tg_chats = [c for c in (tg_chats if tg_chats is not None else [TELEGRAM_CHAT_ID]) if c]
+    # 去重（避免個人 chat 與頻道設成同一個時重複發）
+    seen, uniq = set(), []
+    for c in tg_chats:
+        if c not in seen:
+            seen.add(c); uniq.append(c)
+    tg_chats = uniq
+    if not (TELEGRAM_BOT_TOKEN and tg_chats) and not DISCORD_WEBHOOK:
         print("ℹ️ 未設定推播 Secrets，跳過推播")
         return
     async with aiohttp.ClientSession() as session:
         for msg in messages:
             print(f"\n{'='*40}\n{msg}\n{'='*40}")
-            await asyncio.gather(
-                send_telegram(session, msg),
-                send_discord(session, msg, level),
-            )
+            tasks = [send_telegram(session, msg, c) for c in tg_chats]
+            tasks.append(send_discord(session, msg, level))
+            await asyncio.gather(*tasks)
 
 
 # ─── 主流程：定時回報 + 即時異常 ─────────────────────────────
@@ -187,11 +199,16 @@ async def run_notifications(data: dict, prev_notify: dict | None = None,
     new_notify = {"bucket": bucket, "level": new_level,
                   "pizza_extreme": has_extreme, "hotspots": hs_cnt}
 
-    # 測試：直接送一則，確認連線
+    # 收件對象：個人 chat 永遠收；公開頻道依 scope 決定
+    personal = [TELEGRAM_CHAT_ID]
+    both = [TELEGRAM_CHAT_ID, TELEGRAM_CHANNEL_ID]
+    digest_targets = both if TELEGRAM_CHANNEL_SCOPE == "all" else personal
+
+    # 測試：直接送一則到個人＋頻道，確認連線
     if force_test:
         await _send_all(["🔔 *WARHUBS 推播測試*\nTelegram／Discord 連線正常，"
                          "之後定時回報與異常警報都會送到這裡。\n\n" + build_digest(data)],
-                        new_level)
+                        new_level, tg_chats=both)
         return new_notify
 
     msgs, alert_msgs = [], []
@@ -213,5 +230,7 @@ async def run_notifications(data: dict, prev_notify: dict | None = None,
             and hs_cnt >= prev_hs * HOTSPOT_SURGE_RATIO:
         alert_msgs.append(build_hotspot_alert(data, hs_cnt, prev_hs))
 
-    await _send_all(alert_msgs + msgs, new_level)
+    # 異常警報：個人＋公開頻道都推；定時摘要：依頻道 scope
+    await _send_all(alert_msgs, new_level, tg_chats=both)
+    await _send_all(msgs, new_level, tg_chats=digest_targets)
     return new_notify
