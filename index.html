@@ -87,9 +87,13 @@
     color: var(--accent);
     text-shadow: var(--glow);
     letter-spacing: 4px;
+    white-space: nowrap;
   }
 
   .logo span { color: var(--accent2); }
+  .logo .logo-sub { color: var(--text-dim); }
+  /* 頭部有兩顆導覽按鈕，較窄時先收起副標避免換行擠壓 */
+  @media (max-width: 1120px) { .logo-sub { display: none; } }
 
   .header-status {
     display: flex;
@@ -100,20 +104,24 @@
     color: var(--text-dim);
   }
 
-  .nav-guides {
+  .hdr-left { display: flex; align-items: center; gap: 1.1rem; min-width: 0; }
+  .nav-guides, .nav-tg {
     font-family: 'Orbitron', monospace;
     font-size: 0.68rem;
     font-weight: 700;
     letter-spacing: 1px;
-    color: var(--accent);
     text-decoration: none;
     padding: 4px 11px;
-    border: 1px solid var(--accent);
     border-radius: 3px;
     transition: all .15s;
     white-space: nowrap;
+    flex-shrink: 0;
+    display: inline-flex; align-items: center; gap: .3rem;
   }
+  .nav-guides { color: var(--accent); border: 1px solid var(--accent); }
   .nav-guides:hover { background: var(--accent); color: #04121a; box-shadow: var(--glow); }
+  .nav-tg { color: #29abe2; border: 1px solid #29abe2; }
+  .nav-tg:hover { background: #29abe2; color: #04121a; box-shadow: 0 0 12px rgba(41,171,226,.4); }
 
   /* Telegram 訂閱 CTA */
   .tg-cta {
@@ -129,9 +137,14 @@
   .tg-cta-txt small { font-family: 'Share Tech Mono', monospace; font-size: .62rem; color: var(--text-dim); }
   .tg-cta-go { margin-left: auto; flex: none; font-family: 'Orbitron', monospace; font-size: .7rem; font-weight: 700;
     color: #04121a; background: #29abe2; border-radius: 4px; padding: 5px 12px; white-space: nowrap; }
+  .tg-cta-top { margin: 0 0 1.3rem; padding: .9rem 1.1rem; border-width: 2px;
+    box-shadow: 0 0 18px rgba(41,171,226,.18); }
+  .tg-cta-top .tg-cta-txt b { font-size: .92rem; }
+  .tg-cta-top .tg-cta-ic { font-size: 1.8rem; }
   @media (max-width: 480px) {
     .tg-cta-go { display: none; }
     .tg-cta-txt b { font-size: .72rem; }
+    .tg-cta-top .tg-cta-txt b { font-size: .8rem; }
   }
 
   .live-dot {
@@ -879,6 +892,9 @@
     .threat-badge  { display:none; }  /* 手機：騰出空間給三時區時鐘；警報同時顯示於下方 WPI Hero */
     #clock{ font-size:.62rem; } #clock .clk{ margin-left:.5rem; } #clock .clk i{ font-size:.85em; margin-left:.1rem; } .live-lbl{ display:none; }
     .header-status { gap: .6rem; }
+    .hdr-left { gap: .55rem; }
+    .nav-guides, .nav-tg { font-size:.6rem; padding:3px 8px; letter-spacing:.5px; }
+    #clock .clk:first-child { display:none; }   /* 手機：隱藏 UTC，保留五角＋本地，騰出空間給導覽按鈕 */
 
     /* Pizza */
     .pizza-emoji   { font-size: 2rem; }
@@ -935,6 +951,9 @@
     #clock         { display: none; }
     .live-dot      { display: none; }
     .header-status { gap: .5rem; }
+    .nav-guides .nav-tx, .nav-tg .nav-tx { display: none; }  /* 極小螢幕：導覽只留圖示 */
+    .nav-guides, .nav-tg { font-size:.9rem; padding:3px 8px; }
+    .hdr-left { gap: .5rem; }
 
     /* Layout */
     .container     { padding: .6rem; }
@@ -1267,9 +1286,12 @@
 <!-- Header -->
 <header>
   <div class="header-inner">
-    <div class="logo">WAR<span>HUBS</span> <span style="font-size:0.7rem;color:var(--text-dim);font-weight:400;letter-spacing:2px">戰爭預測情報中心</span></div>
+    <div class="hdr-left">
+      <div class="logo">WAR<span>HUBS</span> <span class="logo-sub" style="font-size:0.7rem;color:var(--text-dim);font-weight:400;letter-spacing:2px">戰爭預測情報中心</span></div>
+      <a href="guides/" class="nav-guides"><span class="nav-ic">🛡️</span><span class="nav-tx">避難指南</span></a>
+      <a href="https://t.me/warhubss" target="_blank" rel="noopener" class="nav-tg"><span class="nav-ic">📢</span><span class="nav-tx">TG 通知</span></a>
+    </div>
     <div class="header-status">
-      <a href="guides/" class="nav-guides">🛡️ 避難指南</a>
       <span class="live-ind"><span class="live-dot"></span><span class="live-lbl">即時連線 LIVE DATA</span></span>
       <span id="clock">--:--:-- UTC</span>
       <span class="threat-badge" id="alert-badge">威脅等級 ELEVATED</span>
@@ -1304,6 +1326,13 @@
 </div>
 
 <div class="container">
+
+  <!-- ══════════ 置頂：免費訂閱 Telegram CTA ══════════ -->
+  <a href="https://t.me/warhubss" target="_blank" rel="noopener" class="tg-cta tg-cta-top">
+    <span class="tg-cta-ic">✈️</span>
+    <span class="tg-cta-txt"><b>免費訂閱 Telegram 即時戰情通知</b><small>威脅升級・五角大廈披薩爆量・衝突火點激增，第一時間推播到你手機（免費）</small></span>
+    <span class="tg-cta-go">加入頻道 →</span>
+  </a>
 
   <!-- ══════════ 戰情摘要（指揮中心）══════════ -->
   <div class="hero-strip">
