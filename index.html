@@ -1731,6 +1731,11 @@
     <div style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim);margin-bottom:.6rem">
       共軍擾台・軍演・軍艦穿越台海・國防部戰報 · <strong>新聞訊號、非精確計數</strong>，供趨勢與異常觀察
     </div>
+    <div id="pla-wrap" class="pla-wrap" style="display:none">
+      <div class="pla-hd">📈 每日共軍擾台架次 · 過去 30 天<span id="pla-latest"></span></div>
+      <div class="fh-chart"><svg id="pla-svg" viewBox="0 0 720 170" preserveAspectRatio="xMidYMid meet"></svg></div>
+      <div class="pla-legend" id="pla-legend"></div>
+    </div>
     <div id="twnews-list">
       <div style="padding:1rem;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 連接台海新聞流…</div>
     </div>
@@ -1757,6 +1762,12 @@
 .strat-flag { display:inline-block; font-family:'Orbitron',monospace; font-size:.56rem; font-weight:700; letter-spacing:.5px; padding:1px 6px; border-radius:3px; margin-left:.35rem; }
 .strat-flag.high { color:#04121a; background:var(--accent2); }
 .strat-flag.low  { color:#04121a; background:var(--accent3); }
+
+/* ── 📈 共軍每日架次趨勢 ── */
+.pla-wrap { margin-bottom:.8rem; padding:.7rem .8rem; background:rgba(255,77,94,.04); border:1px solid rgba(255,77,94,.15); border-radius:4px; }
+.pla-hd { font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700; letter-spacing:.5px; color:var(--text); margin-bottom:.4rem; }
+.pla-hd b { font-family:'Share Tech Mono',monospace; }
+.pla-legend { font-family:'Share Tech Mono',monospace; font-size:.6rem; color:var(--text-dim); margin-top:.35rem; line-height:1.5; }
 
 /* ── 🌾 糧食月度趨勢圖 ── */
 .fh-wrap { margin-top:.9rem; padding-top:.7rem; border-top:1px dashed rgba(255,255,255,.12); }
@@ -2577,6 +2588,9 @@ async function fetchRealPizzaData() {
     try { renderTwNews(json); }
     catch(err) { console.warn('[WARHUBS] renderTwNews error:', err.message); }
 
+    try { renderPla(json); }
+    catch(err) { console.warn('[WARHUBS] renderPla error:', err.message); }
+
     // 同步渲染 AVI 軍機資料
     if (json.aviation) {
       try { renderAviation(json.aviation); }
@@ -3125,6 +3139,50 @@ function renderTwNews(json){
   }).join('');
   var upd=document.getElementById('twnews-updated');
   if(upd) upd.textContent=items[0].ts?('最新 '+newsAgo(items[0].ts)):'新聞訊號';
+}
+// ── 📈 每日共軍擾台架次（過去30天）──
+function renderPla(json){
+  var wrap=document.getElementById('pla-wrap'); if(!wrap) return;
+  var pla=json.pla, days=(pla&&pla.days)||[];
+  if(!days.length){ wrap.style.display='none'; return; }
+  wrap.style.display='';
+  var svg=document.getElementById('pla-svg'); if(!svg) return;
+  var W=720,H=170,padL=34,padR=12,padT=14,padB=26;
+  var n=days.length;
+  var base=pla.baseline||0;
+  var maxV=Math.max.apply(null, days.map(function(d){return d.aircraft||0;}).concat([base,1]))*1.15;
+  function Y(v){ return padT+(H-padT-padB)*(1-v/maxV); }
+  var slot=(W-padL-padR)/Math.max(n,1);
+  function CX(i){ return padL+slot*(i+0.5); }
+  var bw=Math.max(2, Math.min(20, slot*0.7));
+  var y0=Y(0), p=[];
+  // grid + y labels
+  for(var g=0;g<=3;g++){ var gy=padT+(H-padT-padB)*g/3, gv=Math.round(maxV*(1-g/3));
+    p.push('<line x1="'+padL+'" y1="'+gy+'" x2="'+(W-padR)+'" y2="'+gy+'" stroke="rgba(255,255,255,.06)"/>');
+    p.push('<text x="'+(padL-5)+'" y="'+(gy+4)+'" text-anchor="end" class="fh-svg-axis">'+gv+'</text>');
+  }
+  // baseline (median) dashed line
+  if(base>0){ var by=Y(base);
+    p.push('<line x1="'+padL+'" y1="'+by+'" x2="'+(W-padR)+'" y2="'+by+'" stroke="var(--accent3)" stroke-dasharray="4 3" stroke-width="1" opacity=".7"/>');
+    p.push('<text x="'+(W-padR)+'" y="'+(by-3)+'" text-anchor="end" class="fh-svg-axis" style="fill:var(--accent3)">中位 '+base+'</text>');
+  }
+  // bars: red if elevated (>=1.5x median & >=25)
+  days.forEach(function(d,i){
+    var v=d.aircraft||0, hi=(base>0 && v>=base*1.5 && v>=25);
+    var by=Y(v), h=Math.max(0,y0-by), cx=CX(i);
+    p.push('<rect x="'+(cx-bw/2).toFixed(1)+'" y="'+by.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+h.toFixed(1)
+      +'" fill="'+(hi?'#ff4d5e':'var(--accent)')+'" opacity="'+(hi?'.95':'.7')+'"><title>'
+      +d.date+'：共機 '+v+' 架次'+(d.ships?('・共艦 '+d.ships+' 艘'):'')+'</title></rect>');
+  });
+  // x labels: first & last date
+  if(n){ p.push('<text x="'+CX(0)+'" y="'+(H-8)+'" text-anchor="middle" class="fh-svg-axis">'+days[0].date.slice(5)+'</text>');
+    p.push('<text x="'+CX(n-1)+'" y="'+(H-8)+'" text-anchor="middle" class="fh-svg-axis">'+days[n-1].date.slice(5)+'</text>'); }
+  svg.innerHTML=p.join('');
+  var lt=document.getElementById('pla-latest');
+  if(lt && pla.latest){ var el=(base>0 && pla.latest.aircraft>=base*1.5 && pla.latest.aircraft>=25);
+    lt.innerHTML='　最新 '+pla.latest.date.slice(5)+'：<b style="color:'+(el?'#ff4d5e':'var(--accent)')+'">'+pla.latest.aircraft+'</b> 架次'+(el?' <span style="color:#ff4d5e">⚠異常偏高</span>':''); }
+  var lg=document.getElementById('pla-legend');
+  if(lg) lg.textContent='資料：國防部每日戰報（自新聞標題擷取）· 每日一報、非即時 · 紅柱＝≥中位數1.5倍且≥25架次';
 }
 function renderNews(json){
   const el=document.getElementById('news-list'); if(!el) return;
