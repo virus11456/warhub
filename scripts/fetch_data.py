@@ -60,6 +60,8 @@ DATA_DIR        = Path(__file__).resolve().parent.parent / "data"
 DATA_FILE       = DATA_DIR / "data.json"
 # 糧食進口月度歷史（近 5 年，供前端畫 1/3/5 年趨勢；逐步累積）
 FOOD_HISTORY_FILE = DATA_DIR / "food_history.json"
+# 共軍每日擾台架次歷史（過去 30 天，從國防部戰報新聞擷取；逐日累積）
+PLA_HISTORY_FILE = DATA_DIR / "pla_adiz.json"
 USER_AGENT      = "WarHub/1.0 (+https://github.com/virus11456/warhub)"
 
 # index.html 上要顯示哪幾家店（pizzint.watch 列了 14 家，我們挑 6 家披薩店）
@@ -956,6 +958,62 @@ async def fetch_tw_military_news(session: aiohttp.ClientSession) -> list[dict]:
     except Exception:
         pass
     return []
+
+
+# ─────────────────────────────────────────────────────────────
+# 📈 共軍每日擾台架次趨勢（過去 30 天）
+#   granularity＝每日一筆（國防部每日戰報，非即時）。從台海新聞標題擷取「N架次」，
+#   逐日累積到 pla_adiz.json（滾動 30 天）。無官方 API，故以新聞標題為代理來源。
+# ─────────────────────────────────────────────────────────────
+def _num_before(unit: str, title: str):
+    import re
+    nums = [int(m) for m in re.findall(r'(\d{1,3})\s*' + unit, title)]
+    return max(nums) if nums else None
+
+def update_pla_history(tw_news: list) -> dict:
+    from datetime import timedelta
+    days = {}
+    try:
+        days = json.loads(PLA_HISTORY_FILE.read_text(encoding="utf-8")).get("days") or {}
+    except Exception:
+        days = {}
+    for n in (tw_news or []):
+        title = n.get("title") or ""
+        ts = n.get("ts") or ""
+        if "架" not in title:
+            continue
+        # 需為「共軍機艦」語境，避免抓到美機/他國
+        if not any(k in title for k in ("共機", "軍機", "中線", "擾台", "解放軍", "殲", "架次")):
+            continue
+        ac = _num_before("架", title)
+        if ac is None or ac <= 0 or ac > 200:      # 合理上限，濾除誤判
+            continue
+        sh = _num_before("艘", title) or 0
+        try:
+            dt = datetime.fromisoformat(ts)
+            tp = (dt + timedelta(hours=8)).date().isoformat()   # 台北日期
+        except Exception:
+            continue
+        cur = days.get(tp)
+        if (not cur) or ac > cur.get("aircraft", 0):
+            days[tp] = {"aircraft": ac, "ships": max(sh, (cur or {}).get("ships", 0))}
+    # 滾動保留 30 天
+    cutoff = (datetime.now(timezone.utc) + timedelta(hours=8) - timedelta(days=30)).date().isoformat()
+    days = {d: v for d, v in days.items() if d >= cutoff}
+    try:
+        PLA_HISTORY_FILE.write_text(json.dumps({"days": days}, ensure_ascii=False), encoding="utf-8")
+    except Exception as e:
+        log.warning(f"pla history write error: {e}")
+    series = [{"date": d, **days[d]} for d in sorted(days)]
+    acs = [x["aircraft"] for x in series]
+    baseline = sorted(acs)[len(acs) // 2] if acs else 0     # 中位數
+    latest = series[-1] if series else None
+    log.info(f"PLA ADIZ: {len(series)} days recorded, latest={latest}")
+    return {
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+        "days": series, "baseline": baseline, "latest": latest,
+        "note": "每日共軍擾台架次（國防部戰報，自新聞標題擷取）· 每日一報、非即時 · 過去 30 天滾動累積",
+    }
 
 
 
@@ -1887,6 +1945,11 @@ async def main():
         except Exception as e:
             log.warning(f"tw military news skipped: {e}")
             tw_news = []
+        try:
+            pla = update_pla_history(tw_news)
+        except Exception as e:
+            log.warning(f"pla history skipped: {e}")
+            pla = {}
 
     pizza_shops  = transform_pizza_shops(pizzint_data)
     pizza_index  = pizzint_data.get("overall_index", 0)
@@ -1938,6 +2001,7 @@ async def main():
         "food_hist":     food_hist,
         "strat":         strat,
         "tw_news":       tw_news,
+        "pla":           pla,
         "usda":          usda,
         "wikipedia":     wikipedia,
         "notams":        notams,
