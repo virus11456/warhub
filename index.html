@@ -1720,6 +1720,14 @@
     <div id="strat-grid">
       <div style="padding:1rem;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 連接 UN Comtrade…</div>
     </div>
+    <div id="sh-wrap" class="fh-wrap" style="display:none">
+      <div class="fh-controls">
+        <div class="fh-tabs" id="sh-cmd"></div>
+        <div class="fh-tabs" id="sh-range"></div>
+      </div>
+      <div class="fh-chart"><svg id="sh-svg" viewBox="0 0 720 220" preserveAspectRatio="xMidYMid meet"></svg></div>
+      <div class="fh-legend" id="sh-legend"></div>
+    </div>
   </div>
 
   <!-- 🎖️ 台海軍事動態 -->
@@ -2585,6 +2593,9 @@ async function fetchRealPizzaData() {
     try { renderStrat(json); }
     catch(err) { console.warn('[WARHUBS] renderStrat error:', err.message); }
 
+    try { renderStratHistory(json); }
+    catch(err) { console.warn('[WARHUBS] renderStratHistory error:', err.message); }
+
     try { renderTwNews(json); }
     catch(err) { console.warn('[WARHUBS] renderTwNews error:', err.message); }
 
@@ -3087,6 +3098,72 @@ function drawFoodHistory(){
     leg.innerHTML='中國每月<b>'+nm+'</b>進口量（萬噸，每月一根）· '+f+' → '+l
       +'　▮ 實心＝中國海關直報，▯ 淡色虛邊＝鏡像估計（最近幾個月中國停報 Comtrade）'
       +(hasMirror?'':'　·　近月資料累積中…');
+  }
+}
+// ── ⚙️ 戰略物資月度趨勢圖 ──
+var SH_STATE={cmd:'4001', range:24};
+var SH_JSON=null;
+var SH_CMDS=[['4001','天然橡膠'],['2604','鎳礦砂'],['2610','鉻礦砂'],['2601','鐵礦砂']];
+var SH_RANGES=[[12,'近1年'],[24,'近2年'],[36,'近3年']];
+function renderStratHistory(json){
+  SH_JSON=json;
+  var wrap=document.getElementById('sh-wrap'); if(!wrap) return;
+  var all=json.strat_hist||[];
+  if(!all.length){ wrap.style.display='none'; return; }
+  wrap.style.display='';
+  var cmdEl=document.getElementById('sh-cmd');
+  if(cmdEl && !cmdEl.dataset.built){
+    cmdEl.dataset.built='1';
+    cmdEl.innerHTML=SH_CMDS.map(function(c){return '<button class="fh-tab" data-cmd="'+c[0]+'">'+c[1]+'</button>';}).join('');
+    cmdEl.querySelectorAll('.fh-tab').forEach(function(b){ b.onclick=function(){SH_STATE.cmd=b.dataset.cmd; drawStratHistory();}; });
+  }
+  var rEl=document.getElementById('sh-range');
+  if(rEl && !rEl.dataset.built){
+    rEl.dataset.built='1';
+    rEl.innerHTML=SH_RANGES.map(function(r){return '<button class="fh-tab" data-range="'+r[0]+'">'+r[1]+'</button>';}).join('');
+    rEl.querySelectorAll('.fh-tab').forEach(function(b){ b.onclick=function(){SH_STATE.range=+b.dataset.range; drawStratHistory();}; });
+  }
+  drawStratHistory();
+}
+function drawStratHistory(){
+  var json=SH_JSON; if(!json) return;
+  var svg=document.getElementById('sh-svg'); if(!svg) return;
+  document.querySelectorAll('#sh-cmd .fh-tab').forEach(function(b){b.classList.toggle('on', b.dataset.cmd===SH_STATE.cmd);});
+  document.querySelectorAll('#sh-range .fh-tab').forEach(function(b){b.classList.toggle('on', +b.dataset.range===SH_STATE.range);});
+  var data=(json.strat_hist||[]).slice(-SH_STATE.range);
+  var key=SH_STATE.cmd;
+  var W=720,H=220,padL=48,padR=14,padT=14,padB=28;
+  var n=data.length;
+  var maxV=Math.max.apply(null, data.map(function(d){return d[key]||0;}).concat([1]))*1.15;
+  function Y(v){ return padT+(H-padT-padB)*(1-v/maxV); }
+  var slot=(n>0)?(W-padL-padR)/n:0;
+  function CX(i){ return n<=1?(padL+(W-padL-padR)/2):(padL+slot*(i+0.5)); }
+  var bw=Math.max(1.5, Math.min(22, slot*0.72)), y0=Y(0), p=[];
+  for(var g=0;g<=4;g++){ var gy=padT+(H-padT-padB)*g/4, gv=maxV*(1-g/4);
+    p.push('<line class="fh-svg-grid" x1="'+padL+'" y1="'+gy+'" x2="'+(W-padR)+'" y2="'+gy+'"/>');
+    p.push('<text class="fh-svg-axis" x="'+(padL-6)+'" y="'+(gy+4)+'" text-anchor="end">'+fhFmt(gv)+'</text>');
+  }
+  var lastYr=null;
+  data.forEach(function(d,i){ var yr=d.ym.slice(0,4);
+    if(yr!==lastYr){ lastYr=yr; p.push('<text class="fh-svg-axis" x="'+CX(i)+'" y="'+(H-8)+'" text-anchor="middle">'+yr+'</text>'); }
+  });
+  data.forEach(function(d,i){
+    var v=d[key]||0, by=Y(v), h=Math.max(0,y0-by), cx=CX(i);
+    p.push('<rect class="'+(d.src==='mirror'?'fh-bar-m':'fh-bar-c')+'" x="'+(cx-bw/2).toFixed(1)
+      +'" y="'+by.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+h.toFixed(1)+'"><title>'
+      +d.ym+'：'+fhFmt(v)+' 萬噸</title></rect>');
+  });
+  var lv=data.length?data[data.length-1]:null;
+  if(lv){ var lx=CX(n-1), ly=Y(lv[key]||0);
+    p.push('<text class="fh-svg-axis" x="'+lx+'" y="'+(Math.max(padT+9,ly-6))+'" text-anchor="middle" style="fill:var(--accent);font-weight:700">'+fhFmt(lv[key]||0)+'</text>');
+  }
+  svg.innerHTML=p.join('');
+  var leg=document.getElementById('sh-legend');
+  if(leg){
+    var nm=({'4001':'天然橡膠','2604':'鎳礦砂','2610':'鉻礦砂','2601':'鐵礦砂'})[key];
+    var f=data.length?data[0].ym:'', l=data.length?data[data.length-1].ym:'';
+    leg.innerHTML='中國每月<b>'+nm+'</b>進口量（萬噸，每月一根）· '+f+' → '+l
+      +'　▮ 實心＝中國海關直報，▯ 淡色虛邊＝鏡像估計（2025 起中國停報）· 觀察逐月變動與趨勢';
   }
 }
 // ── ⚙️ 戰略物資進口監測 ──

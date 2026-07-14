@@ -1345,6 +1345,93 @@ async def fetch_strategic_imports(session: aiohttp.ClientSession) -> dict:
     }
 
 
+# 戰略物資「月度」歷史（近 3 年逐月，供前端畫趨勢、觀察變動）
+STRAT_HISTORY_FILE = DATA_DIR / "strat_history.json"
+STRAT_HIST_MONTHS  = 36
+STRAT_CHINA_CUTOFF = 202412
+STRAT_HIST_MIRROR_BUDGET = 2      # 每次回填幾個「鏡像」月（每月約 14 呼叫）
+STRAT_HIST_CHINA_BUDGET  = 12     # 每次回填幾個「中國直報」月（每月 1 呼叫，批次 4 個 HS）
+
+async def _comtrade_china_strat(session, period: int):
+    """中國該月自全世界進口 4 項戰略物資 {cmd: netWgt kg}；失敗回 None。"""
+    cmds = ",".join(m["cmd"] for m in STRAT_MATERIALS)
+    params = {"reporterCode": "156", "flowCode": "M", "partnerCode": "0",
+              "cmdCode": cmds, "period": str(period), "partner2Code": "0", "motCode": "0"}
+    for attempt, bk in ((1, 8), (2, 15), (3, 0)):
+        try:
+            async with session.get(COMTRADE_URL, params=params,
+                    headers={"User-Agent": USER_AGENT},
+                    timeout=aiohttp.ClientTimeout(total=30)) as r:
+                if r.status == 429:
+                    if bk: await asyncio.sleep(bk); continue
+                    return None
+                txt = await r.text()
+            data = json.loads(txt)
+            out = {}
+            for row in (data.get("data") or []):
+                c = str(row.get("cmdCode"))
+                out[c] = out.get(c, 0) + (row.get("netWgt") or 0)
+            return out
+        except Exception:
+            if bk: await asyncio.sleep(bk)
+            else: return None
+    return None
+
+async def fetch_strategic_history(session: aiohttp.ClientSession) -> list:
+    """近 3 年逐月戰略物資進口（萬噸）。≤2024-12 中國直報（批次、便宜），≥2025 鏡像。逐步回填。"""
+    store = {}
+    try:
+        raw = json.loads(STRAT_HISTORY_FILE.read_text(encoding="utf-8"))
+        store = (raw.get("months") if isinstance(raw, dict) else {}) or {}
+    except Exception:
+        store = {}
+    now = datetime.now(timezone.utc)
+    cur = now.year * 100 + now.month
+    targets = [_ym_add(cur, -k) for k in range(1, STRAT_HIST_MONTHS + 1)]
+    def key(ym): return f"{ym // 100}-{ym % 100:02d}"
+    cmds = [m["cmd"] for m in STRAT_MATERIALS]
+
+    missing_mirror = [ym for ym in targets if ym > STRAT_CHINA_CUTOFF and key(ym) not in store]
+    missing_china  = [ym for ym in targets if ym <= STRAT_CHINA_CUTOFF and key(ym) not in store]
+    stored_mirror  = sorted([ym for ym in targets if ym > STRAT_CHINA_CUTOFF and key(ym) in store], reverse=True)
+    refresh = stored_mirror[:1]
+
+    try:
+        for ym in sorted(set(missing_mirror + refresh), reverse=True)[:STRAT_HIST_MIRROR_BUDGET]:
+            rec = {"src": "mirror"}
+            any_ok = False
+            for m in STRAT_MATERIALS:
+                tot = 0
+                for rep, _ in m["exp"]:
+                    v = await _comtrade_one(session, rep, m["cmd"], ym)
+                    await asyncio.sleep(3)
+                    if v: tot += v; any_ok = True
+                rec[m["cmd"]] = round(tot / 1e7, 1)
+            if any_ok:
+                store[key(ym)] = rec
+        for ym in sorted(missing_china, reverse=True)[:STRAT_HIST_CHINA_BUDGET]:
+            d = await _comtrade_china_strat(session, ym)
+            await asyncio.sleep(3)
+            if d:
+                rec = {"src": "china"}
+                for c in cmds:
+                    rec[c] = round(d.get(c, 0) / 1e7, 1)
+                store[key(ym)] = rec
+    except Exception as e:
+        log.warning(f"strat history backfill error: {e}")
+
+    keep = {key(ym) for ym in targets}
+    store = {k: v for k, v in store.items() if k in keep}
+    try:
+        STRAT_HISTORY_FILE.write_text(json.dumps({"months": store}, ensure_ascii=False), encoding="utf-8")
+    except Exception as e:
+        log.warning(f"strat history write error: {e}")
+    series = [{"ym": k, **store[k]} for k in sorted(store.keys())]
+    remaining = len([ym for ym in targets if key(ym) not in store])
+    log.info(f"strat history: {len(store)}/{len(targets)} months, {remaining} remaining")
+    return series
+
+
 # ─────────────────────────────────────────────────────────────
 # 🇺🇸→🇨🇳 USDA FAS ESR — 美國對中國每週穀物出口銷售（最即時，需 API key）
 # 需 GitHub Secret USDA_FAS_API_KEY；未設定則自動略過
@@ -1941,6 +2028,11 @@ async def main():
             log.warning(f"strategic imports skipped: {e}")
             strat = {}
         try:
+            strat_hist = await fetch_strategic_history(session)
+        except Exception as e:
+            log.warning(f"strategic history skipped: {e}")
+            strat_hist = []
+        try:
             tw_news = await fetch_tw_military_news(session)
         except Exception as e:
             log.warning(f"tw military news skipped: {e}")
@@ -2000,6 +2092,7 @@ async def main():
         "food":          food,
         "food_hist":     food_hist,
         "strat":         strat,
+        "strat_hist":    strat_hist,
         "tw_news":       tw_news,
         "pla":           pla,
         "usda":          usda,
