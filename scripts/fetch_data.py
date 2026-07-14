@@ -984,33 +984,52 @@ def _num_before(unit: str, title: str):
     nums = [int(m) for m in re.findall(r'(\d{1,3})\s*' + unit, title)]
     return max(nums) if nums else None
 
-def update_pla_history(tw_news: list) -> dict:
+# 專用查詢：直接抓國防部每日戰報「N架次」標題（比一般台海新聞穩定，一次可涵蓋近幾天）
+PLA_SORTIE_QUERY = "共機 架次 OR 擾台 架次 OR 逾越中線 共機 OR 國防部 共機"
+
+async def fetch_pla_sorties(session: aiohttp.ClientSession) -> dict:
     from datetime import timedelta
+    import urllib.parse, xml.etree.ElementTree as ET
     days = {}
     try:
         days = json.loads(PLA_HISTORY_FILE.read_text(encoding="utf-8")).get("days") or {}
     except Exception:
         days = {}
-    for n in (tw_news or []):
-        title = n.get("title") or ""
-        ts = n.get("ts") or ""
-        if "架" not in title:
-            continue
-        # 需為「共軍機艦」語境，避免抓到美機/他國
-        if not any(k in title for k in ("共機", "軍機", "中線", "擾台", "解放軍", "殲", "架次")):
-            continue
-        ac = _num_before("架", title)
-        if ac is None or ac <= 0 or ac > 200:      # 合理上限，濾除誤判
-            continue
-        sh = _num_before("艘", title) or 0
+    url = ("https://news.google.com/rss/search?q=" + urllib.parse.quote(PLA_SORTIE_QUERY)
+           + "&hl=zh-TW&gl=TW&ceid=TW:zh-Hant")
+    parsed = 0
+    for attempt, backoff in ((1, 4), (2, 8), (3, 0)):
         try:
-            dt = datetime.fromisoformat(ts)
-            tp = (dt + timedelta(hours=8)).date().isoformat()   # 台北日期
-        except Exception:
-            continue
-        cur = days.get(tp)
-        if (not cur) or ac > cur.get("aircraft", 0):
-            days[tp] = {"aircraft": ac, "ships": max(sh, (cur or {}).get("ships", 0))}
+            async with session.get(url, timeout=aiohttp.ClientTimeout(total=25),
+                    headers={"User-Agent": "Mozilla/5.0 (compatible; warhub/1.0)"}) as resp:
+                raw = await resp.read()
+            root = ET.fromstring(raw)
+            for it in root.findall(".//item")[:30]:
+                title = (it.findtext("title") or "").strip()
+                pub = (it.findtext("pubDate") or "").strip()
+                if "架" not in title:
+                    continue
+                if not any(k in title for k in ("共機", "軍機", "共軍", "解放軍", "中線", "擾台", "殲")):
+                    continue
+                ac = _num_before("架", title)
+                if ac is None or ac <= 0 or ac > 300:
+                    continue
+                sh = _num_before("艘", title) or 0
+                ts = _news_iso(pub)
+                try:
+                    tp = (datetime.fromisoformat(ts) + timedelta(hours=8)).date().isoformat()
+                except Exception:
+                    continue
+                cur = days.get(tp)
+                if (not cur) or ac > cur.get("aircraft", 0):
+                    days[tp] = {"aircraft": ac, "ships": max(sh, (cur or {}).get("ships", 0))}
+                    parsed += 1
+            break
+        except Exception as e:
+            if backoff:
+                await asyncio.sleep(backoff)
+            else:
+                log.warning(f"PLA sorties fetch failed: {e}")
     # 滾動保留 30 天
     cutoff = (datetime.now(timezone.utc) + timedelta(hours=8) - timedelta(days=30)).date().isoformat()
     days = {d: v for d, v in days.items() if d >= cutoff}
@@ -1022,7 +1041,7 @@ def update_pla_history(tw_news: list) -> dict:
     acs = [x["aircraft"] for x in series]
     baseline = sorted(acs)[len(acs) // 2] if acs else 0     # 中位數
     latest = series[-1] if series else None
-    log.info(f"PLA ADIZ: {len(series)} days recorded, latest={latest}")
+    log.info(f"PLA ADIZ: {len(series)} days total ({parsed} updated), latest={latest}")
     return {
         "updated_at": datetime.now(timezone.utc).isoformat(),
         "days": series, "baseline": baseline, "latest": latest,
@@ -2052,7 +2071,7 @@ async def main():
             log.warning(f"tw military news skipped: {e}")
             tw_news = []
         try:
-            pla = update_pla_history(tw_news)
+            pla = await fetch_pla_sorties(session)
         except Exception as e:
             log.warning(f"pla history skipped: {e}")
             pla = {}
