@@ -1977,13 +1977,53 @@ def update_history(score: dict, pizza_index, regions: list[dict], wiki_score=Non
     return history
 
 
+# ─────────────────────────────────────────────────────────────
+# 💰 經濟避險指標（伺服器端抓 Yahoo，供長期封存；前端另有即時版本）
+#   與前端 FIN 卡片相同標的：金/布油/瑞郎/VIX/小麥 + 四檔國防股
+# ─────────────────────────────────────────────────────────────
+FIN_TICKERS = ["GC=F", "BZ=F", "USDCHF=X", "^VIX", "ZW=F", "LMT", "RTX", "NOC", "GD"]
+
+async def fetch_finance(session: aiohttp.ClientSession) -> dict:
+    import urllib.parse
+    out = {}
+    for sym in FIN_TICKERS:
+        url = ("https://query1.finance.yahoo.com/v8/finance/chart/"
+               + urllib.parse.quote(sym) + "?interval=1d&range=1mo")
+        for attempt, backoff in ((1, 2), (2, 0)):
+            try:
+                async with session.get(url, timeout=aiohttp.ClientTimeout(total=15),
+                        headers={"User-Agent": "Mozilla/5.0 (compatible; warhub/1.0)"}) as resp:
+                    j = await resp.json(content_type=None)
+                r = (((j or {}).get("chart") or {}).get("result") or [None])[0]
+                if not r:
+                    raise ValueError("no result")
+                meta = r.get("meta") or {}
+                price = meta.get("regularMarketPrice")
+                closes = [c for c in ((((r.get("indicators") or {}).get("quote") or [{}])[0]).get("close") or [])
+                          if c is not None]
+                prev = closes[-2] if len(closes) >= 2 else meta.get("chartPreviousClose")
+                chg = round((price - prev) / prev * 100, 2) if (price and prev) else None
+                ma30 = round(sum(closes) / len(closes), 4) if closes else None
+                dev = round((price - ma30) / ma30 * 100, 1) if (price and ma30) else None
+                out[sym] = {"price": price, "chg": chg, "ma30": ma30, "dev": dev}
+                break
+            except Exception as e:
+                if backoff:
+                    await asyncio.sleep(backoff)
+                else:
+                    log.warning(f"finance {sym} fetch failed: {e}")
+        await asyncio.sleep(0.3)
+    log.info(f"FINANCE: fetched {len(out)}/{len(FIN_TICKERS)} tickers")
+    return out
+
+
 def update_daily_metrics(score: dict, pizza_index, defcon_level, firms: dict,
                          aviation: dict | None, wiki_score, nuclear_seismic: dict | None,
-                         regions: list[dict]) -> None:
+                         regions: list[dict], finance: dict | None = None) -> None:
     """把所有伺服器端指標每日封存一筆到 metrics_daily.json（台北日期為 key、
     當日最後一次執行覆蓋、保留 ~2 年）。供未來繪製各指標長期趨勢圖。
-    金融避險（油/金/VIX 等）由前端直接向 Yahoo 取歷史、末日時鐘為靜態值，
-    故不在此封存。"""
+    含經濟避險指標（金/油/瑞郎/VIX/小麥＋國防股，伺服器端抓 Yahoo）；
+    末日時鐘為靜態值故不封存。"""
     from datetime import timedelta
     store = {}
     try:
@@ -2015,6 +2055,19 @@ def update_daily_metrics(score: dict, pizza_index, defcon_level, firms: dict,
         "avi_c4isr": s.get("c4isr"),
         "seismic":  (nuclear_seismic or {}).get("total"),
         "regions":  {r["key"]: round(r.get("score", 0)) for r in (regions or [])},
+    }
+    # 經濟避險指標（僅存價格，供長期趨勢；油價戰爭溢價＝布油現價−30日均）
+    f = finance or {}
+    def _px(sym): return (f.get(sym) or {}).get("price")
+    oil = _px("BZ=F"); oil_ma = (f.get("BZ=F") or {}).get("ma30")
+    rec["fin"] = {
+        "gold":   _px("GC=F"),
+        "oil":    oil,
+        "usdchf": _px("USDCHF=X"),
+        "vix":    _px("^VIX"),
+        "wheat":  _px("ZW=F"),
+        "oil_premium": (round(oil - oil_ma, 2) if (oil and oil_ma) else None),
+        "lmt": _px("LMT"), "rtx": _px("RTX"), "noc": _px("NOC"), "gd": _px("GD"),
     }
     store[tp] = rec  # 當日最後一次執行覆蓋
     # 保留約 2 年
@@ -2150,6 +2203,11 @@ async def main():
         except Exception as e:
             log.warning(f"pla history skipped: {e}")
             pla = {}
+        try:
+            finance = await fetch_finance(session)
+        except Exception as e:
+            log.warning(f"finance skipped: {e}")
+            finance = {}
 
     pizza_shops  = transform_pizza_shops(pizzint_data)
     pizza_index  = pizzint_data.get("overall_index", 0)
@@ -2185,7 +2243,7 @@ async def main():
     # 全指標每日長期封存（每日一筆、保留 ~2 年）
     metrics_daily = update_daily_metrics(
         score, pizza_index, defcon_level, firms, aviation,
-        (wikipedia or {}).get("score"), nuclear_seismic, regions)
+        (wikipedia or {}).get("score"), nuclear_seismic, regions, finance)
 
     output = {
         "updated_at":    datetime.now(timezone.utc).isoformat(),
