@@ -81,10 +81,16 @@ PY
 | 戰爭前 | family-plan.html | v1（待升級）|
 | 戰爭時 | air-raid.html | v1（待升級）|
 | 戰爭時 | evacuate-or-stay.html | v1（待升級）|
-| 戰爭時 | comms-blackout.html | 未撰寫（即將推出）|
+| 戰爭時 | comms-blackout.html | ✅ 完整版（2,040 字）|
 | 災難生存 | **water-purification.html** | ✅ **完整版（符合全部 7 項，範本）** |
-| 災難生存 | power-water-outage.html | 未撰寫（即將推出）|
-| 災難生存 | first-aid-basics.html | 未撰寫（即將推出）|
-| 災難生存 | nbc-basics.html | 未撰寫（即將推出）|
+| 災難生存 | power-water-outage.html | ✅ 完整版（2,285 字）|
+| 災難生存 | first-aid-basics.html | ✅ 完整版（2,123 字）|
+| 災難生存 | nbc-basics.html | ✅ 完整版（2,063 字）|
+
+> 追加圖片授權：
+> - `img/power-outage.jpg` — ViajeroExtraviado，CC0（公有領域）
+> - `img/first-aid-kit.jpg` — 美國 CDC，公有領域
+> - `img/emergency-radio.jpg` — Joe Haupt，CC BY 2.0
+> - `img/radiation-symbol.png` — Garam，公有領域
 
 > 圖片授權：`guides/img/boiling-water.jpg` — 作者 GRAN，CC BY 3.0，來源 https://commons.wikimedia.org/wiki/File:Boiling_water.jpg
