@@ -1968,7 +1968,7 @@ def update_history(score: dict, pizza_index, regions: list[dict], wiki_score=Non
     # 記錄軍機各機型架數（供 AVI 卡片 24h/7d/30d 歷史變化；短鍵省空間）
     s = (aviation or {}).get("summary") or {}
     rec["avi"] = {"t": s.get("tankers", 0), "a": s.get("awacs", 0),
-                  "u": s.get("uav", 0), "tot": s.get("total", 0)}
+                  "u": s.get("uav", 0), "c": s.get("c4isr", 0), "tot": s.get("total", 0)}
     history.append(rec)
     # 保留 31 天（30 天變化需要）
     cutoff = (now - timedelta(days=31)).isoformat()
@@ -2012,6 +2012,7 @@ def update_daily_metrics(score: dict, pizza_index, defcon_level, firms: dict,
         "avi_tank":  s.get("tankers"),
         "avi_awacs": s.get("awacs"),
         "avi_uav":   s.get("uav"),
+        "avi_c4isr": s.get("c4isr"),
         "seismic":  (nuclear_seismic or {}).get("total"),
         "regions":  {r["key"]: round(r.get("score", 0)) for r in (regions or [])},
     }
@@ -2057,7 +2058,7 @@ def compute_avi_trends(history: list[dict]) -> dict | None:
         return round((cur.get(key, 0) - avg) / avg * 100)
 
     out = {}
-    for name, key in (("tankers", "t"), ("awacs", "a"), ("uav", "u")):
+    for name, key in (("tankers", "t"), ("awacs", "a"), ("uav", "u"), ("c4isr", "c")):
         out[name] = {
             "d1":  pct(1,  key, 3),    # 24h：至少 3 點
             "d7":  pct(7,  key, 12),   # 7天：至少 12 點

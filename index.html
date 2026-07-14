@@ -1865,7 +1865,8 @@
 .osint-adv-hdr  { font-family:'Orbitron',monospace; font-size:.62rem; letter-spacing:3px; color:var(--text-dim); text-transform:uppercase; margin-bottom:1rem; padding-bottom:.5rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
 .osint-updated  { font-family:'Share Tech Mono',monospace; font-size:.6rem; color:var(--text-dim); letter-spacing:0; }
 /* Aviation */
-.avi-counter    { display:grid; grid-template-columns:repeat(3,1fr); gap:.5rem; margin-bottom:1rem; }
+.avi-counter    { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.5rem; margin-bottom:1rem; }
+@media (max-width: 480px) { .avi-counter { grid-template-columns:repeat(2,1fr); } }
 .avi-box        { background:var(--bg3); border:1px solid var(--border); padding:.6rem; text-align:center; }
 .avi-box-val    { font-family:'Orbitron',monospace; font-size:1.4rem; font-weight:700; line-height:1; }
 .avi-box-lbl    { font-family:'Share Tech Mono',monospace; font-size:.6rem; color:var(--text-dim); letter-spacing:1px; margin-top:.3rem; }
@@ -1958,6 +1959,7 @@
     <div class="avi-counter">
       <div class="avi-box"><div class="avi-box-val" id="avi-tankers" style="color:var(--accent)">--</div><div class="avi-box-lbl">加油機</div><div class="avi-tr" id="avi-tankers-tr"></div></div>
       <div class="avi-box"><div class="avi-box-val" id="avi-awacs"   style="color:var(--accent3)">--</div><div class="avi-box-lbl">預警機</div><div class="avi-tr" id="avi-awacs-tr"></div></div>
+      <div class="avi-box"><div class="avi-box-val" id="avi-c4isr"   style="color:#35e08a">--</div><div class="avi-box-lbl">偵察機</div><div class="avi-tr" id="avi-c4isr-tr"></div></div>
       <div class="avi-box"><div class="avi-box-val" id="avi-uav"     style="color:var(--accent)">--</div><div class="avi-box-lbl">偵察無人機</div><div class="avi-tr" id="avi-uav-tr"></div></div>
     </div>
     <div style="margin-bottom:.8rem;padding:.5rem .6rem;background:rgba(0,207,232,.06);border:1px solid rgba(0,207,232,.2);font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim)">
@@ -3516,6 +3518,7 @@ function renderAviation(d) {
   if (el('avi-tankers'))  el('avi-tankers').textContent  = hasData ? s.tankers : '--';
   if (el('avi-awacs'))    el('avi-awacs').textContent    = hasData ? s.awacs   : '--';
   if (el('avi-uav'))      el('avi-uav').textContent      = hasData ? s.uav     : '--';
+  if (el('avi-c4isr'))    el('avi-c4isr').textContent    = hasData ? (s.c4isr||0) : '--';
   if (el('avi-baseline')) el('avi-baseline').textContent = hasData ? s.total   : '--';
 
   // 各機型 24h / 7d / 30d 歷史變化（後端 aviation.trends 提供；資料累積前顯示「累積中」）
@@ -3533,6 +3536,7 @@ function renderAviation(d) {
   setTr('avi-tankers-tr', 'tankers');
   setTr('avi-awacs-tr', 'awacs');
   setTr('avi-uav-tr', 'uav');
+  setTr('avi-c4isr-tr', 'c4isr');
 
   // anomaly_pct: 沒有 baseline 7d 就用「值得關注機型佔比」當代理指標
   if (el('avi-anomaly')) {
