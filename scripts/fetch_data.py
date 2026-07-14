@@ -987,6 +987,15 @@ def _num_before(unit: str, title: str):
 # 專用查詢：直接抓國防部每日戰報「N架次」標題（比一般台海新聞穩定，一次可涵蓋近幾天）
 PLA_SORTIE_QUERY = "共機 架次 OR 擾台 架次 OR 逾越中線 共機 OR 國防部 共機"
 
+# 累計／期間總計字眼：這類標題的「N架次」是一段期間的加總（非單日），
+# 若被當單日代入會造成某天異常暴增（誤植／重複計算）。單日紀錄的「新高／破紀錄」
+# 仍是有效單日值，不在此列。
+PLA_CUMULATIVE_TOKENS = (
+    "累計", "以來", "今年", "本週", "本周", "本月", "上半年", "下半年", "全年",
+    "年度", "近一週", "近一周", "近一月", "近30", "近三十", "過去30", "過去三十",
+    "統計", "總計", "共計", "第7次", "第七次", "圍台軍演",
+)
+
 async def fetch_pla_sorties(session: aiohttp.ClientSession) -> dict:
     from datetime import timedelta
     import urllib.parse, xml.etree.ElementTree as ET
@@ -1021,6 +1030,9 @@ async def fetch_pla_sorties(session: aiohttp.ClientSession) -> dict:
                 if "架" not in title:
                     continue
                 if not any(k in title for k in ("共機", "軍機", "共軍", "解放軍", "中線", "擾台", "殲")):
+                    continue
+                # 排除「累計／本週／今年以來」等期間總計標題，避免非單日數字被誤植為單日暴增
+                if any(t in title for t in PLA_CUMULATIVE_TOKENS):
                     continue
                 ac = _num_before("架", title)
                 if ac is None or ac <= 0 or ac > 300:

@@ -1825,6 +1825,15 @@
 .pla-hd b { font-family:'Share Tech Mono',monospace; }
 .pla-legend { font-family:'Share Tech Mono',monospace; font-size:.6rem; color:var(--text-dim); margin-top:.35rem; line-height:1.5; }
 
+/* ── 圖表滑鼠懸浮提示（全站共用）── */
+#chart-tip { position:fixed; z-index:9999; pointer-events:none; opacity:0; transform:translateY(-2px);
+  transition:opacity .08s ease; background:rgba(10,16,24,.97); border:1px solid var(--accent);
+  border-radius:5px; padding:.4rem .55rem; font-family:'Share Tech Mono',monospace; font-size:.72rem;
+  line-height:1.45; color:var(--text); white-space:nowrap; box-shadow:0 4px 16px rgba(0,0,0,.5); max-width:80vw; }
+#chart-tip.on { opacity:1; }
+#chart-tip b { color:var(--accent); font-family:'Orbitron',monospace; }
+[data-tip] { cursor:crosshair; }
+
 /* ── 🌾 糧食月度趨勢圖 ── */
 .fh-wrap { margin-top:.9rem; padding-top:.7rem; border-top:1px dashed rgba(255,255,255,.12); }
 .fh-controls { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.5rem; margin-bottom:.5rem; }
@@ -2753,7 +2762,16 @@ function renderTrendChart(regions) {
     return `<polyline points="${pts.join(' ')}" fill="none" stroke="${TREND_COLORS[i]}" stroke-width="${i === 0 ? 2 : 1.3}" opacity="${i === 0 ? 1 : .8}"/>`;
   }).join('');
 
-  chartEl.innerHTML = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">${gridLines}${xLabels}${lines}</svg>`;
+  // 每個時間點一條透明感應帶：滑鼠移過去顯示該時刻綜合指數與各地區分數
+  const fmtTs = ts => { const d = new Date(ts); return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
+  const bandW = (W - PAD_L - PAD_R) / Math.max(1, hist.length);
+  const hitBands = hist.map(h => {
+    const cx = x(h.ts);
+    const rows = series.map((s,i) => { const v = s.get(h); return v==null ? '' : `<br><span style="color:${TREND_COLORS[i]}">■</span> ${escapeHtml(s.label)} ${Math.round(v)}`; }).join('');
+    const tip = `<b>${escapeHtml(fmtTs(h.ts))}</b>${rows}`;
+    return `<rect x="${(cx-bandW/2).toFixed(1)}" y="${PAD_T}" width="${bandW.toFixed(1)}" height="${(H-PAD_T-PAD_B).toFixed(1)}" fill="transparent" data-tip="${tip.replace(/"/g,'&quot;')}"/>`;
+  }).join('');
+  chartEl.innerHTML = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">${gridLines}${xLabels}${lines}${hitBands}</svg>`;
 
   if (legendEl) {
     legendEl.innerHTML = series.map((s, i) =>
@@ -3126,12 +3144,16 @@ function drawFoodHistory(){
     if(yr!==lastYr){ lastYr=yr; p.push('<text class="fh-svg-axis" x="'+CX(i)+'" y="'+(H-8)+'" text-anchor="middle">'+yr+'</text>'); }
   });
   // 每月一根柱：實心＝中國海關直報，淡色虛邊＝近月鏡像估計
+  var fhHit=[], fhNm=({soy:'大豆',wheat:'小麥',corn:'玉米'})[key]||'';
   data.forEach(function(d,i){
     var v=d[key]||0, by=Y(v), h=Math.max(0, y0-by), cx=CX(i);
     p.push('<rect class="'+(d.src==='mirror'?'fh-bar-m':'fh-bar-c')+'" x="'+(cx-bw/2).toFixed(1)
-      +'" y="'+by.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+h.toFixed(1)+'"><title>'
-      +d.ym+'：'+fhFmt(v)+' 萬噸</title></rect>');
+      +'" y="'+by.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+h.toFixed(1)+'"></rect>');
+    var tip='<b>'+d.ym+'</b><br>'+fhNm+' '+fhFmt(v)+' 萬噸'+(d.src==='mirror'?'<br>（鏡像估計）':'<br>（中國海關直報）');
+    fhHit.push('<rect x="'+(cx-slot/2).toFixed(1)+'" y="'+padT+'" width="'+slot.toFixed(1)+'" height="'+(y0-padT).toFixed(1)
+      +'" fill="transparent" data-tip="'+tip+'"></rect>');
   });
+  p=p.concat(fhHit);
   var lv=data.length?data[data.length-1]:null;
   if(lv){
     var lx=CX(n-1), ly=Y(lv[key]||0);
@@ -3195,12 +3217,16 @@ function drawStratHistory(){
   data.forEach(function(d,i){ var yr=d.ym.slice(0,4);
     if(yr!==lastYr){ lastYr=yr; p.push('<text class="fh-svg-axis" x="'+CX(i)+'" y="'+(H-8)+'" text-anchor="middle">'+yr+'</text>'); }
   });
+  var shHit=[], shNm=({'4001':'天然橡膠','2604':'鎳礦砂','2610':'鉻礦砂','2601':'鐵礦砂'})[key]||'';
   data.forEach(function(d,i){
     var v=d[key]||0, by=Y(v), h=Math.max(0,y0-by), cx=CX(i);
     p.push('<rect class="'+(d.src==='mirror'?'fh-bar-m':'fh-bar-c')+'" x="'+(cx-bw/2).toFixed(1)
-      +'" y="'+by.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+h.toFixed(1)+'"><title>'
-      +d.ym+'：'+fhFmt(v)+' 萬噸</title></rect>');
+      +'" y="'+by.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+h.toFixed(1)+'"></rect>');
+    var tip='<b>'+d.ym+'</b><br>'+shNm+' '+fhFmt(v)+' 萬噸'+(d.src==='mirror'?'<br>（鏡像估計）':'<br>（中國海關直報）');
+    shHit.push('<rect x="'+(cx-slot/2).toFixed(1)+'" y="'+padT+'" width="'+slot.toFixed(1)+'" height="'+(y0-padT).toFixed(1)
+      +'" fill="transparent" data-tip="'+tip+'"></rect>');
   });
+  p=p.concat(shHit);
   var lv=data.length?data[data.length-1]:null;
   if(lv){ var lx=CX(n-1), ly=Y(lv[key]||0);
     p.push('<text class="fh-svg-axis" x="'+lx+'" y="'+(Math.max(padT+9,ly-6))+'" text-anchor="middle" style="fill:var(--accent);font-weight:700">'+fhFmt(lv[key]||0)+'</text>');
@@ -3289,16 +3315,21 @@ function renderPla(json){
   // baseline (median) dashed line
   if(base>0){ var by=Y(base);
     p.push('<line x1="'+padL+'" y1="'+by+'" x2="'+(W-padR)+'" y2="'+by+'" stroke="var(--accent3)" stroke-dasharray="4 3" stroke-width="1" opacity=".7"/>');
-    p.push('<text x="'+(W-padR)+'" y="'+(by-3)+'" text-anchor="end" class="fh-svg-axis" style="fill:var(--accent3)">中位 '+base+'</text>');
+    p.push('<text x="'+(padL+3)+'" y="'+(by-3)+'" text-anchor="start" class="fh-svg-axis" style="fill:var(--accent3)">中位 '+base+'</text>');
   }
   // bars: red if elevated (>=1.5x median & >=25)
+  var plaHit=[];
   days.forEach(function(d,i){
     var v=d.aircraft||0, hi=(base>0 && v>=base*1.5 && v>=25);
     var by=Y(v), h=Math.max(0,y0-by), cx=CX(i);
+    var tip='<b>'+d.date+'</b><br>共機 '+v+' 架次'+(d.ships?('　共艦 '+d.ships+' 艘'):'')+(hi?'<br>⚠ 異常偏高（≥中位數1.5倍）':'');
     p.push('<rect x="'+(cx-bw/2).toFixed(1)+'" y="'+by.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+h.toFixed(1)
-      +'" fill="'+(hi?'#ff4d5e':'var(--accent)')+'" opacity="'+(hi?'.95':'.7')+'"><title>'
-      +d.date+'：共機 '+v+' 架次'+(d.ships?('・共艦 '+d.ships+' 艘'):'')+'</title></rect>');
+      +'" fill="'+(hi?'#ff4d5e':'var(--accent)')+'" opacity="'+(hi?'.95':'.7')+'"></rect>');
+    // 透明全高感應區，滑鼠移到整欄任一處都能看到當日數據
+    plaHit.push('<rect x="'+(cx-slot/2).toFixed(1)+'" y="'+padT+'" width="'+slot.toFixed(1)+'" height="'+(y0-padT).toFixed(1)
+      +'" fill="transparent" data-tip="'+tip+'"></rect>');
   });
+  p=p.concat(plaHit);
   // x labels: first & last date
   if(n){ p.push('<text x="'+CX(0)+'" y="'+(H-8)+'" text-anchor="middle" class="fh-svg-axis">'+days[0].date.slice(5)+'</text>');
     p.push('<text x="'+CX(n-1)+'" y="'+(H-8)+'" text-anchor="middle" class="fh-svg-axis">'+days[n-1].date.slice(5)+'</text>'); }
@@ -4137,6 +4168,33 @@ async function fetchFirmsEvents() { /* no-op: 改由 fetchRealPizzaData 從 data
     persist();
   }
   if(document.readyState!=='loading') init(); else document.addEventListener('DOMContentLoaded', init);
+})();
+</script>
+<div id="chart-tip"></div>
+<script>
+/* 全站圖表懸浮提示：以事件委派監聽任何帶 data-tip 的元素（含每次重繪後的 SVG 柱／點）。 */
+(function(){
+  var tip=document.getElementById('chart-tip'); if(!tip) return;
+  function show(e){
+    var t=e.target.closest('[data-tip]'); if(!t) return;
+    tip.innerHTML=t.getAttribute('data-tip'); tip.classList.add('on'); move(e);
+  }
+  function move(e){
+    if(!tip.classList.contains('on')) return;
+    var x=(e.touches?e.touches[0].clientX:e.clientX), y=(e.touches?e.touches[0].clientY:e.clientY);
+    var w=tip.offsetWidth, h=tip.offsetHeight, vw=window.innerWidth;
+    var left=x+14; if(left+w>vw-8) left=x-w-14; if(left<8) left=8;
+    var top=y-h-12; if(top<8) top=y+18;
+    tip.style.left=left+'px'; tip.style.top=top+'px';
+  }
+  function hide(e){
+    var t=e.relatedTarget&&e.relatedTarget.closest?e.relatedTarget.closest('[data-tip]'):null;
+    if(!t) tip.classList.remove('on');
+  }
+  document.addEventListener('pointerover',show,{passive:true});
+  document.addEventListener('pointermove',move,{passive:true});
+  document.addEventListener('pointerout',hide,{passive:true});
+  document.addEventListener('scroll',function(){tip.classList.remove('on');},{passive:true});
 })();
 </script>
 </body>
