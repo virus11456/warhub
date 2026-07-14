@@ -1680,6 +1680,12 @@
     </div>
   </div><!-- /.poly-card -->
 
+  <!-- ══════════ 🇨🇳 中國戰備動向監測（整合區塊）══════════ -->
+  <div class="cn-banner" id="china-watch">
+    <div class="cn-banner-t">🇨🇳 中國戰備動向監測</div>
+    <div class="cn-banner-s">無法直接觀察中國 → 以「他國對中出口<strong>鏡像數據</strong>」＋「<strong>異常高/低</strong>」＋台海軍事動態，交叉推估備戰訊號。以下皆為佐證指標，須合併研判。</div>
+  </div>
+
   <!-- ══════════ 🌾 中國糧食進口監測（結構性背景指標）══════════ -->
   <div class="card food-card" id="food-card" style="margin-bottom:1.5rem">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-bottom:.4rem">
@@ -1702,7 +1708,52 @@
     </div>
   </div>
 
+  <!-- ⚙️ 戰略物資進口監測 -->
+  <div class="card" id="strat-card" style="margin-bottom:1.5rem">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-bottom:.4rem">
+      <div class="section-title" style="margin:0">⚙️ 戰略物資進口監測</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim)"><span id="strat-updated">軍工原料</span></div>
+    </div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim);margin-bottom:.6rem">
+      軍工必需、中國高度依賴進口的原料（鏡像數據）· <strong>異常高＝突然囤積</strong>、<strong>異常低＝改用儲備</strong>，皆為備戰佐證 · 石油因俄/沙不報 Comtrade 暫無免費資料源
+    </div>
+    <div id="strat-grid">
+      <div style="padding:1rem;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 連接 UN Comtrade…</div>
+    </div>
+  </div>
+
+  <!-- 🎖️ 台海軍事動態 -->
+  <div class="card" id="twnews-card" style="margin-bottom:1.5rem">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-bottom:.4rem">
+      <div class="section-title" style="margin:0">🎖️ 台海軍事動態</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim)"><span id="twnews-updated">新聞訊號</span></div>
+    </div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim);margin-bottom:.6rem">
+      共軍擾台・軍演・軍艦穿越台海・國防部戰報 · <strong>新聞訊號、非精確計數</strong>，供趨勢與異常觀察
+    </div>
+    <div id="twnews-list">
+      <div style="padding:1rem;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 連接台海新聞流…</div>
+    </div>
+  </div>
+
 <style>
+/* ── 🇨🇳 中國戰備動向監測 區塊橫幅 ── */
+.cn-banner { background:linear-gradient(180deg,rgba(255,77,94,.07),rgba(0,207,232,.04)); border:1px solid var(--border);
+  border-left:3px solid var(--accent2); border-radius:4px; padding:.9rem 1.2rem; margin:0 0 1rem; }
+.cn-banner-t { font-family:'Orbitron',monospace; font-size:1.05rem; font-weight:900; letter-spacing:2px; color:var(--text-primary); }
+.cn-banner-s { font-family:'Share Tech Mono',monospace; font-size:.66rem; color:var(--text-dim); margin-top:.35rem; line-height:1.6; }
+/* 戰略物資列 */
+.strat-row { display:grid; grid-template-columns:1fr auto auto; gap:.6rem; align-items:baseline; padding:.55rem .2rem; border-bottom:1px solid rgba(255,255,255,.05); }
+.strat-row:last-child { border-bottom:none; }
+.strat-name { font-family:'Orbitron',monospace; font-weight:700; color:var(--text); font-size:.82rem; }
+.strat-name small { display:block; font-family:'Share Tech Mono',monospace; font-weight:400; font-size:.6rem; color:var(--text-dim); letter-spacing:0; margin-top:.1rem; }
+.strat-val { font-family:'Share Tech Mono',monospace; color:var(--text); font-size:.8rem; }
+.strat-val .u { color:var(--text-dim); font-size:.62rem; margin-left:.15rem; }
+.strat-yoy { font-family:'Share Tech Mono',monospace; font-size:.74rem; text-align:right; min-width:6.5em; }
+.strat-flag { display:inline-block; font-family:'Orbitron',monospace; font-size:.56rem; font-weight:700; letter-spacing:.5px; padding:1px 6px; border-radius:3px; margin-left:.35rem; }
+.strat-flag.high { color:#04121a; background:var(--accent2); }
+.strat-flag.low  { color:#04121a; background:var(--accent3); }
+
 /* ── 🌾 糧食月度趨勢圖 ── */
 .fh-wrap { margin-top:.9rem; padding-top:.7rem; border-top:1px dashed rgba(255,255,255,.12); }
 .fh-controls { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.5rem; margin-bottom:.5rem; }
@@ -2516,6 +2567,12 @@ async function fetchRealPizzaData() {
     try { renderFoodHistory(json); }
     catch(err) { console.warn('[WARHUBS] renderFoodHistory error:', err.message); }
 
+    try { renderStrat(json); }
+    catch(err) { console.warn('[WARHUBS] renderStrat error:', err.message); }
+
+    try { renderTwNews(json); }
+    catch(err) { console.warn('[WARHUBS] renderTwNews error:', err.message); }
+
     // 同步渲染 AVI 軍機資料
     if (json.aviation) {
       try { renderAviation(json.aviation); }
@@ -2896,7 +2953,7 @@ function sparklineSvg(points, color) {
 }
 
 // ─── INTEL FEED 跑馬燈：用 data.json 即時資料重建 ─────────────
-const NEWS_TOPIC_COLOR = { '俄烏':'#ff4d5e','中東':'#f5a623','台海':'#00cfe8','朝鮮':'#a374ff','南海':'#35e08a','白宮':'#7fb2ff','中國':'#ff7a7a','全球':'#8fa6b8' };
+const NEWS_TOPIC_COLOR = { '俄烏':'#ff4d5e','中東':'#f5a623','台海':'#00cfe8','朝鮮':'#a374ff','南海':'#35e08a','白宮':'#7fb2ff','中國':'#ff7a7a','全球':'#8fa6b8','共軍機艦':'#ff4d5e','軍演':'#f5a623','海峽航行':'#00cfe8','國防部':'#7fb2ff' };
 function newsAgo(ts){
   if(!ts) return '';
   const m=(Date.now()-Date.parse(ts))/60000;
@@ -3013,6 +3070,49 @@ function drawFoodHistory(){
       +'　▮ 實心＝中國海關直報，▯ 淡色虛邊＝鏡像估計（最近幾個月中國停報 Comtrade）'
       +(hasMirror?'':'　·　近月資料累積中…');
   }
+}
+// ── ⚙️ 戰略物資進口監測 ──
+function renderStrat(json){
+  var el=document.getElementById('strat-grid'); if(!el) return;
+  var s=json.strat;
+  if(!s || !s.items || !s.items.length){
+    el.innerHTML='<div style="padding:1rem;text-align:center;font-family:\'Share Tech Mono\',monospace;font-size:.7rem;color:var(--text-dim)">暫無資料（每日更新一次）</div>';
+    return;
+  }
+  el.innerHTML=s.items.map(function(it){
+    var y=it.yoy_pct;
+    var col=(y==null)?'var(--text-dim)':(y>0?'#ff4d5e':(y<0?'#35e08a':'var(--text-dim)'));
+    var arr=(y==null)?'':(y>0?'▲':(y<0?'▼':''));
+    var w=it.wan_ton>=100?Math.round(it.wan_ton).toLocaleString():it.wan_ton;
+    var flag=it.anomaly==='high'?'<span class="strat-flag high">異常高</span>'
+            :it.anomaly==='low'?'<span class="strat-flag low">異常低</span>':'';
+    return '<div class="strat-row"><div class="strat-name">'+escapeHtml(it.name)
+      +'<small>'+escapeHtml(it.use||'')+'</small></div>'
+      +'<div class="strat-val">'+w+'<span class="u">萬噸</span></div>'
+      +'<div class="strat-yoy" style="color:'+col+'">'+(y==null?'—':arr+Math.abs(y)+'%')+flag+'</div></div>';
+  }).join('');
+  var upd=document.getElementById('strat-updated');
+  if(upd) upd.textContent='參考月 '+(s.ref_month||'—')+'（對比 '+(s.prev_year_month||'')+'）';
+}
+// ── 🎖️ 台海軍事動態 ──
+function renderTwNews(json){
+  var el=document.getElementById('twnews-list'); if(!el) return;
+  var items=(json.tw_news||[]).slice(0,12);
+  if(!items.length){
+    el.innerHTML='<div style="padding:1rem;text-align:center;font-family:\'Share Tech Mono\',monospace;font-size:.7rem;color:var(--text-dim)">暫無台海軍事新聞（下次更新重試）</div>';
+    return;
+  }
+  el.innerHTML=items.map(function(n){
+    var c=NEWS_TOPIC_COLOR[n.topic]||'#8fa6b8';
+    return '<div class="news-item">'
+      +'<span class="news-topic" style="color:'+c+'">'+escapeHtml(n.topic||'台海')+'</span>'
+      +'<span class="news-time">'+newsAgo(n.ts)+'</span>'
+      +'<a class="news-title" href="'+escapeHtml(n.url||'#')+'" target="_blank" rel="noopener">'
+      +escapeHtml(n.title||'')+' <span class="news-src">— '+escapeHtml(n.domain||'')+'</span></a>'
+      +'</div>';
+  }).join('');
+  var upd=document.getElementById('twnews-updated');
+  if(upd) upd.textContent=items[0].ts?('最新 '+newsAgo(items[0].ts)):'新聞訊號';
 }
 function renderNews(json){
   const el=document.getElementById('news-list'); if(!el) return;
