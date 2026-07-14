@@ -100,6 +100,21 @@
     color: var(--text-dim);
   }
 
+  .nav-guides {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--accent);
+    text-decoration: none;
+    padding: 4px 11px;
+    border: 1px solid var(--accent);
+    border-radius: 3px;
+    transition: all .15s;
+    white-space: nowrap;
+  }
+  .nav-guides:hover { background: var(--accent); color: #04121a; box-shadow: var(--glow); }
+
   .live-dot {
     width: 8px; height: 8px;
     background: var(--accent2);
@@ -1235,6 +1250,7 @@
   <div class="header-inner">
     <div class="logo">WAR<span>HUBS</span> <span style="font-size:0.7rem;color:var(--text-dim);font-weight:400;letter-spacing:2px">戰爭預測情報中心</span></div>
     <div class="header-status">
+      <a href="guides/" class="nav-guides">🛡️ 避難指南</a>
       <span class="live-ind"><span class="live-dot"></span><span class="live-lbl">即時連線 LIVE DATA</span></span>
       <span id="clock">--:--:-- UTC</span>
       <span class="threat-badge" id="alert-badge">威脅等級 ELEVATED</span>
