@@ -1879,7 +1879,7 @@
 .avi-tr .row .flat { color:var(--text-dim); }
 .avi-tr .row .na   { color:rgba(255,255,255,.3); }
 .avi-list       { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.35rem; }
-@media (max-width: 640px) { .avi-list { grid-template-columns:1fr; } }
+@media (max-width: 340px) { .avi-list { grid-template-columns:1fr; } }
 .avi-item       { display:grid; grid-template-columns:12px 1fr auto; align-items:center; gap:.5rem; padding:.45rem .55rem; background:var(--bg3); border:1px solid var(--border); font-family:'Share Tech Mono',monospace; font-size:.7rem; }
 .avi-dot        { width:8px; height:8px; border-radius:50%; }
 .avi-dot.tanker { background:var(--accent); box-shadow:0 0 5px var(--accent); }
@@ -2096,6 +2096,17 @@
     </div>
 
 </div><!-- /.osint-adv-grid -->
+
+  <!-- 📉 避險群聚熱度 & 經濟指標長期趨勢（讀 data/metrics_daily.json）-->
+  <section class="card" id="md-wrap" style="margin:1.5rem 0;display:none">
+    <div class="section-title">📉 避險群聚熱度 & 經濟指標長期趨勢</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim);margin:.2rem 0 .8rem">
+      每日封存於 GitHub（金／油／VIX／美債殖利率／信用利差…）· 交叉比對「同時偏離常態」的避險訊號 · <span style="color:var(--accent)">資料逐日累積，越久曲線越完整</span>
+    </div>
+    <div class="fh-cmd" id="md-cmd" style="display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.6rem"></div>
+    <svg id="md-svg" viewBox="0 0 720 220" style="width:100%;height:auto;display:block" preserveAspectRatio="xMidYMid meet"></svg>
+    <div class="fh-legend" id="md-legend" style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);margin-top:.4rem;line-height:1.5"></div>
+  </section>
 
   <footer>
     WARHUBS // 戰爭預測情報中心 &nbsp;|&nbsp; 資料來源：Polymarket · pizzint.watch · adsb.fi · NASA FIRMS / EONET · GDELT · USGS · Wikipedia &nbsp;|&nbsp; 僅供資訊參考，不構成任何建議 &nbsp;|&nbsp; <span id="last-update-ts" style="color:var(--text-dim)">⏳ 等待後端資料…</span>
@@ -2619,6 +2630,15 @@ async function fetchRealPizzaData() {
       }
       if (hres && hres.ok) WW_HISTORY = await hres.json();
     } catch(err) { console.warn('[WARHUBS] history fetch error:', err.message); }
+
+    // 每日指標長期封存（避險群聚 & 經濟指標趨勢）
+    try {
+      let mres = await fetch('data/metrics_daily.json?t=' + Date.now(), { cache: 'no-store' }).catch(() => null);
+      if (!mres || !mres.ok) {
+        mres = await fetch('https://raw.githubusercontent.com/virus11456/warhub/main/data/metrics_daily.json?t=' + Date.now(), { cache: 'no-store' }).catch(() => null);
+      }
+      if (mres && mres.ok) { MD_JSON = await mres.json(); renderMetricsHist(); }
+    } catch(err) { console.warn('[WARHUBS] metrics_daily fetch error:', err.message); }
 
     // 地區風險看板 + WPI 新因子 + 核試監測 + PizzINT 深度情報
     try {
@@ -3294,6 +3314,92 @@ function renderTwNews(json){
   var upd=document.getElementById('twnews-updated');
   if(upd) upd.textContent=items[0].ts?('最新 '+newsAgo(items[0].ts)):'新聞訊號';
 }
+// ── 📉 避險群聚熱度 & 經濟指標長期趨勢（讀 metrics_daily.json）──
+var MD_JSON=null;
+var MD_STATE={key:'cluster'};
+var MD_KEYS=[
+  ['cluster','🔴 避險群聚'],['gold','黃金'],['oil','布倫特油'],['vix','VIX'],
+  ['ust10','美10Y殖利率'],['em_oas','EM信用利差'],['hy_oas','高收益利差'],['oil_premium','油價戰爭溢價']
+];
+var MD_UNIT={gold:'',oil:'',vix:'',ust10:'%',em_oas:'%',hy_oas:'%',oil_premium:'$/bbl'};
+var MD_DESC={
+  cluster:'同時往避險方向明顯偏離 30 日均值（>5%）的指標數（金↑/油↑/VIX↑/瑞郎強/國防股↑/殖利率↓）。單一指標沒意義，數字越高代表越多指標同時亮 → 市場在同步定價風險。',
+  gold:'避險金屬，戰爭/系統性風險升溫時走揚。',oil:'布倫特原油，供給中斷預期時跳漲。',
+  vix:'股市恐慌指數，風險趨避時飆升。',ust10:'美 10 年公債殖利率，資金逃向安全資產時驟降。',
+  em_oas:'新興市場公司債利差（FRED），全球信用壓力升高時擴大。',
+  hy_oas:'美國高收益債利差（FRED），信用市場壓力指標。',oil_premium:'布油現價高於 30 日均價的幅度，>$8 常代表市場已預期軍事行動。'
+};
+function _mdVal(rec,key){
+  var f=rec.fin||{};
+  return key==='cluster' ? f.risk_off_cluster : f[key];
+}
+function renderMetricsHist(){
+  var wrap=document.getElementById('md-wrap'); if(!wrap||!MD_JSON) return;
+  var days=MD_JSON.days||{};
+  var dates=Object.keys(days).filter(function(d){return _mdVal(days[d],'cluster')!=null || (days[d].fin&&Object.keys(days[d].fin).length);}).sort();
+  if(!dates.length){ wrap.style.display='none'; return; }
+  wrap.style.display='';
+  var cmd=document.getElementById('md-cmd');
+  if(cmd && !cmd.dataset.built){ cmd.dataset.built='1';
+    cmd.innerHTML=MD_KEYS.map(function(k){return '<button class="fh-tab" data-k="'+k[0]+'">'+k[1]+'</button>';}).join('');
+    cmd.querySelectorAll('.fh-tab').forEach(function(b){ b.onclick=function(){MD_STATE.key=b.dataset.k; drawMetricsHist();}; });
+  }
+  drawMetricsHist();
+}
+function drawMetricsHist(){
+  var svg=document.getElementById('md-svg'); if(!svg||!MD_JSON) return;
+  var key=MD_STATE.key, isCluster=(key==='cluster');
+  document.querySelectorAll('#md-cmd .fh-tab').forEach(function(b){b.classList.toggle('on', b.dataset.k===key);});
+  var days=MD_JSON.days||{};
+  var dates=Object.keys(days).sort();
+  var pts=[];
+  dates.forEach(function(d){ var v=_mdVal(days[d],key); if(v!=null && !isNaN(v)) pts.push({d:d,v:+v}); });
+  var W=720,H=220,padL=44,padR=14,padT=14,padB=26, p=[];
+  if(pts.length<1){
+    p.push('<text x="'+(W/2)+'" y="'+(H/2)+'" text-anchor="middle" class="fh-svg-axis">尚無資料，累積中…</text>');
+    svg.innerHTML=p.join(''); return;
+  }
+  var vals=pts.map(function(x){return x.v;});
+  var maxV, minV;
+  if(isCluster){ maxV=6; minV=0; } else {
+    maxV=Math.max.apply(null,vals); minV=Math.min.apply(null,vals);
+    var pad=(maxV-minV)*0.15||Math.abs(maxV)*0.1||1; maxV+=pad; minV-=pad; if(minV<0&&Math.min.apply(null,vals)>=0) minV=0;
+  }
+  var span=(maxV-minV)||1;
+  function Y(v){ return padT+(H-padT-padB)*(1-(v-minV)/span); }
+  var n=pts.length, slot=(W-padL-padR)/Math.max(n,1);
+  function CX(i){ return n<=1?(padL+(W-padL-padR)/2):(padL+slot*(i+0.5)); }
+  // grid + y labels
+  for(var g=0;g<=4;g++){ var gy=padT+(H-padT-padB)*g/4, gv=maxV-(span*g/4);
+    p.push('<line class="fh-svg-grid" x1="'+padL+'" y1="'+gy+'" x2="'+(W-padR)+'" y2="'+gy+'"/>');
+    p.push('<text class="fh-svg-axis" x="'+(padL-6)+'" y="'+(gy+4)+'" text-anchor="end">'+(isCluster?Math.round(gv):(+gv).toFixed(gv<10?1:0))+'</text>');
+  }
+  // x labels: first & last
+  p.push('<text class="fh-svg-axis" x="'+CX(0)+'" y="'+(H-8)+'" text-anchor="middle">'+pts[0].d.slice(5)+'</text>');
+  if(n>1) p.push('<text class="fh-svg-axis" x="'+CX(n-1)+'" y="'+(H-8)+'" text-anchor="middle">'+pts[n-1].d.slice(5)+'</text>');
+  var hit=[];
+  if(isCluster){
+    var y0=Y(0), bw=Math.max(2,Math.min(26,slot*0.7));
+    pts.forEach(function(pt,i){
+      var lvl=pt.v, col= lvl>=5?'#ff3b30': lvl>=4?'#ff7a18': lvl>=2?'var(--accent3)':'var(--accent)';
+      var by=Y(lvl), h=Math.max(0,y0-by), cx=CX(i);
+      p.push('<rect x="'+(cx-bw/2).toFixed(1)+'" y="'+by.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+h.toFixed(1)+'" fill="'+col+'" opacity=".85"></rect>');
+      hit.push('<rect x="'+(cx-slot/2).toFixed(1)+'" y="'+padT+'" width="'+slot.toFixed(1)+'" height="'+(y0-padT).toFixed(1)+'" fill="transparent" data-tip="<b>'+pt.d+'</b><br>避險群聚 '+lvl+' / 6"></rect>');
+    });
+  } else {
+    var line=pts.map(function(pt,i){return CX(i).toFixed(1)+','+Y(pt.v).toFixed(1);}).join(' ');
+    p.push('<polyline points="'+line+'" fill="none" stroke="var(--accent)" stroke-width="1.8"/>');
+    pts.forEach(function(pt,i){
+      p.push('<circle cx="'+CX(i).toFixed(1)+'" cy="'+Y(pt.v).toFixed(1)+'" r="2.4" fill="var(--accent)"/>');
+      hit.push('<rect x="'+(CX(i)-slot/2).toFixed(1)+'" y="'+padT+'" width="'+slot.toFixed(1)+'" height="'+(H-padT-padB).toFixed(1)+'" fill="transparent" data-tip="<b>'+pt.d+'</b><br>'+_mdLabel(key)+' '+pt.v+(MD_UNIT[key]||'')+'"></rect>');
+    });
+  }
+  svg.innerHTML=p.concat(hit).join('');
+  var leg=document.getElementById('md-legend');
+  if(leg) leg.innerHTML='<b style="color:var(--accent)">'+_mdLabel(key)+'</b>　'+(MD_DESC[key]||'')+'　·　資料點：'+n+' 天';
+}
+function _mdLabel(key){ for(var i=0;i<MD_KEYS.length;i++) if(MD_KEYS[i][0]===key) return MD_KEYS[i][1].replace('🔴 ',''); return key; }
+
 // ── 📈 每日共軍擾台架次（過去30天）──
 function renderPla(json){
   var wrap=document.getElementById('pla-wrap'); if(!wrap) return;
