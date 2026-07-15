@@ -986,6 +986,14 @@ def _num_before(unit: str, title: str):
     nums = [int(m) for m in re.findall(r'(\d{1,3})\s*' + unit, title)]
     return max(nums) if nums else None
 
+# 擷取單日架次：同時吃「N架／N架次」與「N機」兩種寫法。
+#   部分國防部戰報頭條用「6機10艦船」而非「6架次」，舊版只認「架」會漏抓。
+#   「N機」的數字必須緊貼「機」字才算（如 6機），可避開「共機／軍機／戰機／
+#   偵察機／F-16戰機」等無數字前綴的機型名，不會誤判。
+def _sortie_count(title: str):
+    cands = [n for n in (_num_before("架", title), _num_before("機", title)) if n]
+    return max(cands) if cands else None
+
 # 專用查詢：直接抓國防部每日戰報「N架次」標題（比一般台海新聞穩定，一次可涵蓋近幾天）
 PLA_SORTIE_QUERY = "共機 架次 OR 擾台 架次 OR 逾越中線 共機 OR 國防部 共機"
 
@@ -1029,14 +1037,14 @@ async def fetch_pla_sorties(session: aiohttp.ClientSession) -> dict:
             for it in root.findall(".//item")[:30]:
                 title = (it.findtext("title") or "").strip()
                 pub = (it.findtext("pubDate") or "").strip()
-                if "架" not in title:
+                if ("架" not in title) and ("機" not in title):
                     continue
                 if not any(k in title for k in ("共機", "軍機", "共軍", "解放軍", "中線", "擾台", "殲")):
                     continue
                 # 排除「累計／本週／今年以來」等期間總計標題，避免非單日數字被誤植為單日暴增
                 if any(t in title for t in PLA_CUMULATIVE_TOKENS):
                     continue
-                ac = _num_before("架", title)
+                ac = _sortie_count(title)
                 if ac is None or ac <= 0 or ac > 300:
                     continue
                 sh = _num_before("艘", title) or 0
