@@ -63,8 +63,11 @@ jobs:
 
       - name: Commit data.json
         run: |
+          # 注意：commit author email 必須是有效的 GitHub 帳號 email，否則
+          # Vercel（Hobby 方案）會以「commit author email is not valid」擋掉
+          # 該次自動部署（狀態 BLOCKED），導致網站停在舊快照不更新。
           git config user.name  "warhub-bot"
-          git config user.email "bot@warhub.local"
+          git config user.email "localhost20000@gmail.com"
           # data 皆為整份重算 → 併發競態時「我們的最新資料直接勝出」，不做 rebase/merge
           # （避免兩個 run 同時重算 data.json 造成 merge conflict 卡死）
           for i in 1 2 3 4 5; do
