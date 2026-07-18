@@ -19,7 +19,9 @@ const ALLOW = new Set([
 export default async function handler(req, res) {
   const f = String((req.query && req.query.f) || 'data.json');
   if (!ALLOW.has(f)) { res.status(400).json({ error: 'file not allowed' }); return; }
-  const token = process.env.GITHUB_TOKEN;
+  // 去掉貼上時常見的前後空白／換行（否則 Authorization 標頭失效 → GitHub 404）
+  const raw = process.env.GITHUB_TOKEN || '';
+  const token = raw.trim();
   try {
     const gh = await fetch(
       `https://api.github.com/repos/${REPO}/contents/data/${f}?ref=main`,
@@ -31,8 +33,10 @@ export default async function handler(req, res) {
       } }
     );
     if (!gh.ok) {
+      // 安全指紋（不洩漏完整 token）：長度＋前綴＋末 3 碼，供比對貼進 Vercel 的值是否正確
+      const fp = token ? (raw.length + '/' + token.length + ':' + token.slice(0, 11) + '…' + token.slice(-3)) : 'none';
       res.status(502).json({ error: 'github ' + gh.status,
-        hint: token ? undefined : 'GITHUB_TOKEN 未設定' });
+        hint: token ? undefined : 'GITHUB_TOKEN 未設定', tok: fp });
       return;
     }
     const body = await gh.text();
