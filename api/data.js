@@ -35,8 +35,24 @@ export default async function handler(req, res) {
     if (!gh.ok) {
       // 安全指紋（不洩漏完整 token）：長度＋前綴＋末 3 碼，供比對貼進 Vercel 的值是否正確
       const fp = token ? (raw.length + '/' + token.length + ':' + token.slice(0, 11) + '…' + token.slice(-3)) : 'none';
+      // 二次探測：token 對 /user 與 repo 根的權限，區分「token 無效」vs「無此 repo 權限」
+      let who = '?', repoStat = '?', body = '';
+      try { body = (await gh.text()).slice(0, 120); } catch (_) {}
+      if (token) {
+        try {
+          const u = await fetch('https://api.github.com/user',
+            { headers: { 'Authorization': `Bearer ${token}`, 'User-Agent': 'warhub-data-fn' } });
+          who = u.status + (u.ok ? ':' + ((await u.json()).login || '') : '');
+        } catch (e) { who = 'err'; }
+        try {
+          const r = await fetch(`https://api.github.com/repos/${REPO}`,
+            { headers: { 'Authorization': `Bearer ${token}`, 'User-Agent': 'warhub-data-fn' } });
+          repoStat = String(r.status);
+        } catch (e) { repoStat = 'err'; }
+      }
       res.status(502).json({ error: 'github ' + gh.status,
-        hint: token ? undefined : 'GITHUB_TOKEN 未設定', tok: fp });
+        hint: token ? undefined : 'GITHUB_TOKEN 未設定',
+        tok: fp, user: who, repo: repoStat, body: body });
       return;
     }
     const body = await gh.text();
