@@ -2573,15 +2573,20 @@ setInterval(htmlWpiRender, 10 * 60 * 1000);
 
 // ─── 從 /data/data.json 抓取真實資料 ─────────────────────────
 // 由 GitHub Actions 每 15 分鐘更新（scripts/fetch_data.py）
+// 統一資料載入：優先打即時 API（/api/data，從 GitHub 讀最新，永遠不會因
+// 部署凍結而卡在舊快照），失敗才退回同站部署快照（較舊，保底用）。
+async function wLoad(file){
+  let r = await fetch('/api/data?f=' + file, { cache: 'no-store' }).catch(function(){return null;});
+  if (!r || !r.ok) r = await fetch('data/' + file + '?t=' + Date.now(), { cache: 'no-store' }).catch(function(){return null;});
+  return r;
+}
+
 // 若 GOOGLE_MAPS_API_KEY 未設定，後端會回傳模擬資料
 async function fetchRealPizzaData() {
   try {
-    // 先抓同站的 data/data.json；不存在時（如 Vercel 鏡像部署）改抓 GitHub 上的資料
-    let res = await fetch('data/data.json?t=' + Date.now(), { cache: 'no-store' }).catch(() => null);
-    if (!res || !res.ok) {
-      res = await fetch('https://raw.githubusercontent.com/virus11456/warhub/main/data/data.json?t=' + Date.now(), { cache: 'no-store' });
-    }
-    if (!res.ok) throw new Error('HTTP ' + res.status);
+    // 即時 API 優先（永遠最新），退回部署快照
+    let res = await wLoad('data.json');
+    if (!res || !res.ok) throw new Error('HTTP ' + (res ? res.status : 'no-response'));
     const json = await res.json();
     if (!Array.isArray(json.pizza) || json.pizza.length === 0) {
       throw new Error('no pizza data');
@@ -2624,19 +2629,13 @@ async function fetchRealPizzaData() {
 
     // 歷史趨勢（供地區/WPI 趨勢箭頭）
     try {
-      let hres = await fetch('data/history.json?t=' + Date.now(), { cache: 'no-store' }).catch(() => null);
-      if (!hres || !hres.ok) {
-        hres = await fetch('https://raw.githubusercontent.com/virus11456/warhub/main/data/history.json?t=' + Date.now(), { cache: 'no-store' }).catch(() => null);
-      }
+      let hres = await wLoad('history.json');
       if (hres && hres.ok) WW_HISTORY = await hres.json();
     } catch(err) { console.warn('[WARHUBS] history fetch error:', err.message); }
 
     // 每日指標長期封存（避險群聚 & 經濟指標趨勢）
     try {
-      let mres = await fetch('data/metrics_daily.json?t=' + Date.now(), { cache: 'no-store' }).catch(() => null);
-      if (!mres || !mres.ok) {
-        mres = await fetch('https://raw.githubusercontent.com/virus11456/warhub/main/data/metrics_daily.json?t=' + Date.now(), { cache: 'no-store' }).catch(() => null);
-      }
+      let mres = await wLoad('metrics_daily.json');
       if (mres && mres.ok) { MD_JSON = await mres.json(); renderMetricsHist(); }
     } catch(err) { console.warn('[WARHUBS] metrics_daily fetch error:', err.message); }
 
