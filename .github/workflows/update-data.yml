@@ -2,7 +2,7 @@ name: Update data
 
 on:
   schedule:
-    - cron: '*/15 * * * *'  # every 15 minutes
+    - cron: '0 * * * *'  # 每小時整點（降頻以避免用完 Vercel 免費部署額度）
   workflow_dispatch:
     inputs:
       test_push:
