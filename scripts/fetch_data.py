@@ -1587,7 +1587,8 @@ async def fetch_usda_esr(session: aiohttp.ClientSession) -> dict | None:
     log.info(f"USDA ESR: commodity codes -> {cmap}")
 
     yr = datetime.now(timezone.utc).year
-    items, latest_week = [], ""
+    ESR_KEY = {"Soybeans": "soy", "Wheat": "wheat", "Corn": "corn"}
+    items, latest_week, hist = [], "", {}
     for nm, zh in USDA_WANT.items():
         cc = cmap.get(nm)
         if cc is None:
@@ -1598,13 +1599,24 @@ async def fetch_usda_esr(session: aiohttp.ClientSession) -> dict | None:
             d = await _usda_get(session, f"/exports/commodityCode/{cc}/countryCode/{china}/marketYear/{my}", key)
             if d:
                 recs.extend(d)
+        recs = [r for r in recs if r.get("weekEndingDate")]
         if not recs:
             log.warning(f"USDA ESR: {nm} (code={cc}) no records for MY {yr-1}/{yr}/{yr+1}")
             continue
-        recs = [r for r in recs if r.get("weekEndingDate")]
-        if not recs:
-            log.warning(f"USDA ESR: {nm} records missing weekEndingDate")
-            continue
+        # 每週序列（去重、排序、留近 ~2 年）供前台畫「承諾趨勢」與「下單 vs 提貨」
+        byweek = {}
+        for rr in recs:
+            wk0 = (rr.get("weekEndingDate") or "")[:10]
+            if not wk0:
+                continue
+            byweek[wk0] = {
+                "w": wk0,
+                "commit": round((rr.get("currentMYTotalCommitment") or 0) / 1000, 1),  # 累計承諾（千噸）
+                "outs":   round((rr.get("outstandingSales") or 0) / 1000, 1),           # 已訂未運
+                "exp":    round((rr.get("accumulatedExports") or 0) / 1000, 1),         # 累計已裝運
+                "net":    round((rr.get("currentMYNetSales") or 0) / 1000, 1),          # 本週淨銷售
+            }
+        hist[ESR_KEY.get(nm, nm.lower())] = [byweek[w] for w in sorted(byweek)][-110:]
         r = max(recs, key=lambda x: x.get("weekEndingDate", ""))
         wk = (r.get("weekEndingDate") or "")[:10]
         if wk > latest_week:
@@ -1619,11 +1631,13 @@ async def fetch_usda_esr(session: aiohttp.ClientSession) -> dict | None:
     if not items:
         log.warning("USDA ESR: matched China+commodities but assembled 0 items")
         return {**prev, "stale": True} if prev else None
-    log.info(f"USDA ESR: week {latest_week}, {len(items)} commodities")
+    log.info(f"USDA ESR: week {latest_week}, {len(items)} commodities, hist weeks="
+             f"{ {k: len(v) for k, v in hist.items()} }")
     return {
         "updated_at": datetime.now(timezone.utc).isoformat(),
         "week_ending": latest_week,
         "items": items,
+        "hist": hist,
         "note": "美國對中國每週出口銷售（USDA FAS ESR）· 週更 · 淨銷售=本週新訂單、未裝運=已訂未運",
     }
 
