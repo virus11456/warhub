@@ -3110,7 +3110,10 @@ function renderFood(json){
     el.innerHTML += '<div class="usda-block"><div class="usda-hd">🇺🇸→🇨🇳 美對中每週穀物銷售 · USDA ESR（截至 '+escapeHtml(u.week_ending||'')+'）</div>'+rows+'</div>';
   }
   var upd=document.getElementById('food-updated');
-  if(upd) upd.textContent='參考月 '+(f.ref_month||'—')+'（對比 '+(f.prev_year_month||'')+'）';
+  if(upd){
+    var ut=f.updated_at?new Date(f.updated_at).toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'—';
+    upd.textContent='參考月 '+(f.ref_month||'—')+'（對比 '+(f.prev_year_month||'')+'）· 最後更新 '+ut+'（每日重查·月資料約月更）';
+  }
   var sub=document.getElementById('food-sub');
   if(sub && f.breadth_up>=2){
     sub.innerHTML=sub.innerHTML.split(' · <strong')[0]
@@ -3298,7 +3301,10 @@ function renderStrat(json){
       +note+'</div>';
   }).join('');
   var upd=document.getElementById('strat-updated');
-  if(upd) upd.textContent='參考月 '+(s.ref_month||'—')+'（對比 '+(s.prev_year_month||'')+'）';
+  if(upd){
+    var ut=s.updated_at?new Date(s.updated_at).toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'—';
+    upd.textContent='參考月 '+(s.ref_month||'—')+'（對比 '+(s.prev_year_month||'')+'）· 最後更新 '+ut+'（每日重查·月資料約月更）';
+  }
 }
 // ── 🎖️ 台海軍事動態 ──
 function renderTwNews(json){
