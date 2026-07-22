@@ -1756,6 +1756,17 @@
       <div class="fh-chart"><svg id="fh-svg" viewBox="0 0 720 240" preserveAspectRatio="xMidYMid meet"></svg></div>
       <div class="fh-legend" id="fh-legend"></div>
     </div>
+    <!-- 🇺🇸→🇨🇳 USDA ESR 週報趨勢（承諾趨勢 / 下單 vs 提貨） -->
+    <div id="uh-wrap" class="fh-wrap" style="display:none;margin-top:1rem;border-top:1px dashed var(--border);padding-top:.7rem">
+      <div style="font-family:'Orbitron',monospace;font-size:.7rem;color:var(--text);margin-bottom:.15rem">🇺🇸→🇨🇳 美對中穀物週報趨勢 · USDA ESR</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim);margin-bottom:.45rem">此區為美國出口端週報(每週更新);中國 2025 起停報進口,故無法對比進口端落差,僅觀察美方趨勢</div>
+      <div class="fh-controls">
+        <div class="fh-tabs" id="uh-cmd"></div>
+        <div class="fh-tabs" id="uh-view"></div>
+      </div>
+      <div class="fh-chart"><svg id="uh-svg" viewBox="0 0 720 240" preserveAspectRatio="xMidYMid meet"></svg></div>
+      <div class="fh-legend" id="uh-legend"></div>
+    </div>
   </div>
 
   <!-- ⚙️ 戰略物資進口監測 -->
@@ -2672,6 +2683,9 @@ async function fetchRealPizzaData() {
     try { renderFoodHistory(json); }
     catch(err) { console.warn('[WARHUBS] renderFoodHistory error:', err.message); }
 
+    try { renderUsdaHist(json); }
+    catch(err) { console.warn('[WARHUBS] renderUsdaHist error:', err.message); }
+
     try { renderStrat(json); }
     catch(err) { console.warn('[WARHUBS] renderStrat error:', err.message); }
 
@@ -3196,6 +3210,74 @@ function drawFoodHistory(){
     leg.innerHTML='中國每月<b>'+nm+'</b>進口量（萬噸，每月一根）· '+f+' → '+l
       +'　▮ 實心＝中國海關直報，▯ 淡色虛邊＝出口國回推（近月中國停報，改由出口國對中出口數據回推）'
       +(hasMirror?'':'　·　近月資料累積中…');
+  }
+}
+// ── 🇺🇸→🇨🇳 美對中穀物週報趨勢（USDA ESR：累計承諾 / 下單vs提貨）──
+var UH_STATE={cmd:'soy', view:'commit'};
+var UH_JSON=null;
+var UH_CMDS=[['soy','大豆'],['wheat','小麥'],['corn','玉米']];
+var UH_VIEWS=[['commit','累計承諾趨勢'],['flow','下單 vs 提貨']];
+function renderUsdaHist(json){
+  UH_JSON=json;
+  var wrap=document.getElementById('uh-wrap'); if(!wrap) return;
+  var h=(json.usda&&json.usda.hist)||{};
+  if(!UH_CMDS.some(function(c){return (h[c[0]]||[]).length;})){ wrap.style.display='none'; return; }
+  wrap.style.display='';
+  var cmdEl=document.getElementById('uh-cmd');
+  if(cmdEl && !cmdEl.dataset.built){ cmdEl.dataset.built='1';
+    cmdEl.innerHTML=UH_CMDS.map(function(c){return '<button class="fh-tab" data-cmd="'+c[0]+'">'+c[1]+'</button>';}).join('');
+    cmdEl.querySelectorAll('.fh-tab').forEach(function(b){ b.onclick=function(){UH_STATE.cmd=b.dataset.cmd; drawUsdaHist();}; });
+  }
+  var vEl=document.getElementById('uh-view');
+  if(vEl && !vEl.dataset.built){ vEl.dataset.built='1';
+    vEl.innerHTML=UH_VIEWS.map(function(v){return '<button class="fh-tab" data-view="'+v[0]+'">'+v[1]+'</button>';}).join('');
+    vEl.querySelectorAll('.fh-tab').forEach(function(b){ b.onclick=function(){UH_STATE.view=b.dataset.view; drawUsdaHist();}; });
+  }
+  drawUsdaHist();
+}
+function drawUsdaHist(){
+  var json=UH_JSON; if(!json) return;
+  var svg=document.getElementById('uh-svg'); if(!svg) return;
+  document.querySelectorAll('#uh-cmd .fh-tab').forEach(function(b){b.classList.toggle('on', b.dataset.cmd===UH_STATE.cmd);});
+  document.querySelectorAll('#uh-view .fh-tab').forEach(function(b){b.classList.toggle('on', b.dataset.view===UH_STATE.view);});
+  var data=(((json.usda||{}).hist||{})[UH_STATE.cmd])||[];
+  var nm=({soy:'大豆',wheat:'小麥',corn:'玉米'})[UH_STATE.cmd]||'';
+  var W=720,H=240,padL=54,padR=14,padT=16,padB=28, p=[];
+  var leg=document.getElementById('uh-legend');
+  if(data.length<2){ svg.innerHTML='<text x="360" y="120" text-anchor="middle" class="fh-svg-axis">資料累積中…</text>'; if(leg) leg.textContent=''; return; }
+  var series = UH_STATE.view==='flow'
+    ? [{k:'outs', c:'var(--accent3)', lbl:'已訂未運（下單未提）'}, {k:'exp', c:'#35e08a', lbl:'累計已裝運（實際提貨）'}]
+    : [{k:'commit', c:'var(--accent)', lbl:'累計承諾（下單總量）'}];
+  var vals=[]; data.forEach(function(d){ series.forEach(function(s){ var v=d[s.k]; if(v!=null&&!isNaN(v)) vals.push(v); }); });
+  var maxV=Math.max.apply(null, vals.concat([1]))*1.12;
+  function Y(v){ return padT+(H-padT-padB)*(1-v/(maxV||1)); }
+  var n=data.length, slot=(W-padL-padR)/n;
+  function CX(i){ return n<=1?(padL+(W-padL-padR)/2):(padL+slot*(i+0.5)); }
+  for(var g=0;g<=4;g++){ var gy=padT+(H-padT-padB)*g/4, gv=maxV*(1-g/4);
+    p.push('<line class="fh-svg-grid" x1="'+padL+'" y1="'+gy+'" x2="'+(W-padR)+'" y2="'+gy+'"/>');
+    p.push('<text class="fh-svg-axis" x="'+(padL-6)+'" y="'+(gy+4)+'" text-anchor="end">'+fhFmt(gv)+'</text>');
+  }
+  var lastYr=null;
+  data.forEach(function(d,i){ var yr=(d.w||'').slice(0,4);
+    if(yr&&yr!==lastYr){ lastYr=yr; p.push('<text class="fh-svg-axis" x="'+CX(i)+'" y="'+(H-8)+'" text-anchor="middle">'+yr+'</text>'); }
+  });
+  series.forEach(function(s){
+    var pts=data.map(function(d,i){ var v=d[s.k]; return (v==null||isNaN(v))?null:(CX(i).toFixed(1)+','+Y(v).toFixed(1)); }).filter(Boolean).join(' ');
+    if(pts) p.push('<polyline points="'+pts+'" fill="none" stroke="'+s.c+'" stroke-width="1.8"/>');
+  });
+  var hit=[];
+  data.forEach(function(d,i){
+    var lines='<b>'+d.w+'</b>';
+    series.forEach(function(s){ if(d[s.k]!=null) lines+='<br>'+s.lbl+'：'+fhFmt(d[s.k])+' 千噸'; });
+    hit.push('<rect x="'+(CX(i)-slot/2).toFixed(1)+'" y="'+padT+'" width="'+slot.toFixed(1)+'" height="'+(H-padT-padB).toFixed(1)+'" fill="transparent" data-tip="'+lines+'"></rect>');
+  });
+  svg.innerHTML=p.concat(hit).join('');
+  if(leg){
+    var lg=series.map(function(s){return '<span style="color:'+s.c+'">▬ '+s.lbl+'</span>';}).join('　');
+    var expl=UH_STATE.view==='flow'
+      ? '「已訂未運」高＝下了單還沒提貨（履約落差，值得注意）；兩線差距＝尚未裝運量'
+      : '中國對美'+nm+'的累計採購承諾（每個行銷年度歸零重算，看每季買氣斜率）';
+    leg.innerHTML='<b>'+nm+'</b> · 千噸 · '+data[0].w+' → '+data[data.length-1].w+'　'+lg+'　·　'+expl;
   }
 }
 // ── ⚙️ 戰略物資月度趨勢圖 ──
