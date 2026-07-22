@@ -1233,8 +1233,8 @@ async def _comtrade_china_import(session, period: int):
     return None
 
 async def _food_mirror_total(session, month: int):
-    """主要出口國該月對中出口三主糧合計 {cmd: netWgt kg}, ok=成功國數。"""
-    tot = {c: 0 for c, _ in FOOD_CMDS}; ok = 0
+    """主要出口國該月對中出口三主糧合計 {cmd: netWgt kg}, ok=成功國數, us=美國(842)部分。"""
+    tot = {c: 0 for c, _ in FOOD_CMDS}; ok = 0; us = None
     for rep, _ in FOOD_EXPORTERS:
         r = await _comtrade_month(session, rep, month)
         await asyncio.sleep(3)
@@ -1242,7 +1242,9 @@ async def _food_mirror_total(session, month: int):
             ok += 1
             for c, _ in FOOD_CMDS:
                 tot[c] += r.get(c, 0)
-    return tot, ok
+            if rep == "842":            # 美國：另存一份供「美國佔比」計算
+                us = r
+    return tot, ok, us
 
 async def fetch_food_history(session: aiohttp.ClientSession) -> list:
     store = {}
@@ -1263,15 +1265,22 @@ async def fetch_food_history(session: aiohttp.ClientSession) -> list:
     stored_mirror = sorted([ym for ym in targets
                             if ym > CHINA_REPORT_CUTOFF and key(ym) in store], reverse=True)
     refresh = stored_mirror[:1]
+    # 已存但缺「美國佔比」欄位的鏡像月 → 逐步回填 us_*（供美國佔比檢視）
+    missing_us = [ym for ym in stored_mirror if "us_soy" not in (store.get(key(ym)) or {})]
 
     try:
         # 先補最近的鏡像月（使用者最先想看「近一年」），再補中國直報深歷史
-        for ym in sorted(set(missing_mirror + refresh), reverse=True)[:HIST_MIRROR_BUDGET]:
-            tot, ok = await _food_mirror_total(session, ym)
+        for ym in sorted(set(missing_mirror + refresh + missing_us), reverse=True)[:HIST_MIRROR_BUDGET]:
+            tot, ok, us = await _food_mirror_total(session, ym)
             if ok:
-                store[key(ym)] = {"soy": round(tot["1201"] / 1e7, 1),
-                                  "wheat": round(tot["1001"] / 1e7, 1),
-                                  "corn": round(tot["1005"] / 1e7, 1), "src": "mirror"}
+                rec = {"soy": round(tot["1201"] / 1e7, 1),
+                       "wheat": round(tot["1001"] / 1e7, 1),
+                       "corn": round(tot["1005"] / 1e7, 1), "src": "mirror"}
+                if us is not None:      # 美國該月對中出口（萬噸）→ 前台算佔比
+                    rec["us_soy"]   = round(us.get("1201", 0) / 1e7, 1)
+                    rec["us_wheat"] = round(us.get("1001", 0) / 1e7, 1)
+                    rec["us_corn"]  = round(us.get("1005", 0) / 1e7, 1)
+                store[key(ym)] = rec
         for ym in sorted(missing_china, reverse=True)[:HIST_CHINA_BUDGET]:
             r = await _comtrade_china_import(session, ym)
             await asyncio.sleep(3)
