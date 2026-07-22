@@ -1192,7 +1192,7 @@ async def fetch_food_imports(session: aiohttp.ClientSession) -> dict:
         "exporters": [n for _, n in FOOD_EXPORTERS],
         "items": items,
         "breadth_up": breadth,
-        "note": "鏡像代理值（主要出口國對中出口合計）· 月資料約 3–4 月落差 · 結構性背景指標",
+        "note": "出口國回推（因中國停報，改由各主要出口國「對中國出口」海關數據回推推估）· 月資料約 3–4 月落差 · 結構性背景指標",
     }
 
 
@@ -1386,18 +1386,24 @@ async def fetch_strategic_imports(session: aiohttp.ClientSession) -> dict:
     items = []
     for m in STRAT_MATERIALS:
         cur_t, ok1 = await collect(m["cmd"], m["exp"], L)
-        prev_t, _ = await collect(m["cmd"], m["exp"], L12)
+        prev_t, ok0 = await collect(m["cmd"], m["exp"], L12)
         if ok1 == 0:
             continue
         a, b = cur_t / 1e7, prev_t / 1e7          # 萬噸
         yoy = round((a - b) / b * 100, 1) if b > 0 else None
+        # 近月「出口國回推」常還沒收齊：本月回報的出口國數比去年同月少時，
+        # 低值多半是資料未齊（非真下滑）→ 標為 partial（資料待補），避免誤判「異常低」。
+        incomplete = ok1 < ok0
         anomaly = ""
         if yoy is not None:
             if yoy >= 25: anomaly = "high"
             elif yoy <= -25: anomaly = "low"
+        if incomplete and anomaly == "low":
+            anomaly = "partial"
         items.append({"cmd": m["cmd"], "name": m["name"], "use": m["use"],
                       "wan_ton": round(a, 1), "prev_wan_ton": round(b, 1),
                       "yoy_pct": yoy, "anomaly": anomaly,
+                      "reporters": ok1, "reporters_prev": ok0, "incomplete": incomplete,
                       "hi": m["hi"], "lo": m["lo"]})
     if not items:
         return {**prev, "stale": True} if prev else {}
@@ -1407,7 +1413,7 @@ async def fetch_strategic_imports(session: aiohttp.ClientSession) -> dict:
         "ref_month": f"{L // 100}-{L % 100:02d}",
         "prev_year_month": f"{L12 // 100}-{L12 % 100:02d}",
         "items": items,
-        "note": "鏡像代理值（主要出口國對中出口合計）· 月資料約 3–4 月落差 · 異常高＝突然囤積、異常低＝改用儲備，皆須交叉印證",
+        "note": "出口國回推（因中國停報，改由各主要出口國「對中國出口」海關數據回推推估）· 月資料約 3–4 月落差 · 單月僅供參考、看趨勢 · 抓不到經俄/伊等不通報管道",
     }
 
 

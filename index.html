@@ -1733,7 +1733,7 @@
   <!-- ══════════ 🇨🇳 中國戰備動向監測（整合區塊）══════════ -->
   <div class="cn-banner" id="china-watch">
     <div class="cn-banner-t">🇨🇳 中國戰備動向監測</div>
-    <div class="cn-banner-s">無法直接觀察中國 → 以「他國對中出口<strong>鏡像數據</strong>」＋「<strong>異常高/低</strong>」＋台海軍事動態，交叉推估備戰訊號。以下皆為佐證指標，須合併研判。</div>
+    <div class="cn-banner-s">中國已停止公布糧食與戰略物資進口 → 改用「<strong>出口國回推</strong>」：把各主要出口國「對中國出口」的海關數據加總，回推中國進口量。搭配「<strong>異常高/低</strong>」與台海軍事動態，交叉推估備戰訊號。皆為佐證指標，須合併研判；<strong>單月易受資料未齊影響，以趨勢為主</strong>，且抓不到經俄/伊等不通報管道。</div>
   </div>
 
   <!-- ══════════ 🌾 中國糧食進口監測（結構性背景指標）══════════ -->
@@ -1743,7 +1743,7 @@
       <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim)"><span id="food-updated">結構性背景指標</span></div>
     </div>
     <div style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim);margin-bottom:.6rem" id="food-sub">
-      鏡像數據（主要出口國對中出口合計）· <strong>異常高＝囤糧備戰</strong>；<strong>異常低≠自給提升</strong>，可能是糧食產量或人口下降（內政因素）· 備戰佐證訊號，非即時、須交叉印證
+      出口國回推（因中國停報，改由主要出口國「對中國出口」海關數據回推）· <strong>異常高＝囤糧備戰</strong>；<strong>異常低≠自給提升</strong>，可能是產量或人口下降（內政因素）· 佐證訊號，非即時、單月僅供參考，看趨勢
     </div>
     <div id="food-grid">
       <div style="padding:1rem;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 連接 UN Comtrade…</div>
@@ -1765,7 +1765,7 @@
       <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim)"><span id="strat-updated">軍工原料</span></div>
     </div>
     <div style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim);margin-bottom:.6rem">
-      軍工必需、中國高度依賴進口的原料（鏡像數據）· <strong>異常高＝突然囤積</strong>、<strong>異常低＝改用儲備</strong>，皆為備戰佐證 · 石油因俄/沙不報 Comtrade 暫無免費資料源
+      軍工必需、中國高度依賴進口的原料（出口國回推）· <strong>異常高＝突然囤積</strong>、<strong>異常低＝改用儲備</strong> · 石油因俄/沙不報 Comtrade 抓不到 · 近月常未收齊，標「<strong>資料待補</strong>」者為暫值、勿當異常
     </div>
     <div id="strat-grid">
       <div style="padding:1rem;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 連接 UN Comtrade…</div>
@@ -1820,6 +1820,7 @@
 .strat-flag { display:inline-block; font-family:'Orbitron',monospace; font-size:.56rem; font-weight:700; letter-spacing:.5px; padding:1px 6px; border-radius:3px; margin-left:.35rem; }
 .strat-flag.high { color:#04121a; background:var(--accent2); }
 .strat-flag.low  { color:#04121a; background:var(--accent3); }
+.strat-flag.partial { color:#04121a; background:#8fa6b8; }
 
 /* ── 📈 共軍每日架次趨勢 ── */
 .pla-wrap { margin-bottom:.8rem; padding:.7rem .8rem; background:rgba(255,77,94,.04); border:1px solid rgba(255,77,94,.15); border-radius:4px; }
@@ -3167,13 +3168,13 @@ function drawFoodHistory(){
   data.forEach(function(d,i){ var yr=d.ym.slice(0,4);
     if(yr!==lastYr){ lastYr=yr; p.push('<text class="fh-svg-axis" x="'+CX(i)+'" y="'+(H-8)+'" text-anchor="middle">'+yr+'</text>'); }
   });
-  // 每月一根柱：實心＝中國海關直報，淡色虛邊＝近月鏡像估計
+  // 每月一根柱：實心＝中國海關直報，淡色虛邊＝近月出口國回推
   var fhHit=[], fhNm=({soy:'大豆',wheat:'小麥',corn:'玉米'})[key]||'';
   data.forEach(function(d,i){
     var v=d[key]||0, by=Y(v), h=Math.max(0, y0-by), cx=CX(i);
     p.push('<rect class="'+(d.src==='mirror'?'fh-bar-m':'fh-bar-c')+'" x="'+(cx-bw/2).toFixed(1)
       +'" y="'+by.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+h.toFixed(1)+'"></rect>');
-    var tip='<b>'+d.ym+'</b><br>'+fhNm+' '+fhFmt(v)+' 萬噸'+(d.src==='mirror'?'<br>（鏡像估計）':'<br>（中國海關直報）');
+    var tip='<b>'+d.ym+'</b><br>'+fhNm+' '+fhFmt(v)+' 萬噸'+(d.src==='mirror'?'<br>（出口國回推）':'<br>（中國海關直報）');
     fhHit.push('<rect x="'+(cx-slot/2).toFixed(1)+'" y="'+padT+'" width="'+slot.toFixed(1)+'" height="'+(y0-padT).toFixed(1)
       +'" fill="transparent" data-tip="'+tip+'"></rect>');
   });
@@ -3190,7 +3191,7 @@ function drawFoodHistory(){
     var f=data.length?data[0].ym:'', l=data.length?data[data.length-1].ym:'';
     var hasMirror=data.some(function(d){return d.src==='mirror';});
     leg.innerHTML='中國每月<b>'+nm+'</b>進口量（萬噸，每月一根）· '+f+' → '+l
-      +'　▮ 實心＝中國海關直報，▯ 淡色虛邊＝鏡像估計（最近幾個月中國停報 Comtrade）'
+      +'　▮ 實心＝中國海關直報，▯ 淡色虛邊＝出口國回推（近月中國停報，改由出口國對中出口數據回推）'
       +(hasMirror?'':'　·　近月資料累積中…');
   }
 }
@@ -3246,7 +3247,7 @@ function drawStratHistory(){
     var v=d[key]||0, by=Y(v), h=Math.max(0,y0-by), cx=CX(i);
     p.push('<rect class="'+(d.src==='mirror'?'fh-bar-m':'fh-bar-c')+'" x="'+(cx-bw/2).toFixed(1)
       +'" y="'+by.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+h.toFixed(1)+'"></rect>');
-    var tip='<b>'+d.ym+'</b><br>'+shNm+' '+fhFmt(v)+' 萬噸'+(d.src==='mirror'?'<br>（鏡像估計）':'<br>（中國海關直報）');
+    var tip='<b>'+d.ym+'</b><br>'+shNm+' '+fhFmt(v)+' 萬噸'+(d.src==='mirror'?'<br>（出口國回推）':'<br>（中國海關直報）');
     shHit.push('<rect x="'+(cx-slot/2).toFixed(1)+'" y="'+padT+'" width="'+slot.toFixed(1)+'" height="'+(y0-padT).toFixed(1)
       +'" fill="transparent" data-tip="'+tip+'"></rect>');
   });
@@ -3261,7 +3262,7 @@ function drawStratHistory(){
     var nm=({'4001':'天然橡膠','2604':'鎳礦砂','2610':'鉻礦砂','2601':'鐵礦砂'})[key];
     var f=data.length?data[0].ym:'', l=data.length?data[data.length-1].ym:'';
     leg.innerHTML='中國每月<b>'+nm+'</b>進口量（萬噸，每月一根）· '+f+' → '+l
-      +'　▮ 實心＝中國海關直報，▯ 淡色虛邊＝鏡像估計（2025 起中國停報）· 觀察逐月變動與趨勢';
+      +'　▮ 實心＝中國海關直報，▯ 淡色虛邊＝出口國回推（2025 起中國停報，改由出口國對中出口數據回推）· 看逐月趨勢';
   }
 }
 // ── ⚙️ 戰略物資進口監測 ──
@@ -3274,14 +3275,18 @@ function renderStrat(json){
   }
   el.innerHTML=s.items.map(function(it){
     var y=it.yoy_pct;
-    var col=(y==null)?'var(--text-dim)':(y>0?'#ff4d5e':(y<0?'#35e08a':'var(--text-dim)'));
+    var partial=(it.anomaly==='partial');
+    var col=partial?'var(--text-dim)':((y==null)?'var(--text-dim)':(y>0?'#ff4d5e':(y<0?'#35e08a':'var(--text-dim)')));
     var arr=(y==null)?'':(y>0?'▲':(y<0?'▼':''));
     var w=it.wan_ton>=100?Math.round(it.wan_ton).toLocaleString():it.wan_ton;
     var flag=it.anomaly==='high'?'<span class="strat-flag high">異常高</span>'
-            :it.anomaly==='low'?'<span class="strat-flag low">異常低</span>':'';
-    // 判讀備註：異常時醒目標出對應解讀，平常則兩種都列供參
+            :it.anomaly==='low'?'<span class="strat-flag low">異常低</span>'
+            :partial?'<span class="strat-flag partial">資料待補</span>':'';
+    // 判讀備註：資料未齊時只提示暫值；異常時醒目標出解讀，平常則兩種都列供參
     var note='';
-    if(it.hi||it.lo){
+    if(partial){
+      note='<div class="strat-note">◷ 近月出口國尚未全數回報（'+(it.reporters||0)+'/'+(it.reporters_prev||0)+' 國），此為暫值、勿當異常低，待補齊後再判讀</div>';
+    } else if(it.hi||it.lo){
       if(it.anomaly==='high') note='<div class="strat-note hi">⚑ 異常高判讀：'+escapeHtml(it.hi||'')+'</div>';
       else if(it.anomaly==='low') note='<div class="strat-note lo">⚑ 異常低判讀：'+escapeHtml(it.lo||'')+'</div>';
       else note='<div class="strat-note">▲高→'+escapeHtml(it.hi||'')+'　▼低→'+escapeHtml(it.lo||'')+'</div>';
