@@ -2,7 +2,7 @@ name: Update data
 
 on:
   schedule:
-    - cron: '*/30 * * * *'  # 每 30 分鐘（GitHub 排程常延後/跳過，用 30 分提升規律性；約 48 次/天，仍在 Vercel 免費部署上限 100/日 內）
+    - cron: '0 * * * *'  # 每小時整點（節省 GitHub Actions 分鐘：私有 repo 每月免費 2,000 分鐘，每次 run 約需數分鐘）
   workflow_dispatch:
     inputs:
       test_push:

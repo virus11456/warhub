@@ -714,17 +714,19 @@ async def fetch_gdelt(session: aiohttp.ClientSession) -> dict:
     first = True
     for key, cfg in REGIONS.items():
         if not first:
-            await asyncio.sleep(6)
+            await asyncio.sleep(5)
         first = False
         params = {
             "query": cfg["gdelt_q"],
             "mode": "timelinevol", "timespan": "48h", "format": "json",
         }
-        for attempt, backoff in ((1, 10), (2, 20), (3, 0)):
+        # GDELT 對 GitHub 共享 runner IP 幾乎必被限速（回非 JSON → 失敗、沿用舊值）。
+        # 因此「快速失敗」：少重試、短退避、短逾時，避免每次 run 白耗數分鐘（省 Actions 額度）。
+        for attempt, backoff in ((1, 3), (2, 0)):
             try:
                 async with session.get(
                     GDELT_API, params=params,
-                    timeout=aiohttp.ClientTimeout(total=20),
+                    timeout=aiohttp.ClientTimeout(total=12),
                     headers={"User-Agent": USER_AGENT},
                 ) as resp:
                     text = await resp.text()
