@@ -62,6 +62,29 @@ def _fmt_news(news, n=3):
     return "\n".join(lines) or "  （無即時頭條）"
 
 
+def _fmt_aviation(aviation):
+    """全球軍機動態摘要（無人機優先，附加油機/預警機/偵察機）。"""
+    s = (aviation or {}).get("summary") or {}
+    return (f"✈️ 全球軍機：無人機 {s.get('uav',0)}・加油機 {s.get('tankers',0)}"
+            f"・預警機 {s.get('awacs',0)}・偵察機 {s.get('c4isr',0)}（共 {s.get('total',0)} 架）")
+
+
+def _fmt_pizza_shops(shops):
+    """目前『超標』的披薩店（status=spike 爆量 / busy 偏忙），列出店名與忙碌度。"""
+    hot = [s for s in (shops or []) if s.get("status") in ("spike", "busy")]
+    if not hot:
+        opn = sum(1 for s in (shops or []) if s.get("is_open"))
+        return f"   （目前無店家爆量／異常忙碌；{opn}/{len(shops or [])} 家營業中）"
+    hot.sort(key=lambda s: (s.get("busyness") or 0), reverse=True)
+    lines = []
+    for s in hot[:6]:
+        p = s.get("percentage_of_usual")
+        tag = "🔴爆量" if s.get("status") == "spike" else "🟠偏忙"
+        extra = f"（達平時 {round(p)}%）" if p is not None else ""
+        lines.append(f"   {tag} {s.get('name','?')}　忙碌度 {s.get('busyness',0)}%{extra}")
+    return "\n".join(lines)
+
+
 def build_digest(data: dict) -> str:
     score = data.get("score", {})
     emoji = LEVEL_EMOJI.get(score.get("alert_level"), "⚠️")
@@ -74,6 +97,8 @@ def build_digest(data: dict) -> str:
         f"{emoji} *綜合威脅指數：{score.get('combined_score',0):.1f} / 100*　等級：*{score.get('alert_level','?')}*\n\n"
         f"🗺️ 地區風險：\n{_fmt_regions(data.get('regions'))}\n\n"
         f"🍕 五角大廈披薩指數：{score.get('pizza_score',0):.1f}　·　DEFCON {data.get('defcon_level','—')}\n"
+        f"{_fmt_pizza_shops(data.get('pizza'))}\n"
+        f"{_fmt_aviation(data.get('aviation'))}\n"
         f"🔥 衝突火點：{hs} 處（NASA FIRMS 24h）\n\n"
         f"📡 最新戰情頭條：\n{_fmt_news(data.get('news'))}\n\n"
         f"🔗 {SITE}"
