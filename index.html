@@ -3203,6 +3203,9 @@ function drawFoodHistory(){
   document.querySelectorAll('#fh-cmd .fh-tab').forEach(function(b){b.classList.toggle('on', b.dataset.cmd===FH_STATE.cmd);});
   document.querySelectorAll('#fh-range .fh-tab').forEach(function(b){b.classList.toggle('on', +b.dataset.range===FH_STATE.range);});
   document.querySelectorAll('#fh-view .fh-tab').forEach(function(b){b.classList.toggle('on', b.dataset.view===(FH_STATE.view||'vol'));});
+  // 美國佔比只涵蓋 2025 起回推月份（約 18 個月內），近1/3/5年切換無意義 → 隱藏年份選單
+  var fhRange=document.getElementById('fh-range');
+  if(fhRange) fhRange.style.display=(FH_STATE.view==='usshare')?'none':'';
   if(FH_STATE.view==='usshare'){ drawFoodShare(); return; }
   var data=(json.food_hist||[]).slice(-FH_STATE.range);
   var key=FH_STATE.cmd;
