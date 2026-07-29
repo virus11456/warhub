@@ -2,7 +2,7 @@ name: Update data
 
 on:
   schedule:
-    - cron: '0 * * * *'  # 每小時整點（節省 GitHub Actions 分鐘：私有 repo 每月免費 2,000 分鐘，每次 run 約需數分鐘）
+    - cron: '23 * * * *'  # 每小時第 23 分（仍每小時一次；避開整點 :00 全球 cron 尖峰，降低 GitHub 排程被延後/跳過的機率）
   workflow_dispatch:
     inputs:
       test_push:
