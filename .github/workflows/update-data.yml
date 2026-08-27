@@ -2,7 +2,7 @@ name: Update data
 
 on:
   schedule:
-    - cron: '23 * * * *'  # 每小時第 23 分（仍每小時一次；避開整點 :00 全球 cron 尖峰，降低 GitHub 排程被延後/跳過的機率）
+    - cron: '23 */2 * * *'  # 每 2 小時第 23 分：每小時對免費 2,000 分鐘/月額度太多（曾兩度用爆被擋），改每 2 小時 ≈ 1,500 分/月，穩在額度內
   workflow_dispatch:
     inputs:
       test_push:
