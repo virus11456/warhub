@@ -1191,31 +1191,24 @@ async def fetch_food_imports(session: aiohttp.ClientSession) -> dict:
     L12 = _ym_add(L, -12)
 
     async def collect(month):
-        tot = {c: 0 for c, _ in FOOD_CMDS}; ok = set()
-        for rep, _ in FOOD_EXPORTERS:
-            r = await _comtrade_month(session, rep, month)
-            await asyncio.sleep(5)
-            if r:
-                ok.add(rep)
-                for c, _ in FOOD_CMDS:
-                    tot[c] += r.get(c, 0)
-        return tot, ok
-    cur_t, ok1 = await collect(L)
-    prev_t, ok2 = await collect(L12)
-    if not ok1:
+        totals, _, _, coverage = await _food_mirror_total(session, month)
+        return totals, coverage
+    cur_t, coverage1 = await collect(L)
+    prev_t, coverage2 = await collect(L12)
+    if not cur_t:
         return {**prev, "stale": True} if prev else {}
-
     items, breadth = [], 0
     for c, name in FOOD_CMDS:
-        a = cur_t[c] / 1e7           # 萬噸
-        b = prev_t[c] / 1e7
+        a = cur_t[c] / 1e7 if c in cur_t else None
+        b = prev_t[c] / 1e7 if c in prev_t else None
+        ok1, ok2 = set(coverage1[c]), set(coverage2[c])
         incomplete = ok1 != ok2 or len(ok1) < len(FOOD_EXPORTERS)
-        yoy = round((a - b) / b * 100, 1) if b > 0 and not incomplete else None
+        yoy = round((a-b)/b*100,1) if a is not None and b is not None and b>0 and not incomplete else None
         if yoy is not None and yoy >= 15:
             breadth += 1
-        items.append({"cmd": c, "name": name,
-                      "wan_ton": round(a, 1), "prev_wan_ton": round(b, 1),
-                      "yoy_pct": yoy, "incomplete": incomplete, "reporter_codes": sorted(ok1), "reporter_codes_prev": sorted(ok2)})
+        items.append({"cmd":c, "name":name, "wan_ton":round(a,1) if a is not None else None,
+                      "prev_wan_ton":round(b,1) if b is not None else None, "yoy_pct":yoy,
+                      "incomplete":incomplete, "reporter_codes":sorted(ok1), "reporter_codes_prev":sorted(ok2)})
     log.info(f"food: ref={L} soy={items[0]['wan_ton']}萬噸 yoy={items[0]['yoy_pct']} breadth={breadth}")
     return {
         "updated_at": now.isoformat(),
@@ -1224,18 +1217,18 @@ async def fetch_food_imports(session: aiohttp.ClientSession) -> dict:
         "exporters": [n for _, n in FOOD_EXPORTERS],
         "items": items,
         "breadth_up": breadth,
-        "note": "出口國回推（因中國停報，改由各主要出口國「對中國出口」海關數據回推推估）· 月資料約 3–4 月落差 · 結構性背景指標",
+        "note": "出口國鏡像合計（涵蓋範圍有限，缺值不表示中國停止公布）· 月資料約 3–4 月落差 · 結構性背景指標",
     }
 
 
 # ─────────────────────────────────────────────────────────────
 # 🌾 糧食進口「月度歷史」— 近 5 年逐月序列（1/3/5 年趨勢）
 #   ≤2024-12：中國海關直報（reporter=中國, partner=全世界，1 呼叫/月，永久快取）
-#   ≥2025-01：中國停報 Comtrade → 改用鏡像（主要出口國對中出口合計，7 呼叫/月）
+#   ≥2025-01：依既有設定改用鏡像；直報是否可用須另查（主要出口國對中出口合計，7 呼叫/月）
 #   每次執行只回填有限筆數，尊重 Comtrade 限速與 12 分鐘工時上限，逐步補齊。
 # ─────────────────────────────────────────────────────────────
 FOOD_HIST_MONTHS    = 60        # 視窗：近 5 年
-CHINA_REPORT_CUTOFF = 202412    # 中國自 2025 起停報 Comtrade
+CHINA_REPORT_CUTOFF = 202412    # 既有直報／鏡像切換界線，非永久停報證據
 HIST_MIRROR_BUDGET  = 3         # 每次最多回填幾個「鏡像」月（每月 7 呼叫）
 HIST_CHINA_BUDGET   = 15        # 每次最多回填幾個「中國直報」月（每月 1 呼叫）
 
@@ -1268,17 +1261,19 @@ async def _comtrade_china_import(session, period: int):
 
 async def _food_mirror_total(session, month: int):
     """主要出口國該月對中出口三主糧合計 {cmd: netWgt kg}, ok=成功國數, us=美國(842)部分。"""
-    tot = {c: 0 for c, _ in FOOD_CMDS}; ok = 0; us = None
+    tot = {}; ok = 0; us = None; coverage = {c: [] for c, _ in FOOD_CMDS}
     for rep, _ in FOOD_EXPORTERS:
         r = await _comtrade_month(session, rep, month)
         await asyncio.sleep(3)
         if r:
             ok += 1
             for c, _ in FOOD_CMDS:
-                tot[c] += r.get(c, 0)
+                if r.get(c) is not None:
+                    tot[c] = tot.get(c, 0) + r[c]
+                    coverage[c].append(rep)
             if rep == "842":            # 美國：另存一份供「美國佔比」計算
                 us = r
-    return tot, ok, us
+    return tot, ok, us, coverage
 
 async def fetch_food_history(session: aiohttp.ClientSession) -> list:
     store = {}
@@ -1305,23 +1300,23 @@ async def fetch_food_history(session: aiohttp.ClientSession) -> list:
     try:
         # 先補最近的鏡像月（使用者最先想看「近一年」），再補中國直報深歷史
         for ym in sorted(set(missing_mirror + refresh + missing_us), reverse=True)[:HIST_MIRROR_BUDGET]:
-            tot, ok, us = await _food_mirror_total(session, ym)
+            tot, ok, us, coverage = await _food_mirror_total(session, ym)
             if ok:
-                rec = {"soy": round(tot["1201"] / 1e7, 1),
-                       "wheat": round(tot["1001"] / 1e7, 1),
-                       "corn": round(tot["1005"] / 1e7, 1), "src": "mirror"}
+                rec = {"soy": round(tot["1201"] / 1e7, 1) if tot.get("1201") is not None else None,
+                       "wheat": round(tot["1001"] / 1e7, 1) if tot.get("1001") is not None else None,
+                       "corn": round(tot["1005"] / 1e7, 1) if tot.get("1005") is not None else None, "src": "mirror", "schema_version":2, "coverage":coverage}
                 if us is not None:      # 美國該月對中出口（萬噸）→ 前台算佔比
-                    rec["us_soy"]   = round(us.get("1201", 0) / 1e7, 1)
-                    rec["us_wheat"] = round(us.get("1001", 0) / 1e7, 1)
-                    rec["us_corn"]  = round(us.get("1005", 0) / 1e7, 1)
+                    rec["us_soy"]   = round(us["1201"] / 1e7, 1) if us.get("1201") is not None else None
+                    rec["us_wheat"] = round(us["1001"] / 1e7, 1) if us.get("1001") is not None else None
+                    rec["us_corn"]  = round(us["1005"] / 1e7, 1) if us.get("1005") is not None else None
                 store[key(ym)] = rec
         for ym in sorted(missing_china, reverse=True)[:HIST_CHINA_BUDGET]:
             r = await _comtrade_china_import(session, ym)
             await asyncio.sleep(3)
             if r:
-                store[key(ym)] = {"soy": round(r.get("1201", 0) / 1e7, 1),
-                                  "wheat": round(r.get("1001", 0) / 1e7, 1),
-                                  "corn": round(r.get("1005", 0) / 1e7, 1), "src": "china"}
+                store[key(ym)] = {"soy": round(r["1201"] / 1e7, 1) if r.get("1201") is not None else None,
+                                  "wheat": round(r["1001"] / 1e7, 1) if r.get("1001") is not None else None,
+                                  "corn": round(r["1005"] / 1e7, 1) if r.get("1005") is not None else None, "src": "china", "schema_version":2}
     except Exception as e:
         log.warning(f"food history backfill error: {e}")
 
@@ -1341,7 +1336,7 @@ async def fetch_food_history(session: aiohttp.ClientSession) -> list:
 
 # ─────────────────────────────────────────────────────────────
 # ⚙️ 戰略物資進口監測（軍工必需、中國高度依賴進口的原物料）
-#   方法同糧食：中國自 2025 起停報 Comtrade → 用「主要出口國對中出口」鏡像加總。
+#   方法同糧食：既有直報／鏡像切換界線，非永久停報證據 → 用「主要出口國對中出口」鏡像加總。
 #   觀察「異常高」（突然囤積＝可能備戰）或「異常低」（可能改用儲備、降低國際牽制）。
 #   石油刻意不納入：中國最大油源（俄、沙、伊拉克）皆不報 Comtrade，鏡像抓不到。
 # ─────────────────────────────────────────────────────────────
@@ -1363,6 +1358,10 @@ STRAT_MATERIALS = [
      "hi": "鋼鐵產能全開（造艦、彈藥、基建），強烈的備戰/擴產訊號",
      "lo": "經濟走弱，或改用國內礦與儲備、降低海運遭封鎖的曝險（戰前也可能出現）"},
 ]
+
+for material in STRAT_MATERIALS:
+    material['hi'] = '進口高於比較期；可能涉及民用需求、價格、庫存與申報時間，原因待查。'
+    material['lo'] = '進口低於比較期；可能涉及替代來源、需求與申報時間，不能推定動用戰備儲備。'
 
 async def _comtrade_one(session, reporter: str, cmd: str, period: int):
     """某出口國該月對中國(156)出口某 HS 商品的淨重(kg)；失敗回 None。"""
@@ -1461,7 +1460,7 @@ async def fetch_strategic_imports(session: aiohttp.ClientSession) -> dict:
         "ref_month": f"{L // 100}-{L % 100:02d}",
         "prev_year_month": f"{L12 // 100}-{L12 % 100:02d}",
         "items": items,
-        "note": "出口國回推（因中國停報，改由各主要出口國「對中國出口」海關數據回推推估）· 月資料約 3–4 月落差 · 單月僅供參考、看趨勢 · 抓不到經俄/伊等不通報管道",
+        "note": "出口國鏡像合計（涵蓋範圍有限，缺值不表示中國停止公布）· 月資料約 3–4 月落差 · 單月僅供參考、看趨勢 · 抓不到經俄/伊等不通報管道",
     }
 
 
@@ -1520,24 +1519,26 @@ async def fetch_strategic_history(session: aiohttp.ClientSession) -> list:
 
     try:
         for ym in sorted(set(missing_mirror + refresh), reverse=True)[:STRAT_HIST_MIRROR_BUDGET]:
-            rec = {"src": "mirror"}
+            rec = {"src": "mirror", "schema_version":2, "coverage":{}}
             any_ok = False
             for m in STRAT_MATERIALS:
-                tot = 0
+                tot = 0; reporters = []
                 for rep, _ in m["exp"]:
                     v = await _comtrade_one(session, rep, m["cmd"], ym)
                     await asyncio.sleep(3)
-                    if v: tot += v; any_ok = True
-                rec[m["cmd"]] = round(tot / 1e7, 1)
+                    if v is not None:
+                        tot += v; any_ok = True; reporters.append(rep)
+                rec[m["cmd"]] = round(tot / 1e7, 1) if reporters else None
+                rec["coverage"][m["cmd"]] = reporters
             if any_ok:
                 store[key(ym)] = rec
         for ym in sorted(missing_china, reverse=True)[:STRAT_HIST_CHINA_BUDGET]:
             d = await _comtrade_china_strat(session, ym)
             await asyncio.sleep(3)
             if d:
-                rec = {"src": "china"}
+                rec = {"src": "china", "schema_version":2}
                 for c in cmds:
-                    rec[c] = round(d.get(c, 0) / 1e7, 1)
+                    rec[c] = round(d[c] / 1e7, 1) if d.get(c) is not None else None
                 store[key(ym)] = rec
     except Exception as e:
         log.warning(f"strat history backfill error: {e}")

@@ -84,6 +84,16 @@ class Integrity(unittest.TestCase):
             r=next(iter(s.values()));self.assertEqual(r['seismic'],3);self.assertEqual(r['fin']['risk_off_cluster'],1)
 
 class Sources(unittest.IsolatedAsyncioTestCase):
+    async def test_comtrade_coverage_is_per_product(self):
+        from unittest.mock import AsyncMock
+        with patch.object(f, 'FOOD_EXPORTERS', [('842','US'),('76','Brazil')]), patch.object(f, '_comtrade_month', AsyncMock(side_effect=[{'1201':0},{'1001':1000}])), patch.object(f.asyncio,'sleep',AsyncMock()):
+            totals,count,us,coverage=await f._food_mirror_total(None,202601)
+            self.assertEqual(totals['1201'],0)
+            self.assertNotIn('1005',totals)
+            self.assertEqual(coverage['1201'],['842'])
+            self.assertEqual(coverage['1001'],['76'])
+            self.assertEqual(coverage['1005'],[])
+
     async def test_eonet_v3(self):
         result=await f.fetch_eonet(Session({'events':[{'geometry':[{'date':'2026-01-01','coordinates':[1,2]},{'date':'2026-01-02','coordinates':[3,4]}]}]}))
         self.assertEqual(result[0]['lat'],4);self.assertEqual(result[0]['date'],'2026-01-02')

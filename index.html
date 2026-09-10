@@ -1726,7 +1726,7 @@
       <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim)"><span id="food-updated">結構性背景指標</span></div>
     </div>
     <div style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim);margin-bottom:.6rem" id="food-sub">
-      出口國回推（採主要出口國回報，改由主要出口國「對中國出口」海關數據回推）· <strong>異常高可能反映需求、價格或庫存調整，不能直接判定備戰</strong>；<strong>異常低≠自給提升</strong>，可能是產量或人口下降（內政因素）· 佐證訊號，非即時、單月僅供參考，看趨勢
+      出口國回推（採主要出口國回報，改由主要出口國「對中國出口」海關數據回推）· <strong>異常高可能反映需求、價格或庫存調整，不能直接判定備戰</strong>；<strong>異常低≠自給提升</strong>，亦可能受需求、價格、季節與申報延遲影響· 佐證訊號，非即時、單月僅供參考，看趨勢
     </div>
     <div id="food-grid">
       <div style="padding:1rem;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 連接 UN Comtrade…</div>
@@ -2678,6 +2678,8 @@ async function fetchRealPizzaData() {
   } catch (e) {
     console.warn('[WARHUBS] data fetch failed:', e.message);
     BACKEND_SCORE = null; htmlWpiRender();
+    const badge=document.getElementById('alert-badge');if(badge)badge.textContent='更新失敗／資料不足';
+    const live=document.querySelector('.live-lbl');if(live)live.textContent='更新失敗';
     const status=document.getElementById('last-update-ts');
     if(status) status.textContent='⚠ 更新失敗；畫面若有資料為上次快照，請查看資料時間';
   }
@@ -3085,7 +3087,7 @@ function renderFood(json){
   var sub=document.getElementById('food-sub');
   if(sub && f.breadth_up>=2){
     sub.innerHTML=sub.innerHTML.split(' · <strong')[0]
-      +' · <strong style="color:#ff4d5e">\u26A0 '+f.breadth_up+'/3 項主糧年增≥15%（囤積訊號偏強，須交叉印證）</strong>';
+      +' · <strong style="color:#ff4d5e">\u26A0 '+f.breadth_up+'/3 項主糧年增≥15%（進口增加，原因待查）</strong>';
   }
 }
 // ── 🌾 糧食月度趨勢圖（1/3/5 年）──
@@ -3203,7 +3205,7 @@ function drawFoodHistory(){
     var f=data.length?data[0].ym:'', l=data.length?data[data.length-1].ym:'';
     var hasMirror=data.some(function(d){return d.src==='mirror';});
     leg.innerHTML='中國每月<b>'+nm+'</b>進口量（萬噸，每月一根）· '+f+' → '+l
-      +'　▮ 實心＝中國海關直報，▯ 淡色虛邊＝出口國回推（近月中國停報，改由出口國對中出口數據回推）'
+      +'　歷史尚未逐月核驗，缺報月份不可當零。▮ 實心＝中國海關直報，▯ 淡色虛邊＝出口國回推（部分期間採出口國資料，不能證明中國停止公布）'
       +(hasMirror?'':'　·　近月資料累積中…');
   }
 }
@@ -3342,7 +3344,7 @@ function drawStratHistory(){
     var nm=({'4001':'天然橡膠','2604':'鎳礦砂','2610':'鉻礦砂','2601':'鐵礦砂'})[key];
     var f=data.length?data[0].ym:'', l=data.length?data[data.length-1].ym:'';
     leg.innerHTML='中國每月<b>'+nm+'</b>進口量（萬噸，每月一根）· '+f+' → '+l
-      +'　▮ 實心＝中國海關直報，▯ 淡色虛邊＝出口國回推（直報與鏡像涵蓋範圍不同，不宜直接比較增幅）· 看逐月趨勢';
+      +'　歷史尚未逐月核驗，缺報月份不可當零。▮ 實心＝中國海關直報，▯ 淡色虛邊＝出口國回推（直報與鏡像涵蓋範圍不同，不宜直接比較增幅）· 看逐月趨勢';
   }
 }
 // ── ⚙️ 戰略物資進口監測 ──
@@ -3367,9 +3369,9 @@ function renderStrat(json){
     if(partial){
       note='<div class="strat-note">◷ 近月出口國尚未全數回報（'+(it.reporters||0)+'/'+(it.reporters_prev||0)+' 國），此為暫值、勿當異常低，待補齊後再判讀</div>';
     } else if(it.hi||it.lo){
-      if(it.anomaly==='high') note='<div class="strat-note hi">⚑ 異常高判讀：'+escapeHtml(it.hi||'')+'</div>';
-      else if(it.anomaly==='low') note='<div class="strat-note lo">⚑ 異常低判讀：'+escapeHtml(it.lo||'')+'</div>';
-      else note='<div class="strat-note">▲高→'+escapeHtml(it.hi||'')+'　▼低→'+escapeHtml(it.lo||'')+'</div>';
+      if(it.anomaly==='high') note='<div class="strat-note hi">⚑ 異常高判讀：'+'進口增加的原因待查，不能直接推定軍備擴張。'+'</div>';
+      else if(it.anomaly==='low') note='<div class="strat-note lo">⚑ 異常低判讀：'+'進口減少的原因待查，不能直接推定動用儲備。'+'</div>';
+      else note='<div class="strat-note">▲高→'+'進口增加的原因待查，不能直接推定軍備擴張。'+'　▼低→'+'進口減少的原因待查，不能直接推定動用儲備。'+'</div>';
     }
     return '<div class="strat-item"><div class="strat-row"><div class="strat-name">'+escapeHtml(it.name)
       +'<small>'+escapeHtml(it.use||'')+'</small></div>'
