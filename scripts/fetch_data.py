@@ -22,6 +22,7 @@ import json
 import logging
 import os
 import re
+from scoring import MODEL_VERSION, market_risk, market_average, aggregate, calculate_wpi
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -228,10 +229,10 @@ def transform_pizza_shops(pizzint_payload: dict) -> list[dict]:
             log.warning(f"Shop not found in pizzint API: {display_name}")
             shops.append({
                 "name":      display_name,
-                "busyness":  0,
-                "is_open":   False,
-                "status":    "closed",
-                "baseline":  35,
+                "busyness":  None,
+                "is_open":   None,
+                "status":    "unavailable",
+                "baseline":  None,
                 "spike":     False,
                 "place_id":  None,
                 "address":   None,
@@ -240,11 +241,13 @@ def transform_pizza_shops(pizzint_payload: dict) -> list[dict]:
 
         cur_pop = src.get("current_popularity")  # 0-100 or None
         pct_usual = src.get("percentage_of_usual")  # deviation %
-        is_open = cur_pop is not None
-        busyness = int(cur_pop) if is_open else 0
+        is_open = False if src.get("is_closed_now") else (True if cur_pop is not None else None)
+        busyness = int(cur_pop) if cur_pop is not None else None
 
         # status: closed / quiet / normal / busy / spike
-        if not is_open:
+        if is_open is None:
+            status = "unavailable"
+        elif not is_open:
             status = "closed"
         elif src.get("is_spike"):
             status = "spike"
@@ -266,7 +269,7 @@ def transform_pizza_shops(pizzint_payload: dict) -> list[dict]:
             "busyness":  busyness,
             "is_open":   is_open,
             "status":    status,
-            "baseline":  35,
+            "baseline":  None,
             "spike":     bool(src.get("is_spike")),
             "spike_magnitude": src.get("spike_magnitude"),
             "percentage_of_usual": pct_usual,
@@ -304,6 +307,7 @@ def _parse_outcome_prices(market: dict) -> tuple[float | None, float | None]:
     for name, price in zip(names, prices):
         try:
             p = float(price)
+            if not 0 <= p <= 1: continue
         except (TypeError, ValueError):
             continue
         n = (name or "").lower()
@@ -322,11 +326,18 @@ async def fetch_polymarket(session: aiohttp.ClientSession) -> list[dict]:
     markets = []
     seen_ids = set()
     try:
+        # /markets accepts tag_id; tag_slug is not a documented market filter.
+        async with session.get("https://gamma-api.polymarket.com/tags/slug/geopolitics",
+                               timeout=aiohttp.ClientTimeout(total=15)) as resp:
+            resp.raise_for_status()
+            tag = await resp.json()
+        if not tag.get("id"):
+            raise ValueError("geopolitics tag unavailable")
         for offset in (0, 100, 200):
             params = {
                 "limit": 100, "offset": offset,
                 "active": "true", "closed": "false",
-                "tag_slug": "geopolitics",
+                "tag_id": str(tag["id"]),
                 "order": "volume24hr", "ascending": "false",
             }
             async with session.get(
@@ -352,15 +363,15 @@ async def fetch_polymarket(session: aiohttp.ClientSession) -> list[dict]:
         log.info(f"Fetched {len(markets)} Polymarket markets")
 
         for m in markets:
-            text = ((m.get("question") or "") + " " + (m.get("description") or "")).lower()
+            text = (m.get("question") or "").lower()
             if any(ex in text for ex in EXCLUDE_KEYWORDS):
-                continue
-            if not _WAR_KW_RE.search(text):
                 continue
 
             yes_price, no_price = _parse_outcome_prices(m)
 
-            war_markets.append({
+            if yes_price is None or no_price is None:
+                continue
+            candidate = {
                 "id":         m.get("conditionId") or m.get("id"),
                 "question":   m.get("question"),
                 "yes_price":  yes_price,
@@ -369,7 +380,11 @@ async def fetch_polymarket(session: aiohttp.ClientSession) -> list[dict]:
                 "category":   m.get("category") or "geopolitics",
                 "slug":       m.get("slug"),
                 "end_date":   m.get("endDate"),
-            })
+            }
+            risk = market_risk(candidate)
+            if risk is not None:
+                candidate["risk_score"] = round(risk, 2)
+                war_markets.append(candidate)
 
         log.info(f"Filtered {len(war_markets)} war-related markets")
     except Exception as e:
@@ -531,7 +546,11 @@ async def fetch_aviation(session: aiohttp.ClientSession) -> dict:
              f"tankers={summary['tankers']} awacs={summary['awacs']} "
              f"uav={summary['uav']} transport={summary['transport']}")
 
-    return {"summary": summary, "aircraft": aircraft[:30], "source": used_source}
+    region_counts = {}
+    for a in aircraft:
+        if a["alt_ft"] > 0:
+            region_counts[a["region"]] = region_counts.get(a["region"], 0) + 1
+    return {"summary": summary, "aircraft": aircraft[:30], "region_counts": region_counts, "source": used_source}
 
 
 # ─────────────────────────────────────────────────────────────
@@ -597,7 +616,10 @@ async def fetch_firms(session: aiohttp.ClientSession) -> dict:
                 "source": FIRMS_CSV_URL, "error": str(e)}
 
     import csv, io
-    rows = list(csv.DictReader(io.StringIO(text)))
+    reader = csv.DictReader(io.StringIO(text))
+    if not {"latitude", "longitude", "acq_date", "acq_time"}.issubset(reader.fieldnames or []):
+        return {"error": "invalid_csv_schema", "total_24h": None}
+    rows = list(reader)
     total = len(rows)
 
     by_region: dict[str, int] = {}
@@ -650,6 +672,10 @@ async def fetch_firms(session: aiohttp.ClientSession) -> dict:
         "delta_ratio":       round(delta_ratio, 4),
         "by_region":         by_region,
         "conflict_hotspots": top_hotspots[:15],
+        "conflict_counts": {k: len(v) for k, v in conflict_hits.items()},
+        "conflict_total": sum(len(v) for v in conflict_hits.values()),
+        "baseline_kind": "fixed_reference_not_7day_mean",
+        "observed_at": max((r.get("acq_date", "") + "T" + r.get("acq_time", "0000")[:2] + ":" + r.get("acq_time", "0000")[2:] + ":00Z" for r in rows), default=None),
         "baseline_24h":      FIRMS_TYPICAL_24H,
         "source":            FIRMS_CSV_URL,
     }
@@ -677,7 +703,7 @@ async def fetch_eonet(session: aiohttp.ClientSession) -> list[dict]:
     out = []
     for ev in data.get("events", []) or []:
         cat = (ev.get("categories") or [{}])[0]
-        geom = (ev.get("geometries") or [{}])[0]
+        geom = max((ev.get("geometry") or ev.get("geometries") or [{}]), key=lambda g: g.get("date", ""))
         coords = geom.get("coordinates") or [None, None]
         out.append({
             "id":       ev.get("id"),
@@ -740,6 +766,7 @@ async def fetch_gdelt(session: aiohttp.ClientSession) -> dict:
                 avg48  = sum(vals) / len(vals)
                 delta  = ((latest - avg48) / avg48 * 100) if avg48 else 0
                 out[key] = {
+                    "observed_at": datetime.now(timezone.utc).isoformat(),
                     "latest": round(latest, 3),
                     "avg48h": round(avg48, 3),
                     "delta_pct": round(delta, 1),
@@ -909,7 +936,7 @@ TW_KEEP = ("台海", "臺海", "台灣海峽", "臺灣海峽", "穿越台灣海�
            "中共軍", "共機", "共艦", "擾台", "繞台", "中線", "防空識別", "ADIZ",
            "東部戰區", "圍台", "國機國艦")
 TW_DROP = ("伊朗", "以色列", "加薩", "加沙", "烏克蘭", "俄羅斯", "俄烏", "葉門",
-           "胡塞", "黎巴嫩", "敘利亞", "哈瑪斯", "毒油", "福利站", "站哨", "外包")
+           "胡塞", "黎巴嫩", "敘利亞", "哈瑪斯", "毒油", "福利站", "站哨", "外包", "諜戰劇", "電視劇", "影集", "電影")
 
 def _tw_relevant(title: str) -> bool:
     t = title or ""
@@ -1057,7 +1084,7 @@ async def fetch_pla_sorties(session: aiohttp.ClientSession) -> dict:
                     continue
                 cur = days.get(tp)
                 if (not cur) or ac > (cur.get("aircraft") or 0):
-                    days[tp] = {"aircraft": ac, "ships": max(sh, (cur or {}).get("ships", 0))}
+                    days[tp] = {"aircraft": ac, "ships": max(sh, (cur or {}).get("ships", 0)), "source_title": title, "source_url": it.findtext("link"), "date_basis": "publication_date", "verified": False}
                     parsed += 1
             break
         except Exception as e:
@@ -1080,7 +1107,7 @@ async def fetch_pla_sorties(session: aiohttp.ClientSession) -> dict:
     return {
         "updated_at": datetime.now(timezone.utc).isoformat(),
         "days": series, "baseline": baseline, "latest": latest,
-        "note": "每日共軍擾台架次（國防部戰報，自新聞標題擷取）· 每日一報、非即時 · 過去 30 天滾動累積",
+        "note": "新聞標題架次估計（未逐筆核對國防部，發稿日非觀測日）· 每日一報、非即時 · 過去 30 天滾動累積",
     }
 
 
@@ -1113,12 +1140,14 @@ async def _comtrade_month(session, reporter: str, period: int):
                 if r.status == 429:
                     if bk: await asyncio.sleep(bk); continue
                     return None
+                r.raise_for_status()
                 txt = await r.text()
             data = json.loads(txt)
             out = {}
             for row in (data.get("data") or []):
                 cmd = str(row.get("cmdCode"))
-                out[cmd] = out.get(cmd, 0) + (row.get("netWgt") or 0)
+                if row.get("netWgt") is not None:
+                    out[cmd] = out.get(cmd, 0) + row["netWgt"]
             return out
         except Exception:
             if bk: await asyncio.sleep(bk)
@@ -1162,30 +1191,31 @@ async def fetch_food_imports(session: aiohttp.ClientSession) -> dict:
     L12 = _ym_add(L, -12)
 
     async def collect(month):
-        tot = {c: 0 for c, _ in FOOD_CMDS}; ok = 0
+        tot = {c: 0 for c, _ in FOOD_CMDS}; ok = set()
         for rep, _ in FOOD_EXPORTERS:
             r = await _comtrade_month(session, rep, month)
             await asyncio.sleep(5)
             if r:
-                ok += 1
+                ok.add(rep)
                 for c, _ in FOOD_CMDS:
                     tot[c] += r.get(c, 0)
         return tot, ok
     cur_t, ok1 = await collect(L)
     prev_t, ok2 = await collect(L12)
-    if ok1 == 0:
+    if not ok1:
         return {**prev, "stale": True} if prev else {}
 
     items, breadth = [], 0
     for c, name in FOOD_CMDS:
         a = cur_t[c] / 1e7           # 萬噸
         b = prev_t[c] / 1e7
-        yoy = round((a - b) / b * 100, 1) if b > 0 else None
+        incomplete = ok1 != ok2 or len(ok1) < len(FOOD_EXPORTERS)
+        yoy = round((a - b) / b * 100, 1) if b > 0 and not incomplete else None
         if yoy is not None and yoy >= 15:
             breadth += 1
         items.append({"cmd": c, "name": name,
                       "wan_ton": round(a, 1), "prev_wan_ton": round(b, 1),
-                      "yoy_pct": yoy})
+                      "yoy_pct": yoy, "incomplete": incomplete, "reporter_codes": sorted(ok1), "reporter_codes_prev": sorted(ok2)})
     log.info(f"food: ref={L} soy={items[0]['wan_ton']}萬噸 yoy={items[0]['yoy_pct']} breadth={breadth}")
     return {
         "updated_at": now.isoformat(),
@@ -1222,12 +1252,14 @@ async def _comtrade_china_import(session, period: int):
                 if r.status == 429:
                     if bk: await asyncio.sleep(bk); continue
                     return None
+                r.raise_for_status()
                 txt = await r.text()
             data = json.loads(txt)
             out = {}
             for row in (data.get("data") or []):
                 cmd = str(row.get("cmdCode"))
-                out[cmd] = out.get(cmd, 0) + (row.get("netWgt") or 0)
+                if row.get("netWgt") is not None:
+                    out[cmd] = out.get(cmd, 0) + row["netWgt"]
             return out
         except Exception:
             if bk: await asyncio.sleep(bk)
@@ -1344,9 +1376,12 @@ async def _comtrade_one(session, reporter: str, cmd: str, period: int):
                 if r.status == 429:
                     if bk: await asyncio.sleep(bk); continue
                     return None
+                r.raise_for_status()
                 txt = await r.text()
             data = json.loads(txt)
-            return sum((row.get("netWgt") or 0) for row in (data.get("data") or []))
+            rows = data.get("data") or []
+            weights = [row["netWgt"] for row in rows if row.get("netWgt") is not None]
+            return sum(weights) if weights else None
         except Exception:
             if bk: await asyncio.sleep(bk)
             else: return None
@@ -1385,12 +1420,12 @@ async def fetch_strategic_imports(session: aiohttp.ClientSession) -> dict:
     L12 = _ym_add(L, -12)
 
     async def collect(cmd, exps, month):
-        tot, ok = 0, 0
+        tot, ok = 0, set()
         for rep, _ in exps:
             v = await _comtrade_one(session, rep, cmd, month)
             await asyncio.sleep(3)
             if v is not None:
-                if v > 0: ok += 1
+                ok.add(rep)
                 tot += v
         return tot, ok
 
@@ -1398,13 +1433,15 @@ async def fetch_strategic_imports(session: aiohttp.ClientSession) -> dict:
     for m in STRAT_MATERIALS:
         cur_t, ok1 = await collect(m["cmd"], m["exp"], L)
         prev_t, ok0 = await collect(m["cmd"], m["exp"], L12)
-        if ok1 == 0:
+        if not ok1:
+            items.append({"cmd": m["cmd"], "name": m["name"], "use": m["use"], "wan_ton": None, "prev_wan_ton": None, "yoy_pct": None, "anomaly": "partial", "incomplete": True, "reporters": 0, "reporters_prev": len(ok0), "hi": m["hi"], "lo": m["lo"]})
             continue
         a, b = cur_t / 1e7, prev_t / 1e7          # 萬噸
         yoy = round((a - b) / b * 100, 1) if b > 0 else None
         # 近月「出口國回推」常還沒收齊：本月回報的出口國數比去年同月少時，
         # 低值多半是資料未齊（非真下滑）→ 標為 partial（資料待補），避免誤判「異常低」。
-        incomplete = ok1 < ok0
+        incomplete = ok1 != ok0 or len(ok1) < len(m["exp"])
+        if incomplete: yoy = None
         anomaly = ""
         if yoy is not None:
             if yoy >= 25: anomaly = "high"
@@ -1414,7 +1451,7 @@ async def fetch_strategic_imports(session: aiohttp.ClientSession) -> dict:
         items.append({"cmd": m["cmd"], "name": m["name"], "use": m["use"],
                       "wan_ton": round(a, 1), "prev_wan_ton": round(b, 1),
                       "yoy_pct": yoy, "anomaly": anomaly,
-                      "reporters": ok1, "reporters_prev": ok0, "incomplete": incomplete,
+                      "reporters": len(ok1), "reporters_prev": len(ok0), "reporter_codes": sorted(ok1), "reporter_codes_prev": sorted(ok0), "incomplete": incomplete,
                       "hi": m["hi"], "lo": m["lo"]})
     if not items:
         return {**prev, "stale": True} if prev else {}
@@ -1448,12 +1485,14 @@ async def _comtrade_china_strat(session, period: int):
                 if r.status == 429:
                     if bk: await asyncio.sleep(bk); continue
                     return None
+                r.raise_for_status()
                 txt = await r.text()
             data = json.loads(txt)
             out = {}
             for row in (data.get("data") or []):
                 c = str(row.get("cmdCode"))
-                out[c] = out.get(c, 0) + (row.get("netWgt") or 0)
+                if row.get("netWgt") is not None:
+                    out[c] = out.get(c, 0) + row["netWgt"]
             return out
         except Exception:
             if bk: await asyncio.sleep(bk)
@@ -1693,7 +1732,7 @@ async def fetch_nuclear_seismic(session: aiohttp.ClientSession) -> dict:
             sites_out.append({**{k: site[k] for k in ("key", "name")},
                               "count": None, "events": []})
     log.info(f"USGS nuclear seismic: {total} events near test sites (72h)")
-    return {"sites": sites_out, "total_72h": total, "window_hours": 72}
+    return {"sites": sites_out, "total_72h": total if all(s["count"] is not None for s in sites_out) else None, "window_hours": 72}
 
 
 # ─────────────────────────────────────────────────────────────
@@ -1766,7 +1805,7 @@ async def fetch_notams(session: aiohttp.ClientSession) -> dict:
     for key, firs in REGION_FIRS.items():
         total = danger = 0
         closure = False
-        ok = False
+        ok = 0
         for fir in firs:
             for attempt in (1, 2):
                 try:
@@ -1778,8 +1817,10 @@ async def fetch_notams(session: aiohttp.ClientSession) -> dict:
                     ) as resp:
                         resp.raise_for_status()
                         data = await resp.json(content_type=None)
-                    notams = data.get("notamList") or []
-                    ok = True
+                    if not isinstance(data.get("notamList"), list):
+                        raise ValueError("missing notamList")
+                    notams = data["notamList"]
+                    ok += 1
                     total += len(notams)
                     for n in notams:
                         msg = (n.get("icaoMessage") or "") + " " + (n.get("traditionalMessage") or "")
@@ -1794,9 +1835,9 @@ async def fetch_notams(session: aiohttp.ClientSession) -> dict:
                     else:
                         await asyncio.sleep(5)
             await asyncio.sleep(1.5)
-        if ok:
+        if ok == len(firs):
             score = min(100.0, danger * 8 + (40 if closure else 0))
-            out[key] = {"firs": firs, "total": total, "danger": danger,
+            out[key] = {"observed_at": datetime.now(timezone.utc).isoformat(), "firs": firs, "total": total, "danger": danger,
                         "closure": closure, "score": round(score, 1)}
         elif key in prev:
             out[key] = {**prev[key], "stale": True}
@@ -1894,38 +1935,17 @@ def _region_poly_score(cfg: dict, polymarket: list[dict]) -> tuple[float | None,
     和平方向的盤（停火/協議）反向計分：停火機率低 = 戰爭持續。
     回傳 (score, 最具代表性的盤口問題)
     """
-    weighted = 0.0
-    vol_sum = 0.0
-    top_q, top_vol = None, 0.0
-    for m in polymarket:
-        if m.get("yes_price") is None:
-            continue
-        q = (m.get("question") or "").lower()
-        if not any(kw in q for kw in cfg["poly_kw"]):
-            continue
-        yes = float(m["yes_price"])
-        vol = float(m.get("volume") or 1)
-        risk = (1 - yes) if any(p in q for p in PEACE_MARKERS) else yes
-        weighted += risk * vol
-        vol_sum += vol
-        if vol > top_vol:
-            top_vol, top_q = vol, m.get("question")
-    if vol_sum <= 0:
-        return None, None
-    return min(100.0, weighted / vol_sum * 100), top_q
+    selected = [m for m in polymarket if any(kw in (m.get("question") or "").lower() for kw in cfg["poly_kw"]) and market_risk(m) is not None]
+    top = max(selected, key=lambda m: m.get("volume", 0), default={})
+    return market_average(selected), top.get("question")
 
 
 def build_region_risks(polymarket: list[dict], gdelt: dict,
                        firms: dict, aviation: dict,
                        notams: dict | None = None) -> list[dict]:
     notams = notams or {}
-    by_region_hits = {}
-    for h in (firms.get("conflict_hotspots") or []):
-        by_region_hits[h["region"]] = by_region_hits.get(h["region"], 0) + 1
-
-    avi_by_region = {}
-    for a in (aviation.get("aircraft") or []):
-        avi_by_region[a.get("region")] = avi_by_region.get(a.get("region"), 0) + 1
+    by_region_hits = firms.get("conflict_counts")
+    avi_by_region = aviation.get("region_counts")
 
     regions_out = []
     for key, cfg in REGIONS.items():
@@ -1938,46 +1958,40 @@ def build_region_risks(polymarket: list[dict], gdelt: dict,
             weights["poly"] = 0.35
 
         g = gdelt.get(key)
-        if g:
+        if g and not g.get("stale"):
             # 新聞量佔全球 % → 0-100（1% ≈ 25 分；重大戰事平時 2-3%，激增 4%+ 滿分）
             factors["gdelt"] = round(min(100.0, g["latest"] * 25), 1)
             factors["gdelt_delta"] = g["delta_pct"]
             weights["gdelt"] = 0.25
 
         nt = notams.get(key)
-        if nt:
+        if nt and not nt.get("stale"):
             factors["notam"] = nt["score"]
             factors["notam_danger"] = nt["danger"]
             factors["notam_closure"] = nt["closure"]
             weights["notam"] = 0.15
 
-        fire_n = sum(by_region_hits.get(r, 0) for r in cfg["firms"])
-        factors["firms"] = round(min(100.0, fire_n * 12), 1)
-        factors["firms_hotspots"] = fire_n
-        weights["firms"] = 0.12
+        # Thermal detections are shown as observations, not scored as confirmed warfare.
+        if by_region_hits is not None and not firms.get("stale") and not firms.get("error"):
+            factors["firms_hotspots"] = sum(by_region_hits.get(r, 0) for r in cfg["firms"])
+        # Broad ADS-B areas overlap (Taiwan/Korea/South China Sea). Counts are context only.
+        if avi_by_region is not None and not aviation.get("error"):
+            factors["avi_count"] = sum(avi_by_region.get(r, 0) for r in cfg["avi_regions"])
+        score, coverage = aggregate(factors, {"poly": .35, "gdelt": .25, "notam": .15, "firms": .12, "avi": .13}, min_coverage=.60, min_factors=2)
 
-        avi_n = sum(avi_by_region.get(r, 0) for r in cfg["avi_regions"])
-        factors["avi"] = round(min(100.0, avi_n * 10), 1)
-        factors["avi_count"] = avi_n
-        weights["avi"] = 0.13
-
-        # 只用可用因子並重新正規化權重
-        usable = {k: w for k, w in weights.items() if k in factors}
-        wsum = sum(usable.values()) or 1
-        score = sum(factors[k] * w for k, w in usable.items()) / wsum
-
-        if score >= 65:  level = "CRITICAL"
+        if score is None: level = "INSUFFICIENT_DATA"
+        elif score >= 65:  level = "CRITICAL"
         elif score >= 45: level = "HIGH"
         elif score >= 25: level = "ELEVATED"
         else:             level = "WATCH"
 
         regions_out.append({
             "key": key, "name": cfg["name"], "flag": cfg["flag"],
-            "score": round(score, 1), "level": level,
+            "score": score, "level": level, "coverage": coverage, "model_version": MODEL_VERSION,
             "factors": factors, "top_market": top_q,
         })
 
-    regions_out.sort(key=lambda r: -r["score"])
+    regions_out.sort(key=lambda r: -(r["score"] if r["score"] is not None else -1))
     return regions_out
 
 
@@ -1998,6 +2012,7 @@ def update_history(score: dict, pizza_index, regions: list[dict], wiki_score=Non
     now = datetime.now(timezone.utc)
     rec = {
         "ts": now.isoformat(timespec="minutes"),
+        "model_version": MODEL_VERSION,
         "combined": score["combined_score"],
         "poly": score["polymarket_score"],
         "pizza": pizza_index,
@@ -2005,8 +2020,8 @@ def update_history(score: dict, pizza_index, regions: list[dict], wiki_score=Non
         "regions": {r["key"]: r["score"] for r in regions},
     }
     # 記錄軍機各機型架數（供 AVI 卡片 24h/7d/30d 歷史變化；短鍵省空間）
-    s = (aviation or {}).get("summary") or {}
-    rec["avi"] = {"t": s.get("tankers", 0), "a": s.get("awacs", 0),
+    s = {} if (aviation or {}).get("error") else ((aviation or {}).get("summary") or {})
+    rec["avi"] = None if (aviation or {}).get("error") else {"t": s.get("tankers", 0), "a": s.get("awacs", 0),
                   "u": s.get("uav", 0), "c": s.get("c4isr", 0), "tot": s.get("total", 0)}
     history.append(rec)
     # 保留 31 天（30 天變化需要）
@@ -2052,7 +2067,7 @@ async def fetch_finance(session: aiohttp.ClientSession) -> dict:
     out = {}
     for sym in FIN_TICKERS:
         url = ("https://query1.finance.yahoo.com/v8/finance/chart/"
-               + urllib.parse.quote(sym) + "?interval=1d&range=1mo")
+               + urllib.parse.quote(sym) + "?interval=1d&range=3mo")
         for attempt, backoff in ((1, 2), (2, 0)):
             try:
                 async with session.get(url, timeout=aiohttp.ClientTimeout(total=15),
@@ -2067,9 +2082,10 @@ async def fetch_finance(session: aiohttp.ClientSession) -> dict:
                           if c is not None]
                 prev = closes[-2] if len(closes) >= 2 else meta.get("chartPreviousClose")
                 chg = round((price - prev) / prev * 100, 2) if (price and prev) else None
-                ma30 = round(sum(closes) / len(closes), 4) if closes else None
+                base = closes[-31:-1]
+                ma30 = round(sum(base) / 30, 4) if len(base) == 30 else None
                 dev = round((price - ma30) / ma30 * 100, 1) if (price and ma30) else None
-                out[sym] = {"price": price, "chg": chg, "ma30": ma30, "dev": dev}
+                out[sym] = {"price": price, "chg": chg, "ma30": ma30, "dev": dev, "observed_at": datetime.fromtimestamp(meta["regularMarketTime"], timezone.utc).isoformat() if meta.get("regularMarketTime") else None}
                 break
             except Exception as e:
                 if backoff:
@@ -2104,8 +2120,9 @@ def update_daily_metrics(score: dict, pizza_index, defcon_level, firms: dict,
             store = {}
 
     tp = (datetime.now(timezone.utc) + timedelta(hours=8)).date().isoformat()
-    s = (aviation or {}).get("summary") or {}
+    s = {} if (aviation or {}).get("error") else ((aviation or {}).get("summary") or {})
     rec = {
+        "model_version": MODEL_VERSION,
         "combined": score.get("combined_score"),
         "poly":     score.get("polymarket_score"),
         "level":    score.get("alert_level"),
@@ -2118,8 +2135,8 @@ def update_daily_metrics(score: dict, pizza_index, defcon_level, firms: dict,
         "avi_awacs": s.get("awacs"),
         "avi_uav":   s.get("uav"),
         "avi_c4isr": s.get("c4isr"),
-        "seismic":  (nuclear_seismic or {}).get("total"),
-        "regions":  {r["key"]: round(r.get("score", 0)) for r in (regions or [])},
+        "seismic":  (nuclear_seismic or {}).get("total_72h"),
+        "regions":  {r["key"]: r.get("score") for r in (regions or [])},
     }
     # 經濟避險指標（僅存價格，供長期趨勢；油價戰爭溢價＝布油現價−30日均）
     f = finance or {}
@@ -2146,7 +2163,7 @@ def update_daily_metrics(score: dict, pizza_index, defcon_level, firms: dict,
     if (_dev("GC=F") or 0) >= THRESH:  cluster += 1   # 金 ↑
     if (_dev("BZ=F") or 0) >= THRESH:  cluster += 1   # 油 ↑
     if (_dev("^VIX") or 0) >= THRESH:  cluster += 1   # VIX ↑
-    if (_dev("USDCHF=X") or 0) >= THRESH: cluster += 1  # 瑞郎走強（USDCHF ↑ 代表美元強；避險時瑞郎/美元皆可能強）
+    if (_dev("USDCHF=X") or 0) <= -THRESH: cluster += 1  # USDCHF 下跌 = 瑞郎相對美元升值
     for stk in ("LMT", "RTX", "NOC", "GD"):
         if (_dev(stk) or 0) >= THRESH: cluster += 1; break   # 國防股整體 ↑（四檔任一達標算一票）
     if (_dev("^TNX") or 0) <= -THRESH: cluster += 1   # 殖利率 ↓（資金逃向安全資產）
@@ -2206,37 +2223,8 @@ def compute_avi_trends(history: list[dict]) -> dict | None:
 # ─────────────────────────────────────────────────────────────
 # Combined score
 # ─────────────────────────────────────────────────────────────
-def calculate_score(pizza_index: int, polymarket: list[dict]) -> dict:
-    """
-    綜合威脅指數：Pizza 40% + Polymarket 60%
-    pizza_index: pizzint.watch 已算好的 0-100 overall index
-    """
-    pizza_score = float(pizza_index or 0)
-
-    total_volume = sum(m["volume"] for m in polymarket if m["yes_price"] is not None)
-    if total_volume > 0:
-        weighted = sum(m["yes_price"] * m["volume"] for m in polymarket if m["yes_price"] is not None)
-        poly_score = (weighted / total_volume) * 100
-    else:
-        poly_score = 30.0
-
-    combined = pizza_score * 0.40 + poly_score * 0.60
-
-    if combined >= 70:
-        level = "CRITICAL"
-    elif combined >= 50:
-        level = "HIGH"
-    elif combined >= 30:
-        level = "ELEVATED"
-    else:
-        level = "NORMAL"
-
-    return {
-        "pizza_score":      round(pizza_score, 2),
-        "polymarket_score": round(poly_score, 2),
-        "combined_score":   round(combined, 2),
-        "alert_level":      level,
-    }
+def calculate_score(pizza_index, polymarket, **sources):
+    return calculate_wpi(pizza_index, polymarket, **sources)
 
 
 async def main():
@@ -2298,16 +2286,34 @@ async def main():
             fred = {}
 
     pizza_shops  = transform_pizza_shops(pizzint_data)
-    pizza_index  = pizzint_data.get("overall_index", 0)
+    pizza_index  = (pizzint_data.get("defcon_details") or {}).get("smoothed_index")
+    if pizza_index is None:
+        pizza_index = pizzint_data.get("overall_index")
+    if not any(s.get("current_popularity") is not None for s in pizzint_data.get("data", [])):
+        pizza_index = None
     defcon_level = pizzint_data.get("defcon_level")
-    score        = calculate_score(pizza_index, polymarket)
+    # Use a genuine past 7-day baseline; require history spanning at least 6 days.
+    try:
+        from datetime import timedelta
+        old = json.loads(HISTORY_FILE.read_text())
+        now = datetime.now(timezone.utc)
+        pts = [(datetime.fromisoformat(h["ts"]), h.get("avi")) for h in old]
+        pts = [(t,a) for t,a in pts if a and now-timedelta(days=7) <= t < now]
+        if not aviation.get("error") and len(pts) >= 12 and min(t for t,_ in pts) <= now-timedelta(days=6):
+            baseline = sum(a.get("tot",0) for _,a in pts)/len(pts)
+            if baseline > 0:
+                aviation["summary"]["anomaly_pct"] = round((aviation["summary"]["total"] / baseline - 1)*100,1)
+                aviation["summary"]["baseline_7d"] = round(baseline,1)
+    except (ValueError, KeyError, TypeError, OSError):
+        pass
+    score        = calculate_score(pizza_index, polymarket, aviation=aviation, firms=firms, gdelt=gdelt, wikipedia=wikipedia, finance=finance)
 
     # 前一份 data.json 的警戒等級 + 推播狀態（供 alerts.py 判斷升級/去重）
     prev_level = "NORMAL"
     prev_notify = {}
     try:
         _prev = json.loads(DATA_FILE.read_text(encoding="utf-8"))
-        prev_level = _prev["score"]["alert_level"]
+        prev_level = _prev["score"]["alert_level"] if _prev["score"].get("model_version") == MODEL_VERSION else "INSUFFICIENT_DATA"
         prev_notify = _prev.get("_notify") or {}
     except Exception:
         pass
@@ -2341,7 +2347,9 @@ async def main():
         "pizza_events":  pizzint_data.get("events") or [],
         "defcon_level":  defcon_level,
         "defcon_details": pizzint_data.get("defcon_details"),
-        "polymarket":    polymarket[:20],
+        "polymarket":    polymarket,
+        "finance":       finance,
+        "fred":          fred,
         "aviation":      aviation,
         "firms":         firms,
         "eonet":         eonet[:20],
@@ -2376,8 +2384,13 @@ async def main():
 
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
+    from data_quality import source_health
+    output["source_health"] = source_health(output)
+
     # 推播：每小時定時回報 + 即時異常（未設定 Secrets 則自動跳過）；狀態寫回 _notify
     try:
+        if os.environ.get("WARHUB_NO_NOTIFY") == "1":
+            raise RuntimeError("notifications disabled for local verification")
         from alerts import run_notifications
         import os as _os
         force_test = (_os.environ.get("TEST_PUSH", "").strip().lower()

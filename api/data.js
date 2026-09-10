@@ -25,7 +25,7 @@ export default async function handler(req, res) {
   try {
     const gh = await fetch(
       `https://api.github.com/repos/${REPO}/contents/data/${f}?ref=main`,
-      { headers: {
+      { signal: AbortSignal.timeout(8000), headers: {
           'Accept': 'application/vnd.github.raw',
           'User-Agent': 'warhub-data-fn',
           'X-GitHub-Api-Version': '2022-11-28',
@@ -33,16 +33,21 @@ export default async function handler(req, res) {
       } }
     );
     if (!gh.ok) {
+      res.setHeader('Cache-Control', 'no-store');
       res.status(502).json({ error: 'github ' + gh.status,
         hint: token ? '確認 GITHUB_TOKEN 對 warhub repo 具 Contents 讀取權' : 'GITHUB_TOKEN 未設定' });
       return;
     }
-    const body = await gh.text();
+    const payload = await gh.json();
+    if (f === "data.json" && (!payload || !payload.updated_at)) throw new Error("invalid data snapshot");
+    const body = JSON.stringify(payload);
+    res.setHeader("X-Warhub-Source", "github");
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     // CDN 快取 60 秒（避免每次請求都打 GitHub API），過期後背景更新
     res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=60, stale-while-revalidate=300');
     res.status(200).send(body);
   } catch (e) {
-    res.status(500).json({ error: String((e && e.message) || e) });
+    res.setHeader('Cache-Control', 'no-store');
+    res.status(502).json({ error: 'data source unavailable' });
   }
 }

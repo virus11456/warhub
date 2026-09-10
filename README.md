@@ -1,107 +1,49 @@
-# WarHub — 戰爭預測情報中心
+# WARHUBS — 開源情報觀察儀表板
 
-整合 OSINT（開源情報）的地緣政治衝突監控平台，原網站 [warhubs.com](https://warhubs.com/)。
+網站：https://warhubs.com/
 
-**架構**：純靜態網站（HTML + CSS + JS）+ GitHub Actions 自動更新資料 + GitHub Pages 部署。
+靜態 HTML/CSS/JavaScript + Python 資料抓取器 + GitHub Actions + Vercel。
+**網站分數是人工權重的觀察指數，尚未校準為開戰機率。缺資料不代表安全。**
 
----
+## 資料流
 
-## 專案結構
+1. `.github/workflows/update-data.yml` 每 2 小時（UTC 第 23 分）抓取上游來源，排程可能延遲。
+2. `scripts/fetch_data.py` 輸出 `data/*.json` 並保留歷史；`scripts/scoring.py` 統一產生網站、歷史與推播使用的 WPI。
+3. Vercel 連動 GitHub；合併至 `main` 會部署正式網站。
+4. 前端每 5 分鐘讀 `/api/data`，失敗退回同站 `data/` 部署快照。刷新網頁不代表上游資料剛更新。
+5. `/api/data` 需要 Vercel 環境變數 `GITHUB_TOKEN`，對私人倉庫 `virus11456/warhub` 具有 Contents read 權限。GitHub Actions 內建 token 不會自動傳到 Vercel。
 
-```
-warhub/
-├── index.html                     # 主頁面（戰爭預測儀表板）
-├── data/
-│   └── data.json                  # 由 GitHub Actions 自動更新（排程每 15 分鐘，GitHub 尖峰時實際約每小時）
-├── scripts/
-│   ├── fetch_data.py              # 抓取 Polymarket + Pizza 指數
-│   ├── alerts.py                  # Telegram / Discord 警報推播
-│   └── requirements.txt
-├── .github/
-│   └── workflows/
-│       ├── update-data.yml        # 每 15 分鐘執行 fetch_data.py
-│       └── deploy.yml             # push 到 main 自動部署到 GitHub Pages
-├── .env.example                   # 本地開發用環境變數範本
-└── .gitignore
-```
+## 模型 v4.0
 
----
+名義权重 P .28 / A .18 / G .10 / Z .14 / F .10 / S .12 / W .08。
+可用權重至少 60%、至少三項有效因子才輸出 WPI；只對有效因子重新正規化。這是資料品質門檻，**不是統計信賴度**。
 
-## 核心功能
+- P：標題通過保守軍事主題篩選、有效 Yes/No、未過期的事件盤，停火題反向。不同事件、期限及累計交易量仍不可解讀為同一事件機率。
+- A：目前 ADS-B 可見軍機數相對過去七天樣本均值；至少 12 個樣本且歷史涵蓋六天。接收覆蓋、日夜與星期效應仍待校正。
+- G：新取得的 GDELT 新聞佔比；沿用值不計分。
+- Z：有店家即時人流時才使用上游 PizzINT 平滑指數。
+- F：暫不計分。全球火點和矩形監測區熱異常沒有足夠證據代表戰火。
+- S：至少三項有效金融偏離指標；基準為最後報價日之前 30 筆日線收盤，不使用硬編碼均線。
+- W：Wikipedia 戰爭相關條目瀏覽量，相對過去基準。
 
-| 模組 | 描述 |
-|------|------|
-| **地區戰爭風險看板** | 俄烏 / 中東 / 台海 / 朝鮮半島 / 南海 逐區風險分數＋24h 趨勢（Polymarket 40% + GDELT 30% + FIRMS 15% + 軍機 15%）|
-| **WPI v3.0** | War Pressure Index — P30/A20/G10/Z15/F10/S15 六因子加權指數 |
-| **PizzINT** | 五角大廈披薩異常監控：DEFCON 演算法、24h sparkline、spike 事件（資料：pizzint.watch）|
-| **Polymarket** | 預測市場機率聚合（字界過濾＋運動/娛樂排除）|
-| **GDELT** | 全球新聞衝突報導強度（早期預警領先指標）|
-| **AVI** | 軍機 / 加油機航空監控（ADS-B）|
-| **FIRMS** | NASA 衛星火點資料 |
-| **核試監測** | USGS 地震 API — 五大核試驗場周邊淺層事件偵測 |
-| **避險指標** | 黃金 / 布倫特原油 / 瑞郎 / VIX / 小麥期貨 / 軍工股 |
-| **歷史趨勢** | data/history.json 保留 7 天各項指數，前端顯示 24h 變化箭頭 |
-| **末日時鐘** | 距午夜倒數（2025：89 秒）|
+地區指數另以市場 35%、新聞 25%、NOTAM 15% 為可用候選；有效權重至少 60%、至少兩因子。火點與廣域軍機數僅展示，不計分。來源不足時顯示「資料不足」。
 
----
+舊版歷史保留以供追溯，但不同模型版本不接成同一分數趨勢。新版權重、門檻仍是暫定設計，需獨立回測。
 
-## 部署到 GitHub Pages
+## 開發與驗證
 
-1. **Settings → Pages → Source** 選 `GitHub Actions`
-2. 將程式碼推到 `main` 分支
-3. `deploy.yml` 會自動部署
-4. 完成後可在 `https://<username>.github.io/warhub/` 看到網站
-
-### 自訂網域（warhubs.com）
-
-於 GitHub 倉庫 **Settings → Pages → Custom domain** 填入 `warhubs.com`，並到 DNS 設定加入：
-- `A` record 指向 GitHub Pages IPs
-- 或 `CNAME` 指向 `<username>.github.io`
-
----
-
-## 資料來源
-
-`scripts/fetch_data.py` 由 GitHub Actions 每 15 分鐘執行，從以下兩個**完全免費的公開 API** 抓取資料，寫入 `data/data.json`：
-
-| 來源 | 用途 | 端點 |
-|------|------|------|
-| [pizzint.watch](https://www.pizzint.watch/) | Pentagon Pizza Index、DEFCON 等級、各店即時繁忙度與 24h 歷史 | `/api/dashboard-data` |
-| [Polymarket Gamma](https://gamma-api.polymarket.com/) | 戰爭/衝突相關預測市場機率 | `/markets?tag_slug=geopolitics` |
-
-不需要任何 API key，所以 GitHub Actions 不需要設定任何 Secret 就能運作。
-
-> 💡 **致謝**：Pentagon Pizza 資料來源為 [pizzint.watch](https://www.pizzint.watch/)（PizzINT Team）— 他們直接抓 Google Maps Popular Times 並提供公開 API。如果這個專案對你有用，請去支持原作者。
-
----
-
-## 警報推播（選用）
-
-`fetch_data.py` 每次更新資料時會比對前一份 `data.json` 的警戒等級，**等級升高**（如 NORMAL → ELEVATED）時自動推播到 Telegram / Discord。未設定 Secrets 則自動跳過。啟用方式：到 GitHub 倉庫 **Settings → Secrets and variables → Actions** 新增：
-
-| Secret | 用途 |
-|--------|------|
-| `TELEGRAM_BOT_TOKEN` | 推播到 Telegram |
-| `TELEGRAM_CHAT_ID` | Telegram 接收頻道 |
-| `DISCORD_WEBHOOK_URL` | 推播到 Discord |
-| `BESTTIME_API_KEY` | Pentagon 周邊酒吧即時人流（BestTime.app 私鑰，選用）|
-
----
-
-## 本地開發
-
-```bash
-# 1. 抓資料
-pip install -r scripts/requirements.txt
-python scripts/fetch_data.py
-
-# 2. 預覽網站
+```sh
+python -m venv .venv
+.venv/bin/pip install -r scripts/requirements.txt
+.venv/bin/python -m unittest discover -s tests -v
+node --test tests/test_api.mjs
+# 本機驗證抓取時禁用通知；會更新本機 data 檔案
+WARHUB_NO_NOTIFY=1 .venv/bin/python scripts/fetch_data.py
 python -m http.server 8000
-# 開啟 http://localhost:8000
 ```
 
----
+選用來源需要 GitHub Actions Secrets：`USDA_FAS_API_KEY`、`BESTTIME_API_KEY`、`FRED_API_KEY`。
+推播需要 `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` 或 `DISCORD_WEBHOOK_URL`。
+不可把金鑰放進前端、資料 JSON 或 Git。Vercel token 應只具有此倉庫唯讀權限。
 
-## 免責聲明
-
-本網站資訊僅供研究與觀察用途，不構成任何投資、軍事或政策建議。Pizza 指數為民間 OSINT 觀察，非官方情報；Polymarket 數據反映市場參與者預測，非事實。
+詳見 [來源稽核與後續工作](docs/DATA_AUDIT.md) 與 [運維說明](docs/OPERATIONS.md)。
