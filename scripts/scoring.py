@@ -22,7 +22,7 @@ def market_risk(market):
     if not ACTION.search(q) or EXCLUDE.search(q) or not number(yes) or not 0 <= yes <= 1:
         return None
     # Negated questions need manual interpretation, never invert them heuristically.
-    if re.search(r"\b(not|no|avoid|prevent)\b", q, re.I):
+    if re.search(r"\b(not|no|avoid|prevent|end|ends|ending|lift|lifts|lifting|withdraw|withdrawal|resume|resumes|break|breaks|violate|violation)\b", q, re.I):
         return None
     end = market.get('end_date')
     if end:

@@ -30,6 +30,10 @@ def source_health(data):
                 status = 'available' if n==5 else 'partial' if n else 'unavailable'
                 note = f'{n}/5 測區查詢成功；地震不等於核試驗'
             if key in ('food','strat','usda'):
+                items=v.get('items') or []
+                if items:
+                    fresh=sum(not r.get('incomplete') and not r.get('stale') for r in items)
+                    status='available' if fresh==len(items) else 'partial' if fresh else 'unavailable'
                 note = '觀測期間：' + str(v.get('ref_month') or v.get('week_ending') or '未知') + '；與抓取時間不同'
         if key == 'pizza':
             n = sum(1 for s in v or [] if s.get('busyness') is not None and s.get('is_open'))

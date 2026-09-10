@@ -27,7 +27,7 @@ async def main():
                     elif isinstance(value,dict):
                         if value.get('error') or value.get('available') is False: result['status']='unavailable'
                         if name=='usda':
-                            result['items']=[{k:it.get(k) for k in ('name','week','market_year','week_net_kt','commit_kt','incomplete')} for it in value.get('items',[])]
+                            result['items']=[{k:it.get(k) for k in ('name','week','market_year','week_net_kt','commit_kt','next_year_net_kt','incomplete','stale')} for it in value.get('items',[])]
                         elif name=='finance': result['count']=len(value)
                         elif name=='fred': result['series']=list(value)
                         elif name=='bars': result['live_count']=value.get('open_count',0); result['reason']=value.get('reason')
@@ -59,18 +59,7 @@ async def main():
                         except (ValueError,AttributeError):v['has_notam_list']=False
                         report['sources']['notam']=v
                 except Exception as e: report['sources']['notam']={'failure_type':type(e).__name__}
-            async def usda_schema():
-                key=os.environ.get('USDA_FAS_API_KEY','')
-                if not key: return
-                commodities=await f._usda_get(session,'/commodities',key) or []
-                selected=[c for c in commodities if any(w in c.get('commodityName','').lower() for w in ('wheat','soybean','corn'))]
-                releases=await f._usda_get(session,'/datareleasedates',key) or []
-                samples=[]
-                for c in selected:
-                    records=await f._usda_get(session,f"/exports/commodityCode/{c['commodityCode']}/countryCode/5700/marketYear/2026",key) or []
-                    samples.append({'commodity':c,'latest':max(records,key=lambda r:r.get('weekEndingDate','')) if records else None})
-                report['usda_schema']={'samples':samples,'release_samples':releases[:3]}
-            await asyncio.gather(one('polymarket',f.fetch_polymarket),one('pizzint',f.fetch_pizzint),one('usda',f.fetch_usda_esr),one('bars',f.fetch_bars),one('fred',f.fetch_fred),one('finance',f.fetch_finance),gdelt(),notam(),one('usda_schema',lambda _:usda_schema(),150))
+            await asyncio.gather(one('polymarket',f.fetch_polymarket),one('pizzint',f.fetch_pizzint),one('usda',f.fetch_usda_esr),one('bars',f.fetch_bars),one('fred',f.fetch_fred),one('finance',f.fetch_finance),gdelt(),notam())
     report['configured']={name:bool(os.environ.get(name,'')) for name in ['USDA_FAS_API_KEY','BESTTIME_API_KEY','FRED_API_KEY']}
     output=Path('probe-report.json');output.write_text(json.dumps(report,ensure_ascii=False,indent=2))
     print(json.dumps(report,ensure_ascii=False,indent=2))

@@ -1576,120 +1576,43 @@ async def _usda_get(session, path, key):
 
 async def fetch_usda_esr(session: aiohttp.ClientSession) -> dict | None:
     import os
+    from usda import assemble
     key = (os.environ.get("USDA_FAS_API_KEY") or "").strip()
     if not key:
         return None
     prev = {}
     try:
         prev = json.loads(DATA_FILE.read_text(encoding="utf-8")).get("usda") or {}
-    except Exception:
+        age = (datetime.now(timezone.utc) - datetime.fromisoformat(prev["updated_at"])).total_seconds()
+        if prev.get("schema_version") == 2 and not prev.get("stale") and 0 <= age < 6*3600:
+            return prev
+    except (OSError, ValueError, KeyError, TypeError):
         pass
-    if prev.get("updated_at"):
-        try:
-            age = (datetime.now(timezone.utc) -
-                   datetime.fromisoformat(prev["updated_at"])).total_seconds()
-            if age < 6 * 3600:
-                log.info("USDA ESR: fresh (<6h), carried over")
-                return prev
-        except Exception:
-            pass
-
-    commodities = await _usda_get(session, "/commodities", key)
-    countries = await _usda_get(session, "/countries", key)
-    if not commodities or not countries:
-        log.warning(f"USDA ESR: commodities={commodities is not None} countries={countries is not None}")
-        return {**prev, "stale": True} if prev else None
-    log.info(f"USDA ESR: {len(commodities)} commodities, {len(countries)} countries")
-
-    # 找中國國家代碼（排除香港/台灣/澳門）— 不分大小寫，容忍 "CHINA, PEOPLES REPUBLIC OF"
-    china = None
-    for c in countries:
-        nm = (c.get("countryName") or "").strip().lower()
-        if "china" in nm and "hong" not in nm and "taiwan" not in nm and "macau" not in nm:
-            china = c.get("countryCode")
-            log.info(f"USDA ESR: matched China -> code={china} name={c.get('countryName')!r}")
-            break
+    commodities, countries, releases = await asyncio.gather(
+        _usda_get(session, "/commodities", key), _usda_get(session, "/countries", key),
+        _usda_get(session, "/datareleasedates", key))
+    if not all(isinstance(v, list) and v for v in (commodities, countries, releases)):
+        return {**prev, "stale": True} if prev.get("schema_version") == 2 else None
+    china = next((c.get("countryCode") for c in countries if "china" in c.get("countryName", "").lower()
+                  and not any(x in c.get("countryName", "").lower() for x in ("hong", "taiwan", "macau"))), None)
     if china is None:
-        sample = [ (c.get("countryName") or "") for c in countries if "china" in (c.get("countryName") or "").lower() ]
-        log.warning(f"USDA ESR: no China country matched; china-like={sample[:5]}")
-        return {**prev, "stale": True} if prev else None
-
-    # 對映想要的商品代碼 — 以關鍵字比對（ESR 小麥可能拆成 "All Wheat" 或分級），不分大小寫
-    # USDA_WANT: {"Soybeans":..,"Wheat":..,"Corn":..}
-    cmap = {}
-    for want in USDA_WANT:  # Soybeans / Wheat / Corn
-        kw = want.lower()
-        best = None
-        for c in commodities:
-            nm = (c.get("commodityName") or "").strip()
-            low = nm.lower()
-            if kw in low:
-                # 小麥優先取彙總 "All Wheat"，避免只抓到單一分級
-                if want == "Wheat":
-                    if low.startswith("all wheat") or "all wheat" in low:
-                        best = c.get("commodityCode"); break
-                    if best is None:
-                        best = c.get("commodityCode")
-                else:
-                    best = c.get("commodityCode"); break
-        if best is not None:
-            cmap[want] = best
-    log.info(f"USDA ESR: commodity codes -> {cmap}")
-
-    yr = datetime.now(timezone.utc).year
-    ESR_KEY = {"Soybeans": "soy", "Wheat": "wheat", "Corn": "corn"}
-    items, latest_week, hist = [], "", {}
+        return None
+    items, hist = [], {}
+    today = datetime.now(timezone.utc).date().isoformat()
     for nm, zh in USDA_WANT.items():
-        cc = cmap.get(nm)
-        if cc is None:
-            log.warning(f"USDA ESR: no commodity code for {nm}")
-            continue
-        recs = []
-        for my in (yr, yr - 1, yr + 1):
-            d = await _usda_get(session, f"/exports/commodityCode/{cc}/countryCode/{china}/marketYear/{my}", key)
-            if d:
-                recs.extend(d)
-        recs = [r for r in recs if r.get("weekEndingDate")]
-        if not recs:
-            log.warning(f"USDA ESR: {nm} (code={cc}) no records for MY {yr-1}/{yr}/{yr+1}")
-            continue
-        # 每週序列（去重、排序、留近 ~2 年）供前台畫「承諾趨勢」與「下單 vs 提貨」
-        byweek = {}
-        for rr in recs:
-            wk0 = (rr.get("weekEndingDate") or "")[:10]
-            if not wk0:
-                continue
-            byweek[wk0] = {
-                "w": wk0,
-                "commit": round((rr.get("currentMYTotalCommitment") or 0) / 1000, 1),  # 累計承諾（千噸）
-                "outs":   round((rr.get("outstandingSales") or 0) / 1000, 1),           # 已訂未運
-                "exp":    round((rr.get("accumulatedExports") or 0) / 1000, 1),         # 累計已裝運
-                "net":    round((rr.get("currentMYNetSales") or 0) / 1000, 1),          # 本週淨銷售
-            }
-        hist[ESR_KEY.get(nm, nm.lower())] = [byweek[w] for w in sorted(byweek)][-110:]
-        r = max(recs, key=lambda x: x.get("weekEndingDate", ""))
-        wk = (r.get("weekEndingDate") or "")[:10]
-        if wk > latest_week:
-            latest_week = wk
-        items.append({
-            "name": zh,
-            "week_net_kt": round((r.get("currentMYNetSales") or 0) / 1000, 1),
-            "outstanding_kt": round((r.get("outstandingSales") or 0) / 1000, 1),
-            "commit_kt": round((r.get("currentMYTotalCommitment") or 0) / 1000, 1),
-            "week": wk,
-        })
-    if not items:
-        log.warning("USDA ESR: matched China+commodities but assembled 0 items")
-        return {**prev, "stale": True} if prev else None
-    log.info(f"USDA ESR: week {latest_week}, {len(items)} commodities, hist weeks="
-             f"{ {k: len(v) for k, v in hist.items()} }")
-    return {
-        "updated_at": datetime.now(timezone.utc).isoformat(),
-        "week_ending": latest_week,
-        "items": items,
-        "hist": hist,
-        "note": "美國對中國每週出口銷售（USDA FAS ESR）· 週更 · 淨銷售=本週新訂單、未裝運=已訂未運",
-    }
+        exact = "all wheat" if nm == "Wheat" else nm.lower()
+        cc = next((c.get("commodityCode") for c in commodities if c.get("commodityName", "").strip().lower() == exact), None)
+        advertised = [r for r in releases if r.get("commodityCode") == cc and r.get("marketYear")
+                      and r.get("marketYearStart", "9999")[:10] <= today]
+        release = max(advertised, key=lambda r:r.get("marketYearStart", "")) if advertised else None
+        records = await _usda_get(session, f"/exports/commodityCode/{cc}/countryCode/{china}/marketYear/{release['marketYear']}", key) if release else None
+        item, rows = assemble(zh, cc, release, records)
+        items.append(item)
+        hist[{"Soybeans":"soy", "Wheat":"wheat", "Corn":"corn"}[nm]] = rows
+    weeks = [i["week"] for i in items if i.get("week")]
+    return {"schema_version":2, "updated_at":datetime.now(timezone.utc).isoformat(),
+            "week_ending":max(weeks) if weeks else None, "items":items, "hist":hist,
+            "note":"USDA 美國對中國出口銷售；每商品依官方行銷年度查詢。當年度與下一年度淨銷售分列，非總進口。"}
 
 
 # ─────────────────────────────────────────────────────────────

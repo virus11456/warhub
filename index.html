@@ -1294,9 +1294,9 @@
       <a href="https://t.me/warhubss" target="_blank" rel="noopener" class="nav-tg"><span class="nav-ic">📢</span><span class="nav-tx">TG 通知</span></a>
     </div>
     <div class="header-status">
-      <span class="live-ind"><span class="live-dot"></span><span class="live-lbl">即時連線 LIVE DATA</span></span>
+      <span class="live-ind"><span class="live-dot"></span><span class="live-lbl">定期資料快照</span></span>
       <span id="clock">--:--:-- UTC</span>
-      <span class="threat-badge" id="alert-badge">威脅等級 ELEVATED</span>
+      <span class="threat-badge" id="alert-badge">等待資料</span>
     </div>
   </div>
 </header>
@@ -1681,12 +1681,12 @@
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-bottom:.4rem">
       <div class="section-title" style="margin:0">📡 即時戰情快訊 · 早期預警</div>
       <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);display:flex;gap:.8rem;align-items:center">
-        <span style="color:var(--accent1)">⟳ 每 15 分鐘</span>
+        <span style="color:var(--accent1)">約每 2 小時更新</span>
         <span id="news-updated">載入中…</span>
       </div>
     </div>
     <div style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim);margin-bottom:.5rem">
-      Google News 全球監測 · 篩選白宮／中國／戰爭升級相關頭條，依時間排序，作為開戰預測的領先訊號（點擊看原文）
+      Google News 全球監測 · 篩選白宮／中國／戰爭升級相關頭條，依時間排序，供事件追蹤與原文查核，未驗證其預測能力（點擊看原文）
     </div>
     <div id="news-list">
       <div style="padding:1rem;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 連接 GDELT 新聞流…</div>
@@ -1698,7 +1698,7 @@
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;flex-wrap:wrap;gap:.5rem">
       <div class="section-title" style="margin:0">📊 Polymarket 戰爭預測市場</div>
       <div style="font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim);display:flex;gap:.8rem;align-items:center">
-        <span style="color:var(--accent1)">⟳ 每 5 分鐘</span>
+        <span style="color:var(--accent1)">約每 2 小時更新</span>
         <span id="poly-updated-time">上次更新：載入中…</span>
       </div>
     </div>
@@ -1716,7 +1716,7 @@
   <!-- ══════════ 🇨🇳 中國戰備動向監測（整合區塊）══════════ -->
   <div class="cn-banner" id="china-watch">
     <div class="cn-banner-t">🇨🇳 中國戰備動向監測</div>
-    <div class="cn-banner-s">中國已停止公布糧食與戰略物資進口 → 改用「<strong>出口國回推</strong>」：把各主要出口國「對中國出口」的海關數據加總，回推中國進口量。搭配「<strong>異常高/低</strong>」與台海軍事動態，交叉推估備戰訊號。皆為佐證指標，須合併研判；<strong>單月易受資料未齊影響，以趨勢為主</strong>，且抓不到經俄/伊等不通報管道。</div>
+    <div class="cn-banner-s">以中國海關直報與<strong>出口國鏡像資料</strong>觀察貿易趨勢；兩者涵蓋範圍不同，不能直接混算增幅。缺少紀錄不代表停止公布或零進口。進口增減亦受價格、季節、需求及申報延遲影響，<strong>不能單憑增減推論備戰</strong>。</div>
   </div>
 
   <!-- ══════════ 🌾 中國糧食進口監測（結構性背景指標）══════════ -->
@@ -1760,7 +1760,7 @@
       <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim)"><span id="strat-updated">軍工原料</span></div>
     </div>
     <div style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim);margin-bottom:.6rem">
-      軍工必需、中國高度依賴進口的原料（出口國回推）· <strong>異常高＝突然囤積</strong>、<strong>異常低＝改用儲備</strong> · 石油因俄/沙不報 Comtrade 抓不到 · 近月常未收齊，標「<strong>資料待補</strong>」者為暫值、勿當異常
+      軍工必需、中國高度依賴進口的原料（出口國回推）· <strong>增減原因未定，不能直接解讀為囤積或動用儲備</strong> · 石油因俄/沙不報 Comtrade 抓不到 · 近月常未收齊，標「<strong>資料待補</strong>」者為暫值、勿當異常
     </div>
     <div id="strat-grid">
       <div style="padding:1rem;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 連接 UN Comtrade…</div>
@@ -2285,7 +2285,7 @@ function renderWarAlert(status, shops) {
     levelLabelEl.style.color = status.gaugeColor;
   }
 
-  const badgeEl = document.getElementById('alert-badge');
+  const badgeEl = null; // 整體狀態由後端模型統一呈現，不能用餐廳人流判定。
 
   if (status.level === 'ANOMALY') {
     // 顯示戰爭警報
@@ -2533,6 +2533,15 @@ async function fetchRealPizzaData() {
       json.regions=(json.regions||[]).map(r=>({...r,score:null,level:'INSUFFICIENT_DATA',coverage:0,factors:{}}));
     }
     renderDataQuality(json);
+    const badge=document.getElementById('alert-badge');
+    if(badge)badge.textContent=BACKEND_SCORE?.combined_score != null ? '觀察指數 '+BACKEND_SCORE.alert_level : '資料不足';
+    const live=document.querySelector('.live-lbl');
+    if(live)live.textContent=age >= 0 && age < 6*3600000 ? '定期資料快照' : '資料已過期';
+    if(json.score?.model_version !== 'wpi-4.0') {
+      json.polymarket=[]; json.pizza_index=null; json.defcon_level=null;
+      const poly=document.getElementById('poly-updated-time');if(poly)poly.textContent='等待新版市場篩選資料';
+    }
+
 
     // 用後端資料覆蓋 PIZZA_SHOPS_DATA（保留 icon 等前端專屬欄位）
     try {
@@ -2568,18 +2577,6 @@ async function fetchRealPizzaData() {
         if (polyTs) polyTs.textContent = '資料時間：' + observedTime();
       }
     } catch(err) { console.warn('[WARHUBS] polymarket render error:', err.message); }
-
-    // 歷史趨勢（供地區/WPI 趨勢箭頭）
-    try {
-      let hres = await wLoad('history.json');
-      if (hres && hres.ok) WW_HISTORY = (await hres.json()).filter(h => h.model_version === 'wpi-4.0');
-    } catch(err) { console.warn('[WARHUBS] history fetch error:', err.message); }
-
-    // 每日指標長期封存（避險群聚 & 經濟指標趨勢）
-    try {
-      let mres = await wLoad('metrics_daily.json');
-      if (mres && mres.ok) { MD_JSON = await mres.json(); Object.values(MD_JSON.days || {}).forEach(d=>{ if(d.model_version !== 'wpi-4.0') {d.combined=null;d.poly=null;d.regions={};} }); renderMetricsHist(); }
-    } catch(err) { console.warn('[WARHUBS] metrics_daily fetch error:', err.message); }
 
     // 地區風險看板 + WPI 新因子 + 核試監測 + PizzINT 深度情報
     try {
@@ -2649,6 +2646,24 @@ async function fetchRealPizzaData() {
 
     htmlWpiRender();
 
+    const historyRequest=wLoad('history.json');
+    const metricsRequest=wLoad('metrics_daily.json');
+    void (async()=>{
+    // 歷史趨勢（供地區/WPI 趨勢箭頭）
+    try {
+      let hres = await historyRequest;
+      if (hres && hres.ok) WW_HISTORY = (await hres.json()).filter(h => h.model_version === 'wpi-4.0');
+    } catch(err) { console.warn('[WARHUBS] history fetch error:', err.message); }
+
+    // 每日指標長期封存（避險群聚 & 經濟指標趨勢）
+    try {
+      let mres = await metricsRequest;
+      if (mres && mres.ok) { MD_JSON = await mres.json(); Object.values(MD_JSON.days || {}).forEach(d=>{ if(d.model_version !== 'wpi-4.0') {d.combined=null;d.poly=null;d.regions={};} }); renderMetricsHist(); }
+    } catch(err) { console.warn('[WARHUBS] metrics_daily fetch error:', err.message); }
+
+      if(json.regions){renderRegions(json.regions);renderTrendChart(json.regions);}
+    })().catch(err=>console.warn('[WARHUBS] history render error:',err.message));
+
     // Footer status indicator (在頁尾顯示「上次成功更新」)
     const tsEl = document.getElementById('last-update-ts');
     if (tsEl && json.updated_at) {
@@ -2701,7 +2716,7 @@ function renderTrendChart(regions) {
     .filter(h => h.ts && h.combined != null)
     .sort((a, b) => Date.parse(a.ts) - Date.parse(b.ts));
   if (hist.length < 4) {
-    chartEl.textContent = `⏳ 歷史資料累積中（目前 ${hist.length} 筆，需至少 4 筆；資料每小時累積）…`;
+    chartEl.textContent = `⏳ 歷史資料累積中（目前 ${hist.length} 筆，需至少 4 筆；資料約每 2 小時累積）…`;
     return;
   }
 
@@ -3037,11 +3052,10 @@ function newsAgo(ts){
 }
 function renderFood(json){
   var el=document.getElementById('food-grid'); if(!el) return;
-  var f=json.food;
+  var f=json.food || {items:[]};
   if(!f || !f.items || !f.items.length){
     el.innerHTML='<div style="padding:1rem;text-align:center;font-family:\'Share Tech Mono\',monospace;font-size:.7rem;color:var(--text-dim)">暫無資料（每日更新一次）</div>';
-    return;
-  }
+  } else {
   el.innerHTML=f.items.map(function(it){
     var y=it.yoy_pct;
     var col=(y==null)?'var(--text-dim)':(y>=15?'#ff4d5e':(y>0?'#f5a623':(y<0?'#35e08a':'var(--text-dim)')));
@@ -3051,13 +3065,15 @@ function renderFood(json){
       +'<div class="food-val">'+w+'<span class="food-unit">萬噸</span></div>'
       +'<div class="food-yoy" style="color:'+col+'">'+(y==null?'—':arr+Math.abs(y)+'% 年增')+'</div></div>';
   }).join('');
+  }
   // 🇺🇸→🇨🇳 USDA 每週銷售（有 key 才有）
   var u=json.usda;
-  if(u && u.items && u.items.length){
+  if(u?.schema_version === 2 && u.items?.length){
     var rows=u.items.map(function(it){
-      return '<div class="usda-row"><div class="u-name">'+escapeHtml(it.name)+'</div>'
-        +'<div class="u-v">本週淨銷售 <b>'+(it.week_net_kt||0).toLocaleString()+'</b> 千噸</div>'
-        +'<div class="u-v">未裝運 <b>'+(it.outstanding_kt||0).toLocaleString()+'</b> 千噸</div></div>';
+      return '<div class="usda-row"><div class="u-name">'+escapeHtml(it.name)+' · MY '+(it.market_year ?? '未知')+' · '+escapeHtml(it.week || '無觀測週次')+(it.stale?'（舊資料）':'')+'</div>'
+        +'<div class="u-v">當年度本週淨銷售 <b>'+(it.week_net_kt?.toLocaleString() ?? '--')+'</b> 千噸</div>'
+        +'<div class="u-v">下一年度本週淨銷售 <b>'+(it.next_year_net_kt?.toLocaleString() ?? '--')+'</b> 千噸</div>'
+        +'<div class="u-v">未裝運 <b>'+(it.outstanding_kt?.toLocaleString() ?? '--')+'</b> 千噸</div></div>';
     }).join('');
     el.innerHTML += '<div class="usda-block"><div class="usda-hd">🇺🇸→🇨🇳 美對中每週穀物銷售 · USDA ESR（截至 '+escapeHtml(u.week_ending||'')+'）</div>'+rows+'</div>';
   }
@@ -3132,7 +3148,7 @@ function drawFoodShare(){
     hit.push('<rect x="'+(CX(i)-slot/2).toFixed(1)+'" y="'+padT+'" width="'+slot.toFixed(1)+'" height="'+(H-padT-padB).toFixed(1)+'" fill="transparent" data-tip="<b>'+d.ym+'</b><br>美國佔比 '+pts[i].toFixed(1)+'%<br>美 '+fhFmt(d[uk])+' / 總 '+fhFmt(d[key])+' 萬噸"></rect>');
   });
   svg.innerHTML=p.concat(hit).join('');
-  if(leg) leg.innerHTML='<b>'+nm+'</b> 美國佔中國進口比重（%）· '+data[0].ym+' → '+data[data.length-1].ym+'　·　比重下滑＝中國轉向巴西/阿根廷等（脫鉤訊號）· 僅 2025 起回推月份';
+  if(leg) leg.innerHTML='<b>'+nm+'</b> 美國佔中國進口比重（%）· '+data[0].ym+' → '+data[data.length-1].ym+'　·　比重受回報覆蓋與來源口徑影響，不能單憑下降判定脫鉤· 僅 2025 起回推月份';
 }
 function drawFoodHistory(){
   var json=FH_JSON; if(!json) return;
@@ -3199,7 +3215,7 @@ var UH_VIEWS=[['commit','累計承諾趨勢'],['flow','下單 vs 提貨']];
 function renderUsdaHist(json){
   UH_JSON=json;
   var wrap=document.getElementById('uh-wrap'); if(!wrap) return;
-  var h=(json.usda&&json.usda.hist)||{};
+  var h=json.usda?.schema_version === 2 ? json.usda.hist || {} : {};
   if(!UH_CMDS.some(function(c){return (h[c[0]]||[]).length;})){ wrap.style.display='none'; return; }
   wrap.style.display='';
   var cmdEl=document.getElementById('uh-cmd');
@@ -3254,9 +3270,9 @@ function drawUsdaHist(){
   if(leg){
     var lg=series.map(function(s){return '<span style="color:'+s.c+'">▬ '+s.lbl+'</span>';}).join('　');
     var expl=UH_STATE.view==='flow'
-      ? '「已訂未運」高＝下了單還沒提貨（履約落差，值得注意）；兩線差距＝尚未裝運量'
+      ? '已訂未運與累計已装運為不同存量；兩線相減沒有尚未裝運量的意義，不能據此判定違約'
       : '中國對美'+nm+'的累計採購承諾（每個行銷年度歸零重算，看每季買氣斜率）';
-    leg.innerHTML='<b>'+nm+'</b> · 千噸 · '+data[0].w+' → '+data[data.length-1].w+'　'+lg+'　·　'+expl;
+    leg.innerHTML='<b>'+nm+'</b> · 行銷年度 '+data[0].market_year+' · 千噸 · '+data[0].w+' → '+data[data.length-1].w+'　'+lg+'　·　'+expl;
   }
 }
 // ── ⚙️ 戰略物資月度趨勢圖 ──
@@ -3558,22 +3574,22 @@ function renderTicker(json) {
       items.push(`📊 ${escapeHtml(zhMarket(m.question))} <span class="hi">${Math.round(m.yes_price * 100)}%</span>`);
     });
   if (json.firms?.total_24h) {
-    items.push(`🔥 NASA FIRMS 24hr 衛星火點 <span class="red">${json.firms.total_24h.toLocaleString()}</span>（vs 基準 ${json.firms.delta_pct || '--'}）`);
+    items.push(`🔥 NASA FIRMS 24hr 衛星火點 <span class="red">${json.firms.total_24h.toLocaleString()}</span>（包含野火與工業熱源）`);
   }
   const av = json.aviation?.summary;
   if (av?.total) {
     items.push(`✈️ 全球軍機追蹤 <span class="hi">${av.total}</span> 架 · 加油機 ${av.tankers} · 運輸機 ${av.transport}`);
   }
-  if (json.score?.combined_score != null) {
-    items.push(`🎯 綜合威脅指數 <span class="hi">${json.score.combined_score}</span> / 100 · ${json.score.alert_level}`);
+  if (BACKEND_SCORE?.combined_score != null) {
+    items.push(`🎯 戰爭壓力指數 <span class="hi">${BACKEND_SCORE.combined_score}</span> / 100 · ${BACKEND_SCORE.alert_level}（非機率）`);
   }
-  if (Array.isArray(json.regions) && json.regions.length) {
-    const r = json.regions[0];
+  if (Array.isArray(json.regions) && json.regions.some(r=>Number.isFinite(r.score))) {
+    const r = [...json.regions].filter(r=>Number.isFinite(r.score)).sort((a,b)=>b.score-a.score)[0];
     items.push(`⚔️ 風險最高地區：${r.flag} ${escapeHtml(r.name)} <span class="red">${(r.score == null ? '--' : Math.round(r.score))}</span> 分 [${r.level}]`);
   }
   if (json.wikipedia?.mean_ratio >= 1.5) {
     const top = (json.wikipedia.pages || []).reduce((a,b) => (b.ratio > (a?.ratio ?? 0) ? b : a), null);
-    items.push(`📖 公眾焦慮上升：維基戰爭條目瀏覽量達平時 <span class="hi">${json.wikipedia.mean_ratio}x</span>${top ? `（${escapeHtml(top.title.replace(/_/g,' '))} ${top.ratio}x）` : ''}`);
+    items.push(`📖 維基戰爭條目瀏覽量達平時 <span class="hi">${json.wikipedia.mean_ratio}x</span>${top ? `（${escapeHtml(top.title.replace(/_/g,' '))} ${top.ratio}x）` : ''}`);
   }
   items.push(`末日時鐘距離午夜 <span class="red">85秒</span>（2026 年公告，象徵性指標）`);
 
@@ -4054,7 +4070,7 @@ function renderWarMap(json){
   WarGlobe.setData(regs, hs);
   const cntEl=document.getElementById('warmap-count');
   if(cntEl) cntEl.textContent = hs.length
-    ? '🔥 '+hs.length+' 處活躍衝突火點 · 🛰️ NASA FIRMS 24h'
+    ? '🔥 '+hs.length+' 筆監測區熱異常（地圖顯示筆數） · 🛰️ NASA FIRMS 24h'
     : '🛰️ NASA FIRMS · 暫無衝突區火點';
 }
 

@@ -21,6 +21,22 @@ class Session:
     def get(self,*args,**kwargs): return Response(self.value)
 
 class Integrity(unittest.TestCase):
+    def test_usda_missing_and_next_year_sales(self):
+        from usda import assemble
+        release={'marketYear':2027,'marketYearStart':'2026-06-01'}
+        record={'weekEndingDate':'2026-09-03T00:00:00','unitId':1,'currentMYNetSales':0,'nextMYNetSales':972000}
+        item,rows=assemble('大豆',801,release,[record])
+        self.assertEqual(item['week_net_kt'],0)
+        self.assertEqual(item['next_year_net_kt'],972)
+        self.assertIsNone(item['commit_kt'])
+        self.assertTrue(item['incomplete'])
+        self.assertEqual(rows[0]['market_year'],2027)
+        missing,_=assemble('大豆',801,release,[])
+        self.assertIsNone(missing['week_net_kt'])
+    def test_usda_wrong_unit_rejected(self):
+        from usda import normalize
+        self.assertIsNone(normalize({'weekEndingDate':'2026-09-03','unitId':2,'currentMYNetSales':1000},2027)['net'])
+
     def test_market_filter(self):
         for q in ['Will 7 Fed rate cuts happen in 2026?','Will Iran win the FIFA World Cup?','Will Taiwan elect a president?','Will Counter-Strike release?']:
             self.assertIsNone(sc.market_risk(market(q)))
@@ -28,6 +44,9 @@ class Integrity(unittest.TestCase):
     def test_peace_direction(self):
         self.assertAlmostEqual(sc.market_risk(market('Russia Ukraine ceasefire?',.8)),20)
         self.assertLess(sc.market_average([market('Russia Ukraine ceasefire?',.9)]),sc.market_average([market('Russia Ukraine ceasefire?',.1)]))
+    def test_ambiguous_peace_and_deescalation_excluded(self):
+        for q in ['US announces end of Iranian blockade by September 30, 2026?', 'Will Israel break the ceasefire?', 'Will the US lift its blockade?']:
+            self.assertIsNone(sc.market_risk(market(q)))
     def test_invalid_values_and_expiration(self):
         for n in [None,float('nan'),float('inf'),-1,2]:
             self.assertIsNone(sc.market_risk(market('Will China invade Taiwan?',n)))
