@@ -1,0 +1,33 @@
+name: Validate isolated data snapshot
+on:
+  workflow_dispatch:
+  push:
+    branches: ['codex/data-integrity-audit']
+    paths: ['scripts/validate_snapshot.py', '.github/workflows/snapshot-validation.yml']
+permissions:
+  contents: read
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r scripts/requirements.txt
+      - name: Validate current sources using isolated files
+        env:
+          USDA_FAS_API_KEY: ${{ secrets.USDA_FAS_API_KEY }}
+          BESTTIME_API_KEY: ${{ secrets.BESTTIME_API_KEY }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          WARHUB_NO_NOTIFY: '1'
+        run: python scripts/validate_snapshot.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: isolated-snapshot
+          path: |
+            snapshot-report.json
+            validated-snapshot.json
+          retention-days: 7
