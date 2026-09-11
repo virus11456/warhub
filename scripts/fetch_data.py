@@ -1049,8 +1049,8 @@ async def fetch_pla_sorties(session: aiohttp.ClientSession) -> dict:
         prev_pla = json.loads(DATA_FILE.read_text(encoding="utf-8")).get("pla") or {}
         for d in (prev_pla.get("days") or []):
             k = d.get("date")
-            if k and (k not in days or (d.get("aircraft") or 0) > (days[k].get("aircraft") or 0)):
-                days[k] = {"aircraft": d.get("aircraft") or 0, "ships": d.get("ships") or 0}
+            if k and k not in days:
+                days[k] = {field:value for field,value in d.items() if field != 'date'}
     except Exception:
         pass
 
@@ -1083,7 +1083,7 @@ async def fetch_pla_sorties(session: aiohttp.ClientSession) -> dict:
                 except Exception:
                     continue
                 cur = days.get(tp)
-                if (not cur) or ac > (cur.get("aircraft") or 0):
+                if not (cur or {}).get("verified") and ((not cur) or ac > (cur.get("aircraft") or 0)):
                     days[tp] = {"aircraft": ac, "ships": max(sh, (cur or {}).get("ships", 0)), "source_title": title, "source_url": it.findtext("link"), "date_basis": "publication_date", "verified": False}
                     parsed += 1
             break
@@ -1169,7 +1169,7 @@ async def fetch_food_imports(session: aiohttp.ClientSession) -> dict:
         try:
             age = (datetime.now(timezone.utc) -
                    datetime.fromisoformat(prev["updated_at"])).total_seconds()
-            if age < 22 * 3600:
+            if prev.get("schema_version") == 2 and not prev.get("stale") and 0 <= age < 22 * 3600:
                 log.info("food: fresh (<22h), carried over")
                 return prev
         except Exception:
@@ -1211,7 +1211,7 @@ async def fetch_food_imports(session: aiohttp.ClientSession) -> dict:
                       "incomplete":incomplete, "reporter_codes":sorted(ok1), "reporter_codes_prev":sorted(ok2)})
     log.info(f"food: ref={L} soy={items[0]['wan_ton']}萬噸 yoy={items[0]['yoy_pct']} breadth={breadth}")
     return {
-        "updated_at": now.isoformat(),
+        "schema_version": 2, "updated_at": now.isoformat(),
         "ref_month": f"{L//100}-{L%100:02d}",
         "prev_year_month": f"{L12//100}-{L12%100:02d}",
         "exporters": [n for _, n in FOOD_EXPORTERS],
@@ -1397,7 +1397,7 @@ async def fetch_strategic_imports(session: aiohttp.ClientSession) -> dict:
         try:
             age = (datetime.now(timezone.utc) -
                    datetime.fromisoformat(prev["updated_at"])).total_seconds()
-            if age < 22 * 3600:
+            if prev.get("schema_version") == 2 and not prev.get("stale") and 0 <= age < 22 * 3600:
                 log.info("strat: fresh (<22h), carried over")
                 return prev
         except Exception:
@@ -1456,7 +1456,7 @@ async def fetch_strategic_imports(session: aiohttp.ClientSession) -> dict:
         return {**prev, "stale": True} if prev else {}
     log.info(f"strat: ref={L} materials={len(items)}")
     return {
-        "updated_at": now.isoformat(),
+        "schema_version": 2, "updated_at": now.isoformat(),
         "ref_month": f"{L // 100}-{L % 100:02d}",
         "prev_year_month": f"{L12 // 100}-{L12 % 100:02d}",
         "items": items,

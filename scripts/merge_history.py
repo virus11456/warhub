@@ -43,7 +43,9 @@ def _union_days(local: dict, remote: dict, key="aircraft") -> dict:
     rd = (remote or {}).get("days") or {}
     for k, v in rd.items():
         cur = ld.get(k)
-        if (not cur) or (v.get(key, 0) or 0) > (cur.get(key, 0) or 0):
+        if cur and cur.get('verified') and not v.get('verified'):
+            continue
+        if (not cur) or (v.get('verified') and not cur.get('verified')) or (v.get(key, 0) or 0) > (cur.get(key, 0) or 0):
             ld[k] = v
     return ld
 
@@ -80,7 +82,7 @@ def merge_pla():
         "updated_at": datetime.now(timezone.utc).isoformat(),
         "days": series, "baseline": baseline,
         "latest": series[-1] if series else None,
-        "note": "每日共軍擾台架次（國防部戰報，自新聞標題擷取）· 每日一報、非即時 · 過去 30 天滾動累積",
+        "note": "新聞標題架次估計（未逐筆核對國防部，發稿日非觀測日）· 非即時 · 過去 30 天滾動累積",
     }
     DATA_FILE.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 

@@ -3539,7 +3539,7 @@ function renderPla(json){
   if(lt && pla.latest){ var el=(base>0 && pla.latest.aircraft>=base*1.5 && pla.latest.aircraft>=25);
     lt.innerHTML='　最新 '+pla.latest.date.slice(5)+'：<b style="color:'+(el?'#ff4d5e':'var(--accent)')+'">'+pla.latest.aircraft+'</b> 架次'+(el?' <span style="color:#ff4d5e">⚠異常偏高</span>':''); }
   var lg=document.getElementById('pla-legend');
-  if(lg) lg.textContent='資料：國防部每日戰報（自新聞標題擷取）· 每日一報、非即時 · 紅柱＝≥中位數1.5倍且≥25架次';
+  if(lg) lg.textContent='資料：新聞標題擷取，未逐筆核實；發稿日可能不同於活動日 · 紅柱＝≥中位數1.5倍且≥25架次';
 }
 function renderNews(json){
   const el=document.getElementById('news-list'); if(!el) return;

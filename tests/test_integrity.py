@@ -21,6 +21,13 @@ class Session:
     def get(self,*args,**kwargs): return Response(self.value)
 
 class Integrity(unittest.TestCase):
+    def test_verified_revision_survives_larger_headline(self):
+        from merge_history import _union_days
+        verified={'aircraft':12,'verified':True,'source_url':'https://example.test/report'}
+        unverified={'aircraft':40,'verified':False}
+        for local,remote in [(verified,unverified),(unverified,verified)]:
+            self.assertEqual(_union_days({'days':{'2026-09-10':local}},{'days':{'2026-09-10':remote}})['2026-09-10'],verified)
+
     def test_usda_missing_and_next_year_sales(self):
         from usda import assemble
         release={'marketYear':2027,'marketYearStart':'2026-06-01'}
