@@ -15,6 +15,7 @@ import json
 import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
+from pla_counts import usable_days
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 DATA_FILE = DATA_DIR / "data.json"
@@ -39,15 +40,15 @@ def _load(p: Path):
 
 def _union_days(local: dict, remote: dict, key="aircraft") -> dict:
     """逐日聯集：遠端有而本地無 → 補上；兩邊都有 → 取 aircraft 較大者。"""
-    ld = dict((local or {}).get("days") or {})
-    rd = (remote or {}).get("days") or {}
+    ld = usable_days(dict((local or {}).get("days") or {}))
+    rd = usable_days((remote or {}).get("days") or {})
     for k, v in rd.items():
         cur = ld.get(k)
         if cur and cur.get('verified') and not v.get('verified'):
             continue
         if (not cur) or (v.get('verified') and not cur.get('verified')) or (v.get(key, 0) or 0) > (cur.get(key, 0) or 0):
             ld[k] = v
-    return ld
+    return usable_days(ld)
 
 
 def _union_months(local: dict, remote: dict) -> dict:
