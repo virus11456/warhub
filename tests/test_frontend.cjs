@@ -22,5 +22,19 @@ const {JSDOM,VirtualConsole}=require('jsdom');const fs=require('fs');const asser
  }
 assert.equal(d.querySelector('#source-health'),null);
 if(mode==='valid'){assert.ok(d.querySelector('#html-wpi-a-desc').textContent.includes('170 架'));assert.ok(d.querySelector('#html-wpi-a-desc').textContent.includes('異常分數 0'));assert.ok(d.querySelector('#html-wpi-f-desc').textContent.includes('11,785 筆'));assert.ok(d.querySelector('#html-wpi-f-desc').textContent.includes('暫不計分'));assert.ok(d.querySelector('#poly-list-container').textContent.includes('美國會在12月31日前打擊古巴嗎？'));assert.ok(d.querySelector('#news-list').textContent.includes('新聞繁體中文標題'));assert.ok(!d.querySelector('#news-list').textContent.includes('English original'));assert.ok(d.querySelector('#strat-grid').textContent.includes('最近歷史參考：2026-06'));assert.ok(d.querySelector('#sh-svg').textContent.includes('缺報'));assert.ok(!d.querySelector('#sh-svg').innerHTML.includes('999'));}
+if(mode==='valid'){
+  const w=dom.window;
+  assert.equal(w.zhMarket('Will Russia test a nuclear weapon by December 31?'), '中文翻譯暫時無法取得（點擊查看原文）');
+  assert.equal(w.zhMarket('中文市場問題？'), '中文市場問題？');
+  assert.equal(w.chineseTitle('English mistranslation', 'English original'), '中文翻譯暫時無法取得（點擊查看原文）');
+  assert.equal(w.chineseTitle(null, '中文原標題'), '中文原標題');
+  w.renderPolymarketCards([{question:'Unknown future question?',yes_price:.2,volume:500,slug:'untranslated-test'}]);
+  const card=d.querySelector('#poly-list-container');
+  assert.ok(card.textContent.includes('中文翻譯暫時無法取得'));
+  assert.ok(!card.textContent.includes('Unknown future question'));
+  assert.equal(card.querySelector('.poly-question').title,'Unknown future question?');
+  assert.equal(card.querySelector('a').href,'https://polymarket.com/market/untranslated-test');
+  assert.ok(card.textContent.includes('20%'));
+}
 assert.equal(result.wpi,mode==='valid'?'42':'--');dom.window.close();
 }})().catch(e=>{console.error(e);process.exit(1)});

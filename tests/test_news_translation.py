@@ -55,3 +55,33 @@ class NewsTranslation(unittest.IsolatedAsyncioTestCase):
             with patch.object(fetch_data,'DATA_FILE',p):
                 await fetch_data._translate_market_questions(Session(),items)
         self.assertEqual(items[0]['question_zh'],'美國12月31日前攻擊古巴？')
+
+    async def test_invalid_cache_is_retried_and_stale_translation_is_cleared(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            items=[{'title_en':'new question', 'title':'舊題目', 'title_zh':'舊譯文'}]
+            session=Session(429)
+            with patch.object(fetch_data,'DATA_FILE',Path(tmp)/'absent.json'):
+                await fetch_data._translate_titles(session,items,cached_titles={'new question':'English only'})
+        self.assertEqual(len(session.calls),1)
+        self.assertEqual(items[0]['title'],'new question')
+        self.assertNotIn('title_zh',items[0])
+        self.assertEqual(items[0]['translation_status'],'unavailable')
+
+    async def test_original_chinese_requires_no_translation_request(self):
+        items=[{'title':'台灣新聞標題'}];session=Session()
+        await fetch_data._translate_titles(session,items,cached_titles={})
+        self.assertEqual(items[0]['title_zh'],'台灣新聞標題')
+        self.assertEqual(session.calls,[])
+
+    async def test_market_cache_is_exact_and_separate_from_news(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            p=Path(tmp)/'data.json'
+            p.write_text(json.dumps({'news':[{'title_en':'new question','title_zh':'新聞譯文'}],
+                'polymarket':[{'question':'old question','question_zh':'舊市場譯文'}]}))
+            items=[{'question':'new question','question_zh':'殘留譯文','yes_price':.2}]
+            session=Session(429)
+            with patch.object(fetch_data,'DATA_FILE',p):
+                await fetch_data._translate_market_questions(session,items)
+        self.assertNotIn('question_zh',items[0])
+        self.assertEqual(items[0]['yes_price'],.2)
+        self.assertEqual(len(session.calls),1)

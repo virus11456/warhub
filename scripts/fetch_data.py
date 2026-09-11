@@ -862,16 +862,24 @@ async def _translate_titles(session, items, tl="zh-TW", cached_titles=None):
     Reuse translations for unchanged originals and bound the entire translation stage.
     """
     cached = dict(cached_titles or {})
-    try:
-        for old in json.loads(DATA_FILE.read_text(encoding="utf-8")).get("news", []):
-            if old.get("title_en") and old.get("title_zh"):
-                cached[old["title_en"]] = old["title_zh"]
-    except (OSError, ValueError, TypeError):
-        pass
+    if cached_titles is None:
+        try:
+            for old in json.loads(DATA_FILE.read_text(encoding="utf-8")).get("news", []):
+                if old.get("title_en") and old.get("title_zh"):
+                    cached[old["title_en"]] = old["title_zh"]
+        except (OSError, ValueError, TypeError):
+            pass
+    cached = {original: translated for original, translated in cached.items()
+              if isinstance(translated, str) and re.search(r"[\u3400-\u9fff]", translated)}
     gate = asyncio.Semaphore(2)
     async def translate(item):
         original = item.get("title_en") or item.get("title", "")
         item["title_en"] = original
+        item.pop("title_zh", None)
+        item["title"] = original
+        if re.search(r"[\u3400-\u9fff]", original):
+            item.update(title_zh=original, translation_status="original")
+            return
         if original in cached:
             item.update(title=cached[original], title_zh=cached[original], translation_status="cached")
             return
@@ -906,6 +914,7 @@ async def _translate_market_questions(session, markets):
     titles = [{"title":m.get("question", "")} for m in markets]
     await _translate_titles(session, titles, cached_titles=cached)
     for market, title in zip(markets, titles):
+        market.pop("question_zh", None)
         if title.get("title_zh"):
             translated = title["title_zh"]
             # Preserve deadline semantics: a "by" date must not become an event on that date.
