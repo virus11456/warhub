@@ -907,7 +907,11 @@ async def _translate_market_questions(session, markets):
     await _translate_titles(session, titles, cached_titles=cached)
     for market, title in zip(markets, titles):
         if title.get("title_zh"):
-            market["question_zh"] = title["title_zh"]
+            translated = title["title_zh"]
+            # Preserve deadline semantics: a "by" date must not become an event on that date.
+            if re.search(r"\bby\s+", market.get("question", ""), re.I):
+                translated = re.sub(r"(\d+\s*月\s*\d+\s*日)(?!前|之前)", r"\1前", translated)
+            market["question_zh"] = re.sub(r"\s+x\s+", "與", translated)
 
 
 async def fetch_gnews(session: aiohttp.ClientSession) -> list[dict]:

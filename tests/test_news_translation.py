@@ -45,3 +45,13 @@ class NewsTranslation(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(items[0]['question_zh'],'繁體中文標題')
         self.assertEqual(items[0]['yes_price'],.14)
         self.assertEqual(items[0]['risk_score'],14)
+
+    async def test_market_deadline_does_not_become_exact_day(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            p=Path(tmp)/'data.json'
+            q='US strike on Cuba by December 31?'
+            p.write_text(json.dumps({'polymarket':[{'question':q,'question_zh':'美國12月31日攻擊古巴？'}]}))
+            items=[{'question':q}]
+            with patch.object(fetch_data,'DATA_FILE',p):
+                await fetch_data._translate_market_questions(Session(),items)
+        self.assertEqual(items[0]['question_zh'],'美國12月31日前攻擊古巴？')
