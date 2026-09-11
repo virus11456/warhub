@@ -91,6 +91,17 @@ class Integrity(unittest.TestCase):
             r=next(iter(s.values()));self.assertEqual(r['seismic'],3);self.assertEqual(r['fin']['risk_off_cluster'],1)
 
 class Sources(unittest.IsolatedAsyncioTestCase):
+    async def test_besttime_http_failure_not_closed(self):
+        class Failed(Response):
+            status=403
+        class BarsSession:
+            def post(self,*args,**kwargs): return Failed({})
+        with patch.dict('os.environ',{'BESTTIME_API_KEY':'test-only'}), patch.object(f,'ZoneInfo',None):
+            result=await f.fetch_bars(BarsSession())
+        self.assertFalse(result['available'])
+        self.assertIn('來源請求',result['reason'])
+        self.assertTrue(all(b['http_status']==403 for b in result['bars']))
+
     async def test_comtrade_coverage_is_per_product(self):
         from unittest.mock import AsyncMock
         with patch.object(f, 'FOOD_EXPORTERS', [('842','US'),('76','Brazil')]), patch.object(f, '_comtrade_month', AsyncMock(side_effect=[{'1201':0},{'1001':1000}])), patch.object(f.asyncio,'sleep',AsyncMock()):

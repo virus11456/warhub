@@ -1801,9 +1801,15 @@ async def fetch_bars(session: aiohttp.ClientSession) -> dict:
                 timeout=aiohttp.ClientTimeout(total=25),
                 headers={"User-Agent": USER_AGENT},
             ) as resp:
+                if resp.status != 200:
+                    return {"name":bar["name"], "live_available":False, "live_busyness":None,
+                            "error":True, "http_status":resp.status}
                 data = await resp.json(content_type=None)
+                if not isinstance(data,dict) or not isinstance(data.get('analysis'),dict):
+                    return {"name":bar["name"], "live_available":False, "live_busyness":None,
+                            "error":True, "failure_type":"invalid_schema"}
             an = data.get("analysis") or {}
-            live_ok = bool(an.get("venue_live_busyness_available"))
+            live_ok = an.get("venue_live_busyness_available") is True
             return {
                 "name": bar["name"],
                 "live_available": live_ok,
@@ -1813,7 +1819,7 @@ async def fetch_bars(session: aiohttp.ClientSession) -> dict:
                 "open": (data.get("venue_info") or {}).get("venue_open"),
             }
         except Exception as e:
-            log.warning(f"BestTime {bar['name']} failed: {e}")
+            log.warning(f"BestTime {bar['name']} failed: {type(e).__name__}")
             return {"name": bar["name"], "live_available": False, "live_busyness": None,
                     "forecasted": None, "delta": None, "open": None, "error": True}
 
@@ -1845,8 +1851,10 @@ async def fetch_bars(session: aiohttp.ClientSession) -> dict:
         log.info(f"Bars: {len(live_bars)}/{len(bars)} open, avg_live={avg_live:.0f}% "
                  f"avg_delta={avg_delta:+.0f}% emptiness={emptiness:.0f} score={overtime_score:.0f}")
     else:
-        result["reason"] = "目前無酒吧即時資料（可能皆未營業）"
+        result["reason"] = "目前無酒吧即時資料；不能推定未營業"
         log.info(f"Bars: no live data ({result.get('reason')})")
+    if not live_bars and any(b.get('error') for b in bars):
+        result['reason']='來源請求或回應失敗；請檢查帳號權限及場地覆蓋'
     return result
 
 
