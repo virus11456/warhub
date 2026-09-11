@@ -1,39 +1,34 @@
 {
-  "updated_at": "2026-09-11T04:08:59.986607+00:00",
+  "updated_at": "2026-09-11T04:55:29.510633+00:00",
   "collection": {
-    "mode": "full",
-    "slow_refresh": true,
-    "history_refresh": false,
+    "mode": "auto",
+    "slow_refresh": false,
+    "history_refresh": true,
     "slow_attempted_at": "2026-09-11T04:04:28.059757+00:00",
-    "history_attempted_at": null,
-    "reused_sources": [],
+    "history_attempted_at": "2026-09-11T04:52:29.674400+00:00",
+    "reused_sources": [
+      "food",
+      "usda",
+      "strat",
+      "fred"
+    ],
     "duration_seconds": {
-      "bars": 0.0,
-      "wikipedia_anxiety": 0.206,
-      "aviation": 0.312,
-      "pizzint": 0.331,
-      "eonet": 0.582,
-      "polymarket": 0.843,
-      "gnews": 1.005,
-      "firms": 1.165,
-      "nuclear_seismic": 1.888,
-      "usda_esr": 2.362,
-      "notams": 39.391,
-      "food_imports": 66.609,
-      "gdelt": 153.162,
-      "food_history": 0.001,
-      "strategic_imports": 113.028,
-      "strategic_history": 0.001,
-      "tw_military_news": 0.47,
-      "pla_sorties": 0.361,
-      "finance": 4.386,
-      "fred": 0.509
-    },
-    "initialization": {
-      "workflow_run": 34560794537,
-      "code_commit": "e4cdb851a6839c22aa139ce359f861511e89a2a2",
-      "notifications_sent": false,
-      "historical_backfill": false
+      "bars": 0.001,
+      "pizzint": 0.126,
+      "wikipedia_anxiety": 0.098,
+      "notams": 0.18,
+      "firms": 0.289,
+      "polymarket": 0.303,
+      "eonet": 0.337,
+      "aviation": 0.405,
+      "gnews": 0.866,
+      "nuclear_seismic": 1.221,
+      "gdelt": 24.941,
+      "food_history": 53.168,
+      "strategic_history": 96.558,
+      "tw_military_news": 0.481,
+      "pla_sorties": 0.397,
+      "finance": 4.281
     }
   },
   "score": {
@@ -41,14 +36,14 @@
     "combined_score": 23.2,
     "alert_level": "LOW",
     "pizza_score": null,
-    "polymarket_score": 21.06715856906939,
+    "polymarket_score": 21.05070839270419,
     "factors": {
-      "p": 21.07,
+      "p": 21.05,
       "a": 0.0,
       "g": null,
       "z": null,
       "f": null,
-      "s": 60.91,
+      "s": 60.43,
       "w": 26.7
     },
     "coverage": 0.66,
@@ -75,7 +70,6 @@
         null,
         null,
         null,
-        null,
         18,
         23,
         29,
@@ -88,13 +82,14 @@
         null,
         null,
         null,
+        null,
         null
       ],
       "is_closed_now": true,
       "place_id": "ChIJS1rpOC-3t4kRsLyM6aftM8k",
       "address": "https://www.google.com/maps/place/We,+The+Pizza/@38.8663614,-77.0588449,15.76z/data=!3m1!5s0x89b7b72f331803b7:0x7edf0a3adffa41c8!4m6!3m5!1s0x89b7b72f38e95a4b:0xc933eda7e98cbcb0!8m2!3d38.8551791!4d-77.049733!16s%2Fg%2F1q62g66vf?entry=ttu&g_ep=EgoyMDI1MDYxNi4wIKXMDSoASAFQAw%3D%3D",
       "data_source": "none",
-      "recorded_at": "2026-09-11T03:53:56.939Z"
+      "recorded_at": "2026-09-11T04:44:53.529Z"
     },
     {
       "name": "Pizzato Pizza",
@@ -106,7 +101,6 @@
       "spike_magnitude": null,
       "percentage_of_usual": null,
       "sparkline": [
-        100,
         0,
         4,
         null,
@@ -129,25 +123,25 @@
         null,
         null,
         null,
+        null,
         null
       ],
       "is_closed_now": false,
       "place_id": "ChIJrbin_Qm3t4kRVSytw_2DM1g",
       "address": "https://www.google.com/maps/place/Pizzato+Pizza/@38.8791607,-77.096414,15.18z/data=!4m6!3m5!1s0x89b7b709fda7b8ad:0x583383fdc3ad2c55!8m2!3d38.8806865!4d-77.089827!16s%2Fg%2F11v5zglw6h?entry=ttu&g_ep=EgoyMDI1MDYxNy4wIKXMDSoASAFQAw%3D%3D",
       "data_source": "none",
-      "recorded_at": "2026-09-11T03:53:56.939Z"
+      "recorded_at": "2026-09-11T04:44:53.529Z"
     },
     {
       "name": "Papa Johns Pizza",
       "busyness": null,
-      "is_open": null,
-      "status": "unavailable",
+      "is_open": false,
+      "status": "closed",
       "baseline": null,
       "spike": false,
       "spike_magnitude": null,
       "percentage_of_usual": null,
       "sparkline": [
-        null,
         null,
         null,
         null,
@@ -170,25 +164,25 @@
         null,
         null,
         null,
+        null,
         null
       ],
-      "is_closed_now": false,
+      "is_closed_now": true,
       "place_id": "ChIJo03BaX-3t4kRbyhPM0rTuqM",
       "address": "https://www.google.com/maps/place/Papa+Johns+Pizza/@38.8292633,-77.1901741,11.83z/data=!4m6!3m5!1s0x89b7b77f69c14da3:0xa3bad34a334f286f!8m2!3d38.8606821!4d-77.0922272!16s%2Fg%2F11t104lmtl?entry=ttu&g_ep=EgoyMDI1MDYxNy4wIKXMDSoASAFQAw%3D%3D",
       "data_source": "none",
-      "recorded_at": "2026-09-11T03:53:56.939Z"
+      "recorded_at": "2026-09-11T04:44:53.529Z"
     },
     {
       "name": "Domino's Pizza (Pentagon Closest)",
       "busyness": null,
-      "is_open": null,
-      "status": "unavailable",
+      "is_open": false,
+      "status": "closed",
       "baseline": null,
       "spike": false,
       "spike_magnitude": null,
       "percentage_of_usual": null,
       "sparkline": [
-        null,
         null,
         null,
         null,
@@ -211,13 +205,14 @@
         null,
         null,
         null,
+        null,
         null
       ],
-      "is_closed_now": false,
+      "is_closed_now": true,
       "place_id": "ChIJI6ACK7q2t4kRFcPtFhUuYhU",
       "address": "https://www.google.com/maps/place/Domino's+Pizza/@38.8627308,-77.0879692,17z/data=!3m1!4b1!4m6!3m5!1s0x89b7b6ba2b02a023:0x15622e1516edc315!8m2!3d38.8627267!4d-77.0853943!16s%2Fg%2F1wbryp46?entry=ttu&g_ep=EgoyMDI1MDYxNi4wIKXMDSoASAFQAw%3D%3D",
       "data_source": "none",
-      "recorded_at": "2026-09-11T03:53:56.939Z"
+      "recorded_at": "2026-09-11T04:44:53.529Z"
     },
     {
       "name": "Extreme Pizza",
@@ -240,7 +235,6 @@
         null,
         null,
         null,
-        null,
         28,
         34,
         42,
@@ -252,25 +246,25 @@
         null,
         null,
         null,
+        null,
         null
       ],
       "is_closed_now": true,
       "place_id": "ChIJcYireCe3t4kR4d9trEbGYjc",
       "address": "https://www.google.com/maps/place/Extreme+Pizza/@38.8602396,-77.0585603,17z/data=!3m1!4b1!4m6!3m5!1s0x89b7b72778ab8871:0x3762c646ac6ddfe1!8m2!3d38.8602396!4d-77.0559854!16s%2Fg%2F12llsn19l?entry=ttu&g_ep=EgoyMDI1MDYxNi4wIKXMDSoASAFQAw%3D%3D",
       "data_source": "none",
-      "recorded_at": "2026-09-11T03:53:56.939Z"
+      "recorded_at": "2026-09-11T04:44:53.529Z"
     },
     {
       "name": "District Pizza Palace",
       "busyness": null,
-      "is_open": null,
-      "status": "unavailable",
+      "is_open": false,
+      "status": "closed",
       "baseline": null,
       "spike": false,
       "spike_magnitude": null,
       "percentage_of_usual": null,
       "sparkline": [
-        null,
         null,
         null,
         null,
@@ -293,13 +287,14 @@
         null,
         null,
         null,
+        null,
         null
       ],
-      "is_closed_now": false,
+      "is_closed_now": true,
       "place_id": "ChIJ42QeLXu3t4kRnArvcaz2o3A",
       "address": "https://www.google.com/maps/place/District+Pizza+Palace/@38.8527414,-77.0557157,17z/data=!3m1!4b1!4m6!3m5!1s0x89b7b77b2d1e64e3:0x70a3f6ac71ef0a9c!8m2!3d38.8527414!4d-77.0531408!16s%2Fg%2F11vc1fb80v?entry=ttu&g_ep=EgoyMDI1MDYxNi4wIKXMDSoASAFQAw%3D%3D",
       "data_source": "none",
-      "recorded_at": "2026-09-11T03:53:56.939Z"
+      "recorded_at": "2026-09-11T04:44:53.529Z"
     },
     {
       "name": "Nighthawk Brewery & Pizza",
@@ -316,15 +311,15 @@
   "pizza_events": [],
   "defcon_level": 5,
   "defcon_details": {
-    "at_time": "2026-09-11T03:00:00.000Z",
-    "defcon_severity_decimal": 0.0404,
+    "at_time": "2026-09-11T04:00:00.000Z",
+    "defcon_severity_decimal": 0.0262,
     "raw_index": 0,
-    "smoothed_index": 4.04,
+    "smoothed_index": 2.62,
     "open_places": 0,
     "total_places": 6,
     "intensity_score": 0,
     "breadth_score": 0,
-    "night_multiplier": 1.14,
+    "night_multiplier": 1.22,
     "persistence_factor": 1,
     "places_above_150": 0,
     "places_above_200": 0,
@@ -342,7 +337,7 @@
       "question": "Will the U.S. invade Iran before 2027?",
       "yes_price": 0.165,
       "no_price": 0.835,
-      "volume": 65406789.106753066,
+      "volume": 65407217.16149397,
       "category": "geopolitics",
       "slug": "will-the-us-invade-iran-before-2027",
       "end_date": "2027-01-01T04:59:00Z",
@@ -353,7 +348,7 @@
       "question": "Israel x Iran ceasefire continues through September 30?",
       "yes_price": 0.845,
       "no_price": 0.155,
-      "volume": 1824125.6167000008,
+      "volume": 1825375.6167000008,
       "category": "geopolitics",
       "slug": "israel-x-iran-ceasefire-continues-through-september-30",
       "end_date": "2026-09-30T20:29:00Z",
@@ -364,18 +359,29 @@
       "question": "Israel x Iran ceasefire continues through November 30?",
       "yes_price": 0.635,
       "no_price": 0.365,
-      "volume": 199142.67342399995,
+      "volume": 199142.67342399998,
       "category": "geopolitics",
       "slug": "israel-x-iran-ceasefire-continues-through-november-30",
       "end_date": "2026-11-30T20:29:00Z",
       "risk_score": 36.5
     },
     {
+      "id": "0x3a3becf905da80c4f5a7d886514120d52febd9635bf13522924888cd9da803f3",
+      "question": "Israel x Iran ceasefire continues through September 15?",
+      "yes_price": 0.935,
+      "no_price": 0.065,
+      "volume": 41396.77946999999,
+      "category": "geopolitics",
+      "slug": "israel-x-iran-ceasefire-continues-through-september-15",
+      "end_date": "2026-09-30T20:29:00Z",
+      "risk_score": 6.5
+    },
+    {
       "id": "0x5759fb62768738cda38232974fa399fd8bfbbe6c04d891a2c4cdb71731f8f692",
       "question": "Will the US strike 9 countries in 2026?",
       "yes_price": 0.2925,
       "no_price": 0.7075,
-      "volume": 105494.79302700002,
+      "volume": 105494.793027,
       "category": "geopolitics",
       "slug": "will-the-us-strike-9-countries-in-2026",
       "end_date": "2027-01-01T04:59:00Z",
@@ -384,53 +390,53 @@
     {
       "id": "0x1c4c6a698f0591ddf0c96e1beb56f8c75112ef849331bf3b0388f14830a7421d",
       "question": "Israel x Iran ceasefire continues through December 31?",
-      "yes_price": 0.585,
-      "no_price": 0.415,
-      "volume": 505524.24297500006,
+      "yes_price": 0.58,
+      "no_price": 0.42,
+      "volume": 505876.172975,
       "category": "geopolitics",
       "slug": "israel-x-iran-ceasefire-continues-through-december-31-415",
       "end_date": "2026-12-31T20:29:00Z",
-      "risk_score": 41.5
+      "risk_score": 42.0
     },
     {
       "id": "0xe6d5e5da83874cd82c9b651a8a5d4fc541a800a295fb62e85124b4f5a04a4b7d",
       "question": "Will China invade Taiwan by December 31, 2027?",
       "yes_price": 0.115,
       "no_price": 0.885,
-      "volume": 3146943.4966599997,
+      "volume": 3146943.4966600006,
       "category": "geopolitics",
       "slug": "will-china-invade-taiwan-by-december-31-2027",
       "end_date": "2028-01-01T04:59:00Z",
       "risk_score": 11.5
     },
     {
-      "id": "0x3a3becf905da80c4f5a7d886514120d52febd9635bf13522924888cd9da803f3",
-      "question": "Israel x Iran ceasefire continues through September 15?",
-      "yes_price": 0.915,
-      "no_price": 0.085,
-      "volume": 32612.115382999997,
-      "category": "geopolitics",
-      "slug": "israel-x-iran-ceasefire-continues-through-september-15",
-      "end_date": "2026-09-30T20:29:00Z",
-      "risk_score": 8.5
-    },
-    {
       "id": "0x36fd215387f80bb2ff1c059436f52394a5accababc77dea98d4ba3b6770c884e",
       "question": "US x Iran Effective Ceasefire by September 11?",
       "yes_price": 0.675,
       "no_price": 0.325,
-      "volume": 101925.36790900004,
+      "volume": 101925.36790900005,
       "category": "geopolitics",
       "slug": "us-x-iran-effective-ceasefire-by-september-11",
       "end_date": "2026-09-11T23:59:00Z",
       "risk_score": 32.5
     },
     {
+      "id": "0x6c3f1009a0c91ba9f7aae44aeadf86863b0d433b60f7a090fd00c945019aa32f",
+      "question": "Russia x Ukraine ceasefire agreement by October 31, 2026?",
+      "yes_price": 0.085,
+      "no_price": 0.915,
+      "volume": 1614417.63309,
+      "category": "geopolitics",
+      "slug": "russia-x-ukraine-ceasefire-agreement-by-october-31-2026",
+      "end_date": "2026-11-01T03:59:00Z",
+      "risk_score": 91.5
+    },
+    {
       "id": "0x88c6800dd5cebb3ccbc554b93493a678f74d39b1b29f637f234576a8993c10df",
       "question": "US x Iran Effective Ceasefire by September 30?",
       "yes_price": 0.755,
       "no_price": 0.245,
-      "volume": 186581.81868899998,
+      "volume": 186581.81868900004,
       "category": "geopolitics",
       "slug": "us-x-iran-effective-ceasefire-by-september-30",
       "end_date": "2026-09-30T23:59:00Z",
@@ -439,20 +445,20 @@
     {
       "id": "0x2167ab5c0d163f85195ccea4d11734e4ba53913c838c6720fb815794128c68f2",
       "question": "China x Philippines military clash before 2027?",
-      "yes_price": 0.285,
-      "no_price": 0.715,
+      "yes_price": 0.275,
+      "no_price": 0.725,
       "volume": 464703.836909,
       "category": "geopolitics",
       "slug": "china-x-philippines-military-clash-before-2027-20260723214807932",
       "end_date": "2027-01-01T04:59:00Z",
-      "risk_score": 28.5
+      "risk_score": 27.5
     },
     {
       "id": "0xc3d5708780de5528998aeb53ca90e7ade64804f9f2386392a681435d5c42b44d",
       "question": "Israel x Iran ceasefire continues through October 31?",
       "yes_price": 0.735,
       "no_price": 0.265,
-      "volume": 525538.2607699999,
+      "volume": 527600.112622,
       "category": "geopolitics",
       "slug": "israel-x-iran-ceasefire-continues-through-october-31",
       "end_date": "2026-10-31T20:29:00Z",
@@ -461,20 +467,20 @@
     {
       "id": "0x5ca616aaa0e1e5df6c38439f8bee4b96bacfe32f8f39cb2f1604c0196548662f",
       "question": "Will China invade Taiwan by September 30, 2026?",
-      "yes_price": 0.0035,
-      "no_price": 0.9965,
-      "volume": 2113540.3390490003,
+      "yes_price": 0.0045,
+      "no_price": 0.9955,
+      "volume": 2113627.339049,
       "category": "geopolitics",
       "slug": "will-china-invade-taiwan-by-september-30-2026",
       "end_date": "2026-10-01T03:59:00Z",
-      "risk_score": 0.35
+      "risk_score": 0.45
     },
     {
       "id": "0x4c80df6f557bb0b9de08c0301ebdce500dd9bdc58400d9269fb8fab1709ed584",
       "question": "China x Taiwan military clash before 2027?",
       "yes_price": 0.067,
       "no_price": 0.933,
-      "volume": 3342344.5683830013,
+      "volume": 3342344.5683830003,
       "category": "geopolitics",
       "slug": "china-x-taiwan-military-clash-before-2027",
       "end_date": "2027-01-01T04:59:00Z",
@@ -483,20 +489,20 @@
     {
       "id": "0x601b72cf13b40689481896f58e9cfeb26e0c39353235edb55d2370311b9d60ac",
       "question": "US x Iran Effective Ceasefire by September 18?",
-      "yes_price": 0.705,
-      "no_price": 0.295,
-      "volume": 58143.826503,
+      "yes_price": 0.71,
+      "no_price": 0.29,
+      "volume": 58211.826503000004,
       "category": "geopolitics",
       "slug": "us-x-iran-effective-ceasefire-by-september-18",
       "end_date": "2026-09-18T23:59:00Z",
-      "risk_score": 29.5
+      "risk_score": 29.0
     },
     {
       "id": "0x84c625fdccf5c5246a15e476361e4563033906ee225800e1136c0d737596a72f",
       "question": "Russia x Ukraine ceasefire by December 31, 2026?",
       "yes_price": 0.135,
       "no_price": 0.865,
-      "volume": 844481.1120830002,
+      "volume": 844481.112083,
       "category": "geopolitics",
       "slug": "russia-x-ukraine-ceasefire-by-december-31-2026",
       "end_date": "2026-12-31T21:59:00Z",
@@ -507,7 +513,7 @@
       "question": "US strike on Cuba by December 31?",
       "yes_price": 0.135,
       "no_price": 0.865,
-      "volume": 5216148.01312,
+      "volume": 5216179.253120001,
       "category": "geopolitics",
       "slug": "us-strike-on-cuba-by-december-31",
       "end_date": "2027-01-01T04:59:00Z",
@@ -518,7 +524,7 @@
       "question": "Russia x Ukraine ceasefire by October 31, 2026?",
       "yes_price": 0.055,
       "no_price": 0.945,
-      "volume": 677024.4358380002,
+      "volume": 677024.4358380003,
       "category": "geopolitics",
       "slug": "russia-x-ukraine-ceasefire-by-october-31-2026",
       "end_date": "2026-10-31T21:59:00Z",
@@ -549,42 +555,31 @@
     {
       "id": "0x917b070cd100acb5e6f4bafbf36f35af5ac047390b2916d05d836adf97a9f293",
       "question": "Will there be Saudi Arabian military action against Yemen by September 15, 2026?",
-      "yes_price": 0.81,
-      "no_price": 0.19,
-      "volume": 20540.518406,
+      "yes_price": 0.815,
+      "no_price": 0.185,
+      "volume": 20548.753936,
       "category": "geopolitics",
       "slug": "will-there-be-saudi-arabian-military-action-against-yemen-by-september-15-2026",
       "end_date": "2026-09-15T20:59:00Z",
-      "risk_score": 81.0
+      "risk_score": 81.5
     },
     {
       "id": "0x4167e22670f31e5f93d132f78108f3fae809bd15cadf78983eff096845ed1415",
       "question": "Ukraine signs peace deal with Russia before 2027?",
       "yes_price": 0.105,
       "no_price": 0.895,
-      "volume": 2716326.025697999,
+      "volume": 2716326.0256980006,
       "category": "geopolitics",
       "slug": "ukraine-signs-peace-deal-with-russia-before-2027",
       "end_date": "2027-01-01T04:59:00Z",
       "risk_score": 89.5
     },
     {
-      "id": "0x6c3f1009a0c91ba9f7aae44aeadf86863b0d433b60f7a090fd00c945019aa32f",
-      "question": "Russia x Ukraine ceasefire agreement by October 31, 2026?",
-      "yes_price": 0.095,
-      "no_price": 0.905,
-      "volume": 1597936.4730899984,
-      "category": "geopolitics",
-      "slug": "russia-x-ukraine-ceasefire-agreement-by-october-31-2026",
-      "end_date": "2026-11-01T03:59:00Z",
-      "risk_score": 90.5
-    },
-    {
       "id": "0xa466e17524bcc473279c4ca86f4f1fb01932946a8204e68f6ca96628f8bf2b5e",
       "question": "China x Japan military clash before 2027?",
       "yes_price": 0.065,
       "no_price": 0.935,
-      "volume": 1339254.9934239995,
+      "volume": 1339254.9934240002,
       "category": "geopolitics",
       "slug": "china-x-japan-military-clash-before-2027",
       "end_date": "2027-01-01T04:59:00Z",
@@ -595,7 +590,7 @@
       "question": "Will Russia invade another country in 2026?",
       "yes_price": 0.065,
       "no_price": 0.935,
-      "volume": 460612.92667600024,
+      "volume": 460612.92667599994,
       "category": "geopolitics",
       "slug": "will-russia-invade-another-country-in-2026",
       "end_date": "2027-01-01T04:59:00Z",
@@ -617,7 +612,7 @@
       "question": "NATO x Russia military clash by December 31, 2026?",
       "yes_price": 0.215,
       "no_price": 0.785,
-      "volume": 1821849.8858290007,
+      "volume": 1821862.544057,
       "category": "geopolitics",
       "slug": "nato-x-russia-military-clash-by-december-31-2026-244-538-582",
       "end_date": "2027-01-01T04:59:00Z",
@@ -628,7 +623,7 @@
       "question": "Will China invade Taiwan by June 30, 2027?",
       "yes_price": 0.075,
       "no_price": 0.925,
-      "volume": 442678.486291,
+      "volume": 442678.4862910001,
       "category": "geopolitics",
       "slug": "will-china-invade-taiwan-by-june-30-2027",
       "end_date": "2027-07-01T03:59:00Z",
@@ -639,62 +634,62 @@
       "question": "Pakistan military action against Yemen by October 31, 2026?",
       "yes_price": 0.1,
       "no_price": 0.9,
-      "volume": 1276.339018,
+      "volume": 1315.319018,
       "category": "geopolitics",
       "slug": "pakistan-military-action-against-yemen-by-october-31-2026-20260909",
       "end_date": "2026-10-31T20:59:00Z",
       "risk_score": 10.0
     },
     {
-      "id": "0x5554affca1eb02e9f0f18f4100a71b4bd71c7f2627ec48e7753319806fce0ae9",
-      "question": "Iran blockade lifted before Xi visits US?",
-      "yes_price": 0.065,
-      "no_price": 0.935,
-      "volume": 1429.1678979999997,
-      "category": "geopolitics",
-      "slug": "iran-blockade-lifted-before-xi-visits-us",
-      "end_date": "2026-12-31T23:59:00Z",
-      "risk_score": 6.5
-    },
-    {
       "id": "0x2d4f0c95e41efde8159dbc8e44a4d6d0e9caebcf835ce98094924f4b1bc5f968",
       "question": "Israel x Lebanon Effective Ceasefire by September 11?",
-      "yes_price": 0.0255,
-      "no_price": 0.9745,
-      "volume": 2992.3011889999993,
+      "yes_price": 0.023,
+      "no_price": 0.977,
+      "volume": 2992.301189,
       "category": "geopolitics",
       "slug": "israel-x-lebanon-effective-ceasefire-by-september-11",
       "end_date": "2026-09-11T23:59:00Z",
-      "risk_score": 97.45
+      "risk_score": 97.7
+    },
+    {
+      "id": "0x5554affca1eb02e9f0f18f4100a71b4bd71c7f2627ec48e7753319806fce0ae9",
+      "question": "Iran blockade lifted before Xi visits US?",
+      "yes_price": 0.075,
+      "no_price": 0.925,
+      "volume": 1429.167898,
+      "category": "geopolitics",
+      "slug": "iran-blockade-lifted-before-xi-visits-us",
+      "end_date": "2026-12-31T23:59:00Z",
+      "risk_score": 7.5
+    },
+    {
+      "id": "0xa84fb47f9c33fd7e05571361bc472e164fc32b9a461397ece5125702922f1058",
+      "question": "Pakistan military action against Yemen by September 30, 2026?",
+      "yes_price": 0.322,
+      "no_price": 0.678,
+      "volume": 1014.7227570000001,
+      "category": "geopolitics",
+      "slug": "pakistan-military-action-against-yemen-by-september-30-2026-20260909",
+      "end_date": "2026-09-30T20:59:00Z",
+      "risk_score": 32.2
     },
     {
       "id": "0x96498c10c79ecaafa2bbb92ada36c7ff617913b03d9220f8c95ce7d6776a0b0c",
       "question": "Will China blockade Taiwan in 2026?",
       "yes_price": 0.0485,
       "no_price": 0.9515,
-      "volume": 351370.25251799996,
+      "volume": 351370.25251799985,
       "category": "geopolitics",
       "slug": "will-china-blockade-taiwan-by-in-2026",
       "end_date": "2027-01-01T04:59:00Z",
       "risk_score": 4.85
     },
     {
-      "id": "0xa84fb47f9c33fd7e05571361bc472e164fc32b9a461397ece5125702922f1058",
-      "question": "Pakistan military action against Yemen by September 30, 2026?",
-      "yes_price": 0.0725,
-      "no_price": 0.9275,
-      "volume": 990.6495310000001,
-      "category": "geopolitics",
-      "slug": "pakistan-military-action-against-yemen-by-september-30-2026-20260909",
-      "end_date": "2026-09-30T20:59:00Z",
-      "risk_score": 7.25
-    },
-    {
       "id": "0x1015d806e33eebde7edb0762f1197051575f6286b5f06261d8e4ff4d34c90697",
       "question": "Will the U.S. invade Mexico in 2026?",
       "yes_price": 0.014,
       "no_price": 0.986,
-      "volume": 253846.07504200007,
+      "volume": 253846.07504199998,
       "category": "geopolitics",
       "slug": "will-the-us-invade-mexico-in-2026",
       "end_date": "2027-01-01T04:59:00Z",
@@ -703,20 +698,20 @@
     {
       "id": "0x2349e6f85eaf78e840acb16ca11723bdbb51d070b8ea6439f1d05f95574ac45d",
       "question": "Israel military action against Greater Beirut by September 30?",
-      "yes_price": 0.125,
-      "no_price": 0.875,
-      "volume": 20483.153196999996,
+      "yes_price": 0.09,
+      "no_price": 0.91,
+      "volume": 20483.153196999992,
       "category": "geopolitics",
       "slug": "israel-military-action-against-greater-beirut-by-september-30",
       "end_date": "2026-09-30T20:59:00Z",
-      "risk_score": 12.5
+      "risk_score": 9.0
     },
     {
       "id": "0x0ce9d09caf450b46d3c942a3fb5ca2e68b165988583a3f7a3831a201d312e411",
       "question": "Israel military action against Syria by September 30, 2026?",
       "yes_price": 0.165,
       "no_price": 0.835,
-      "volume": 6314.533766999998,
+      "volume": 6314.533766999999,
       "category": "geopolitics",
       "slug": "israel-military-action-against-syria-by-september-30-2026-21",
       "end_date": "2026-09-30T20:59:00Z",
@@ -727,7 +722,7 @@
       "question": "Iran blockade lifted before Iran-Oman Hormuz agreement?",
       "yes_price": 0.235,
       "no_price": 0.765,
-      "volume": 7142.982225,
+      "volume": 7142.982225000001,
       "category": "geopolitics",
       "slug": "iran-blockade-lifted-before-iran-oman-hormuz-agreement",
       "end_date": "2026-12-31T23:59:00Z",
@@ -738,7 +733,7 @@
       "question": "Israel x Lebanon Effective Ceasefire by September 18?",
       "yes_price": 0.055,
       "no_price": 0.945,
-      "volume": 2472.722083,
+      "volume": 2472.7220829999997,
       "category": "geopolitics",
       "slug": "israel-x-lebanon-effective-ceasefire-by-september-18",
       "end_date": "2026-09-18T23:59:00Z",
@@ -749,7 +744,7 @@
       "question": "Israel military action against Yemen by September 30?",
       "yes_price": 0.072,
       "no_price": 0.928,
-      "volume": 1642.8191479999998,
+      "volume": 1659.913166,
       "category": "geopolitics",
       "slug": "israel-military-action-against-yemen-by-september-30",
       "end_date": "2026-09-30T20:59:00Z",
@@ -760,7 +755,7 @@
       "question": "Will the US officially declare war on Iran by December 31, 2026?",
       "yes_price": 0.0225,
       "no_price": 0.9775,
-      "volume": 843032.0615109997,
+      "volume": 843032.0615109996,
       "category": "geopolitics",
       "slug": "will-the-us-officially-declare-war-on-iran-by-december-31-2026-746",
       "end_date": "2027-01-01T04:59:00Z",
@@ -769,13 +764,13 @@
     {
       "id": "0xb7ca42c3a0324b32cad3e64b29cc372d5e941a41f7f23f787806439854be9021",
       "question": "Will India strike Pakistan by December 31, 2026?",
-      "yes_price": 0.105,
-      "no_price": 0.895,
-      "volume": 328152.32696499984,
+      "yes_price": 0.115,
+      "no_price": 0.885,
+      "volume": 328152.326965,
       "category": "geopolitics",
       "slug": "will-india-strike-pakistan-by-december-31-2026",
       "end_date": "2027-01-01T04:59:00Z",
-      "risk_score": 10.5
+      "risk_score": 11.5
     },
     {
       "id": "0xae554f30b7ba3de62193b969264d817329c44111cbb0364042a091e229b24d66",
@@ -793,18 +788,29 @@
       "question": "Will the US strike 8 countries in 2026?",
       "yes_price": 0.6565,
       "no_price": 0.3435,
-      "volume": 319733.129516,
+      "volume": 319733.1295160001,
       "category": "geopolitics",
       "slug": "will-the-us-strike-8-countries-in-2026",
       "end_date": "2027-01-01T04:59:00Z",
       "risk_score": 65.65
     },
     {
+      "id": "0x765e5daae966128da2acac8edab65d23abcabcf8958563a490d24c3498812c85",
+      "question": "Iran nuclear test before 2027?",
+      "yes_price": 0.054,
+      "no_price": 0.946,
+      "volume": 257824.93586000003,
+      "category": "geopolitics",
+      "slug": "iran-nuclear-test-before-2027",
+      "end_date": "2027-01-01T04:59:00Z",
+      "risk_score": 5.4
+    },
+    {
       "id": "0x3e365cd4a3ed1b8486bf270c69791a070886fd4398d9d4dccc055817aa8efbe8",
       "question": "Ukraine signs peace deal with Russia by October 31?",
       "yes_price": 0.0345,
       "no_price": 0.9655,
-      "volume": 11062.913400000005,
+      "volume": 11062.913399999998,
       "category": "geopolitics",
       "slug": "ukraine-signs-peace-deal-with-russia-by-october-31",
       "end_date": "2026-11-01T03:59:00Z",
@@ -826,7 +832,7 @@
       "question": "Will the U.S. invade Cuba in 2026?",
       "yes_price": 0.065,
       "no_price": 0.935,
-      "volume": 3292857.2374400008,
+      "volume": 3292857.237440002,
       "category": "geopolitics",
       "slug": "will-the-us-invade-cuba-in-2026",
       "end_date": "2027-01-01T04:59:00Z",
@@ -837,7 +843,7 @@
       "question": "NATO x Russia military clash by October 31, 2026?",
       "yes_price": 0.075,
       "no_price": 0.925,
-      "volume": 436964.1930020001,
+      "volume": 436964.193002,
       "category": "geopolitics",
       "slug": "nato-x-russia-military-clash-by-october-31-2026",
       "end_date": "2026-11-01T03:59:00Z",
@@ -848,56 +854,34 @@
       "question": "Ukraine strikes another tanker in the Caspian Sea by September 30, 2026?",
       "yes_price": 0.125,
       "no_price": 0.875,
-      "volume": 1487.4357170000003,
+      "volume": 1487.435717,
       "category": "geopolitics",
       "slug": "ukraine-strikes-another-tanker-in-the-caspian-sea-by-september-30-2026",
       "end_date": "2026-09-30T20:59:00Z",
       "risk_score": 12.5
-    },
-    {
-      "id": "0x849e6c0abbb37a1d95608c5483cc55b7c03578bb345750981e24724cd3c3de11",
-      "question": "Israel military action against Lebanon on September 11?",
-      "yes_price": 0.735,
-      "no_price": 0.265,
-      "volume": 8992.718024000002,
-      "category": "geopolitics",
-      "slug": "israel-military-action-against-lebanon-on-september-11-20260903",
-      "end_date": "2026-09-11T23:59:00Z",
-      "risk_score": 73.5
-    },
-    {
-      "id": "0x08f1d018dc73d4df073a64f7184ab77aff8a977c076e28383a65394668a39be9",
-      "question": "Russia x Ukraine ceasefire agreement by September 30, 2027?",
-      "yes_price": 0.635,
-      "no_price": 0.365,
-      "volume": 674.577837,
-      "category": "geopolitics",
-      "slug": "russia-x-ukraine-ceasefire-agreement-by-september-30-2027",
-      "end_date": "2027-10-01T03:59:00Z",
-      "risk_score": 36.5
     }
   ],
   "finance": {
     "GC=F": {
-      "price": 4345.3,
-      "chg": -1.6,
-      "ma30": 4376.4833,
-      "dev": -0.7,
-      "observed_at": "2026-09-11T03:58:51+00:00"
+      "price": 4371.5,
+      "chg": 0.16,
+      "ma30": 4387.4767,
+      "dev": -0.4,
+      "observed_at": "2026-09-11T04:45:17+00:00"
     },
     "BZ=F": {
-      "price": 108.51,
-      "chg": 7.21,
-      "ma30": 90.023,
-      "dev": 20.5,
-      "observed_at": "2026-09-11T03:58:38+00:00"
+      "price": 107.92,
+      "chg": 0.27,
+      "ma30": 90.586,
+      "dev": 19.1,
+      "observed_at": "2026-09-11T04:45:01+00:00"
     },
     "USDCHF=X": {
-      "price": 0.8134,
-      "chg": 0.42,
+      "price": 0.8133,
+      "chg": 0.41,
       "ma30": 0.808,
       "dev": 0.7,
-      "observed_at": "2026-09-11T04:08:54+00:00"
+      "observed_at": "2026-09-11T04:55:25+00:00"
     },
     "^VIX": {
       "price": 17.84,
@@ -907,11 +891,11 @@
       "observed_at": "2026-09-10T20:15:01+00:00"
     },
     "ZW=F": {
-      "price": 736.5,
-      "chg": 3.55,
-      "ma30": 685.9083,
-      "dev": 7.4,
-      "observed_at": "2026-09-11T03:56:06+00:00"
+      "price": 734.75,
+      "chg": 1.59,
+      "ma30": 687.9917,
+      "dev": 6.8,
+      "observed_at": "2026-09-11T04:45:16+00:00"
     },
     "LMT": {
       "price": 530.12,
@@ -969,68 +953,46 @@
   },
   "aviation": {
     "summary": {
-      "tankers": 9,
+      "tankers": 6,
       "awacs": 0,
-      "uav": 0,
-      "transport": 33,
+      "uav": 1,
+      "transport": 37,
       "fighter": 0,
-      "c4isr": 4,
-      "total": 197,
+      "c4isr": 5,
+      "total": 199,
       "anomaly_pct": -0.8,
-      "baseline_7d": 198.7
+      "baseline_7d": 200.7
     },
     "aircraft": [
       {
-        "icao24": "7CF864",
-        "callsign": "ASY716",
-        "type": "A332",
-        "type_code": "A332",
-        "role": "tanker",
-        "alt_ft": 19025,
-        "lat": -34.112595,
-        "lon": 138.626862,
-        "region": "南太平洋"
-      },
-      {
-        "icao24": "7CF9C8",
-        "callsign": "THUM",
-        "type": "A332",
-        "type_code": "A332",
-        "role": "tanker",
-        "alt_ft": 20025,
-        "lat": -24.844045,
-        "lon": 151.86448,
-        "region": "南太平洋"
-      },
-      {
-        "icao24": "AE04E7",
-        "callsign": "—",
-        "type": "KC-135R",
-        "type_code": "K35R",
-        "role": "tanker",
-        "alt_ft": 1275,
-        "lat": 37.640159,
-        "lon": -97.264103,
+        "icao24": "AE4DDF",
+        "callsign": "TROY703",
+        "type": "MQ-9 Reaper",
+        "type_code": "Q9",
+        "role": "uav",
+        "alt_ft": 21000,
+        "lat": 31.105879,
+        "lon": -101.355963,
         "region": "北美"
       },
       {
-        "icao24": "7CF9C9",
-        "callsign": "—",
-        "type": "A332",
-        "type_code": "A332",
+        "icao24": "AE025C",
+        "callsign": "NITRO71",
+        "type": "KC-135R",
+        "type_code": "K35R",
         "role": "tanker",
-        "alt_ft": 20500,
+        "alt_ft": 6100,
         "lat": null,
         "lon": null,
         "region": "未知"
       },
       {
-        "icao24": "AE0425",
-        "callsign": "—",
+        "icao24": "AE0654",
+        "callsign": "PISTN63",
         "type": "KC-135R",
         "type_code": "K35R",
         "role": "tanker",
-        "alt_ft": 2325,
+        "alt_ft": 33000,
         "lat": null,
         "lon": null,
         "region": "未知"
@@ -1041,13 +1003,35 @@
         "type": "KC-135R",
         "type_code": "K35R",
         "role": "tanker",
-        "alt_ft": 17200,
-        "lat": null,
-        "lon": null,
-        "region": "未知"
+        "alt_ft": 1550,
+        "lat": 33.845115,
+        "lon": -117.234209,
+        "region": "北美"
       },
       {
-        "icao24": "AE0654",
+        "icao24": "ADFF10",
+        "callsign": "—",
+        "type": "KC-135R",
+        "type_code": "K35R",
+        "role": "tanker",
+        "alt_ft": 1300,
+        "lat": 37.608343,
+        "lon": -97.270262,
+        "region": "北美"
+      },
+      {
+        "icao24": "AE04E7",
+        "callsign": "—",
+        "type": "KC-135R",
+        "type_code": "K35R",
+        "role": "tanker",
+        "alt_ft": 3950,
+        "lat": 37.708379,
+        "lon": -97.11385,
+        "region": "北美"
+      },
+      {
+        "icao24": "AE04FE",
         "callsign": "—",
         "type": "KC-135R",
         "type_code": "K35R",
@@ -1058,48 +1042,26 @@
         "region": "未知"
       },
       {
-        "icao24": "AE025C",
-        "callsign": "—",
-        "type": "KC-135R",
-        "type_code": "K35R",
-        "role": "tanker",
-        "alt_ft": 21025,
-        "lat": null,
-        "lon": null,
-        "region": "未知"
-      },
-      {
-        "icao24": "AE04F7",
-        "callsign": "—",
-        "type": "KC-135R",
-        "type_code": "K35R",
-        "role": "tanker",
-        "alt_ft": 23000,
-        "lat": null,
-        "lon": null,
-        "region": "未知"
-      },
-      {
-        "icao24": "7CF9D4",
-        "callsign": "BLKT45",
+        "icao24": "7CF9CE",
+        "callsign": "ASY203",
         "type": "P-8 Poseidon",
         "type_code": "P8",
         "role": "c4isr",
-        "alt_ft": -125,
-        "lat": -34.768051,
-        "lon": 138.159142,
+        "alt_ft": 31000,
+        "lat": -12.019788,
+        "lon": 130.823846,
         "region": "南太平洋"
       },
       {
-        "icao24": "AE687B",
-        "callsign": "—",
+        "icao24": "AE6817",
+        "callsign": "PH336",
         "type": "P-8 Poseidon",
         "type_code": "P8",
         "role": "c4isr",
-        "alt_ft": 4600,
-        "lat": 47.667969,
-        "lon": -117.473461,
-        "region": "北美"
+        "alt_ft": 0,
+        "lat": -31.938257,
+        "lon": 115.972577,
+        "region": "南太平洋"
       },
       {
         "icao24": "AE67C3",
@@ -1107,13 +1069,13 @@
         "type": "P-8 Poseidon",
         "type_code": "P8",
         "role": "c4isr",
-        "alt_ft": 30000,
-        "lat": -27.994095,
-        "lon": 119.767187,
+        "alt_ft": 18050,
+        "lat": -31.622563,
+        "lon": 116.161963,
         "region": "南太平洋"
       },
       {
-        "icao24": "AE678D",
+        "icao24": "AE68A4",
         "callsign": "—",
         "type": "P-8 Poseidon",
         "type_code": "P8",
@@ -1124,26 +1086,26 @@
         "region": "未知"
       },
       {
-        "icao24": "8016E8",
-        "callsign": "116",
-        "type": "C295",
-        "type_code": "C295",
-        "role": "transport",
-        "alt_ft": 8100,
-        "lat": 27.048706,
-        "lon": 77.907732,
-        "region": "27.0,77.9"
+        "icao24": "AE687B",
+        "callsign": "—",
+        "type": "P-8 Poseidon",
+        "type_code": "P8",
+        "role": "c4isr",
+        "alt_ft": 20000,
+        "lat": null,
+        "lon": null,
+        "region": "未知"
       },
       {
-        "icao24": "7CF83B",
-        "callsign": "ASY742",
-        "type": "C-130J",
-        "type_code": "C30J",
+        "icao24": "AE1179",
+        "callsign": "BANNR79",
+        "type": "C-17 Globemaster III",
+        "type_code": "C17",
         "role": "transport",
-        "alt_ft": 6525,
-        "lat": -33.394574,
-        "lon": 150.739765,
-        "region": "南太平洋"
+        "alt_ft": 33500,
+        "lat": 33.492101,
+        "lon": -94.251653,
+        "region": "北美"
       },
       {
         "icao24": "AE1460",
@@ -1151,21 +1113,10 @@
         "type": "C-17 Globemaster III",
         "type_code": "C17",
         "role": "transport",
-        "alt_ft": 0,
-        "lat": null,
-        "lon": null,
-        "region": "未知"
-      },
-      {
-        "icao24": "AE57D4",
-        "callsign": "C2010",
-        "type": "C-130J",
-        "type_code": "C30J",
-        "role": "transport",
-        "alt_ft": 20000,
-        "lat": 56.940903,
-        "lon": -156.926651,
-        "region": "56.9,-156.9"
+        "alt_ft": 1700,
+        "lat": 38.214565,
+        "lon": -121.842628,
+        "region": "北美"
       },
       {
         "icao24": "4CA420",
@@ -1173,32 +1124,43 @@
         "type": "C295",
         "type_code": "C295",
         "role": "transport",
-        "alt_ft": 12875,
-        "lat": 53.424728,
-        "lon": -7.097168,
-        "region": "歐洲"
+        "alt_ft": 10000,
+        "lat": 52.91011,
+        "lon": -10.40184,
+        "region": "52.9,-10.4"
       },
       {
-        "icao24": "AE5C96",
-        "callsign": "KANTO20",
-        "type": "C-130J",
-        "type_code": "C30J",
+        "icao24": "C2BCC9",
+        "callsign": "CRDO503",
+        "type": "C295",
+        "type_code": "C295",
         "role": "transport",
-        "alt_ft": 700,
-        "lat": 35.706684,
-        "lon": 139.370324,
-        "region": "歐亞 / 中東"
+        "alt_ft": 1975,
+        "lat": 49.735199,
+        "lon": -124.694101,
+        "region": "北美"
       },
       {
-        "icao24": "AE6472",
-        "callsign": "KING99",
-        "type": "C-130J",
-        "type_code": "C30J",
+        "icao24": "AE145F",
+        "callsign": "FAMUS42",
+        "type": "C-17 Globemaster III",
+        "type_code": "C17",
         "role": "transport",
-        "alt_ft": 0,
-        "lat": 61.251526,
-        "lon": -149.809672,
-        "region": "61.3,-149.8"
+        "alt_ft": 35000,
+        "lat": 34.560104,
+        "lon": -101.355211,
+        "region": "北美"
+      },
+      {
+        "icao24": "AE117B",
+        "callsign": "HORSE84",
+        "type": "C-17 Globemaster III",
+        "type_code": "C17",
+        "role": "transport",
+        "alt_ft": 2650,
+        "lat": 47.269934,
+        "lon": -119.347792,
+        "region": "北美"
       },
       {
         "icao24": "C87F36",
@@ -1206,21 +1168,32 @@
         "type": "B350",
         "type_code": "B350",
         "role": "transport",
-        "alt_ft": 0,
-        "lat": -40.209239,
-        "lon": 175.399319,
+        "alt_ft": 3125,
+        "lat": -36.680511,
+        "lon": 174.842091,
         "region": "南太平洋"
       },
       {
-        "icao24": "C87F39",
-        "callsign": "KNG53",
-        "type": "B350",
-        "type_code": "B350",
+        "icao24": "AE1450",
+        "callsign": "MANU22",
+        "type": "C-17 Globemaster III",
+        "type_code": "C17",
         "role": "transport",
-        "alt_ft": 900,
-        "lat": -40.201584,
-        "lon": 175.369507,
-        "region": "南太平洋"
+        "alt_ft": 16475,
+        "lat": null,
+        "lon": null,
+        "region": "未知"
+      },
+      {
+        "icao24": "AE2FAE",
+        "callsign": "MOOSE71",
+        "type": "C-17 Globemaster III",
+        "type_code": "C17",
+        "role": "transport",
+        "alt_ft": 30950,
+        "lat": 50.064238,
+        "lon": 9.312501,
+        "region": "歐洲"
       },
       {
         "icao24": "880416",
@@ -1228,21 +1201,32 @@
         "type": "C295",
         "type_code": "C295",
         "role": "transport",
-        "alt_ft": 12550,
-        "lat": 14.813481,
-        "lon": 100.750315,
+        "alt_ft": 7450,
+        "lat": 14.818771,
+        "lon": 100.763334,
         "region": "西太平洋"
       },
       {
-        "icao24": "AE6C13",
-        "callsign": "OTIS42",
-        "type": "C-130J",
-        "type_code": "C30J",
+        "icao24": "AE07F9",
+        "callsign": "NOGS12",
+        "type": "C-17 Globemaster III",
+        "type_code": "C17",
         "role": "transport",
-        "alt_ft": 5450,
-        "lat": 35.885956,
-        "lon": -78.691387,
+        "alt_ft": 7475,
+        "lat": 34.689517,
+        "lon": -99.707279,
         "region": "北美"
+      },
+      {
+        "icao24": "AE1240",
+        "callsign": "NOGS38",
+        "type": "C-17 Globemaster III",
+        "type_code": "C17",
+        "role": "transport",
+        "alt_ft": 6525,
+        "lat": null,
+        "lon": null,
+        "region": "未知"
       },
       {
         "icao24": "AE0816",
@@ -1250,31 +1234,20 @@
         "type": "C-17 Globemaster III",
         "type_code": "C17",
         "role": "transport",
-        "alt_ft": 31000,
-        "lat": 44.495636,
-        "lon": -73.827667,
-        "region": "北美"
+        "alt_ft": 33000,
+        "lat": 46.665313,
+        "lon": -63.902252,
+        "region": "46.7,-63.9"
       },
       {
-        "icao24": "AE07DF",
-        "callsign": "RCH289",
+        "icao24": "AE119A",
+        "callsign": "RCH4600",
         "type": "C-17 Globemaster III",
         "type_code": "C17",
         "role": "transport",
-        "alt_ft": 36000,
-        "lat": 43.940741,
-        "lon": -88.544794,
-        "region": "北美"
-      },
-      {
-        "icao24": "AE4F16",
-        "callsign": "RCH447",
-        "type": "C-17 Globemaster III",
-        "type_code": "C17",
-        "role": "transport",
-        "alt_ft": 30000,
-        "lat": 43.133649,
-        "lon": -90.710133,
+        "alt_ft": 35000,
+        "lat": 32.877937,
+        "lon": -93.499202,
         "region": "北美"
       },
       {
@@ -1289,46 +1262,59 @@
         "region": "未知"
       },
       {
-        "icao24": "6831F4",
-        "callsign": "RK23037",
+        "icao24": "702C25",
+        "callsign": "S3AGE",
+        "type": "C-130J",
+        "type_code": "C30J",
+        "role": "transport",
+        "alt_ft": 14000,
+        "lat": 22.749161,
+        "lon": 90.440302,
+        "region": "22.7,90.4"
+      },
+      {
+        "icao24": "C2BCFB",
+        "callsign": "SNAK508",
         "type": "C295",
         "type_code": "C295",
         "role": "transport",
-        "alt_ft": 18000,
-        "lat": null,
-        "lon": null,
-        "region": "未知"
+        "alt_ft": 4075,
+        "lat": 49.69043,
+        "lon": -124.842561,
+        "region": "北美"
       },
       {
-        "icao24": "ADFE88",
-        "callsign": "ROLER09",
-        "type": "C-130",
-        "type_code": "C130",
+        "icao24": "AE4E19",
+        "callsign": "STALK01",
+        "type": "C-130J",
+        "type_code": "C30J",
         "role": "transport",
-        "alt_ft": 22000,
-        "lat": 38.384491,
-        "lon": -105.825747,
+        "alt_ft": 8325,
+        "lat": 35.386684,
+        "lon": -107.099811,
         "region": "北美"
       }
     ],
     "region_counts": {
-      "南太平洋": 6,
-      "北美": 13,
-      "未知": 10,
-      "27.0,77.9": 1,
-      "56.9,-156.9": 1,
+      "北美": 17,
+      "未知": 13,
+      "南太平洋": 3,
+      "52.9,-10.4": 1,
       "歐洲": 1,
-      "歐亞 / 中東": 1,
       "西太平洋": 1,
-      "21.2,-157.8": 1,
-      "59.0,-138.8": 1
+      "46.7,-63.9": 1,
+      "22.7,90.4": 1,
+      "60.8,-148.0": 1,
+      "28.7,77.0": 1,
+      "61.1,-150.3": 1,
+      "歐亞 / 中東": 2
     },
     "source": "https://opendata.adsb.fi/api/v2/mil",
     "trends": {
       "tankers": {
-        "d1": -33,
-        "d7": 9,
-        "d30": -10
+        "d1": -53,
+        "d7": -28,
+        "d30": -40
       },
       "awacs": {
         "d1": -100,
@@ -1336,31 +1322,31 @@
         "d30": -100
       },
       "uav": {
-        "d1": -100,
-        "d7": -100,
-        "d30": -100
+        "d1": 500,
+        "d7": 500,
+        "d30": 287
       },
       "c4isr": {
-        "d1": -57,
-        "d7": -20,
-        "d30": 29
+        "d1": -41,
+        "d7": -2,
+        "d30": 61
       }
     }
   },
   "firms": {
-    "total_24h": 20477,
-    "high_conf_count": 5243,
-    "delta_pct": "+215%",
-    "delta_ratio": 2.1503,
+    "total_24h": 11701,
+    "high_conf_count": 2973,
+    "delta_pct": "+80%",
+    "delta_ratio": 0.8002,
     "by_region": {
-      "oceania": 3081,
-      "south_america": 4215,
-      "other": 6307,
-      "asia": 697,
-      "africa": 4047,
-      "europe_russia": 1433,
-      "middle_east": 329,
-      "north_america": 368
+      "other": 4003,
+      "oceania": 2101,
+      "asia": 393,
+      "south_america": 2210,
+      "north_america": 187,
+      "africa": 1842,
+      "middle_east": 142,
+      "europe_russia": 823
     },
     "conflict_hotspots": [
       {
@@ -1374,16 +1360,6 @@
         "region": "russia"
       },
       {
-        "lat": 37.388,
-        "lon": 35.496,
-        "frp": 324.1,
-        "conf": 100,
-        "daynight": "D",
-        "acq_date": "2026-09-09",
-        "acq_time": "0622",
-        "region": "syria"
-      },
-      {
         "lat": 51.931,
         "lon": 30.986,
         "frp": 311.8,
@@ -1391,26 +1367,6 @@
         "daynight": "D",
         "acq_date": "2026-09-10",
         "acq_time": "1234",
-        "region": "ukraine"
-      },
-      {
-        "lat": 37.399,
-        "lon": 35.497,
-        "frp": 267.8,
-        "conf": 100,
-        "daynight": "D",
-        "acq_date": "2026-09-09",
-        "acq_time": "0622",
-        "region": "syria"
-      },
-      {
-        "lat": 47.877,
-        "lon": 38.591,
-        "frp": 253.7,
-        "conf": 100,
-        "daynight": "D",
-        "acq_date": "2026-09-09",
-        "acq_time": "1155",
         "region": "ukraine"
       },
       {
@@ -1434,24 +1390,14 @@
         "region": "syria"
       },
       {
-        "lat": 47.882,
-        "lon": 38.614,
-        "frp": 225.1,
+        "lat": 48.171,
+        "lon": 39.417,
+        "frp": 221.9,
         "conf": 100,
         "daynight": "D",
-        "acq_date": "2026-09-09",
-        "acq_time": "1155",
+        "acq_date": "2026-09-10",
+        "acq_time": "1234",
         "region": "ukraine"
-      },
-      {
-        "lat": 30.754,
-        "lon": 48.281,
-        "frp": 194.3,
-        "conf": 91,
-        "daynight": "D",
-        "acq_date": "2026-09-09",
-        "acq_time": "0622",
-        "region": "iran"
       },
       {
         "lat": 50.04,
@@ -1484,6 +1430,56 @@
         "region": "russia"
       },
       {
+        "lat": 30.751,
+        "lon": 48.305,
+        "frp": 177.3,
+        "conf": 100,
+        "daynight": "N",
+        "acq_date": "2026-09-10",
+        "acq_time": "0130",
+        "region": "iran"
+      },
+      {
+        "lat": 47.994,
+        "lon": 37.436,
+        "frp": 161.3,
+        "conf": 100,
+        "daynight": "D",
+        "acq_date": "2026-09-10",
+        "acq_time": "1234",
+        "region": "ukraine"
+      },
+      {
+        "lat": 36.948,
+        "lon": 40.867,
+        "frp": 146.8,
+        "conf": 100,
+        "daynight": "D",
+        "acq_date": "2026-09-10",
+        "acq_time": "1229",
+        "region": "syria"
+      },
+      {
+        "lat": 36.823,
+        "lon": 40.28,
+        "frp": 137.3,
+        "conf": 100,
+        "daynight": "D",
+        "acq_date": "2026-09-10",
+        "acq_time": "1229",
+        "region": "syria"
+      },
+      {
+        "lat": 34.899,
+        "lon": 43.811,
+        "frp": 108.9,
+        "conf": 100,
+        "daynight": "N",
+        "acq_date": "2026-09-11",
+        "acq_time": "0030",
+        "region": "iraq"
+      },
+      {
         "lat": 34.897,
         "lon": 43.808,
         "frp": 106.3,
@@ -1491,16 +1487,6 @@
         "daynight": "N",
         "acq_date": "2026-09-10",
         "acq_time": "0128",
-        "region": "iraq"
-      },
-      {
-        "lat": 35.603,
-        "lon": 43.401,
-        "frp": 93.9,
-        "conf": 100,
-        "daynight": "D",
-        "acq_date": "2026-09-09",
-        "acq_time": "0622",
         "region": "iraq"
       },
       {
@@ -1515,17 +1501,17 @@
       }
     ],
     "conflict_counts": {
-      "korea": 8,
-      "syria": 125,
-      "iran": 478,
-      "iraq": 50,
-      "ukraine": 633,
-      "russia": 59,
-      "taiwan": 1
+      "syria": 75,
+      "iran": 217,
+      "ukraine": 460,
+      "iraq": 14,
+      "korea": 16,
+      "russia": 41,
+      "taiwan": 2
     },
-    "conflict_total": 1354,
+    "conflict_total": 825,
     "baseline_kind": "fixed_reference_not_7day_mean",
-    "observed_at": "2026-09-10T23:44:00Z",
+    "observed_at": "2026-09-11T02:49:00Z",
     "baseline_24h": 6500,
     "source": "https://firms.modaps.eosdis.nasa.gov/data/active_fire/modis-c6.1/csv/MODIS_C6_1_Global_24h.csv"
   },
@@ -1730,6 +1716,48 @@
   },
   "news": [
     {
+      "title": "'Chances are good' in getting a joint statement on Iran war from upcoming BRICS summit: Expert",
+      "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxQbVhfaTF1LWdaUDZUSl9PLXdpY0xzY0xYTzk5aThOanJsc2VKLVVCVkZZX00zdk4xd2JVbHVOVEhyLU12eU42VzJmRENBRm1mS3Y1WE5TZlZ5VHpQb3ZTNXBiN2hwZ3E4Y3FMMzVIUEMtRFJMZmNBZTZsUTgzaWxSdHFkSjhDR29iZV92cFNWYzhRbE1nUTV4bEFkeW5PZ0lkQ3ZJOERMcXlOdHFDVHhYekl5NA?oc=5",
+      "domain": "CNBC",
+      "ts": "2026-09-11T04:24:19+00:00",
+      "topic": "中東"
+    },
+    {
+      "title": "Houthis seize strategic Red Sea port in Yemen, and other Mideast developments",
+      "url": "https://news.google.com/rss/articles/CBMipgFBVV95cUxNMi1lNm91a2VNZ2pET3pySXpRdExjT01OZ2dTbmxRblk4ME5ZZko0aElVbFdrV1gyY2VWcmJPUkREbWZBdGNJYmZyQmIwOVVJWmdyT3J1cHhhTzNCTFlTZzN5UEk1bE5DVVl5bDhaVkh6Q0xDcEtkVWM5SEtGb05XcUc3dGh6dUZEOWQ3czNqWndFelg3ZEJtSXZlcXNPalFCSF9LbWtR?oc=5",
+      "domain": "AP News",
+      "ts": "2026-09-11T04:22:00+00:00",
+      "topic": "中東"
+    },
+    {
+      "title": "The US has loosened Iran’s grip on the Strait of Hormuz, but the costly war is far from over",
+      "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxPdkRFZzA4VW9Ub1dpSFN3X3lqSW5MdWhfTDQyLWxGeUFMZDNMa2dVYVVTLWxIVjFBQkp4ams0N3ZyMjhjelFQUjZ2S29MWk01WDZJUUNGRmFjYmtUcWdBV0JkVHFkSzg0MXFaTmtlcmlydUdWQXlvbFU1Q0xvdFJwTndJTVBkRTBSWnlvZ0k1V2FHRG02blZNZ2NldWphUWc?oc=5",
+      "domain": "AP News",
+      "ts": "2026-09-11T04:03:00+00:00",
+      "topic": "中東"
+    },
+    {
+      "title": "Even if it’s real, Trump’s new Ukraine push is already being undermined by events",
+      "url": "https://news.google.com/rss/articles/CBMihgFBVV95cUxPSWFFLTNybWQtb2c2VUZ4dFdXTGZoNF9EUjc5emphNC1BN1ZmNVhpTTFGZ2p4ZlQwbDVQR0tPZk9CMzItb1JSRFV3dVNjTHp4MGw3UGhyUExHVEdIV3Z6ZmFKOEl2N0ttekEtenVCYW5iTlg1SzI2dVdIUGpFVnpUZm5JTW92Zw?oc=5",
+      "domain": "CNN",
+      "ts": "2026-09-11T04:01:29+00:00",
+      "topic": "俄烏"
+    },
+    {
+      "title": "Houthi rebels take key Red Sea city in Yemen, as Iran’s wartime leverage grows",
+      "url": "https://news.google.com/rss/articles/CBMirgFBVV95cUxQWUYwT2ZBY29SQkhnbTRHTnIxTXVTWndGampQSVo0VlpHUkdDb0lGTkZOMXB0TFVxcEFFcVpWcUZ5RHNEd3NuZTk0ZnZBaFBWU1ZrN3hGNEdHVGtjWkJ5WF9xMU5tUnJlQWl1U1RGWVZuMkhFbjdvRHEtTmw1a2FmRVJ2d2phMTM3V0hLY3poSF9tME54RkZnand2VUV4TW50YnhueDlnc2p6UUp0VEE?oc=5",
+      "domain": "The Washington Post",
+      "ts": "2026-09-11T03:55:12+00:00",
+      "topic": "中東"
+    },
+    {
+      "title": "Vance asks voters to stick with GOP, nods to Iran War angst",
+      "url": "https://news.google.com/rss/articles/CBMi5AFBVV95cUxQZUxvXzB4SjRVTXV4YUl5T3dtRDIybDFZNFN4VFFZZ01aYk5vWV9NS2pRZ29HeU4xcHc1Q0c4MW0xSGRwQlQyeTM4Y2RLTWozUk5zQWNuUXNpYXNEbnhtTHdJaGdTaXZPdXljZVV1S2NJdU50LUh1eHJSbFp3eWNxV3hKaTFZaHdoNU0yc3FIZ240X1JseF95MHExWkVyc2l6bkNCOUFjejRPRDc0TEJHUXRfR3NtV3VQLXRwSGlxZmVtYm9RNnVjZ1FjRHRJX29pY0xqVVRKUkFER2ZKVWZvUW8yc2rSAeoBQVVfeXFMTlR4Z3BHLThTZFh5WkM5MHpiRE5sWV9xMzY0aW82ZzY3UkloOUNuMDRHZm9VNVRySEZ6YVhGeGFLOF9naTI4enBjTWJOMVBYd0lGMTVEc0dMYmlBZDgwb3E1ZGZBWC1kTFRrcGNrQ1FzaGN1UURpVnVVeF9la08wSTVSWDA2TTZOSENQaUpJeXJWdHROQVdNcHRQNy01SC1WT3lMYXpwSk1RWUZRRl9heE1ZV1NfbVhwaTFZSkNCQ2FlNEl0VEVPcVpNN0VsLVI4cEthcnNma3JoVE9SV0ZZUS1OcUkwd3VjamtB?oc=5",
+      "domain": "Hanford Sentinel",
+      "ts": "2026-09-11T03:48:00+00:00",
+      "topic": "中東"
+    },
+    {
       "title": "Russia and China oppose push to reactivate UN Iran sanctions committee",
       "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxPRHVycXJRNjRMMlNQNm5HZHJ0Zkd5Mm1EcjhoWnF1cTZzYVNRaVFXbjVLQ1JTdFFQQ2VLaE9tcmhPOGJaQTB0WjhET0dtZm85S0hLMlVhb2FaVXVxXzh1bE03RGlwUEZ4OXpwQmh4b2s3NWl3STNWZDNjVmxmVno2NUZkQXVVUldScGZpdjlPSEhEZ2lYZEx6YzdCcFlLbUdKRjJMWl9kQU5hM3NlR3pNd2NSS05kd2Nsd3UyS21ZVQ?oc=5",
       "domain": "thenationalnews.com",
@@ -1749,13 +1777,6 @@
       "domain": "The Guardian",
       "ts": "2026-09-11T02:33:00+00:00",
       "topic": "俄烏"
-    },
-    {
-      "title": "Houthi rebels take key Red Sea city in Yemen, as Iran’s wartime leverage grows",
-      "url": "https://news.google.com/rss/articles/CBMirgFBVV95cUxQWUYwT2ZBY29SQkhnbTRHTnIxTXVTWndGampQSVo0VlpHUkdDb0lGTkZOMXB0TFVxcEFFcVpWcUZ5RHNEd3NuZTk0ZnZBaFBWU1ZrN3hGNEdHVGtjWkJ5WF9xMU5tUnJlQWl1U1RGWVZuMkhFbjdvRHEtTmw1a2FmRVJ2d2phMTM3V0hLY3poSF9tME54RkZnand2VUV4TW50YnhueDlnc2p6UUp0VEE?oc=5",
-      "domain": "washingtonpost.com",
-      "ts": "2026-09-11T02:25:12+00:00",
-      "topic": "中東"
     },
     {
       "title": "Trump says he has no regrets about starting the Iran war as U.S. dials up economic pressure",
@@ -1779,13 +1800,6 @@
       "topic": "中東"
     },
     {
-      "title": "Bessent says 'a large bank' will be sanctioned on Monday as part of Iran strategy",
-      "url": "https://news.google.com/rss/articles/CBMidEFVX3lxTE5hRjZwbjNmOUdKVjQ5ZVVIZmVQSXB0Z1BoV1BORjdNeUpYTV85UVNGbmJKd1VzQXVBaVdHVmdlREo3SlZlM2RPejZCOE5PWjlvMEVOSHJCS1lGS0RfUmkyeUJDcmZib2dsYmw3bElaQmdGX3Jm0gF6QVVfeXFMT0E3MGJucVFXdU9uVE5aQWJBLUk4YUI5VXNHWmloV1M0MWtNc2tPQm10YmRKczA3bHVhWktCdFd3N3VQcG5CNzBhTVJybVBUWVNRYWt0SWE3ekQzWnZ4bVhHekRKRThSa3ZsMUVUS2lEalF2UXJwb1FxRUE?oc=5",
-      "domain": "CNBC",
-      "ts": "2026-09-11T00:54:00+00:00",
-      "topic": "中東"
-    },
-    {
       "title": "Trump says he does not regret Iran war despite impact it may have on midterm elections",
       "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxNZmZLSXdlTkU0cmx1cTlYYV9KVUliY1k4aUNpNjQxZ2ZyamhIWklodVVZTW1rZkhhNEpwQmM0dFQycmhpR2NzeGVReVYyYjNtV281QlpyMDVHeFUzLTUteGc1NTl6SWhUdzQyZUtlblFkdTVPYUZ0bkt5WTg5dm9walJFeUE0aWJrQjVjZk5KY01OUUFPeHZ4b2pWVGZybWtIb3NOOVFBak9ZajA0WlQ3T3FzeHV2Zw?oc=5",
       "domain": "Reuters",
@@ -1804,34 +1818,6 @@
       "url": "https://news.google.com/rss/articles/CBMihwFBVV95cUxOUmhxMGpwcUp4ekxXQnBpSUMxazB5dnZfb2JVQThIb0c4Tk15TklsNDhyVmEwMHFTV3kwWm5JUExnbld4SkVIQ25jakVoRzNNR1UtLW80R3FfakwzVTVTRnZ3OGJCTGNYUWh0VzFHd1FQTUktQ1lPZEJUeWxDcWMyalBDazVXZGc?oc=5",
       "domain": "France 24",
       "ts": "2026-09-10T22:55:00+00:00",
-      "topic": "中東"
-    },
-    {
-      "title": "Watch Rep. Crawford: Iran Ballistic Missiles Remain Nuclear Threat",
-      "url": "https://news.google.com/rss/articles/CBMirgFBVV95cUxNU1JEdXdrYzZ6RUc3S1NscUtpdS1fcEJpaHJob3RsaDhDd1U1SmJrdVVfVjdxYm13TFc0Zlo2TzJDMjdfY0tUUUZYSjAwcEJGd0t1UHppY2g2Q2haX2t4RTF5V1Y0dVdwVG1LcjNzdFdqM0NScExXR0VVclp5TGFGeVdLeUFmMmV6WG16Mmx6eWZBRmtKVXNwU3U4YzdBclU5TWFPYmlaMnBPVFowQWc?oc=5",
-      "domain": "Bloomberg.com",
-      "ts": "2026-09-10T22:46:23+00:00",
-      "topic": "中東"
-    },
-    {
-      "title": "How the U.S. Treasury's New Aviation Sanctions on Iran Extend Beyond Tehran",
-      "url": "https://news.google.com/rss/articles/CBMimgFBVV95cUxNaFhUYUhHOUpHTEZrTmhmbllNR0s4WXJxZUlLZnVadWxmbXE5NGV0a2xzd3NLNDBRcW0wR2laRnpGUUNxTkppeW9CdzhZRFNjY1gyQWRIcTZMZFFqOGRseGE1TmxwSW9nMTdTNmVfcTMwSzd1bkZwOW85SUhMUVpZMEJlS05sX05rNGsxc1AzWEVjVm4wTmhYVEZ3?oc=5",
-      "domain": "Time Magazine",
-      "ts": "2026-09-10T21:53:30+00:00",
-      "topic": "中東"
-    },
-    {
-      "title": "This Trump Speech Sent a Dangerous Message to Iran‍—and the Rest of the World",
-      "url": "https://news.google.com/rss/articles/CBMiowFBVV95cUxNREJlUEdjeGlkZGNFSnZmMzlNN2dESEpBcUhuVFR6SFZ5X0VrWUdEZnRLRnlEM2tMLWlWN2ZfeklCR2JEaWVDaUlxV3k3RThXM3RFWFVYSEw3WnF2NXBIdFVtdnNKR09YRHFxREVMQjVEc1ItSTZYcjJXNU9jdW1KWmUzN2Fld3ZrNUdUMDZLNURZSUtOeG1xT0NQUzB5NEVlOWZN?oc=5",
-      "domain": "Slate",
-      "ts": "2026-09-10T20:35:00+00:00",
-      "topic": "中東"
-    },
-    {
-      "title": "US slaps new sanctions on networks aiding Iran's proxies in Middle East",
-      "url": "https://news.google.com/rss/articles/CBMiugFBVV95cUxQQ2p0aERlM3VXMFFWMkg4ZUtIejRIWDdUNUtlbnkwLWlyTWFBNGMyUzBUVnczaGdsNGIxcjJNT3BIekZrQXhOVEdwY0ZaQ0RZVmE2SW5RWTdLN1F6M01vbXZyMXF1OE9XbHphN1dnRWxwWmNyV2V2WDg3dGVOTDR3TXd5dDFwcEl6X2pxd05LRmc4d2NkUzFMS3piTFg1eWppdW8xNWNHd0VYZ3EwOFM4a19SMmNkeE9TZlE?oc=5",
-      "domain": "Reuters",
-      "ts": "2026-09-10T20:32:11+00:00",
       "topic": "中東"
     }
   ],
@@ -2373,8 +2359,24 @@
       "wheat": 17.3,
       "corn": 7.1,
       "src": "mirror",
+      "schema_version": 2,
+      "coverage": {
+        "1201": [
+          "76",
+          "842",
+          "124"
+        ],
+        "1001": [
+          "36",
+          "124"
+        ],
+        "1005": [
+          "76",
+          "842"
+        ]
+      },
       "us_soy": 32.1,
-      "us_wheat": 0.0,
+      "us_wheat": null,
       "us_corn": 0.0
     }
   ],
@@ -2736,24 +2738,36 @@
     {
       "ym": "2026-07",
       "src": "mirror",
-      "4001": 0.0,
+      "schema_version": 2,
+      "coverage": {
+        "4001": [],
+        "2604": [
+          "36"
+        ],
+        "2610": [],
+        "2601": [
+          "36",
+          "76"
+        ]
+      },
+      "4001": null,
       "2604": 1.1,
-      "2610": 0.0,
+      "2610": null,
       "2601": 9034.0
     }
   ],
   "tw_news": [
     {
       "title": "顧立雄曝台海戰略！鬆口國軍作戰準備「開戰不等美軍」：計畫沒把美軍介入當前提",
-      "url": "https://news.google.com/rss/articles/CBMiUkFVX3lxTE11OVl1RmdXNlh3cWlHcWpoYS1vSEZiTW9OYUwydlVxNWVrbWkxeW5hU0UwbXg3RU1GbWZNc0FIWHYzVzVTUWQwTUNLNjVoRG1VNEE?oc=5",
-      "domain": "鏡報",
-      "ts": "2026-09-11T04:03:54+00:00",
+      "url": "https://news.google.com/rss/articles/CBMi4wNBVV95cUxOZmRPd1RabDhocGVINUc3UEpidzQzUHF2Ykc5bS04aThmdE44UkY4VVBJZnFDbm5ubFgtMGRUVkk4eFdBQ0JldDJWZmtQeWhmNUtVQk1KakExV043aXBjU2hXalBXRkpjbmVFMVRzY3IxbWlrLWpxZndNclNlWGgyQzlXR2lLa2wtem9tSGFMZ1dkVHFZTTJyc3RzXzRrZ1NsSzhIeHBXa29RNy0zakd2ai02bHBld09lQlBBSWhnOGNwRzF4MnhVeTlsSFlQaldaWUtzbHhlZlpZYXhxbXBYRXNiNE5kT3pONzBTWnMxMlR1WHd0T2JPakxJbERkM3ctSjRtWFBOSWpGamlaMGQ1dVRoMnhlblVsYnczTzVRd1V5TDF2dTZ1YjcwMlE1cHY1cTNHSlRkeFM5ZXNlcFQ3SEFpemowbFZUNkVRZjFwX1JsbzhqSElndDhiTWNiWFFYVDVGdXhhWmxEa2V0S3BKS2hlR0sxY2hlLS1fVEc0VkRlQjZtd3FGRi15YlpKN3l5bVBRR09KWGpNd0c4OXJBNnlJa29HVFZvaTJLaTdDVDJFRVpqdmMzbDlUWENmZ0ktUkFhR2VOZVpEN21JcU9aNGdHSXAwOGVOVXlndnVlS0haZEk?oc=5",
+      "domain": "Yahoo新聞",
+      "ts": "2026-09-11T04:50:52+00:00",
       "topic": "台海"
     },
     {
       "title": "9月11日台海早資訊",
       "url": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE1EWGlmY0RhN0dMZHBib200dk53XzVyak1HZF9Sb3NILTNCQWZ1MUc1b21YWHgzRlJycHI2MkxzSjRJUzRoMWI2UEREcDhDRzF5eWtSN3k1cEhqTTZPeFVhSG90Z1dOZw?oc=5",
-      "domain": "hkcna.hk",
+      "domain": "Hkcna.Hk",
       "ts": "2026-09-11T02:44:00+00:00",
       "topic": "台海"
     },
@@ -2766,7 +2780,7 @@
     },
     {
       "title": "中共21機艦船台海周邊活動　國軍嚴密監控應處",
-      "url": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE1vSTQ2YWEzLTVnWE5wVzNpT3NDXzVTMnJyUDlHRHNvT3NYMkptRThzekdOS3Z0VWR5ZTBFUjZSallWSng4WE5FMTZyd0pTbkRDc1NCdVR2ZGo1Z9IBX0FVX3lxTFAwdGdEeUtGZnFidHdxelVaWHBLRTJhUzZEUlV1Rk80MWhiZ1NoWkRNRVBhdUx6TkpJUVJ4aVZRck9fOGhoZlJNeThCQ3RORk1UcnBuT0Zpak5ibkhTTFNV?oc=5",
+      "url": "https://news.google.com/rss/articles/CBMiX0FVX3lxTFAwdGdEeUtGZnFidHdxelVaWHBLRTJhUzZEUlV1Rk80MWhiZ1NoWkRNRVBhdUx6TkpJUVJ4aVZRck9fOGhoZlJNeThCQ3RORk1UcnBuT0Zpak5ibkhTTFNV0gFfQVVfeXFMUDB0Z0R5S0ZmcWJ0d3F6VVpYcEtFMmFTNkRSVXVGTzQxaGJnU2haRE1FUGF1THpOSklRUnhpVlFyT184aGhmUk15OEJDdE5GTVRycG5PRmlqTmJuSFNMU1U?oc=5",
       "domain": "經濟日報",
       "ts": "2026-09-11T02:01:12+00:00",
       "topic": "台海"
@@ -2816,7 +2830,7 @@
     {
       "title": "台軍：解放軍27機艦船台海周邊活動",
       "url": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE9vTkdsT2pJc1pBQ1Bja18zR0hhdUtVOE1ieXhOdThnTTdwV2RIU3VMS1NjdzVzeWtCd2tZZVFfRmhfZEgwdk13cXdzMEhSVGRDd2YzeW5KWVFrN0oxMXZpWGpLTGtQUQ?oc=5",
-      "domain": "hkcna.hk",
+      "domain": "Hkcna.Hk",
       "ts": "2026-09-10T13:14:00+00:00",
       "topic": "台海"
     },
@@ -2829,7 +2843,7 @@
     }
   ],
   "pla": {
-    "updated_at": "2026-09-11T04:10:57.728207+00:00",
+    "updated_at": "2026-09-11T04:55:30.245351+00:00",
     "days": [
       {
         "date": "2026-08-13",
@@ -4008,8 +4022,8 @@
       "coverage": 0.35,
       "model_version": "wpi-4.0",
       "factors": {
-        "poly": 69.3,
-        "firms_hotspots": 692,
+        "poly": 69.5,
+        "firms_hotspots": 501,
         "avi_count": 1
       },
       "top_market": "Ukraine signs peace deal with Russia before 2027?"
@@ -4023,9 +4037,9 @@
       "coverage": 0.35,
       "model_version": "wpi-4.0",
       "factors": {
-        "poly": 16.7,
-        "firms_hotspots": 653,
-        "avi_count": 1
+        "poly": 16.6,
+        "firms_hotspots": 306,
+        "avi_count": 2
       },
       "top_market": "Will the U.S. invade Iran before 2027?"
     },
@@ -4038,8 +4052,8 @@
       "coverage": 0.35,
       "model_version": "wpi-4.0",
       "factors": {
-        "poly": 6.8,
-        "firms_hotspots": 1,
+        "poly": 6.9,
+        "firms_hotspots": 2,
         "avi_count": 1
       },
       "top_market": "China x Taiwan military clash before 2027?"
@@ -4053,7 +4067,7 @@
       "coverage": 0,
       "model_version": "wpi-4.0",
       "factors": {
-        "firms_hotspots": 8,
+        "firms_hotspots": 16,
         "avi_count": 1
       },
       "top_market": null
@@ -4067,7 +4081,7 @@
       "coverage": 0.35,
       "model_version": "wpi-4.0",
       "factors": {
-        "poly": 28.5,
+        "poly": 27.5,
         "firms_hotspots": 0,
         "avi_count": 1
       },
@@ -4091,7 +4105,7 @@
     "pizza": {
       "label": "PizzINT",
       "status": "unavailable",
-      "observed_at": "2026-09-11T03:00:00.000Z",
+      "observed_at": "2026-09-11T04:00:00.000Z",
       "note": "0 店有即時人流；未觀測不等同已打烊"
     },
     "polymarket": {
@@ -4109,7 +4123,7 @@
     "firms": {
       "label": "NASA FIRMS",
       "status": "available",
-      "observed_at": "2026-09-10T23:44:00Z",
+      "observed_at": "2026-09-11T02:49:00Z",
       "note": ""
     },
     "gdelt": {
@@ -4164,19 +4178,19 @@
       "label": "Comtrade 糧食",
       "status": "partial",
       "observed_at": "2026-09-11T04:04:28.079753+00:00",
-      "note": "觀測期間：2026-07；與抓取時間不同"
+      "note": "觀測期間：2026-07；與抓取時間不同；本輪沿用慢資料，未重新查詢，原觀測時間不變"
     },
     "strat": {
       "label": "Comtrade 物資",
       "status": "partial",
       "observed_at": "2026-09-11T04:07:01.224755+00:00",
-      "note": "觀測期間：2026-07；與抓取時間不同"
+      "note": "觀測期間：2026-07；與抓取時間不同；本輪沿用慢資料，未重新查詢，原觀測時間不變"
     },
     "usda": {
       "label": "USDA ESR",
       "status": "stale",
       "observed_at": "2026-09-11T04:04:30.442302+00:00",
-      "note": "觀測期間：2026-08-27；與抓取時間不同"
+      "note": "觀測期間：2026-08-27；與抓取時間不同；本輪沿用慢資料，未重新查詢，原觀測時間不變"
     },
     "bars": {
       "label": "BestTime",
@@ -4188,13 +4202,14 @@
       "label": "FRED",
       "status": "available",
       "observed_at": null,
-      "note": ""
+      "note": "；本輪沿用慢資料，未重新查詢，原觀測時間不變"
     }
   },
   "_notify": {
-    "bucket": 496968,
-    "level": "NORMAL",
+    "bucket": 496972,
+    "level": "LOW",
     "pizza_extreme": false,
-    "hotspots": 15
+    "hotspots": 825,
+    "hotspot_counter_version": 2
   }
 }
