@@ -12,11 +12,11 @@ try {
     const files = execFileSync('git', ['diff', '--name-only', '-z', previous, 'HEAD'],
       { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).split('\0').filter(Boolean);
     // Empty diff allows manual redeployment after environment-variable changes.
-    skip = files.length > 0 && files.every(file => liveFiles.has(file) || /^archives\/\d{4}\/\d{2}\/\d{8}T\d{6}_[a-f0-9]{64}\.json\.gz$/.test(file));
+    skip = files.length > 0 && files.every(file => liveFiles.has(file) || file === 'AGENTS.md' || file.startsWith('.agents/skills/') || /^archives\/\d{4}\/\d{2}\/\d{8}T\d{6}_[a-f0-9]{64}\.json\.gz$/.test(file));
   }
 } catch {
   // Missing shallow-clone history or any git error: build safely.
 }
-console.log(skip ? 'Data-only change: live API serves updates; skip build.'
+console.log(skip ? 'Only live data, archives, or agent skills changed; skip build.'
   : 'Build required: code, redeployment, or unknown deployment history.');
 process.exit(skip ? 0 : 1);
