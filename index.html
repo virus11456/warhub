@@ -1270,7 +1270,7 @@
 
   /* 溢位防護：任何情況都不橫向捲動 */
   html, body { overflow-x:hidden !important; max-width:100%; }
-  body.theme-8bit .wpi-formula { overflow-x:auto; white-space:nowrap; }
+  body.theme-8bit .wpi-formula { white-space:normal; overflow-wrap:anywhere; }
 
 
 #clock{ display:inline-flex; gap:.1rem; align-items:baseline; }
@@ -1526,7 +1526,7 @@
   .wpi-badge.critical { color:var(--crit); border-color:var(--crit); background:rgba(255,0,255,.08); }
   @keyframes wpi-blink { 0%,100%{opacity:1} 50%{opacity:.6} }
 
-  .wpi-body { display:grid; grid-template-columns:1fr 320px 1fr; gap:1.8rem; align-items:center; }
+  .wpi-body { display:grid; grid-template-columns:minmax(0,1fr) 320px minmax(0,1fr); gap:1.8rem; align-items:center; }
   .wpi-factors { display:flex; flex-direction:column; gap:.6rem; }
   .wpi-factor { background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.07); padding:.5rem .65rem; }
   .wpi-f-hdr  { display:flex; align-items:center; gap:.4rem; margin-bottom:.3rem; }
@@ -1540,14 +1540,15 @@
   .wpi-f-val  { font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700; color:var(--accent3); min-width:26px; text-align:right; }
   .wpi-f-desc { font-family:'Share Tech Mono',monospace; font-size:.6rem; color:var(--text-dim); }
 
-  .wpi-gauge-wrap { display:flex; flex-direction:column; align-items:center; }
-  .wpi-arc { width:300px; height:175px; }
+  .wpi-body > * { min-width:0; }
+  .wpi-gauge-wrap { display:flex; flex-direction:column; align-items:center; min-width:0; }
+  .wpi-arc { width:300px; max-width:100%; height:auto; aspect-ratio:300/175; }
   .wpi-center { text-align:center; margin-top:-.8rem; }
   .wpi-num { font-family:'Orbitron',monospace; font-size:3rem; font-weight:900; line-height:1; background:linear-gradient(135deg,#fff,var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; filter:drop-shadow(0 0 12px rgba(0,207,232,.4)); }
   .wpi-num-lbl { font-family:'Share Tech Mono',monospace; font-size:.68rem; color:var(--text-dim); margin-top:.1rem; }
   .wpi-level { font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700; letter-spacing:3px; margin-top:.35rem; color:var(--accent3); }
   .wpi-scale { display:flex; justify-content:space-between; width:300px; max-width:100%; margin-top:.4rem; font-family:'Share Tech Mono',monospace; font-size:.6rem; text-align:center; line-height:1.3; }
-  .wpi-formula { margin-top:.6rem; font-family:'Share Tech Mono',monospace; font-size:.64rem; color:var(--text-dim); background:rgba(0,0,0,.3); padding:.3rem .6rem; border:1px solid rgba(255,255,255,.07); }
+  .wpi-formula { box-sizing:border-box; width:100%; max-width:320px; white-space:normal; overflow-wrap:anywhere; line-height:1.7; text-align:center; margin-top:.6rem; font-family:'Share Tech Mono',monospace; font-size:.64rem; color:var(--text-dim); background:rgba(0,0,0,.3); padding:.3rem .6rem; border:1px solid rgba(255,255,255,.07); }
   .wpi-formula em { color:var(--accent); font-style:normal; }
 
   .wpi-alerts { display:flex; flex-direction:column; gap:.55rem; }
@@ -1686,7 +1687,7 @@
       </div>
     </div>
     <div style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim);margin-bottom:.5rem">
-      Google News 全球監測 · 篩選白宮／中國／戰爭升級相關頭條，依時間排序，供事件追蹤與原文查核，未驗證其預測能力（點擊看原文）
+      Google News 全球監測 · 篩選白宮／中國／戰爭升級相關頭條，依時間排序，標題以繁體中文顯示（機器翻譯）· 供事件追蹤與原文查核，未驗證其預測能力（點擊看原文）
     </div>
     <div id="news-list">
       <div style="padding:1rem;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 連接 GDELT 新聞流…</div>
@@ -3314,7 +3315,12 @@ function drawStratHistory(){
   });
   var shHit=[], shNm=({'4001':'天然橡膠','2604':'鎳礦砂','2610':'鉻礦砂','2601':'鐵礦砂'})[key]||'';
   data.forEach(function(d,i){
-    var v=d[key]||0, by=Y(v), h=Math.max(0,y0-by), cx=CX(i);
+    var cx=CX(i);
+    if(d[key]==null || (d.schema_version!==2 && d[key]===0)) {
+      p.push('<text class="fh-svg-axis" x="'+cx+'" y="'+(y0-6)+'" text-anchor="middle">缺報</text>');
+      return;
+    }
+    var v=d[key], by=Y(v), h=Math.max(0,y0-by);
     p.push('<rect class="'+(d.src==='mirror'?'fh-bar-m':'fh-bar-c')+'" x="'+(cx-bw/2).toFixed(1)
       +'" y="'+by.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+h.toFixed(1)+'"></rect>');
     var tip='<b>'+d.ym+'</b><br>'+shNm+' '+fhFmt(v)+' 萬噸'+(d.src==='mirror'?'<br>（出口國回推）':'<br>（中國海關直報）');
@@ -3323,7 +3329,7 @@ function drawStratHistory(){
   });
   p=p.concat(shHit);
   var lv=data.length?data[data.length-1]:null;
-  if(lv){ var lx=CX(n-1), ly=Y(lv[key]||0);
+  if(lv && lv[key]!=null && !(lv.schema_version!==2 && lv[key]===0)){ var lx=CX(n-1), ly=Y(lv[key]||0);
     p.push('<text class="fh-svg-axis" x="'+lx+'" y="'+(Math.max(padT+9,ly-6))+'" text-anchor="middle" style="fill:var(--accent);font-weight:700">'+fhFmt(lv[key]||0)+'</text>');
   }
   svg.innerHTML=p.join('');
@@ -3339,6 +3345,7 @@ function drawStratHistory(){
 function renderStrat(json){
   var el=document.getElementById('strat-grid'); if(!el) return;
   var s=json.strat;
+  var history=(json.strat_hist||[]).slice().sort((a,b)=>b.ym.localeCompare(a.ym));
   if(!s || !s.items || !s.items.length){
     el.innerHTML='<div style="padding:1rem;text-align:center;font-family:\'Share Tech Mono\',monospace;font-size:.7rem;color:var(--text-dim)">暫無資料（每日更新一次）</div>';
     return;
@@ -3348,22 +3355,24 @@ function renderStrat(json){
     var partial=!!it.incomplete || it.anomaly==='partial';
     var col=partial?'var(--text-dim)':((y==null)?'var(--text-dim)':(y>0?'#ff4d5e':(y<0?'#35e08a':'var(--text-dim)')));
     var arr=(y==null)?'':(y>0?'▲':(y<0?'▼':''));
-    var w=it.wan_ton==null?'--':it.wan_ton>=100?Math.round(it.wan_ton).toLocaleString():it.wan_ton;
+    var reference=it.wan_ton==null ? history.find(d=>d.ym<s.ref_month && Number.isFinite(d[it.cmd]) && d[it.cmd]>0) : null;
+    var w=it.wan_ton==null?'待回報':it.wan_ton>=100?Math.round(it.wan_ton).toLocaleString():it.wan_ton;
     var flag=it.anomaly==='high'?'<span class="strat-flag high">異常高</span>'
             :it.anomaly==='low'?'<span class="strat-flag low">異常低</span>'
             :partial?'<span class="strat-flag partial">資料待補</span>':'';
     // 判讀備註：資料未齊時只提示暫值；異常時醒目標出解讀，平常則兩種都列供參
     var note='';
     if(partial){
-      note='<div class="strat-note">◷ 近月出口國尚未全數回報（'+(it.reporters||0)+'/'+(it.reporters_prev||0)+' 國），此為暫值、勿當異常低，待補齊後再判讀</div>';
+      note='<div class="strat-note">◷ 近月出口國尚未全數回報（'+(it.reporters||0)+'/'+({'4001':4,'2604':3,'2610':3,'2601':4}[it.cmd]||it.reporters_prev||0)+' 個追蹤出口國），此為暫值、勿當異常低，待補齊後再判讀</div>';
     } else if(it.hi||it.lo){
       if(it.anomaly==='high') note='<div class="strat-note hi">⚑ 異常高判讀：'+'進口增加的原因待查，不能直接推定軍備擴張。'+'</div>';
       else if(it.anomaly==='low') note='<div class="strat-note lo">⚑ 異常低判讀：'+'進口減少的原因待查，不能直接推定動用儲備。'+'</div>';
       else note='<div class="strat-note">▲高→'+'進口增加的原因待查，不能直接推定軍備擴張。'+'　▼低→'+'進口減少的原因待查，不能直接推定動用儲備。'+'</div>';
     }
+    if(reference) note+='<div class="strat-note">最近歷史參考：'+escapeHtml(reference.ym)+' · '+reference[it.cmd].toLocaleString('zh-TW',{maximumFractionDigits:1})+' 萬噸（出口國回推；'+(reference.schema_version===2?'部分覆蓋':'舊歷史未逐月核驗')+'，不是當月值）</div>';
     return '<div class="strat-item"><div class="strat-row"><div class="strat-name">'+escapeHtml(it.name)
       +'<small>'+escapeHtml(it.use||'')+'</small></div>'
-      +'<div class="strat-val">'+w+'<span class="u">萬噸</span></div>'
+      +'<div class="strat-val">'+w+(it.wan_ton==null?'':'<span class="u">萬噸</span>')+'</div>'
       +'<div class="strat-yoy" style="color:'+col+'">'+(y==null?'—':arr+Math.abs(y)+'%')+flag+'</div></div>'
       +note+'</div>';
   }).join('');
@@ -3387,7 +3396,7 @@ function renderTwNews(json){
       +'<span class="news-topic" style="color:'+c+'">'+escapeHtml(n.topic||'台海')+'</span>'
       +'<span class="news-time">'+newsAgo(n.ts)+'</span>'
       +'<a class="news-title" href="'+escapeHtml(n.url||'#')+'" target="_blank" rel="noopener">'
-      +escapeHtml(n.title||'')+' <span class="news-src">— '+escapeHtml(n.domain||'')+'</span></a>'
+      +escapeHtml(n.title_zh || (/[\u3400-\u9fff]/.test(n.title||'') ? n.title : '中文翻譯暫時無法取得（點擊查看原文）'))+' <span class="news-src">— '+escapeHtml(n.domain||'')+'</span></a>'
       +'</div>';
   }).join('');
   var upd=document.getElementById('twnews-updated');
@@ -3542,7 +3551,7 @@ function renderNews(json){
       +'<span class="news-topic" style="color:'+c+'">'+escapeHtml(n.topic||'全球')+'</span>'
       +'<span class="news-time">'+newsAgo(n.ts)+'</span>'
       +'<a class="news-title" href="'+escapeHtml(n.url||'#')+'" target="_blank" rel="noopener">'
-      +escapeHtml(n.title||'')+' <span class="news-src">— '+escapeHtml(n.domain||'')+'</span></a>'
+      +escapeHtml(n.title_zh || (/[\u3400-\u9fff]/.test(n.title||'') ? n.title : '中文翻譯暫時無法取得（點擊查看原文）'))+' <span class="news-src">— '+escapeHtml(n.domain||'')+'</span></a>'
       +'</div>';
   }).join('');
   const upd=document.getElementById('news-updated');
