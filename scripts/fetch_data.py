@@ -390,6 +390,7 @@ async def fetch_polymarket(session: aiohttp.ClientSession) -> list[dict]:
     except Exception as e:
         log.error(f"Polymarket error: {e}")
 
+    await _translate_market_questions(session, war_markets)
     return war_markets
 
 
@@ -856,11 +857,11 @@ def _news_iso(pubdate: str) -> str:
     except Exception:
         return ""
 
-async def _translate_titles(session, items, tl="zh-TW"):
+async def _translate_titles(session, items, tl="zh-TW", cached_titles=None):
     """Persist Chinese titles; short requests avoid oversized batch URLs.
     Reuse translations for unchanged originals and bound the entire translation stage.
     """
-    cached = {}
+    cached = dict(cached_titles or {})
     try:
         for old in json.loads(DATA_FILE.read_text(encoding="utf-8")).get("news", []):
             if old.get("title_en") and old.get("title_zh"):
@@ -893,6 +894,20 @@ async def _translate_titles(session, items, tl="zh-TW"):
     except asyncio.TimeoutError:
         log.warning("title translation budget reached; completed translations retained")
     log.info("Chinese news titles: %s/%s", sum(bool(i.get("title_zh")) for i in items), len(items))
+
+
+async def _translate_market_questions(session, markets):
+    cached = {}
+    try:
+        old = json.loads(DATA_FILE.read_text(encoding="utf-8")).get("polymarket", [])
+        cached = {m["question"]:m["question_zh"] for m in old if m.get("question_zh")}
+    except (OSError, ValueError, TypeError):
+        pass
+    titles = [{"title":m.get("question", "")} for m in markets]
+    await _translate_titles(session, titles, cached_titles=cached)
+    for market, title in zip(markets, titles):
+        if title.get("title_zh"):
+            market["question_zh"] = title["title_zh"]
 
 
 async def fetch_gnews(session: aiohttp.ClientSession) -> list[dict]:

@@ -2337,6 +2337,8 @@ const HTML_WPI_WEIGHTS = { p:0.28, a:0.18, g:0.10, z:0.14, f:0.10, s:0.12, w:0.0
 // WPI has one authority: the versioned backend score used by history and notifications.
 const HTML_WPI_STATE = {poly:[], avi:{}, firms:{}, finance:{assets:[]}, pizza:[], gdelt:null, pizzint:null, wiki:null, spikes:false};
 let BACKEND_SCORE = null;
+let OBSERVED_DATA = null;
+let MARKET_TRANSLATIONS = new Map();
 let DATA_UPDATED_AT = null;
 function htmlWpiComputeScores() {
   return BACKEND_SCORE?.factors || {p:null,a:null,g:null,z:null,f:null,s:null,w:null};
@@ -2345,20 +2347,6 @@ function htmlWpiCalc() { return BACKEND_SCORE?.combined_score ?? null; }
 function observedTime() {
   return DATA_UPDATED_AT ? new Date(DATA_UPDATED_AT).toLocaleString('zh-TW') : '尚未取得';
 }
-function renderDataQuality(json) {
-  let panel = document.getElementById('source-health');
-  if (!panel) {
-    panel = document.createElement('section'); panel.id = 'source-health';
-    panel.style.cssText = 'margin:1rem;padding:1rem;border:1px solid var(--border);font-size:.8rem;line-height:1.8';
-    document.getElementById('last-update-ts')?.parentElement?.before(panel);
-  }
-  const states = {available:'已取得',partial:'部分資料',stale:'舊資料',unavailable:'無有效資料'};
-  const health = json.source_health || {};
-  if(!Object.keys(health).length) health.legacy={label:'舊版資料快照',status:'unavailable',note:'等待新版抓取器完成；舊版分数不納入新模型'};
-  panel.innerHTML = '<strong>資料來源狀態</strong> · 抓取時間與觀測期間不同；無資料不代表安全。' +
-    Object.values(health).map(h => `<div>${escapeHtml(h.label)}：${escapeHtml(states[h.status] || h.status)} · ${escapeHtml(h.note || '')}${h.observed_at ? ' · 觀測 '+escapeHtml(h.observed_at) : ''}</div>`).join('');
-}
-
 function htmlWpiLevel(wpi) {
   if (wpi == null) return {label:'資料不足', cls:'low', color:'var(--text-dim)'};
   if (wpi>=80) return { label:'CRITICAL', cls:'critical', color:'var(--crit)' };
@@ -2439,20 +2427,30 @@ function htmlWpiRender() {
   const heroLvl = document.getElementById('hero-wpi-level');
   if (heroLvl) { heroLvl.textContent = level.label; heroLvl.style.color = level.color; }
 
+  // Show raw observations separately from the derived score.
+  const raw=OBSERVED_DATA || {};
+  const fresh=BACKEND_SCORE!=null;
+  const count=(value,unit)=>Number.isFinite(value)?value.toLocaleString('zh-TW')+unit:null;
+  const aircraft=count(raw.aviation?.summary?.total,' 架');
+  const fires=count(raw.firms?.total_24h,' 筆');
+  const observation=(value,unavailable)=>!fresh?'快照過期或尚未載入，暫不計分':(value?'已取得 '+value:unavailable);
+  const aDesc=observation(!raw.aviation?.error?aircraft:null,'未取得有效軍機資料')+'｜'+(sc.a==null?'缺少可比較基準，暫不計分':'異常分數 '+sc.a.toFixed(1)+(sc.a===0?'（未高於基準）':''));
+  const fDesc=observation(!raw.firms?.error?fires:null,'未取得有效熱異常資料')+'｜暫不計分；熱異常不等於戰火';
   // 子指標
   [
     { key:'p', pfx:'html-wpi-p', desc:`事件方向觀察值 ${(sc.p == null ? '--' : sc.p.toFixed(1))}%` },
-    { key:'a', pfx:'html-wpi-a', desc:`航空異常指數 ${(sc.a == null ? '--' : sc.a.toFixed(1))}%` },
-    { key:'g', pfx:'html-wpi-g', desc: sc.g == null ? '全球新聞衝突報導強度' : `新聞強度分數 ${sc.g.toFixed(1)}` },
-    { key:'z', pfx:'html-wpi-z', desc:`Pentagon Pizza 指數 ${(sc.z ?? 0).toFixed(1)}` },
+    { key:'a', pfx:'html-wpi-a', desc:aDesc },
+    { key:'g', pfx:'html-wpi-g', desc: sc.g == null ? '新聞強度未取得有效新資料｜不計分（與下方新聞標題來源不同）' : `新聞強度分數 ${sc.g.toFixed(1)}` },
+    { key:'z', pfx:'html-wpi-z', desc:sc.z==null?'店家清單已載入，但無有效即時人流｜不計分':`人流異常分數 ${sc.z.toFixed(1)}` },
     { key:'w', pfx:'html-wpi-w', desc: sc.w == null ? '戰爭條目瀏覽量 vs 30日基準' : `公眾焦慮指數 ${sc.w.toFixed(1)}` },
-    { key:'f', pfx:'html-wpi-f', desc:`FIRMS 火點異常 ${(sc.f == null ? '--' : sc.f.toFixed(1))}%` },
+    { key:'f', pfx:'html-wpi-f', desc:fDesc },
     { key:'s', pfx:'html-wpi-s', desc:`金融情緒指數 ${(sc.s == null ? '--' : sc.s.toFixed(1))}%` },
   ].forEach(f => {
     const score = sc[f.key];
     const fill  = document.getElementById(`${f.pfx}-fill`);
     const val   = document.getElementById(`${f.pfx}-val`);
     const desc  = document.getElementById(`${f.pfx}-desc`);
+    if (desc) desc.textContent = f.desc;
     if (score == null) {
       if (val) { val.textContent = '--'; val.style.color = 'var(--text-dim)'; }
       if (fill) fill.style.width = '0%';
@@ -2506,12 +2504,13 @@ async function fetchRealPizzaData() {
     if (!res || !res.ok) throw new Error('HTTP ' + (res ? res.status : 'no-response'));
     const json = await res.json();
     DATA_UPDATED_AT = json.updated_at;
+    OBSERVED_DATA = json;
+    MARKET_TRANSLATIONS = new Map((json.polymarket||[]).filter(m=>m.question_zh).map(m=>[m.question,m.question_zh]));
     const age = Date.now() - Date.parse(json.updated_at);
     BACKEND_SCORE = age >= 0 && age < 6*3600000 && json.score?.model_version === 'wpi-4.0' ? json.score : null;
     if (json.score?.model_version !== 'wpi-4.0' || !(age >= 0 && age < 6*3600000)) {
       json.regions=(json.regions||[]).map(r=>({...r,score:null,level:'INSUFFICIENT_DATA',coverage:0,factors:{}}));
     }
-    renderDataQuality(json);
     const badge=document.getElementById('alert-badge');
     if(badge)badge.textContent=BACKEND_SCORE?.combined_score != null ? '觀察指數 '+BACKEND_SCORE.alert_level : '資料不足';
     const live=document.querySelector('.live-lbl');
@@ -2844,7 +2843,7 @@ function renderRegions(regions) {
           ${factorRow('熱異常', null)}<small>觀測像元：${f.firms_hotspots ?? '--'}（不計分）</small>
           ${factorRow('廣域軍機', null)}<small>廣域可見：${f.avi_count ?? '--'} 架（非當地全量；不計分）</small>
         </div>
-        <div style="margin-top:auto;padding-top:.55rem;font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.top_market ? escapeHtml(r.top_market) : ''}">${r.top_market ? '📊 ' + escapeHtml(r.top_market) : '&nbsp;'}</div>
+        <div style="margin-top:auto;padding-top:.55rem;font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.top_market ? escapeHtml(r.top_market) : ''}">${r.top_market ? '📊 ' + escapeHtml(zhMarket(r.top_market)) : '&nbsp;'}</div>
       </div>`;
     }).join('');
   }
@@ -3640,6 +3639,7 @@ const PM_VERBS=[['capture','攻佔'],['recapture','奪回'],['retake','奪回'],
 function pmVerbs(s){let o=s;for(const[en,zh]of PM_VERBS)o=o.replace(new RegExp('\\b'+en+'\\b','gi'),zh);return o;}
 function zhMarket(q){
   if(!q) return q;
+  if(MARKET_TRANSLATIONS.has(q)) return MARKET_TRANSLATIONS.get(q);
   const s=q.trim().replace(/\s+/g,' ');
   const d=pmDate(s), dz=d?d.zh:'', head=d?d.head:s.replace(/\?$/,'');
   let m;

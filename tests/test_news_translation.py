@@ -35,3 +35,13 @@ class NewsTranslation(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(items[0]['translation_status'],'unavailable')
         self.assertNotIn('title_zh',items[0])
         self.assertEqual(len(session.calls),1)
+
+    async def test_market_translation_preserves_original_and_numeric_fields(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            items=[{'question':'US strike on Cuba by December 31?', 'yes_price':.14, 'risk_score':14}]
+            with patch.object(fetch_data,'DATA_FILE',Path(tmp)/'absent.json'):
+                await fetch_data._translate_market_questions(Session(),items)
+        self.assertEqual(items[0]['question'],'US strike on Cuba by December 31?')
+        self.assertEqual(items[0]['question_zh'],'繁體中文標題')
+        self.assertEqual(items[0]['yes_price'],.14)
+        self.assertEqual(items[0]['risk_score'],14)
