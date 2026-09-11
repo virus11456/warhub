@@ -1072,13 +1072,8 @@ def _num_before(unit: str, title: str):
     nums = [int(m) for m in re.findall(r'(\d{1,3})\s*' + unit, title)]
     return max(nums) if nums else None
 
-# 擷取單日架次：同時吃「N架／N架次」與「N機」兩種寫法。
-#   部分國防部戰報頭條用「6機10艦船」而非「6架次」，舊版只認「架」會漏抓。
-#   「N機」的數字必須緊貼「機」字才算（如 6機），可避開「共機／軍機／戰機／
-#   偵察機／F-16戰機」等無數字前綴的機型名，不會誤判。
-def _sortie_count(title: str):
-    cands = [n for n in (_num_before("架", title), _num_before("機", title)) if n]
-    return max(cands) if cands else None
+# Keep extraction and historical validation identical in collection and merge paths.
+from pla_counts import sortie_count as _sortie_count, usable_days as _usable_pla_days
 
 # 專用查詢：直接抓國防部每日戰報「N架次」標題（比一般台海新聞穩定，一次可涵蓋近幾天）
 PLA_SORTIE_QUERY = "共機 架次 OR 擾台 架次 OR 逾越中線 共機 OR 國防部 共機"
@@ -1110,6 +1105,8 @@ async def fetch_pla_sorties(session: aiohttp.ClientSession) -> dict:
                 days[k] = {field:value for field,value in d.items() if field != 'date'}
     except Exception:
         pass
+
+    days = _usable_pla_days(days)
 
     url = ("https://news.google.com/rss/search?q=" + urllib.parse.quote(PLA_SORTIE_QUERY)
            + "&hl=zh-TW&gl=TW&ceid=TW:zh-Hant")
