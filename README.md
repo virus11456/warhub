@@ -9,7 +9,7 @@
 
 1. `.github/workflows/update-data.yml` 每 2 小時（UTC 第 23 分）抓取上游來源，排程可能延遲。
 2. `scripts/fetch_data.py` 輸出 `data/*.json` 並保留歷史；`scripts/scoring.py` 統一產生網站、歷史與推播使用的 WPI。
-3. Vercel 連動 GitHub；合併至 `main` 會部署正式網站。
+3. Vercel 連動 GitHub；程式合併至 `main` 會部署正式網站。只有六個 API 資料 JSON 變動時跳過重建，仍從 GitHub 讀最新資料；無法確認上次部署差異則正常重建。
 4. 前端每 5 分鐘讀 `/api/data`，失敗退回同站 `data/` 部署快照。刷新網頁不代表上游資料剛更新。
 5. `/api/data` 需要 Vercel 環境變數 `GITHUB_TOKEN`，對私人倉庫 `virus11456/warhub` 具有 Contents read 權限。GitHub Actions 內建 token 不會自動傳到 Vercel。
 
@@ -47,3 +47,9 @@ python -m http.server 8000
 不可把金鑰放進前端、資料 JSON 或 Git。Vercel token 應只具有此倉庫唯讀權限。
 
 詳見 [來源稽核與後續工作](docs/DATA_AUDIT.md) 與 [運維說明](docs/OPERATIONS.md)。
+
+### 更新頻率與額度
+
+來源抓取維持每 2 小時；前端每 5 分鐘重新讀取快照，不代表來源每 5 分鐘更新。資料流程僅排程或手動執行，程式推送不額外抓取。probe／隔離驗證僅手動啟動且不自動提交資料。PR 驗證避免 push 與 pull_request 重複觸發。
+
+資料更新不必部署，但 API 失效時靜態備援可能較舊；請注意畫面更新時間與過期提示。更新 Vercel 環境變數後仍可手動重新部署同一版本。新抓取器於合併後下一次排程生效。

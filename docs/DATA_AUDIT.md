@@ -10,7 +10,7 @@
 
 | 來源 | 證據 / 狀態 | 處理與限制 |
 |---|---|---|
-| 正式 `/api/data` | HTTP 502；body 為 `github 404`，提示 token 已設定但讀取失敗 | 私人 repo 已確認。需在 Vercel 更新正確 scope 的 token 並重新部署；程式加入逾時、JSON 驗證、錯誤不快取。已用使用者 Chrome 確認 Production 與 Preview 有此變數；值為不可讀的 Secret，未修改 token，更新表單已交接使用者。 |
+| 正式 `/api/data` | 原先 502；使用者更新 token 後，10:35–10:36 正式請求 HTTP 200，展示時間及數值與 main 相符 | 目前讀取已恢復。程式加入逾時、JSON 驗證、錯誤不快取；不由此推斷舊 token 失效時間。 |
 | 同站 `data/data.json` | HTTP 200；快照時間 `2026-09-10T16:38:16Z` | 與檢查時 GitHub 快照一致；這不表示每個子來源都是這個時間的觀測。 |
 | PizzINT | 公開 API 可讀；多家當時沒有即時人流 | 原版把 null 當關店／零分。修正為不可用；無即時店家時不計 Z。上游的假陽性、觀測時間延遲仍需評估。 |
 | Polymarket | 已存前 20 筆含 Fed 降息問題；原版用 description 關鍵字誤收 | 改 title-only、保守軍事動作篩選、按 outcome 名称取 Yes/No、停火方向一致、過期剔除、正式 tag_id 參數。本機 TLS 問題未繞過；已在 GitHub runner 驗證正式 tag 查詢，修正後取得 43 個市場，結束封鎖、破壞停火等歧義問句排除。最多 300 筆候選仍不保證涵蓋所有盤口。 |
@@ -50,14 +50,14 @@
 
 ## 後續優先順序
 
-1. Vercel `GITHUB_TOKEN`：限此 repo、Contents Read、有效期／organization approval 如適用；重新部署後確認 `/api/data?f=data.json` 200，updated_at 與 GitHub 一致。
-2. 在 GitHub runner 跑新版資料更新，驗證 Polymarket tag 和實際有效盤口數；處理 GDELT／NOTAM 存取問題。合併 scripts 會觸發既有資料 workflow，也可能依原設定推播，請在合併前知悉。
+1. Vercel token 修復與正式 API 讀取驗證已完成；持續留意過期提示。
+2. 在 GitHub runner 跑新版資料更新，驗證 Polymarket tag 和實際有效盤口數；處理 GDELT／NOTAM 存取問題。本次將資料流程改為既有每 2 小時排程與手動觸發，合併程式不額外觸發抓取／推播。
 3. USDA、BestTime、FRED 金鑰來源驗證；USDA marketYear 與缺欄位不可當零；Comtrade 按商品／報告國／版本補 coverage 並重建不可信歷史；PLA 改接國防部原始戰報。
 4. 將 500 KB 單一 HTML 的地球點資料、視覺、來源渲染拆開。避免為每筆資料提交重建整站可減少部署，但应先修通 API，再調 Vercel 的忽略部署策略，否則會凍結快照。
 
 ## 驗證範圍
 
-25 項 Python 單元／失敗情境整合測試、4 項 API 測試、JavaScript 語法檢查及四種 DOM 情境（中斷、舊快照、缺值、新分數）通過。公開來源抽樣實測見上表。
+25 項 Python 單元／失敗情境整合測試、5 項 API 測試、JavaScript 語法檢查及四種 DOM 情境（中斷、舊快照、缺值、新分數）通過。公開來源抽樣實測見上表。
 已用使用者 Chrome 驗證預覽頁面：頁首、主分數與跑馬燈皆不再沿用舊版分數；歷史載入不阻擋當前卡片。桌面截圖已核對，手機版未完成獨立驗證。已跑帶來源金鑰的唯讀 probe（含 USDA、BestTime、FRED），未跑寫入正式檔案的完整抓取、未發送測試通知，未修改 production、金鑰或既存 data JSON。
 
 ## 主要方法來源
@@ -90,3 +90,22 @@
 - Vercel token 更新表單仍待使用者填寫；Chrome 直接開正式 API 時被客戶端阻擋，未據此宣稱 API 已恢復。main 的既有更新排程仍有成功執行，正式發布與 API 修通須另外驗證。
 
 - 展開 Chrome 進階區塊後確認仍有第二處靜態核警戒／核武 5%／市場 94% 宣稱，已移除；WPI 公式改成有效權重歸一化。舊版快照的餐廳關店判斷及貿易年增不再沿用。新增四情境前端 DOM 回歸至 CI，檢查上述錯誤不再出現。
+
+## Token 更新後的正式站驗證（2026-09-11 10:37 台灣時間）
+
+使用者已儲存 GITHUB_TOKEN，Vercel 顯示 Production 與 Preview 的變數 Updated just now。新正式部署 dpl_8ZowH8rjHLdgfQ8BUPg5nkM3wRvc 已 Ready，仍使用 main 的既有程式。
+
+Chrome 直接導覽 JSON URL 回 ERR_BLOCKED_BY_CLIENT，不能用此瀏覽器端阻擋判定伺服器或 token 失敗。網站正常載入後，Vercel 日誌顯示 warhubs.com 的 /api/data 在 10:35:57、10:36:21、10:36:25、10:36:40 均 HTTP 200。
+
+網站後端資料時間 2026-09-11 08:20:56（台灣時間），與 GitHub main data.json 的 updated_at 2026-09-11T00:20:56.890557+00:00 一致；網站展示的 FIRMS 20,233、可見軍機 278 亦與該快照一致。可確認更新後的正式資料讀取已成功；不能由此追溯判定舊 token 何時失效，也不表示所有第三方來源或舊版分析均已修正。PR #105 的程式修正尚未合併到正式站。
+
+## 更新頻率與部署控制
+
+- 保留每 2 小時來源抓取、網頁每 5 分鐘讀取最新快照；這不是分鐘級來源即時性。上游發布時間、排程延誤、抓取耗時及 CDN 快取也影響延遲。
+- Vercel 僅在與上次成功部署相比，變動全部是 API 可讀取的六個資料 JSON 時跳過重建；網頁照常從 GitHub 讀最新資料。不支援的靜態檔、程式修改、首次部署、缺少 Git 歷史及同版本手動重新部署均正常建置。Vercel 仍可能留下取消的部署紀錄；淺層歷史不足時會保守重建，不能承諾完全零部署。
+- 靜態備援快照只隨成功部署刷新；API 中斷時可能更舊，需保留過期提示，不能把備援當新資料。
+- PR 每次提交只跑一份程式驗證，main 合併後另驗證；新版本取消同 PR 過時驗證。來源 probe 和完整隔離抓取僅手動執行，不會自動提交預覽資料或連帶部署。
+- 移除程式 push 額外觸發的資料抓取；保留原定排程與手動更新。新版抓取器合併後會在下一次排程產生新模型資料，這段過渡期間新版頁面會將舊模型標為不可用。
+- 部署守門測試涵蓋首次部署、環境變數手動重部署、純資料、缺失歷史、程式後接資料提交、未由 API 支援的靜態檔。
+
+設定依據：[Vercel Ignored Build Step](https://vercel.com/kb/guide/how-do-i-use-the-ignored-build-step-field-on-vercel)、[上次成功部署 SHA](https://vercel.com/docs/environment-variables/system-environment-variables#VERCEL_GIT_PREVIOUS_SHA)。

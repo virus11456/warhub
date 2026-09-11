@@ -1,9 +1,6 @@
 name: Probe upstream sources
 on:
   workflow_dispatch:
-  push:
-    branches: ['codex/data-integrity-audit']
-    paths: ['scripts/probe_sources.py', '.github/workflows/source-probe.yml']
 permissions:
   contents: read
 jobs:

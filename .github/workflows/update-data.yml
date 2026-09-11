@@ -9,11 +9,6 @@ on:
         description: '傳一則測試推播到 Telegram/Discord（驗證連線）'
         type: boolean
         default: false
-  push:
-    branches: [main]
-    paths:
-      - 'scripts/**'
-      - '.github/workflows/update-data.yml'
 
 permissions:
   contents: write

@@ -1,8 +1,13 @@
 name: Verify data integrity
 on:
   pull_request:
+    paths: ['scripts/**', 'tests/**', 'api/**', 'index.html', 'vercel.json', '.github/workflows/**']
   push:
-    paths: ['scripts/**', 'tests/**', 'api/**', 'index.html', '.github/workflows/verify.yml']
+    branches: [main]
+    paths: ['scripts/**', 'tests/**', 'api/**', 'index.html', 'vercel.json', '.github/workflows/**']
+concurrency:
+  group: verify-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
@@ -18,7 +23,7 @@ jobs:
           node-version: '22'
       - run: pip install -r scripts/requirements.txt
       - run: python -m unittest discover -s tests -v
-      - run: node --test tests/test_api.mjs
+      - run: node --test tests/test_api.mjs tests/test_deploy.mjs
       - run: npm install --no-save --ignore-scripts jsdom@30.0.1
       - run: node tests/test_frontend.cjs
       - name: Check inline JavaScript
