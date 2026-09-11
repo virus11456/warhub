@@ -10,6 +10,10 @@ on:
         type: choice
         options: [auto, fast, full]
         default: auto
+      force_refresh:
+        description: '略過近期更新檢查，強制收集一次（可能觸發正常通知）'
+        type: boolean
+        default: false
       test_push:
         description: '傳一則測試推播到 Telegram/Discord（驗證連線）'
         type: boolean
@@ -28,6 +32,9 @@ jobs:
     timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Resolve the latest branch after acquiring the workflow concurrency slot.
+          ref: ${{ github.ref }}
 
       - uses: actions/setup-python@v5
         with:
@@ -35,10 +42,19 @@ jobs:
           cache: pip
           cache-dependency-path: scripts/requirements.txt
 
+      - name: Check collection spacing
+        id: spacing
+        env:
+          FORCE_REFRESH: ${{ inputs.force_refresh }}
+          TEST_PUSH: ${{ inputs.test_push }}
+        run: python scripts/collection_guard.py
+
       - name: Install deps
+        if: steps.spacing.outputs.collect == 'true'
         run: pip install -r scripts/requirements.txt
 
       - name: Fetch data
+        if: steps.spacing.outputs.collect == 'true'
         env:
           GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
@@ -63,6 +79,7 @@ jobs:
         run: python scripts/fetch_data.py
 
       - name: Commit data.json
+        if: steps.spacing.outputs.collect == 'true'
         run: |
           # 注意：commit author email 必須是有效的 GitHub 帳號 email，否則
           # Vercel（Hobby 方案）會以「commit author email is not valid」擋掉
