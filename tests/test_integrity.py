@@ -21,6 +21,11 @@ class Session:
     def get(self,*args,**kwargs): return Response(self.value)
 
 class Integrity(unittest.TestCase):
+    def test_partial_trade_and_old_usda_labels(self):
+        health=source_health({'food':{'items':[{'wan_ton':12,'incomplete':True}]},'usda':{'items':[{'week_net_kt':0,'stale':True}]}})
+        self.assertEqual(health['food']['status'],'partial')
+        self.assertEqual(health['usda']['status'],'stale')
+
     def test_verified_revision_survives_larger_headline(self):
         from merge_history import _union_days
         verified={'aircraft':12,'verified':True,'source_url':'https://example.test/report'}

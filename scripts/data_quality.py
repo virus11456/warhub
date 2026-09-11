@@ -33,7 +33,9 @@ def source_health(data):
                 items=v.get('items') or []
                 if items and not v.get("stale"):
                     fresh=sum(not r.get('incomplete') and not r.get('stale') for r in items)
-                    status='available' if fresh==len(items) else 'partial' if fresh else 'unavailable'
+                    measured=[r for r in items if any(r.get(k) is not None for k in ('wan_ton','week_net_kt','commit_kt'))]
+                    status='available' if fresh==len(items) else 'partial' if measured else 'unavailable'
+                    if measured and all(r.get('stale') for r in measured): status='stale'
                 note = '觀測期間：' + str(v.get('ref_month') or v.get('week_ending') or '未知') + '；與抓取時間不同'
         if key == 'pizza':
             n = sum(1 for s in v or [] if s.get('busyness') is not None and s.get('is_open'))
