@@ -3295,7 +3295,7 @@ function drawStratHistory(){
   var svg=document.getElementById('sh-svg'); if(!svg) return;
   document.querySelectorAll('#sh-cmd .fh-tab').forEach(function(b){b.classList.toggle('on', b.dataset.cmd===SH_STATE.cmd);});
   document.querySelectorAll('#sh-range .fh-tab').forEach(function(b){b.classList.toggle('on', +b.dataset.range===SH_STATE.range);});
-  var data=(json.strat_hist||[]).slice(-SH_STATE.range);
+  var data=(json.strat_hist||[]).slice(-SH_STATE.range).map(d=>d.schema_version===2?d:{...d,'4001':null,'2604':null,'2610':null,'2601':null});
   var key=SH_STATE.cmd;
   var W=720,H=220,padL=48,padR=14,padT=14,padB=28;
   var n=data.length;
@@ -3337,7 +3337,7 @@ function drawStratHistory(){
     var nm=({'4001':'天然橡膠','2604':'鎳礦砂','2610':'鉻礦砂','2601':'鐵礦砂'})[key];
     var f=data.length?data[0].ym:'', l=data.length?data[data.length-1].ym:'';
     leg.innerHTML='中國每月<b>'+nm+'</b>進口量（萬噸，每月一根）· '+f+' → '+l
-      +'　歷史尚未逐月核驗，缺報月份不可當零。▮ 實心＝中國海關直報，▯ 淡色虛邊＝出口國回推（直報與鏡像涵蓋範圍不同，不宜直接比較增幅）· 看逐月趨勢';
+      +'　舊歷史正分批重新核驗，未核驗月份暫不繪製；缺報不等於零。▮ 實心＝中國海關直報，▯ 淡色虛邊＝出口國回推（直報與鏡像涵蓋範圍不同，不宜直接比較增幅）· 看逐月趨勢';
   }
 }
 // ── ⚙️ 戰略物資進口監測 ──
@@ -3354,7 +3354,7 @@ function renderStrat(json){
     var partial=!!it.incomplete || it.anomaly==='partial';
     var col=partial?'var(--text-dim)':((y==null)?'var(--text-dim)':(y>0?'#ff4d5e':(y<0?'#35e08a':'var(--text-dim)')));
     var arr=(y==null)?'':(y>0?'▲':(y<0?'▼':''));
-    var reference=it.wan_ton==null ? history.find(d=>d.ym<s.ref_month && Number.isFinite(d[it.cmd]) && d[it.cmd]>0) : null;
+    var reference=it.wan_ton==null ? history.find(d=>d.schema_version===2 && d.ym<s.ref_month && Number.isFinite(d[it.cmd]) && d[it.cmd]>0) : null;
     var w=it.wan_ton==null?'待回報':it.wan_ton>=100?Math.round(it.wan_ton).toLocaleString():it.wan_ton;
     var flag=it.anomaly==='high'?'<span class="strat-flag high">異常高</span>'
             :it.anomaly==='low'?'<span class="strat-flag low">異常低</span>'

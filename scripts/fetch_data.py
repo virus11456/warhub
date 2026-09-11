@@ -1570,12 +1570,18 @@ async def fetch_strategic_history(session: aiohttp.ClientSession) -> list:
     cmds = [m["cmd"] for m in STRAT_MATERIALS]
 
     missing_mirror = [ym for ym in targets if ym > STRAT_CHINA_CUTOFF and key(ym) not in store]
-    missing_china  = [ym for ym in targets if ym <= STRAT_CHINA_CUTOFF and key(ym) not in store]
-    stored_mirror  = sorted([ym for ym in targets if ym > STRAT_CHINA_CUTOFF and key(ym) in store], reverse=True)
-    refresh = stored_mirror[:1]
+    missing_china = [ym for ym in targets if ym <= STRAT_CHINA_CUTOFF
+                     and store.get(key(ym), {}).get("schema_version") != 2]
+    stored_mirror = sorted([ym for ym in targets if ym > STRAT_CHINA_CUTOFF and key(ym) in store], reverse=True)
+    legacy = [ym for ym in stored_mirror if store[key(ym)].get("schema_version") != 2]
+    # Reserve one existing budget slot for legacy repair, otherwise newest-month refresh starves it.
+    candidates = sorted(set(missing_mirror + stored_mirror[:1]), reverse=True)
+    legacy.sort(key=lambda ym: (store[key(ym)].get("recheck_attempted_at", ""), -ym))
+    repair = legacy[:1]
+    selected = repair + [ym for ym in candidates if ym not in repair]
 
     try:
-        for ym in sorted(set(missing_mirror + refresh), reverse=True)[:STRAT_HIST_MIRROR_BUDGET]:
+        for ym in selected[:STRAT_HIST_MIRROR_BUDGET]:
             rec = {"src": "mirror", "schema_version":2, "coverage":{}}
             any_ok = False
             for m in STRAT_MATERIALS:
@@ -1589,6 +1595,8 @@ async def fetch_strategic_history(session: aiohttp.ClientSession) -> list:
                 rec["coverage"][m["cmd"]] = reporters
             if any_ok:
                 store[key(ym)] = rec
+            elif key(ym) in store:
+                store[key(ym)]["recheck_attempted_at"] = now.isoformat()
         for ym in sorted(missing_china, reverse=True)[:STRAT_HIST_CHINA_BUDGET]:
             d = await _comtrade_china_strat(session, ym)
             await asyncio.sleep(3)
