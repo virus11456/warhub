@@ -1569,20 +1569,33 @@ async def fetch_strategic_history(session: aiohttp.ClientSession) -> list:
     def key(ym): return f"{ym // 100}-{ym % 100:02d}"
     cmds = [m["cmd"] for m in STRAT_MATERIALS]
 
-    missing_mirror = [ym for ym in targets if ym > STRAT_CHINA_CUTOFF and key(ym) not in store]
-    missing_china = [ym for ym in targets if ym <= STRAT_CHINA_CUTOFF
-                     and store.get(key(ym), {}).get("schema_version") != 2]
-    stored_mirror = sorted([ym for ym in targets if ym > STRAT_CHINA_CUTOFF and key(ym) in store], reverse=True)
-    legacy = [ym for ym in stored_mirror if store[key(ym)].get("schema_version") != 2]
-    # Reserve one existing budget slot for legacy repair, otherwise newest-month refresh starves it.
-    candidates = sorted(set(missing_mirror + stored_mirror[:1]), reverse=True)
-    legacy.sort(key=lambda ym: (store[key(ym)].get("recheck_attempted_at", ""), -ym))
-    repair = legacy[:1]
-    selected = repair + [ym for ym in candidates if ym not in repair]
+    def incomplete(ym):
+        rec = store.get(key(ym), {})
+        if rec.get("schema_version") != 2:
+            return True
+        if ym <= STRAT_CHINA_CUTOFF:
+            return any(rec.get(c) is None for c in cmds)
+        return any(rec.get(m["cmd"]) is None or
+                   set(rec.get("coverage", {}).get(m["cmd"], [])) != {r for r, _ in m["exp"]}
+                   for m in STRAT_MATERIALS)
+
+    # Rotate all incomplete months, including successful but partial responses.
+    # The second slot still refreshes the newest month; budgets/cadence are unchanged.
+    retry_order = lambda ym: (store.get(key(ym), {}).get("recheck_attempted_at", ""),
+                                 2 if key(ym) not in store else
+                                 0 if store[key(ym)].get("schema_version") != 2 else 1, -ym)
+    mirror = sorted((ym for ym in targets if ym > STRAT_CHINA_CUTOFF), reverse=True)
+    pending = sorted((ym for ym in mirror if incomplete(ym)), key=retry_order)
+    selected = pending[:1] + [ym for ym in mirror[:1] + pending if ym not in pending[:1]]
+    selected = list(dict.fromkeys(selected))
+    missing_china = sorted((ym for ym in targets if ym <= STRAT_CHINA_CUTOFF and incomplete(ym)),
+                           key=retry_order)
 
     try:
         for ym in selected[:STRAT_HIST_MIRROR_BUDGET]:
-            rec = {"src": "mirror", "schema_version":2, "coverage":{}}
+            rec = {"src": "mirror", "schema_version":2, "coverage":{},
+                   "recheck_attempted_at": now.isoformat()}
+            previous = store.get(key(ym), {})
             any_ok = False
             for m in STRAT_MATERIALS:
                 tot = 0; reporters = []
@@ -1593,18 +1606,30 @@ async def fetch_strategic_history(session: aiohttp.ClientSession) -> list:
                         tot += v; any_ok = True; reporters.append(rep)
                 rec[m["cmd"]] = round(tot / 1e7, 1) if reporters else None
                 rec["coverage"][m["cmd"]] = reporters
-            if any_ok:
+            if previous.get("schema_version") == 2:
+                for c in cmds:
+                    old_coverage = set(previous.get("coverage", {}).get(c, []))
+                    if previous.get(c) is not None and (rec[c] is None or
+                            not old_coverage.issubset(set(rec["coverage"][c]))):
+                        # Keep the whole earlier observation; never add overlapping aggregates.
+                        rec[c] = previous[c]
+                        rec["coverage"][c] = sorted(old_coverage)
+            if any_ok or previous.get("schema_version") == 2:
                 store[key(ym)] = rec
-            elif key(ym) in store:
-                store[key(ym)]["recheck_attempted_at"] = now.isoformat()
-        for ym in sorted(missing_china, reverse=True)[:STRAT_HIST_CHINA_BUDGET]:
+            else:
+                store[key(ym)] = {**previous, "recheck_attempted_at": now.isoformat()}
+        for ym in missing_china[:STRAT_HIST_CHINA_BUDGET]:
             d = await _comtrade_china_strat(session, ym)
             await asyncio.sleep(3)
+            previous = store.get(key(ym), {})
             if d:
-                rec = {"src": "china", "schema_version":2}
+                rec = {"src": "china", "schema_version":2, "recheck_attempted_at": now.isoformat()}
                 for c in cmds:
-                    rec[c] = round(d[c] / 1e7, 1) if d.get(c) is not None else None
+                    rec[c] = (round(d[c] / 1e7, 1) if d.get(c) is not None else
+                              previous.get(c) if previous.get("schema_version") == 2 else None)
                 store[key(ym)] = rec
+            else:
+                store[key(ym)] = {**previous, "recheck_attempted_at": now.isoformat()}
     except Exception as e:
         log.warning(f"strat history backfill error: {e}")
 
@@ -1615,8 +1640,8 @@ async def fetch_strategic_history(session: aiohttp.ClientSession) -> list:
     except Exception as e:
         log.warning(f"strat history write error: {e}")
     series = [{"ym": k, **store[k]} for k in sorted(store.keys())]
-    remaining = len([ym for ym in targets if key(ym) not in store])
-    log.info(f"strat history: {len(store)}/{len(targets)} months, {remaining} remaining")
+    remaining = sum(incomplete(ym) for ym in targets)
+    log.info(f"strat history: {len(store)}/{len(targets)} months tracked, {remaining} incomplete")
     return series
 
 
