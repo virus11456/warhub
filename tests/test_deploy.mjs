@@ -33,6 +33,12 @@ test('deployment gate preserves code updates and fresh data without unnecessary 
     writeFileSync(join(cwd, 'data/data.json'), '{"updated":1}'); commit();
     assert.equal(gate(deployed), 0, 'only API-backed data skips');
     assert.equal(gate('f'.repeat(40)), 1, 'unavailable shallow history builds');
+    mkdirSync(join(cwd, 'archives/2026/09'), { recursive: true });
+    const archive = `archives/2026/09/20260911T060211_${'a'.repeat(64)}.json.gz`;
+    writeFileSync(join(cwd, archive), 'compressed snapshot fixture'); commit();
+    assert.equal(gate(deployed), 0, 'archive and data changes skip deployment');
+    const archiveIgnored = spawnSync('git', ['-c', `core.excludesfile=${ignoreFile}`, 'check-ignore', '--no-index', archive], { cwd });
+    assert.equal(archiveIgnored.status, 0, 'archives stay out of the public deployment');
     writeFileSync(join(cwd, 'index.html'), 'new code'); commit();
     writeFileSync(join(cwd, 'data/data.json'), '{"updated":2}'); commit();
     assert.equal(gate(deployed), 1, 'later data commit cannot hide undeployed code');

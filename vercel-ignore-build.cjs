@@ -12,7 +12,7 @@ try {
     const files = execFileSync('git', ['diff', '--name-only', '-z', previous, 'HEAD'],
       { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).split('\0').filter(Boolean);
     // Empty diff allows manual redeployment after environment-variable changes.
-    skip = files.length > 0 && files.every(file => liveFiles.has(file));
+    skip = files.length > 0 && files.every(file => liveFiles.has(file) || /^archives\/\d{4}\/\d{2}\/\d{8}T\d{6}_[a-f0-9]{64}\.json\.gz$/.test(file));
   }
 } catch {
   // Missing shallow-clone history or any git error: build safely.
