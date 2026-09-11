@@ -1,10 +1,10 @@
 name: Verify data integrity
 on:
   pull_request:
-    paths: ['scripts/**', 'tests/**', 'api/**', 'index.html', 'vercel.json', '.github/workflows/**']
+    paths: ['scripts/**', 'tests/**', 'api/**', 'index.html', 'vercel.json', 'vercel-ignore-build.cjs', '.vercelignore', '.github/workflows/**']
   push:
     branches: [main]
-    paths: ['scripts/**', 'tests/**', 'api/**', 'index.html', 'vercel.json', '.github/workflows/**']
+    paths: ['scripts/**', 'tests/**', 'api/**', 'index.html', 'vercel.json', 'vercel-ignore-build.cjs', '.vercelignore', '.github/workflows/**']
 concurrency:
   group: verify-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
