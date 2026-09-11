@@ -1294,9 +1294,9 @@
       <a href="https://t.me/warhubss" target="_blank" rel="noopener" class="nav-tg"><span class="nav-ic">📢</span><span class="nav-tx">TG 通知</span></a>
     </div>
     <div class="header-status">
-      <span class="live-ind"><span class="live-dot"></span><span class="live-lbl">即時連線 LIVE DATA</span></span>
+      <span class="live-ind"><span class="live-dot"></span><span class="live-lbl">定期資料快照</span></span>
       <span id="clock">--:--:-- UTC</span>
-      <span class="threat-badge" id="alert-badge">威脅等級 ELEVATED</span>
+      <span class="threat-badge" id="alert-badge">等待資料</span>
     </div>
   </div>
 </header>
@@ -1305,24 +1305,7 @@
 <div class="ticker-wrap">
   <div class="ticker-label">情報快訊 INTEL FEED</div>
   <div style="overflow:hidden;flex:1;">
-    <div class="ticker-scroll" id="ticker">
-      <div class="ticker-item"><svg class="px-ic"><use href="#ic-pizza"/></svg> 五角大廈披薩指數 <span class="hi">↑ 異常偏高</span> &nbsp;•&nbsp;</div>
-      <div class="ticker-item">Polymarket：烏克蘭停火機率 <span class="hi">37%</span> &nbsp;•&nbsp;</div>
-      <div class="ticker-item">末日時鐘距離午夜 <span class="red">89秒</span> — 史上最近 &nbsp;•&nbsp;</div>
-      <div class="ticker-item">美伊談判陷入僵局，川普：正在考慮有限軍事行動 &nbsp;•&nbsp;</div>
-      <div class="ticker-item">台海：Polymarket 開戰預測維持 <span class="hi">~12%</span> &nbsp;•&nbsp;</div>
-      
-      <div class="ticker-item">Polymarket 估值達 <span class="green">90億美元</span>，地緣政治賭局交易量激增 &nbsp;•&nbsp;</div>
-      <div class="ticker-item">索馬利亞：美軍打擊海盜概率 <span class="red">89%</span> &nbsp;•&nbsp;</div>
-      <!-- Duplicate for seamless loop -->
-      <div class="ticker-item"><svg class="px-ic"><use href="#ic-pizza"/></svg> 五角大廈披薩指數 <span class="hi">↑ 異常偏高</span> &nbsp;•&nbsp;</div>
-      <div class="ticker-item">Polymarket：烏克蘭停火機率 <span class="hi">37%</span> &nbsp;•&nbsp;</div>
-      <div class="ticker-item">末日時鐘距離午夜 <span class="red">89秒</span> — 史上最近 &nbsp;•&nbsp;</div>
-      <div class="ticker-item">美伊談判陷入僵局，川普：正在考慮有限軍事行動 &nbsp;•&nbsp;</div>
-      <div class="ticker-item">台海：Polymarket 開戰預測維持 <span class="hi">~12%</span> &nbsp;•&nbsp;</div>
-      
-      <div class="ticker-item">Polymarket 估值達 <span class="green">90億美元</span>，地緣政治賭局交易量激增 &nbsp;•&nbsp;</div>
-      <div class="ticker-item">索馬利亞：美軍打擊海盜概率 <span class="red">89%</span> &nbsp;•&nbsp;</div>
+    <div class="ticker-scroll" id="ticker"><div class="ticker-item">等待載入可核對的資料；本站觀察指數不是開戰機率。</div>
     </div>
   </div>
 </div>
@@ -1363,7 +1346,7 @@
         <div style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)" id="alert-timestamp">--:--:-- UTC</div>
       </div>
       <div style="font-family:'Share Tech Mono',monospace;font-size:.82rem;color:var(--accent2);line-height:1.6;margin-bottom:.8rem" id="alert-main-text">
-        <svg class="px-ic"><use href="#ic-pizza"/></svg> Pizza DEFCON 異常升高 — 歷史上此訊號出現後 2–48 小時內曾發生軍事行動
+        <svg class="px-ic"><use href="#ic-pizza"/></svg> PizzINT 人流異常 — 尚無已驗證的軍事行動預測能力，需交叉查證
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.8rem">
         <div style="background:rgba(255,77,94,.1);border:1px solid rgba(255,77,94,.3);padding:.6rem;border-radius:4px">
@@ -1420,7 +1403,7 @@
 
       <!-- 說明 -->
       <div style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim);line-height:1.6;margin-bottom:.6rem">
-        冷戰時 KGB 監視五角大廈深夜外送作為早期預警。<strong style="color:var(--accent4)">PizzINT</strong>：Pentagon 周邊披薩店突發爆單、深夜外送量暴增 → 五角大廈正在加班策劃。
+        冷戰時 KGB 監視五角大廈深夜外送作為早期預警。<strong style="color:var(--accent4)">PizzINT</strong>：觀察 Pentagon 周邊餐廳人流變化，無法直接確認外送訂單、軍方加班或行動規劃。
       </div>
 
       <!-- 🍺 加班指數（PizzINT × 酒吧反向 交叉判讀）-->
@@ -1440,7 +1423,7 @@
           </div>
         </div>
         <div style="font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim);line-height:1.6" id="overtime-note">
-          判讀邏輯：披薩<strong style="color:var(--accent3)">爆單</strong> ＋ 酒吧下班後<strong style="color:var(--accent4)">異常冷清</strong>（幕僚沒去喝酒）＝ 五角大廈留守加班策劃。兩訊號同時異常時，偽陽性（財年截止、演習、賽事）大幅降低。
+          判讀邏輯：披薩<strong style="color:var(--accent3)">爆單</strong> ＋ 酒吧下班後<strong style="color:var(--accent4)">異常冷清</strong>（幕僚沒去喝酒）＝ 五角大廈留守加班策劃。兩訊號仍可能受共同因素影響，降低偽陽性的效果尚未回測。
         </div>
         <div id="overtime-footnote" style="margin-top:.45rem;font-family:'Share Tech Mono',monospace;font-size:.6rem;color:rgba(255,255,255,.28)">
           🍺 酒吧即時人流由 BestTime 提供，僅美東傍晚下班時段（16–24 時）查詢。非該時段或未營業時顯示待接/無資料。
@@ -1497,7 +1480,7 @@
         <div class="warmap-hint" id="warmap-hint">🖱️ 拖曳旋轉 · 滾輪縮放　📱 拖曳/雙指</div>
       </div>
       <div class="warmap-legend">
-        <span><i class="wm-fire"></i>紅點＝衝突火點（衛星偵測的即時戰火）</span>
+        <span><i class="wm-fire"></i>紅點＝監測區衛星熱異常（可能是野火、工業熱源；未確認戰火）</span>
         <span><i class="wm-ring"></i>監測地區 · 依風險著色</span>
         <span id="warmap-count" style="margin-left:auto;color:var(--text-dim)">連接資料中…</span>
       </div>
@@ -1506,7 +1489,7 @@
       <div style="grid-column:1/-1;text-align:center;padding:1.2rem;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 計算地區風險中…</div>
     </div>
     <div style="margin-top:.7rem;font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim)">
-      計分：Polymarket 35%（停火盤反向）· GDELT 新聞強度 25% · 領空 NOTAM 15% · 衛星火點 12% · 軍機活動 13% ｜ ↑↓ = 與 24 小時前相比
+      計分：市場 35% · 新聞 25% · NOTAM 15%；火點及廣域軍機數僅展示，暫不計分；有效權重不足 60% 不出分數 ｜ ↑↓ = 與 24 小時前相比
     </div>
 
     <!-- 7 天風險趨勢圖 -->
@@ -1587,8 +1570,8 @@
   <div class="wpi-section">
     <div class="wpi-topbar">
       <div>
-        <div class="wpi-title">戰爭壓力指數 WAR PRESSURE INDEX <span class="wpi-ver">v3.0</span></div>
-        <div class="wpi-subtitle">加權多源 OSINT 綜合指數 · 每 10 分鐘自動重算</div>
+        <div class="wpi-title">戰爭壓力指數 WAR PRESSURE INDEX <span class="wpi-ver">v4.0</span></div>
+        <div class="wpi-subtitle">加權多源 OSINT 綜合指數 · 同一後端快照供網站、歷史與通知使用</div>
       </div>
       <div class="wpi-badge medium" id="html-wpi-badge">⚠ <span id="html-wpi-badge-text">ELEVATED</span></div>
     </div>
@@ -1599,7 +1582,7 @@
         <div class="wpi-factor">
           <div class="wpi-f-hdr"><span class="wpi-f-icon">📊</span><span class="wpi-f-name">Polymarket <em>P</em></span><span class="wpi-f-wt">×28%</span></div>
           <div class="wpi-f-bar-wrap"><div class="wpi-f-bar"><div class="wpi-f-fill" id="html-wpi-p-fill" style="width:0%"></div></div><div class="wpi-f-val" id="html-wpi-p-val">--</div></div>
-          <div class="wpi-f-desc" id="html-wpi-p-desc">市場共識戰爭機率</div>
+          <div class="wpi-f-desc" id="html-wpi-p-desc">合格事件盤口的方向調整指數</div>
         </div>
         <div class="wpi-factor">
           <div class="wpi-f-hdr"><span class="wpi-f-icon">✈️</span><span class="wpi-f-name">Aviation <em>A</em></span><span class="wpi-f-wt">×18%</span></div>
@@ -1653,7 +1636,7 @@
           <span style="color:var(--accent3)">50<br><small>MED</small></span>
           <span style="color:var(--accent2)">100<br><small>MAX</small></span>
         </div>
-        <div class="wpi-formula">WPI = 0.28<em>P</em> + 0.18<em>A</em> + 0.10<em>G</em> + 0.14<em>Z</em> + 0.10<em>F</em> + 0.12<em>S</em> + 0.08<em>W</em></div>
+        <div class="wpi-formula">WPI = 有效因子加權總和 ÷ 有效權重總和；覆蓋至少 60% 且至少 3 個有效因子才出分</div>
       </div>
 
       <!-- 右：三級警戒 + 地區熱度 -->
@@ -1661,7 +1644,7 @@
         <div class="wpi-al-title">多重驗證警戒</div>
         <div class="wpi-al-item" id="html-wpi-al-low">
           <div class="wpi-al-dot low"></div>
-          <div><div class="wpi-al-name">低度警戒</div><div class="wpi-al-cond">僅 Polymarket 波動</div><div class="wpi-al-sub">可能是政治口水，無需行動</div></div>
+          <div><div class="wpi-al-name">低度警戒</div><div class="wpi-al-cond">僅 Polymarket 波動</div><div class="wpi-al-sub">單一市場變動不足以判斷情勢</div></div>
           <div class="wpi-al-status" id="html-wpi-al-low-st">—</div>
         </div>
         <div class="wpi-al-item" id="html-wpi-al-med">
@@ -1671,7 +1654,7 @@
         </div>
         <div class="wpi-al-item" id="html-wpi-al-high">
           <div class="wpi-al-dot high"></div>
-          <div><div class="wpi-al-name">高度警戒</div><div class="wpi-al-cond">以上皆有 + 大量加油機</div><div class="wpi-al-sub">軍事行動即將執行</div></div>
+          <div><div class="wpi-al-name">高度警戒</div><div class="wpi-al-cond">以上皆有 + 大量加油機</div><div class="wpi-al-sub">多源訊號同時變動，需查證原因</div></div>
           <div class="wpi-al-status" id="html-wpi-al-high-st">—</div>
         </div>
         <div class="wpi-mini-regions">
@@ -1698,12 +1681,12 @@
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-bottom:.4rem">
       <div class="section-title" style="margin:0">📡 即時戰情快訊 · 早期預警</div>
       <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);display:flex;gap:.8rem;align-items:center">
-        <span style="color:var(--accent1)">⟳ 每 15 分鐘</span>
+        <span style="color:var(--accent1)">約每 2 小時更新</span>
         <span id="news-updated">載入中…</span>
       </div>
     </div>
     <div style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim);margin-bottom:.5rem">
-      Google News 全球監測 · 篩選白宮／中國／戰爭升級相關頭條，依時間排序，作為開戰預測的領先訊號（點擊看原文）
+      Google News 全球監測 · 篩選白宮／中國／戰爭升級相關頭條，依時間排序，供事件追蹤與原文查核，未驗證其預測能力（點擊看原文）
     </div>
     <div id="news-list">
       <div style="padding:1rem;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 連接 GDELT 新聞流…</div>
@@ -1715,12 +1698,12 @@
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;flex-wrap:wrap;gap:.5rem">
       <div class="section-title" style="margin:0">📊 Polymarket 戰爭預測市場</div>
       <div style="font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim);display:flex;gap:.8rem;align-items:center">
-        <span style="color:var(--accent1)">⟳ 每 5 分鐘</span>
+        <span style="color:var(--accent1)">約每 2 小時更新</span>
         <span id="poly-updated-time">上次更新：載入中…</span>
       </div>
     </div>
     <div style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim);margin-bottom:.8rem;padding:.5rem .7rem;background:rgba(0,207,232,.05);border-left:2px solid var(--accent4)">
-      真實資金下注 · 準確率 <span style="color:var(--accent1)">94%</span>（事件前一個月）· 2025 年地緣政治交易量 <span style="color:var(--accent3)">$33B+</span>
+      市場價格代表參與者對特定事件的定價；本站未驗證其預測準確率。不同到期日及事件定義不可直接比較。
     </div>
     <div class="poly-grid" id="poly-list-container">
       <div style="grid-column:1/-1;text-align:center;padding:1.4rem;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">載入即時 Polymarket 戰爭預測市場…</div>
@@ -1733,7 +1716,7 @@
   <!-- ══════════ 🇨🇳 中國戰備動向監測（整合區塊）══════════ -->
   <div class="cn-banner" id="china-watch">
     <div class="cn-banner-t">🇨🇳 中國戰備動向監測</div>
-    <div class="cn-banner-s">中國已停止公布糧食與戰略物資進口 → 改用「<strong>出口國回推</strong>」：把各主要出口國「對中國出口」的海關數據加總，回推中國進口量。搭配「<strong>異常高/低</strong>」與台海軍事動態，交叉推估備戰訊號。皆為佐證指標，須合併研判；<strong>單月易受資料未齊影響，以趨勢為主</strong>，且抓不到經俄/伊等不通報管道。</div>
+    <div class="cn-banner-s">以中國海關直報與<strong>出口國鏡像資料</strong>觀察貿易趨勢；兩者涵蓋範圍不同，不能直接混算增幅。缺少紀錄不代表停止公布或零進口。進口增減亦受價格、季節、需求及申報延遲影響，<strong>不能單憑增減推論備戰</strong>。</div>
   </div>
 
   <!-- ══════════ 🌾 中國糧食進口監測（結構性背景指標）══════════ -->
@@ -1743,7 +1726,7 @@
       <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim)"><span id="food-updated">結構性背景指標</span></div>
     </div>
     <div style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim);margin-bottom:.6rem" id="food-sub">
-      出口國回推（因中國停報，改由主要出口國「對中國出口」海關數據回推）· <strong>異常高＝囤糧備戰</strong>；<strong>異常低≠自給提升</strong>，可能是產量或人口下降（內政因素）· 佐證訊號，非即時、單月僅供參考，看趨勢
+      出口國回推（採主要出口國回報，改由主要出口國「對中國出口」海關數據回推）· <strong>異常高可能反映需求、價格或庫存調整，不能直接判定備戰</strong>；<strong>異常低≠自給提升</strong>，亦可能受需求、價格、季節與申報延遲影響· 佐證訊號，非即時、單月僅供參考，看趨勢
     </div>
     <div id="food-grid">
       <div style="padding:1rem;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 連接 UN Comtrade…</div>
@@ -1760,7 +1743,7 @@
     <!-- 🇺🇸→🇨🇳 USDA ESR 週報趨勢（承諾趨勢 / 下單 vs 提貨） -->
     <div id="uh-wrap" class="fh-wrap" style="display:none;margin-top:1rem;border-top:1px dashed var(--border);padding-top:.7rem">
       <div style="font-family:'Orbitron',monospace;font-size:.7rem;color:var(--text);margin-bottom:.15rem">🇺🇸→🇨🇳 美對中穀物週報趨勢 · USDA ESR</div>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim);margin-bottom:.45rem">此區為美國出口端週報(每週更新);中國 2025 起停報進口,故無法對比進口端落差,僅觀察美方趨勢</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim);margin-bottom:.45rem">此區為美國出口端週報(每週更新);中國直報資料可用性需逐期核對,故無法對比進口端落差,僅觀察美方趨勢</div>
       <div class="fh-controls">
         <div class="fh-tabs" id="uh-cmd"></div>
         <div class="fh-tabs" id="uh-view"></div>
@@ -1777,7 +1760,7 @@
       <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim)"><span id="strat-updated">軍工原料</span></div>
     </div>
     <div style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim);margin-bottom:.6rem">
-      軍工必需、中國高度依賴進口的原料（出口國回推）· <strong>異常高＝突然囤積</strong>、<strong>異常低＝改用儲備</strong> · 石油因俄/沙不報 Comtrade 抓不到 · 近月常未收齊，標「<strong>資料待補</strong>」者為暫值、勿當異常
+      軍工必需、中國高度依賴進口的原料（出口國回推）· <strong>增減原因未定，不能直接解讀為囤積或動用儲備</strong> · 石油因俄/沙不報 Comtrade 抓不到 · 近月常未收齊，標「<strong>資料待補</strong>」者為暫值、勿當異常
     </div>
     <div id="strat-grid">
       <div style="padding:1rem;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 連接 UN Comtrade…</div>
@@ -1802,7 +1785,7 @@
       共軍擾台・軍演・軍艦穿越台海・國防部戰報 · <strong>新聞訊號、非精確計數</strong>，供趨勢與異常觀察
     </div>
     <div id="pla-wrap" class="pla-wrap" style="display:none">
-      <div class="pla-hd">📈 每日共軍擾台架次 · 過去 30 天<span id="pla-latest"></span></div>
+      <div class="pla-hd">📈 新聞擷取架次（未核實）· 過去 30 天<span id="pla-latest"></span></div>
       <div class="fh-chart"><svg id="pla-svg" viewBox="0 0 720 170" preserveAspectRatio="xMidYMid meet"></svg></div>
       <div class="pla-legend" id="pla-legend"></div>
     </div>
@@ -1969,7 +1952,7 @@
   <div class="card" style="border-top:2px solid var(--accent)">
     <div class="osint-adv-hdr">
       <span>✈️ &nbsp;航空異常監控 (AVI)</span>
-      <span class="osint-updated" id="avi-updated">OpenSky Network</span>
+      <span class="osint-updated" id="avi-updated">ADS-B 公開接收網路</span>
     </div>
     <div class="avi-counter">
       <div class="avi-box"><div class="avi-box-val" id="avi-tankers" style="color:var(--accent)">--</div><div class="avi-box-lbl">加油機</div><div class="avi-tr" id="avi-tankers-tr"></div></div>
@@ -1978,7 +1961,7 @@
       <div class="avi-box"><div class="avi-box-val" id="avi-uav"     style="color:var(--accent)">--</div><div class="avi-box-lbl">偵察無人機</div><div class="avi-tr" id="avi-uav-tr"></div></div>
     </div>
     <div style="margin-bottom:.8rem;padding:.5rem .6rem;background:rgba(0,207,232,.06);border:1px solid rgba(0,207,232,.2);font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim)">
-      較 7 日均值 <strong style="color:var(--accent2);font-size:.82rem" id="avi-anomaly">--%</strong> &nbsp;·&nbsp; 7日均：<span id="avi-baseline">--</span> 架次/hr
+      關注機型佔目前可見軍機 <strong style="color:var(--accent2);font-size:.82rem" id="avi-anomaly">--%</strong> &nbsp;·&nbsp; 目前可見：<span id="avi-baseline">--</span> 架
     </div>
     <div class="avi-list" id="avi-list">
       <div style="text-align:center;padding:1.2rem;font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim)">⏳ 載入即時 ADS-B 軍機資料…</div>
@@ -2005,16 +1988,16 @@
     </div>
     <div class="fire-summary">
       <div class="fire-box"><div class="fire-val" id="firms-count" style="color:var(--text-dim)">--</div><div class="fire-lbl">24hr 衛星火點</div></div>
-      <div class="fire-box"><div class="fire-val" id="firms-delta" style="color:var(--text-dim)">--</div><div class="fire-lbl">vs 7日均值</div></div>
+      <div class="fire-box"><div class="fire-val" id="firms-delta" style="color:var(--text-dim)">--</div><div class="fire-lbl">vs 固定參考值 6,500（非7日均）</div></div>
     </div>
     <div class="live-feed" id="firms-feed">
       <div style="text-align:center;padding:1rem;font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim)">⏳ 連接 NASA FIRMS…</div>
     </div>
     <div class="event-tags">
-      <span class="event-tag" style="color:var(--accent2);border-color:var(--accent2);background:rgba(255,77,94,.08)">砲擊/爆炸 45%</span>
-      <span class="event-tag" style="color:var(--accent3);border-color:var(--accent3);background:rgba(245,166,35,.08)">部隊移動 30%</span>
-      <span class="event-tag" style="color:var(--accent);border-color:var(--accent);background:rgba(0,207,232,.08)">網路攻擊 15%</span>
-      <span class="event-tag" style="color:var(--accent);border-color:var(--accent);background:rgba(0,207,232,.08)">防空啟動 10%</span>
+      <span class="event-tag" style="color:var(--accent2);border-color:var(--accent2);background:rgba(255,77,94,.08)">熱異常無法判定武器類型</span>
+      <span class="event-tag" style="color:var(--accent3);border-color:var(--accent3);background:rgba(245,166,35,.08)">可能包含野火</span>
+      <span class="event-tag" style="color:var(--accent);border-color:var(--accent);background:rgba(0,207,232,.08)">可能包含工業熱源</span>
+      <span class="event-tag" style="color:var(--accent);border-color:var(--accent);background:rgba(0,207,232,.08)">需其他來源交叉核對</span>
     </div>
     <div style="margin-top:.6rem;text-align:right">
       <a href="https://firms.modaps.eosdis.nasa.gov/map/" target="_blank" rel="noopener" style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--accent)">NASA FIRMS 即時地圖 ↗</a>
@@ -2035,9 +2018,9 @@
       <div class="fin-box"><div class="fin-ticker">ZW=F 小麥</div><div class="fin-price" id="html-fin-zw" style="color:var(--text-dim)">--</div><div class="fin-change" id="html-fin-zw-chg">載入中</div><div class="fin-ma" id="html-fin-zw-ma">--</div></div>
     </div>
     <div class="fin-premium">
-      ⛽ 油價戰爭溢價：布倫特較 30日均價高出
+      ⛽ 油價相對均線差額：布倫特較 30日均價高出
       <strong style="color:var(--accent3);font-size:.82rem" id="fin-war-premium"> --</strong>
-      &nbsp;— 溢價超過 $8 通常代表市場已預期軍事行動
+      &nbsp;— 均線差額亦受供需等因素影響，不能單獨判定市場預期軍事行動
     </div>
     <div style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim);margin:.65rem 0 .3rem;letter-spacing:2px">軍工類股 DEFENSE STOCKS</div>
     <div class="fin-stocks" id="fin-stocks-list">
@@ -2059,8 +2042,8 @@
       <div class="section-title">末日時鐘 &amp; 核威脅</div>
 
       <div class="doomsday-display">
-        <div class="clock-face">23:58:31</div>
-        <div class="clock-label">距離午夜（核戰）僅剩 89 秒</div>
+        <div class="clock-face">23:58:35</div>
+        <div class="clock-label">2026：距象徵性午夜 85 秒（非實際倒數）</div>
       </div>
 
       <div class="midnight-bar">
@@ -2073,32 +2056,10 @@
       </div>
 
       <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--text-dim);line-height:1.7;margin-bottom:1rem;">
-        由《原子科學家公報》設定。<span style="color:var(--accent)">2025年調整至 89 秒</span>，為1947年以來最接近午夜的紀錄。俄烏核威脅、AI軍備競賽及氣候危機為主要考量。
+        由《原子科學家公報》設定。<span style="color:var(--accent)">2026年調整至 85 秒</span>，象徵多種全球災難風險，並非核戰倒數。<a href="https://thebulletin.org/doomsday-clock/2026-statement/" target="_blank" rel="noopener">2026 官方公告 ↗</a>
       </div>
 
-      <div class="section-title">核持有國警戒狀態</div>
-      <div style="display:flex;flex-direction:column;gap:0.5rem;">
-        <div style="display:grid;grid-template-columns:1fr auto;background:var(--bg3);border:1px solid var(--border);padding:0.6rem;gap:0.5rem;">
-          <div style="font-size:0.78rem;">🇷🇺 俄羅斯 — 核武威懾言論</div>
-          <div class="risk-pill critical">HIGH</div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr auto;background:var(--bg3);border:1px solid var(--border);padding:0.6rem;gap:0.5rem;">
-          <div style="font-size:0.78rem;">🇺🇸 美國 — DEFCON 維持3級</div>
-          <div class="risk-pill medium">ALERT</div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr auto;background:var(--bg3);border:1px solid var(--border);padding:0.6rem;gap:0.5rem;">
-          <div style="font-size:0.78rem;">🇨🇳 中國 — 核彈頭快速擴張中</div>
-          <div class="risk-pill high">HIGH</div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr auto;background:var(--bg3);border:1px solid var(--border);padding:0.6rem;gap:0.5rem;">
-          <div style="font-size:0.78rem;">🇮🇳🇵🇰 印巴核對峙</div>
-          <div class="risk-pill medium">WATCH</div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr auto;background:var(--bg3);border:1px solid var(--border);padding:0.6rem;gap:0.5rem;">
-          <div style="font-size:0.78rem;">🇮🇷 伊朗 — 濃縮鈾接近武器級</div>
-          <div class="risk-pill high">ELEVATED</div>
-        </div>
-      </div>
+      <p style="color:var(--text-dim)">未接入可核實的各國核警戒等級來源，暫不顯示等級。</p>
 
       <div class="section-title" style="margin-top:1rem">核試場地震監測（USGS 72h）</div>
       <div id="nuclear-seismic" style="display:flex;flex-direction:column;gap:0.35rem;font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);">
@@ -2106,7 +2067,7 @@
       </div>
 
       <div style="margin-top:1rem;padding:0.7rem;background:rgba(170,0,255,0.05);border:1px solid rgba(170,0,255,0.2);font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);">
-        ☢️ Polymarket 核武使用概率：5%（2026年）。低但非零。
+        核武相關盤口應逐筆核對事件定義及到期日；目前不提供固定機率。
       </div>
     </div>
 
@@ -2173,13 +2134,13 @@ document.querySelectorAll('.meter-fill').forEach(bar => {
 // 名稱必須與 scripts/fetch_data.py 的 SHOPS_TO_DISPLAY 完全相符
 // 資料來源：https://www.pizzint.watch/api/dashboard-data
 const PIZZA_SHOPS_DATA = [
-  { name: "We, The Pizza",                     busyness: 0, baseline: 45, icon: "🍕", is_open: false, status: "closed" },
-  { name: "Pizzato Pizza",                     busyness: 0, baseline: 40, icon: "🍕", is_open: false, status: "closed" },
-  { name: "Papa Johns Pizza",                  busyness: 0, baseline: 38, icon: "🍕", is_open: false, status: "closed" },
-  { name: "Domino's Pizza (Pentagon Closest)", busyness: 0, baseline: 35, icon: "🍕", is_open: false, status: "closed" },
-  { name: "Extreme Pizza",                     busyness: 0, baseline: 30, icon: "🍕", is_open: false, status: "closed" },
-  { name: "District Pizza Palace",             busyness: 0, baseline: 32, icon: "🍕", is_open: false, status: "closed" },
-  { name: "Nighthawk Brewery & Pizza",         busyness: 0, baseline: 35, icon: "🍕", is_open: false, status: "closed" },
+  { name: "We, The Pizza",                     busyness: null, baseline: 45, icon: "🍕", is_open: null, status: "unavailable" },
+  { name: "Pizzato Pizza",                     busyness: null, baseline: 40, icon: "🍕", is_open: null, status: "unavailable" },
+  { name: "Papa Johns Pizza",                  busyness: null, baseline: 38, icon: "🍕", is_open: null, status: "unavailable" },
+  { name: "Domino's Pizza (Pentagon Closest)", busyness: null, baseline: 35, icon: "🍕", is_open: null, status: "unavailable" },
+  { name: "Extreme Pizza",                     busyness: null, baseline: 30, icon: "🍕", is_open: null, status: "unavailable" },
+  { name: "District Pizza Palace",             busyness: null, baseline: 32, icon: "🍕", is_open: null, status: "unavailable" },
+  { name: "Nighthawk Brewery & Pizza",         busyness: null, baseline: 35, icon: "🍕", is_open: null, status: "unavailable" },
 ];
 
 // 異常閾值設定
@@ -2195,7 +2156,7 @@ const ANOMALY_SHOPS_REQUIRED = 2;
 
 // ─── 評估當前披薩狀態 ────────────────────────────────────────
 function evaluatePizzaStatus(shops) {
-  const anomalyShops = shops.filter(s => s.busyness >= THRESHOLD.ANOMALY);
+  const anomalyShops = shops.filter(s => s.status === "spike");
   const highShops    = shops.filter(s => s.busyness >= THRESHOLD.HIGH && s.busyness < THRESHOLD.ANOMALY);
   const avg          = shops.reduce((a,s) => a + s.busyness, 0) / shops.length;
 
@@ -2218,7 +2179,7 @@ function renderPizzaShops(shops) {
   const grid = document.getElementById('pizza-shops-grid');
   grid.innerHTML = shops.map(shop => {
     const isClosed   = shop.is_open === false || shop.status === 'closed';
-    const isAnomaly  = !isClosed && (shop.busyness >= THRESHOLD.ANOMALY || !!shop.spike_magnitude);
+    const isAnomaly  = !isClosed && shop.status === "spike";
     const isHigh     = !isClosed && shop.busyness >= THRESHOLD.HIGH && !isAnomaly;
     // 優先用 pizzint 的「相對平時 %」（100 = 正常），否則退回本地 baseline 估算
     let devStr;
@@ -2226,12 +2187,13 @@ function renderPizzaShops(shops) {
       const dev = Math.round(shop.percentage_of_usual - 100);
       devStr = `較平時 ${dev > 0 ? '+' : ''}${dev}%`;
     } else {
-      const deviation = shop.baseline ? Math.round(((shop.busyness - shop.baseline) / shop.baseline) * 100) : 0;
-      devStr = `vs 基準 ${deviation > 0 ? '+' : ''}${deviation}%`;
+      devStr = '無可比較的基準';
     }
 
     let dotCls, statusColor, statusText;
-    if (isClosed) {
+    if (shop.status === 'unavailable' || shop.busyness == null && !isClosed) {
+      dotCls='normal'; statusColor='var(--text-dim)'; statusText='無即時資料';
+    } else if (isClosed) {
       dotCls = 'normal'; statusColor = 'rgba(255,255,255,0.25)';
       statusText = '⬛ CLOSED';
     } else if (shop.spike_magnitude) {
@@ -2259,7 +2221,7 @@ function renderPizzaShops(shops) {
       </div>
       <div style="margin-top:0.4rem;">
         <div style="height:3px;background:var(--bg);border:1px solid var(--border);overflow:hidden;">
-          <div style="height:100%;width:${isClosed ? 0 : shop.busyness}%;background:${barColor};transition:width 1s;"></div>
+          <div style="height:100%;width:${isClosed ? 0 : (shop.busyness ?? 0)}%;background:${barColor};transition:width 1s;"></div>
         </div>
         ${sparklineSvg(shop.sparkline, barColor)}
         <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:rgba(255,255,255,0.25);margin-top:0.2rem;text-align:right;">
@@ -2301,7 +2263,7 @@ function renderWarAlert(status, shops) {
     levelLabelEl.style.color = status.gaugeColor;
   }
 
-  const badgeEl = document.getElementById('alert-badge');
+  const badgeEl = null; // 整體狀態由後端模型統一呈現，不能用餐廳人流判定。
 
   if (status.level === 'ANOMALY') {
     // 顯示戰爭警報
@@ -2365,102 +2327,39 @@ function initPizzaSystem() {
   renderWarAlert(status, PIZZA_SHOPS_DATA);
 }
 
-// ─── 模擬即時數據波動（每30秒更新一次模擬值）─────────────────
-// 實際部署時，改為從 API fetch Google Maps 數據
-// 基準快照，防止 busyness 隨機漂移
-const PIZZA_BASE = PIZZA_SHOPS_DATA.map(s => ({ ...s }));
-
-function simulateLiveUpdate() {
-  // 每次從基準值加 ±5 抖動，不累積
-  PIZZA_SHOPS_DATA.forEach((shop, i) => {
-    const base = PIZZA_BASE[i];
-    shop.busyness = Math.round(Math.max(0, Math.min(100,
-      base.busyness + (Math.random() * 10 - 5)
-    )));
-  });
-  const status = evaluatePizzaStatus(PIZZA_SHOPS_DATA);
-  renderPizzaShops(PIZZA_SHOPS_DATA);
-  renderWarAlert(status, PIZZA_SHOPS_DATA);
-  // 同步 WPI pizza state
-  HTML_WPI_STATE.pizza = PIZZA_SHOPS_DATA.map(s => ({ busyness: s.busyness }));
-  htmlWpiRender();
-}
-
 // ═══════════════════════════════════════════════════════════════
 // 🧮 WPI — 戰爭壓力指數計算引擎（HTML 版）
 // WPI = 0.28*P + 0.18*A + 0.10*G + 0.14*Z + 0.10*F + 0.12*S + 0.08*W
 // ═══════════════════════════════════════════════════════════════
 const HTML_WPI_WEIGHTS = { p:0.28, a:0.18, g:0.10, z:0.14, f:0.10, s:0.12, w:0.08 };
 
-// 靜態初始數據（對應 STATIC_AVIATION / STATIC_FINANCE）
-const HTML_WPI_STATE = {
-  poly:    [{ yes_pct:37, volume:10500000 },{ yes_pct:28, volume:8200000 },{ yes_pct:89, volume:5100000 },{ yes_pct:12, volume:4700000 },{ yes_pct:5, volume:3200000 }],
-  avi:     { summary:{ anomaly_pct:20 } },
-  firms:   { fire_delta:'0%' },
-  finance: { assets:[] },
-  pizza:   [{ busyness:89 },{ busyness:71 },{ busyness:76 },{ busyness:82 }],
-  gdelt:   null,       // {region: {latest, avg48h, delta_pct}} — 由 data.json 填入
-  pizzint: null,       // 後端 defcon_details.smoothed_index (0-100)
-  spikes:  false,      // pizzint 是否有 active spike 事件
-  wiki:    null        // 後端 wikipedia.score（公眾焦慮指數 0-100）
-};
-
+// WPI has one authority: the versioned backend score used by history and notifications.
+const HTML_WPI_STATE = {poly:[], avi:{}, firms:{}, finance:{assets:[]}, pizza:[], gdelt:null, pizzint:null, wiki:null, spikes:false};
+let BACKEND_SCORE = null;
+let DATA_UPDATED_AT = null;
 function htmlWpiComputeScores() {
-  // P
-  const poly = HTML_WPI_STATE.poly;
-  const totalVol = poly.reduce((s,m) => s+(m.volume||1), 0);
-  const pScore = Math.min(100, Math.max(0, poly.reduce((s,m) => s+(m.yes_pct||0)*(m.volume||1), 0) / totalVol));
-
-  // A
-  const ap = HTML_WPI_STATE.avi.summary?.anomaly_pct ?? 114;
-  const aScore = Math.min(100, Math.max(0, ap / 2));
-
-  // F
-  const delta = parseFloat((HTML_WPI_STATE.firms.fire_delta||'0%').replace('%','')) || 0;
-  const fScore = Math.min(100, Math.max(0, 50 + delta * 0.5));
-
-  // S
-  const comps = [];
-  (HTML_WPI_STATE.finance.assets||[]).forEach(a => {
-    const dev = a.ma30 > 0 ? (a.price - a.ma30) / a.ma30 * 100 : 0;
-    if (a.ticker==='^VIX')     comps.push(Math.min(100,Math.max(0, 50+dev)));
-    if (a.ticker==='GC=F')     comps.push(Math.min(100,Math.max(0, 50+dev*2)));
-    if (a.ticker==='BZ=F')     comps.push(Math.min(100,Math.max(0, 50+dev*1.5)));
-    if (a.ticker==='USDCHF=X') comps.push(Math.min(100,Math.max(0, 50-dev*3)));
-    if (a.ticker==='ZW=F')     comps.push(Math.min(100,Math.max(0, 50+dev*1.5)));
-  });
-  const sScore = comps.length ? comps.reduce((s,v)=>s+v,0)/comps.length : 55;
-
-  // G — GDELT 新聞衝突強度（各地區「目前 vs 全球報導佔比」平均，1% ≈ 25 分）
-  let gScore = null;
-  const gd = HTML_WPI_STATE.gdelt;
-  if (gd && Object.keys(gd).length) {
-    const vals = Object.values(gd).map(r => Math.min(100, (r.latest || 0) * 25));
-    gScore = vals.reduce((s,v)=>s+v,0) / vals.length;
-  }
-
-  // Z — PizzINT（後端 pizzint.watch 的 DEFCON 演算法 smoothed_index），
-  //     沒有後端資料時退回本地 busyness 平均
-  let zScore = HTML_WPI_STATE.pizzint;
-  if (zScore == null) {
-    const pz = HTML_WPI_STATE.pizza;
-    zScore = pz.length ? pz.reduce((s,x)=>s+(x.busyness||0),0)/pz.length : 0;
-  }
-
-  return { p:pScore, a:aScore, f:fScore, s:sScore, g:gScore, z:zScore, w:HTML_WPI_STATE.wiki };
+  return BACKEND_SCORE?.factors || {p:null,a:null,g:null,z:null,f:null,s:null,w:null};
 }
-
-function htmlWpiCalc(sc) {
-  // 只用可用因子並重新正規化權重（例如 GDELT 尚未載入時）
-  let sum = 0, wsum = 0;
-  for (const [k, w] of Object.entries(HTML_WPI_WEIGHTS)) {
-    if (sc[k] == null) continue;
-    sum += sc[k] * w; wsum += w;
+function htmlWpiCalc() { return BACKEND_SCORE?.combined_score ?? null; }
+function observedTime() {
+  return DATA_UPDATED_AT ? new Date(DATA_UPDATED_AT).toLocaleString('zh-TW') : '尚未取得';
+}
+function renderDataQuality(json) {
+  let panel = document.getElementById('source-health');
+  if (!panel) {
+    panel = document.createElement('section'); panel.id = 'source-health';
+    panel.style.cssText = 'margin:1rem;padding:1rem;border:1px solid var(--border);font-size:.8rem;line-height:1.8';
+    document.getElementById('last-update-ts')?.parentElement?.before(panel);
   }
-  return Math.round(wsum ? sum / wsum : 0);
+  const states = {available:'已取得',partial:'部分資料',stale:'舊資料',unavailable:'無有效資料'};
+  const health = json.source_health || {};
+  if(!Object.keys(health).length) health.legacy={label:'舊版資料快照',status:'unavailable',note:'等待新版抓取器完成；舊版分数不納入新模型'};
+  panel.innerHTML = '<strong>資料來源狀態</strong> · 抓取時間與觀測期間不同；無資料不代表安全。' +
+    Object.values(health).map(h => `<div>${escapeHtml(h.label)}：${escapeHtml(states[h.status] || h.status)} · ${escapeHtml(h.note || '')}${h.observed_at ? ' · 觀測 '+escapeHtml(h.observed_at) : ''}</div>`).join('');
 }
 
 function htmlWpiLevel(wpi) {
+  if (wpi == null) return {label:'資料不足', cls:'low', color:'var(--text-dim)'};
   if (wpi>=80) return { label:'CRITICAL', cls:'critical', color:'var(--crit)' };
   if (wpi>=65) return { label:'HIGH',     cls:'high',     color:'var(--accent2)' };
   if (wpi>=45) return { label:'ELEVATED', cls:'medium',   color:'var(--accent3)' };
@@ -2513,17 +2412,19 @@ function renderWpiGauge(wpi){
 }
 
 function htmlWpiRender() {
+  if(DATA_UPDATED_AT && Date.now()-Date.parse(DATA_UPDATED_AT)>6*3600000) BACKEND_SCORE=null;
   const sc    = htmlWpiComputeScores();
   const wpi   = htmlWpiCalc(sc);
   const level = htmlWpiLevel(wpi);
   const pizza = HTML_WPI_STATE.pizza;
   const pizzaHigh = HTML_WPI_STATE.spikes || pizza.some(s => (s.busyness||0) >= 70);
-  const tankersUp = (HTML_WPI_STATE.avi.summary?.tankers ?? 0) >= 8 || sc.a >= 50;
+  const tankersUp = (HTML_WPI_STATE.avi.summary?.tankers ?? 0) >= 8 && sc.a != null && sc.a >= 50;
   const alts  = { low: sc.p>=40, med: sc.p>=40 && pizzaHigh, high: sc.p>=40 && pizzaHigh && tankersUp };
 
   // 數字 + 像素錶盤
-  htmlWpiAnimNum(wpi);
-  renderWpiGauge(wpi);
+  if (wpi == null) { const n=document.getElementById('html-wpi-num'); if(n)n.textContent='--'; }
+  else htmlWpiAnimNum(wpi);
+  renderWpiGauge(wpi ?? 0);
 
   // 等級
   const lvl = document.getElementById('html-wpi-level');
@@ -2533,19 +2434,19 @@ function htmlWpiRender() {
   const badgeTxt = document.getElementById('html-wpi-badge-text');
   if (badgeTxt) badgeTxt.textContent = level.label;
   const heroNum = document.getElementById('hero-wpi-num');
-  if (heroNum) heroNum.textContent = wpi;
+  if (heroNum) heroNum.textContent = wpi ?? '--';
   const heroLvl = document.getElementById('hero-wpi-level');
   if (heroLvl) { heroLvl.textContent = level.label; heroLvl.style.color = level.color; }
 
   // 子指標
   [
-    { key:'p', pfx:'html-wpi-p', desc:`Polymarket 加權平均 ${sc.p.toFixed(1)}%` },
-    { key:'a', pfx:'html-wpi-a', desc:`航空異常指數 ${sc.a.toFixed(1)}%` },
-    { key:'g', pfx:'html-wpi-g', desc: sc.g == null ? '全球新聞衝突報導強度' : `新聞衝突強度 ${sc.g.toFixed(1)}%` },
+    { key:'p', pfx:'html-wpi-p', desc:`事件方向觀察值 ${(sc.p == null ? '--' : sc.p.toFixed(1))}%` },
+    { key:'a', pfx:'html-wpi-a', desc:`航空異常指數 ${(sc.a == null ? '--' : sc.a.toFixed(1))}%` },
+    { key:'g', pfx:'html-wpi-g', desc: sc.g == null ? '全球新聞衝突報導強度' : `新聞強度分數 ${sc.g.toFixed(1)}` },
     { key:'z', pfx:'html-wpi-z', desc:`Pentagon Pizza 指數 ${(sc.z ?? 0).toFixed(1)}` },
     { key:'w', pfx:'html-wpi-w', desc: sc.w == null ? '戰爭條目瀏覽量 vs 30日基準' : `公眾焦慮指數 ${sc.w.toFixed(1)}` },
-    { key:'f', pfx:'html-wpi-f', desc:`FIRMS 火點異常 ${sc.f.toFixed(1)}%` },
-    { key:'s', pfx:'html-wpi-s', desc:`金融情緒指數 ${sc.s.toFixed(1)}%` },
+    { key:'f', pfx:'html-wpi-f', desc:`FIRMS 火點異常 ${(sc.f == null ? '--' : sc.f.toFixed(1))}%` },
+    { key:'s', pfx:'html-wpi-s', desc:`金融情緒指數 ${(sc.s == null ? '--' : sc.s.toFixed(1))}%` },
   ].forEach(f => {
     const score = sc[f.key];
     const fill  = document.getElementById(`${f.pfx}-fill`);
@@ -2579,7 +2480,7 @@ function htmlWpiRender() {
 
   // 時間戳
   const ts = document.getElementById('html-wpi-updated');
-  if (ts) ts.textContent = `⟳ WPI 上次計算：${new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'})}`;
+  if (ts) ts.textContent = `資料時間：${observedTime()} · 有效權重覆蓋 ${Math.round((BACKEND_SCORE?.coverage || 0)*100)}% · 人工權重觀察指數，非開戰機率`;
 }
 
 // 啟動 WPI
@@ -2587,34 +2488,57 @@ setTimeout(htmlWpiRender, 400);
 setInterval(htmlWpiRender, 10 * 60 * 1000);
 
 // ─── 從 /data/data.json 抓取真實資料 ─────────────────────────
-// 由 GitHub Actions 每 15 分鐘更新（scripts/fetch_data.py）
+// GitHub Actions 約每 2 小時更新；前端輪詢只讀取快照。
 // 統一資料載入：優先打即時 API（/api/data，從 GitHub 讀最新，永遠不會因
 // 部署凍結而卡在舊快照），失敗才退回同站部署快照（較舊，保底用）。
 async function wLoad(file){
-  let r = await fetch('/api/data?f=' + file, { cache: 'no-store' }).catch(function(){return null;});
-  if (!r || !r.ok) r = await fetch('data/' + file + '?t=' + Date.now(), { cache: 'no-store' }).catch(function(){return null;});
+  let r = await fetch('/api/data?f=' + file, { cache: 'no-store', signal: AbortSignal.timeout(10000) }).catch(function(){return null;});
+  if (!r || !r.ok) r = await fetch('data/' + file + '?t=' + Date.now(), { cache: 'no-store', signal: AbortSignal.timeout(10000) }).catch(function(){return null;});
   return r;
 }
 
-// 若 GOOGLE_MAPS_API_KEY 未設定，後端會回傳模擬資料
+// 不填入模擬值；來源不可用時保持明確的缺值狀態。
 async function fetchRealPizzaData() {
   try {
     // 即時 API 優先（永遠最新），退回部署快照
     let res = await wLoad('data.json');
     if (!res || !res.ok) throw new Error('HTTP ' + (res ? res.status : 'no-response'));
     const json = await res.json();
-    if (!Array.isArray(json.pizza) || json.pizza.length === 0) {
-      throw new Error('no pizza data');
+    DATA_UPDATED_AT = json.updated_at;
+    const age = Date.now() - Date.parse(json.updated_at);
+    BACKEND_SCORE = age >= 0 && age < 6*3600000 && json.score?.model_version === 'wpi-4.0' ? json.score : null;
+    if (json.score?.model_version !== 'wpi-4.0' || !(age >= 0 && age < 6*3600000)) {
+      json.regions=(json.regions||[]).map(r=>({...r,score:null,level:'INSUFFICIENT_DATA',coverage:0,factors:{}}));
+    }
+    renderDataQuality(json);
+    const badge=document.getElementById('alert-badge');
+    if(badge)badge.textContent=BACKEND_SCORE?.combined_score != null ? '觀察指數 '+BACKEND_SCORE.alert_level : '資料不足';
+    const live=document.querySelector('.live-lbl');
+    if(live)live.textContent=age >= 0 && age < 6*3600000 ? '定期資料快照' : '資料已過期';
+    if(json.score?.model_version !== 'wpi-4.0') {
+      json.polymarket=[]; json.pizza_index=null; json.defcon_level=null;
+      const list=document.getElementById('poly-list-container');if(list)list.textContent='舊版盤口尚未核驗，等待新版資料。';
+      const poly=document.getElementById('poly-updated-time');if(poly)poly.textContent='等待新版市場篩選資料';
+    }
+
+
+    if(json.score?.model_version !== 'wpi-4.0' || !(age>=0 && age<6*3600000)) {
+      json.pizza=(json.pizza||[]).map(s=>({...s,busyness:null,is_open:null,status:'unavailable',spike:false,percentage_of_usual:null}));
+    }
+    for(const source of ['food','strat']) {
+      if(json[source]?.schema_version !== 2) {
+        if(json[source])json[source]={...json[source],breadth_up:0,items:(json[source].items||[]).map(i=>({...i,yoy_pct:null,incomplete:true,anomaly:'partial'}))};
+      }
     }
 
     // 用後端資料覆蓋 PIZZA_SHOPS_DATA（保留 icon 等前端專屬欄位）
     try {
-      const byName = Object.fromEntries(json.pizza.map(s => [s.name, s]));
+      const byName = Object.fromEntries((json.pizza || []).map(s => [s.name, s]));
       PIZZA_SHOPS_DATA.forEach(shop => {
         const incoming = byName[shop.name];
         if (!incoming) return;
-        shop.busyness = incoming.busyness ?? 0;
-        shop.is_open  = incoming.is_open ?? false;
+        shop.busyness = incoming.busyness ?? null;
+        shop.is_open  = incoming.is_open ?? null;
         shop.status   = incoming.status  ?? (incoming.is_open ? 'open' : 'closed');
         if (incoming.baseline) shop.baseline = incoming.baseline;
         shop.percentage_of_usual = incoming.percentage_of_usual;
@@ -2638,21 +2562,9 @@ async function fetchRealPizzaData() {
           .slice(0, 5)
           .map(m => ({ yes_pct: m.yes_price * 100, volume: m.volume }));
         const polyTs = document.getElementById('poly-updated-time');
-        if (polyTs) polyTs.textContent = '上次更新：' + new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+        if (polyTs) polyTs.textContent = '資料時間：' + observedTime();
       }
     } catch(err) { console.warn('[WARHUBS] polymarket render error:', err.message); }
-
-    // 歷史趨勢（供地區/WPI 趨勢箭頭）
-    try {
-      let hres = await wLoad('history.json');
-      if (hres && hres.ok) WW_HISTORY = await hres.json();
-    } catch(err) { console.warn('[WARHUBS] history fetch error:', err.message); }
-
-    // 每日指標長期封存（避險群聚 & 經濟指標趨勢）
-    try {
-      let mres = await wLoad('metrics_daily.json');
-      if (mres && mres.ok) { MD_JSON = await mres.json(); renderMetricsHist(); }
-    } catch(err) { console.warn('[WARHUBS] metrics_daily fetch error:', err.message); }
 
     // 地區風險看板 + WPI 新因子 + 核試監測 + PizzINT 深度情報
     try {
@@ -2668,6 +2580,12 @@ async function fetchRealPizzaData() {
       try { renderWarMap(json); } catch(e){ console.warn('[WARHUBS] renderWarMap error:', e.message); }
       if (json.nuclear_seismic) renderNuclearSeismic(json.nuclear_seismic);
       applyPizzintIntel(json);
+      if(json.pizza_index == null) {
+        for(const id of ['pizza-gauge-pct','pizza-level-num','pizza-level-label','overtime-pizza']) {
+          const el=document.getElementById(id); if(el)el.textContent='無即時人流資料';
+        }
+        const fill=document.getElementById('pizza-gauge-fill');if(fill)fill.style.width='0%';
+      }
     } catch(err) { console.warn('[WARHUBS] intel render error:', err.message); }
 
     // 用即時資料重建 INTEL FEED 跑馬燈
@@ -2700,6 +2618,7 @@ async function fetchRealPizzaData() {
     catch(err) { console.warn('[WARHUBS] renderPla error:', err.message); }
 
     // 同步渲染 AVI 軍機資料
+    if (json.finance) renderFinanceSnapshot(json.finance);
     if (json.aviation) {
       try { renderAviation(json.aviation); }
       catch(err) { console.warn('[WARHUBS] renderAviation error:', err.message); }
@@ -2715,11 +2634,29 @@ async function fetchRealPizzaData() {
 
     htmlWpiRender();
 
+    const historyRequest=wLoad('history.json');
+    const metricsRequest=wLoad('metrics_daily.json');
+    void (async()=>{
+    // 歷史趨勢（供地區/WPI 趨勢箭頭）
+    try {
+      let hres = await historyRequest;
+      if (hres && hres.ok) WW_HISTORY = (await hres.json()).filter(h => h.model_version === 'wpi-4.0');
+    } catch(err) { console.warn('[WARHUBS] history fetch error:', err.message); }
+
+    // 每日指標長期封存（避險群聚 & 經濟指標趨勢）
+    try {
+      let mres = await metricsRequest;
+      if (mres && mres.ok) { MD_JSON = await mres.json(); Object.values(MD_JSON.days || {}).forEach(d=>{ if(d.model_version !== 'wpi-4.0') {d.combined=null;d.poly=null;d.regions={};} }); renderMetricsHist(); }
+    } catch(err) { console.warn('[WARHUBS] metrics_daily fetch error:', err.message); }
+
+      if(json.regions){renderRegions(json.regions);renderTrendChart(json.regions);}
+    })().catch(err=>console.warn('[WARHUBS] history render error:',err.message));
+
     // Footer status indicator (在頁尾顯示「上次成功更新」)
     const tsEl = document.getElementById('last-update-ts');
     if (tsEl && json.updated_at) {
       const dt = new Date(json.updated_at);
-      tsEl.textContent = '✅ 後端資料最後更新：' + dt.toLocaleString('zh-TW');
+      tsEl.textContent = (Date.now()-dt.getTime() > 6*3600000 ? '⚠ 資料已過期：' : '後端資料時間：') + dt.toLocaleString('zh-TW');
     }
 
     console.log('[WARHUBS] data refreshed @', json.updated_at,
@@ -2727,8 +2664,12 @@ async function fetchRealPizzaData() {
                 '| AVI total', json.aviation?.summary?.total ?? 'n/a',
                 '| FIRMS', json.firms?.total_24h ?? 'n/a');
   } catch (e) {
-    console.warn('[WARHUBS] data fetch failed, using simulated:', e.message);
-    simulateLiveUpdate();
+    console.warn('[WARHUBS] data fetch failed:', e.message);
+    BACKEND_SCORE = null; htmlWpiRender();
+    const badge=document.getElementById('alert-badge');if(badge)badge.textContent='更新失敗／資料不足';
+    const live=document.querySelector('.live-lbl');if(live)live.textContent='更新失敗';
+    const status=document.getElementById('last-update-ts');
+    if(status) status.textContent='⚠ 更新失敗；畫面若有資料為上次快照，請查看資料時間';
   }
 }
 
@@ -2765,7 +2706,7 @@ function renderTrendChart(regions) {
     .filter(h => h.ts && h.combined != null)
     .sort((a, b) => Date.parse(a.ts) - Date.parse(b.ts));
   if (hist.length < 4) {
-    chartEl.textContent = `⏳ 歷史資料累積中（目前 ${hist.length} 筆，需至少 4 筆；資料每小時累積）…`;
+    chartEl.textContent = `⏳ 歷史資料累積中（目前 ${hist.length} 筆，需至少 4 筆；資料約每 2 小時累積）…`;
     return;
   }
 
@@ -2827,9 +2768,9 @@ function renderHero(json) {
   if (regionsEl && Array.isArray(json.regions) && json.regions.length) {
     regionsEl.innerHTML = json.regions.map(r => {
       const st = REGION_LEVEL_STYLE[r.level] || REGION_LEVEL_STYLE.WATCH;
-      return `<a class="hero-region-pill" style="border-color:${st.color}" href="#region-board" title="${r.level} · ${st.zh}">
+      return `<a class="hero-region-pill" style="border-color:${st.color}" href="#region-board" title="${r.level} · ${st.zh} · 覆蓋 ${Math.round((r.coverage || 0)*100)}%">
         <span>${r.flag}</span><span>${escapeHtml(r.name)}</span>
-        <b style="color:${st.color}">${Math.round(r.score)}</b>
+        <b style="color:${st.color}">${(r.score == null ? '--' : Math.round(r.score))}</b>
         <span style="font-size:.68rem">${trendArrow(r.score, r.key)}</span>
       </a>`;
     }).join('');
@@ -2852,16 +2793,17 @@ function renderHero(json) {
     line = `📖 公眾焦慮上升：維基戰爭條目瀏覽量 ${json.wikipedia.mean_ratio}x`;
     color = 'var(--accent3)';
   } else {
-    line = '✓ 無現行升級警報 · 全域監控中';
+    line = BACKEND_SCORE?.combined_score == null ? '資料不足，暫不判定整體警戒等級' : '目前未觸發模型門檻；不代表沒有風險';
     color = 'var(--accent)';
   }
-  alertEl.innerHTML = `<span style="color:${color}">${line}</span><br><span style="color:var(--text-dim);font-size:.66rem">資料更新 ${upd} · 每小時自動刷新</span>`;
+  alertEl.innerHTML = `<span style="color:${color}">${line}</span><br><span style="color:var(--text-dim);font-size:.66rem">資料更新 ${upd} · 約每 2 小時抓取；排程可能延遲</span>`;
   alertEl.style.borderLeftColor = color;
 }
 
 // ─── 地區戰爭風險看板 ─────────────────────────────────────────
 const REGION_LEVEL_STYLE = {
-  CRITICAL: { color:'var(--crit)', zh:'一觸即發' },
+  INSUFFICIENT_DATA: { color:'var(--text-dim)', zh:'資料不足' },
+  CRITICAL: { color:'var(--crit)', zh:'觀察指數高' },
   HIGH:     { color:'var(--accent2)', zh:'高度風險' },
   ELEVATED: { color:'var(--accent3)', zh:'風險升高' },
   WATCH:    { color:'var(--accent)', zh:'觀察中' },
@@ -2890,16 +2832,16 @@ function renderRegions(regions) {
       return `<div style="display:flex;flex-direction:column;min-width:0;overflow:hidden;background:var(--bg3);border:1px solid var(--border);border-left:3px solid ${st.color};padding:.9rem 1rem">
         <div style="display:flex;align-items:baseline;gap:.5rem;margin-bottom:.4rem">
           <span style="font-size:1rem">${r.flag} ${escapeHtml(r.name)}</span>
-          <span style="margin-left:auto;font-family:'Orbitron',monospace;font-size:1.5rem;font-weight:900;color:${st.color}">${Math.round(r.score)}</span>
+          <span style="margin-left:auto;font-family:'Orbitron',monospace;font-size:1.5rem;font-weight:900;color:${st.color}">${(r.score == null ? '--' : Math.round(r.score))}</span>
           <span style="font-family:'Share Tech Mono',monospace;font-size:.72rem">${trend}</span>
         </div>
-        <div style="font-family:'Orbitron',monospace;font-size:.7rem;letter-spacing:2px;color:${st.color};margin-bottom:.55rem">${r.level} · ${st.zh}</div>
+        <div style="font-family:'Orbitron',monospace;font-size:.7rem;letter-spacing:2px;color:${st.color};margin-bottom:.55rem">${r.level} · ${st.zh} · 覆蓋 ${Math.round((r.coverage || 0)*100)}%</div>
         <div style="display:flex;flex-direction:column;gap:.34rem;font-family:'Share Tech Mono',monospace">
           ${factorRow('市場盤口', f.poly)}
           ${factorRow('新聞強度', f.gdelt, gdeltDelta)}
           ${factorRow('領空', f.notam, f.notam == null ? null : (f.notam_closure ? '⛔ 關閉' : (f.notam_danger ?? 0) + ' 警戒'))}
-          ${factorRow('衛星火點', f.firms, (f.firms_hotspots ?? 0) + ' 處')}
-          ${factorRow('軍機活動', f.avi, (f.avi_count ?? 0) + ' 架')}
+          ${factorRow('熱異常', null)}<small>觀測像元：${f.firms_hotspots ?? '--'}（不計分）</small>
+          ${factorRow('廣域軍機', null)}<small>廣域可見：${f.avi_count ?? '--'} 架（非當地全量；不計分）</small>
         </div>
         <div style="margin-top:auto;padding-top:.55rem;font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.top_market ? escapeHtml(r.top_market) : ''}">${r.top_market ? '📊 ' + escapeHtml(r.top_market) : '&nbsp;'}</div>
       </div>`;
@@ -2914,14 +2856,14 @@ function renderRegions(regions) {
       return `<div style="display:grid;grid-template-columns:82px 1fr 34px 30px;align-items:center;gap:.4rem;font-family:'Share Tech Mono',monospace;font-size:.68rem">
         <span>${r.flag} ${escapeHtml(r.name)}</span>
         <div style="height:4px;background:rgba(255,255,255,.08)"><div style="width:${Math.min(100, r.score)}%;height:100%;background:${st.color}"></div></div>
-        <span style="color:${st.color};text-align:right">${Math.round(r.score)}</span>
+        <span style="color:${st.color};text-align:right">${(r.score == null ? '--' : Math.round(r.score))}</span>
         <span style="font-size:.62rem">${trendArrow(r.score, r.key)}</span>
       </div>`;
     }).join('');
   }
 
   const upd = document.getElementById('region-board-updated');
-  if (upd) upd.textContent = '更新：' + new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'}) + ' · Polymarket + GDELT + FIRMS + ADS-B';
+  if (upd) upd.textContent = '快照：' + observedTime() + ' · Polymarket + GDELT + FIRMS + ADS-B';
 }
 
 // ─── 核試場地震監測（USGS）──────────────────────────────────
@@ -2939,11 +2881,11 @@ function renderNuclearSeismic(ns) {
     const shallow = (s.events || []).some(e => e.depth_km != null && e.depth_km < 2);
     const maxMag = Math.max(...(s.events || []).map(e => e.mag || 0));
     const color = shallow ? 'var(--accent2)' : 'var(--accent3)';
-    const note  = shallow ? `🚨 淺層事件 M${maxMag}（疑似非天然）` : `${s.count} 筆天然地震 M${maxMag}`;
+    const note  = shallow ? `🚨 淺層事件 M${maxMag}（成因待核實）` : `${s.count} 筆地震事件 M${maxMag}（成因待核實）`;
     return `<div style="display:flex;justify-content:space-between"><span>${escapeHtml(s.name)}</span><span style="color:${color}">${note}</span></div>`;
   });
   el.innerHTML = rows.join('') +
-    `<div style="margin-top:.3rem;font-size:.6rem;color:rgba(255,255,255,.25)">核試驗特徵：淺層（&lt;2km）+ 試驗場 150km 內 · 資料：USGS</div>`;
+    `<div style="margin-top:.3rem;font-size:.6rem;color:rgba(255,255,255,.25)">篩選：試驗場 150km 內；淺層地震也可能為自然成因，不能據此認定核試 · 資料：USGS</div>`;
 }
 
 // ─── PizzINT 深度情報：後端 DEFCON 演算法 + spike 事件 ────────
@@ -3100,27 +3042,28 @@ function newsAgo(ts){
 }
 function renderFood(json){
   var el=document.getElementById('food-grid'); if(!el) return;
-  var f=json.food;
+  var f=json.food || {items:[]};
   if(!f || !f.items || !f.items.length){
     el.innerHTML='<div style="padding:1rem;text-align:center;font-family:\'Share Tech Mono\',monospace;font-size:.7rem;color:var(--text-dim)">暫無資料（每日更新一次）</div>';
-    return;
-  }
+  } else {
   el.innerHTML=f.items.map(function(it){
     var y=it.yoy_pct;
     var col=(y==null)?'var(--text-dim)':(y>=15?'#ff4d5e':(y>0?'#f5a623':(y<0?'#35e08a':'var(--text-dim)')));
     var arr=(y==null)?'':(y>0?'▲':(y<0?'▼':''));
-    var w=it.wan_ton>=100?Math.round(it.wan_ton).toLocaleString():it.wan_ton;
+    var w=it.wan_ton==null?'--':it.wan_ton>=100?Math.round(it.wan_ton).toLocaleString():it.wan_ton;
     return '<div class="food-row"><div class="food-name">'+escapeHtml(it.name)+'</div>'
       +'<div class="food-val">'+w+'<span class="food-unit">萬噸</span></div>'
       +'<div class="food-yoy" style="color:'+col+'">'+(y==null?'—':arr+Math.abs(y)+'% 年增')+'</div></div>';
   }).join('');
+  }
   // 🇺🇸→🇨🇳 USDA 每週銷售（有 key 才有）
   var u=json.usda;
-  if(u && u.items && u.items.length){
+  if(u?.schema_version === 2 && u.items?.length){
     var rows=u.items.map(function(it){
-      return '<div class="usda-row"><div class="u-name">'+escapeHtml(it.name)+'</div>'
-        +'<div class="u-v">本週淨銷售 <b>'+(it.week_net_kt||0).toLocaleString()+'</b> 千噸</div>'
-        +'<div class="u-v">未裝運 <b>'+(it.outstanding_kt||0).toLocaleString()+'</b> 千噸</div></div>';
+      return '<div class="usda-row"><div class="u-name">'+escapeHtml(it.name)+' · MY '+(it.market_year ?? '未知')+' · '+escapeHtml(it.week || '無觀測週次')+(it.stale?'（舊資料）':'')+'</div>'
+        +'<div class="u-v">當年度本週淨銷售 <b>'+(it.week_net_kt?.toLocaleString() ?? '--')+'</b> 千噸</div>'
+        +'<div class="u-v">下一年度本週淨銷售 <b>'+(it.next_year_net_kt?.toLocaleString() ?? '--')+'</b> 千噸</div>'
+        +'<div class="u-v">未裝運 <b>'+(it.outstanding_kt?.toLocaleString() ?? '--')+'</b> 千噸</div></div>';
     }).join('');
     el.innerHTML += '<div class="usda-block"><div class="usda-hd">🇺🇸→🇨🇳 美對中每週穀物銷售 · USDA ESR（截至 '+escapeHtml(u.week_ending||'')+'）</div>'+rows+'</div>';
   }
@@ -3132,7 +3075,7 @@ function renderFood(json){
   var sub=document.getElementById('food-sub');
   if(sub && f.breadth_up>=2){
     sub.innerHTML=sub.innerHTML.split(' · <strong')[0]
-      +' · <strong style="color:#ff4d5e">\u26A0 '+f.breadth_up+'/3 項主糧年增≥15%（囤積訊號偏強，須交叉印證）</strong>';
+      +' · <strong style="color:#ff4d5e">\u26A0 '+f.breadth_up+'/3 項主糧年增≥15%（進口增加，原因待查）</strong>';
   }
 }
 // ── 🌾 糧食月度趨勢圖（1/3/5 年）──
@@ -3195,7 +3138,7 @@ function drawFoodShare(){
     hit.push('<rect x="'+(CX(i)-slot/2).toFixed(1)+'" y="'+padT+'" width="'+slot.toFixed(1)+'" height="'+(H-padT-padB).toFixed(1)+'" fill="transparent" data-tip="<b>'+d.ym+'</b><br>美國佔比 '+pts[i].toFixed(1)+'%<br>美 '+fhFmt(d[uk])+' / 總 '+fhFmt(d[key])+' 萬噸"></rect>');
   });
   svg.innerHTML=p.concat(hit).join('');
-  if(leg) leg.innerHTML='<b>'+nm+'</b> 美國佔中國進口比重（%）· '+data[0].ym+' → '+data[data.length-1].ym+'　·　比重下滑＝中國轉向巴西/阿根廷等（脫鉤訊號）· 僅 2025 起回推月份';
+  if(leg) leg.innerHTML='<b>'+nm+'</b> 美國佔中國進口比重（%）· '+data[0].ym+' → '+data[data.length-1].ym+'　·　比重受回報覆蓋與來源口徑影響，不能單憑下降判定脫鉤· 僅 2025 起回推月份';
 }
 function drawFoodHistory(){
   var json=FH_JSON; if(!json) return;
@@ -3250,7 +3193,7 @@ function drawFoodHistory(){
     var f=data.length?data[0].ym:'', l=data.length?data[data.length-1].ym:'';
     var hasMirror=data.some(function(d){return d.src==='mirror';});
     leg.innerHTML='中國每月<b>'+nm+'</b>進口量（萬噸，每月一根）· '+f+' → '+l
-      +'　▮ 實心＝中國海關直報，▯ 淡色虛邊＝出口國回推（近月中國停報，改由出口國對中出口數據回推）'
+      +'　歷史尚未逐月核驗，缺報月份不可當零。▮ 實心＝中國海關直報，▯ 淡色虛邊＝出口國回推（部分期間採出口國資料，不能證明中國停止公布）'
       +(hasMirror?'':'　·　近月資料累積中…');
   }
 }
@@ -3262,7 +3205,7 @@ var UH_VIEWS=[['commit','累計承諾趨勢'],['flow','下單 vs 提貨']];
 function renderUsdaHist(json){
   UH_JSON=json;
   var wrap=document.getElementById('uh-wrap'); if(!wrap) return;
-  var h=(json.usda&&json.usda.hist)||{};
+  var h=json.usda?.schema_version === 2 ? json.usda.hist || {} : {};
   if(!UH_CMDS.some(function(c){return (h[c[0]]||[]).length;})){ wrap.style.display='none'; return; }
   wrap.style.display='';
   var cmdEl=document.getElementById('uh-cmd');
@@ -3317,9 +3260,9 @@ function drawUsdaHist(){
   if(leg){
     var lg=series.map(function(s){return '<span style="color:'+s.c+'">▬ '+s.lbl+'</span>';}).join('　');
     var expl=UH_STATE.view==='flow'
-      ? '「已訂未運」高＝下了單還沒提貨（履約落差，值得注意）；兩線差距＝尚未裝運量'
+      ? '已訂未運與累計已装運為不同存量；兩線相減沒有尚未裝運量的意義，不能據此判定違約'
       : '中國對美'+nm+'的累計採購承諾（每個行銷年度歸零重算，看每季買氣斜率）';
-    leg.innerHTML='<b>'+nm+'</b> · 千噸 · '+data[0].w+' → '+data[data.length-1].w+'　'+lg+'　·　'+expl;
+    leg.innerHTML='<b>'+nm+'</b> · 行銷年度 '+data[0].market_year+' · 千噸 · '+data[0].w+' → '+data[data.length-1].w+'　'+lg+'　·　'+expl;
   }
 }
 // ── ⚙️ 戰略物資月度趨勢圖 ──
@@ -3389,7 +3332,7 @@ function drawStratHistory(){
     var nm=({'4001':'天然橡膠','2604':'鎳礦砂','2610':'鉻礦砂','2601':'鐵礦砂'})[key];
     var f=data.length?data[0].ym:'', l=data.length?data[data.length-1].ym:'';
     leg.innerHTML='中國每月<b>'+nm+'</b>進口量（萬噸，每月一根）· '+f+' → '+l
-      +'　▮ 實心＝中國海關直報，▯ 淡色虛邊＝出口國回推（2025 起中國停報，改由出口國對中出口數據回推）· 看逐月趨勢';
+      +'　歷史尚未逐月核驗，缺報月份不可當零。▮ 實心＝中國海關直報，▯ 淡色虛邊＝出口國回推（直報與鏡像涵蓋範圍不同，不宜直接比較增幅）· 看逐月趨勢';
   }
 }
 // ── ⚙️ 戰略物資進口監測 ──
@@ -3402,10 +3345,10 @@ function renderStrat(json){
   }
   el.innerHTML=s.items.map(function(it){
     var y=it.yoy_pct;
-    var partial=(it.anomaly==='partial');
+    var partial=!!it.incomplete || it.anomaly==='partial';
     var col=partial?'var(--text-dim)':((y==null)?'var(--text-dim)':(y>0?'#ff4d5e':(y<0?'#35e08a':'var(--text-dim)')));
     var arr=(y==null)?'':(y>0?'▲':(y<0?'▼':''));
-    var w=it.wan_ton>=100?Math.round(it.wan_ton).toLocaleString():it.wan_ton;
+    var w=it.wan_ton==null?'--':it.wan_ton>=100?Math.round(it.wan_ton).toLocaleString():it.wan_ton;
     var flag=it.anomaly==='high'?'<span class="strat-flag high">異常高</span>'
             :it.anomaly==='low'?'<span class="strat-flag low">異常低</span>'
             :partial?'<span class="strat-flag partial">資料待補</span>':'';
@@ -3414,9 +3357,9 @@ function renderStrat(json){
     if(partial){
       note='<div class="strat-note">◷ 近月出口國尚未全數回報（'+(it.reporters||0)+'/'+(it.reporters_prev||0)+' 國），此為暫值、勿當異常低，待補齊後再判讀</div>';
     } else if(it.hi||it.lo){
-      if(it.anomaly==='high') note='<div class="strat-note hi">⚑ 異常高判讀：'+escapeHtml(it.hi||'')+'</div>';
-      else if(it.anomaly==='low') note='<div class="strat-note lo">⚑ 異常低判讀：'+escapeHtml(it.lo||'')+'</div>';
-      else note='<div class="strat-note">▲高→'+escapeHtml(it.hi||'')+'　▼低→'+escapeHtml(it.lo||'')+'</div>';
+      if(it.anomaly==='high') note='<div class="strat-note hi">⚑ 異常高判讀：'+'進口增加的原因待查，不能直接推定軍備擴張。'+'</div>';
+      else if(it.anomaly==='low') note='<div class="strat-note lo">⚑ 異常低判讀：'+'進口減少的原因待查，不能直接推定動用儲備。'+'</div>';
+      else note='<div class="strat-note">▲高→'+'進口增加的原因待查，不能直接推定軍備擴張。'+'　▼低→'+'進口減少的原因待查，不能直接推定動用儲備。'+'</div>';
     }
     return '<div class="strat-item"><div class="strat-row"><div class="strat-name">'+escapeHtml(it.name)
       +'<small>'+escapeHtml(it.use||'')+'</small></div>'
@@ -3455,7 +3398,7 @@ var MD_JSON=null;
 var MD_STATE={key:'cluster'};
 var MD_KEYS=[
   ['cluster','🔴 避險群聚'],['gold','黃金'],['oil','布倫特油'],['vix','VIX'],
-  ['ust10','美10Y殖利率'],['em_oas','EM信用利差'],['hy_oas','高收益利差'],['oil_premium','油價戰爭溢價']
+  ['ust10','美10Y殖利率'],['em_oas','EM信用利差'],['hy_oas','高收益利差'],['oil_premium','油價相對均線差額']
 ];
 var MD_UNIT={gold:'',oil:'',vix:'',ust10:'%',em_oas:'%',hy_oas:'%',oil_premium:'$/bbl'};
 var MD_DESC={
@@ -3538,6 +3481,7 @@ function _mdLabel(key){ for(var i=0;i<MD_KEYS.length;i++) if(MD_KEYS[i][0]===key
 
 // ── 📈 每日共軍擾台架次（過去30天）──
 function renderPla(json){
+  const note=document.getElementById('pla-note'); if(note)note.textContent='新聞標題擷取的未核實估計，發稿日未必是觀測日。';
   var wrap=document.getElementById('pla-wrap'); if(!wrap) return;
   var pla=json.pla, days=(pla&&pla.days)||[];
   if(!days.length){ wrap.style.display='none'; return; }
@@ -3583,7 +3527,7 @@ function renderPla(json){
   if(lt && pla.latest){ var el=(base>0 && pla.latest.aircraft>=base*1.5 && pla.latest.aircraft>=25);
     lt.innerHTML='　最新 '+pla.latest.date.slice(5)+'：<b style="color:'+(el?'#ff4d5e':'var(--accent)')+'">'+pla.latest.aircraft+'</b> 架次'+(el?' <span style="color:#ff4d5e">⚠異常偏高</span>':''); }
   var lg=document.getElementById('pla-legend');
-  if(lg) lg.textContent='資料：國防部每日戰報（自新聞標題擷取）· 每日一報、非即時 · 紅柱＝≥中位數1.5倍且≥25架次';
+  if(lg) lg.textContent='資料：新聞標題擷取，未逐筆核實；發稿日可能不同於活動日 · 紅柱＝≥中位數1.5倍且≥25架次';
 }
 function renderNews(json){
   const el=document.getElementById('news-list'); if(!el) return;
@@ -3620,24 +3564,24 @@ function renderTicker(json) {
       items.push(`📊 ${escapeHtml(zhMarket(m.question))} <span class="hi">${Math.round(m.yes_price * 100)}%</span>`);
     });
   if (json.firms?.total_24h) {
-    items.push(`🔥 NASA FIRMS 24hr 衛星火點 <span class="red">${json.firms.total_24h.toLocaleString()}</span>（vs 基準 ${json.firms.delta_pct || '--'}）`);
+    items.push(`🔥 NASA FIRMS 24hr 衛星火點 <span class="red">${json.firms.total_24h.toLocaleString()}</span>（包含野火與工業熱源）`);
   }
   const av = json.aviation?.summary;
   if (av?.total) {
     items.push(`✈️ 全球軍機追蹤 <span class="hi">${av.total}</span> 架 · 加油機 ${av.tankers} · 運輸機 ${av.transport}`);
   }
-  if (json.score?.combined_score != null) {
-    items.push(`🎯 綜合威脅指數 <span class="hi">${json.score.combined_score}</span> / 100 · ${json.score.alert_level}`);
+  if (BACKEND_SCORE?.combined_score != null) {
+    items.push(`🎯 戰爭壓力指數 <span class="hi">${BACKEND_SCORE.combined_score}</span> / 100 · ${BACKEND_SCORE.alert_level}（非機率）`);
   }
-  if (Array.isArray(json.regions) && json.regions.length) {
-    const r = json.regions[0];
-    items.push(`⚔️ 風險最高地區：${r.flag} ${escapeHtml(r.name)} <span class="red">${Math.round(r.score)}</span> 分 [${r.level}]`);
+  if (Array.isArray(json.regions) && json.regions.some(r=>Number.isFinite(r.score))) {
+    const r = [...json.regions].filter(r=>Number.isFinite(r.score)).sort((a,b)=>b.score-a.score)[0];
+    items.push(`⚔️ 風險最高地區：${r.flag} ${escapeHtml(r.name)} <span class="red">${(r.score == null ? '--' : Math.round(r.score))}</span> 分 [${r.level}]`);
   }
   if (json.wikipedia?.mean_ratio >= 1.5) {
     const top = (json.wikipedia.pages || []).reduce((a,b) => (b.ratio > (a?.ratio ?? 0) ? b : a), null);
-    items.push(`📖 公眾焦慮上升：維基戰爭條目瀏覽量達平時 <span class="hi">${json.wikipedia.mean_ratio}x</span>${top ? `（${escapeHtml(top.title.replace(/_/g,' '))} ${top.ratio}x）` : ''}`);
+    items.push(`📖 維基戰爭條目瀏覽量達平時 <span class="hi">${json.wikipedia.mean_ratio}x</span>${top ? `（${escapeHtml(top.title.replace(/_/g,' '))} ${top.ratio}x）` : ''}`);
   }
-  items.push(`末日時鐘距離午夜 <span class="red">89秒</span> — 史上最近`);
+  items.push(`末日時鐘距離午夜 <span class="red">85秒</span>（2026 年公告，象徵性指標）`);
 
   if (!items.length) return;
   const html = items.map(t => `<div class="ticker-item">${t} &nbsp;•&nbsp;</div>`).join('');
@@ -3900,7 +3844,7 @@ function renderAviation(d) {
   }
 
   if (el('avi-updated')) el('avi-updated').textContent = hasData
-    ? '更新：' + new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'})
+    ? '快照：' + observedTime()
     : 'ADS-B (adsb.fi)';
 
   HTML_WPI_STATE.avi = {
@@ -3916,192 +3860,32 @@ function simulateAviation() { renderAviation(STATIC_AVIATION); }
 // 基準值快照（防止累積漂移）
 const FINANCE_BASE = STATIC_FINANCE.assets.map(a => ({ ...a }));
 
-function simulateFinance() {
-  const idMap = {
-    'GC=F':'html-fin-gc', 'BZ=F':'html-fin-bz',
-    'USDCHF=X':'html-fin-chf', '^VIX':'html-fin-vix'
-  };
-  FINANCE_BASE.forEach((base, i) => {
-    if (!base.price) return;  // 無資料時跳過，保持 --
-    const jitter = (Math.random() - 0.5) * 0.1;
-    const price  = base.price * (1 + jitter / 100);
-    const chg    = +(base.change + jitter * 0.1).toFixed(2);
-    const devPct = base.ma30 ? +((price - base.ma30)/base.ma30*100).toFixed(1) : 0;
-    const pid    = idMap[base.ticker];
-    const pxEl   = pid ? document.getElementById(pid) : null;
-    const chEl   = pid ? document.getElementById(pid+'-chg') : null;
-    const maEl   = pid ? document.getElementById(pid+'-ma') : null;
-    const fmtPx  = base.ticker === 'USDCHF=X' ? price.toFixed(4) : price.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2});
-    if (pxEl) { pxEl.textContent = fmtPx; pxEl.style.color = chg>=0?'var(--accent3)':'var(--accent)'; }
-    if (chEl) { chEl.textContent = (chg>=0?'+':'')+chg+'% 24h'; chEl.className='fin-change '+(chg>=0?'up':'down'); }
-    if (maEl) { maEl.innerHTML = '30MA偏離 '+(devPct>=0?'+':'')+devPct+'%'+(Math.abs(devPct)>5?' <span style="color:var(--accent3)">⚠</span>':''); }
-    if (HTML_WPI_STATE.finance.assets[i]) HTML_WPI_STATE.finance.assets[i].price = price;
-  });
-  // 軍工股（price=0 時跳過）
-  const stkIds = ['lmt','rtx','noc','gd'];
-  STATIC_FINANCE.stocks.forEach((s,i) => {
-    if (!s.price) return;
-    const jitter = (Math.random()-0.5)*0.1;
-    const price  = +(s.price*(1+jitter/100)).toFixed(2);
-    const chg    = +(s.change+jitter*0.1).toFixed(2);
-    const pxEl = document.getElementById('html-stk-'+stkIds[i]);
-    const chEl = document.getElementById('html-stk-'+stkIds[i]+'-c');
-    if (pxEl) pxEl.textContent = price.toFixed(2);
-    if (chEl) { chEl.textContent=(chg>=0?'+':'')+chg+'%'+(s.flag?' 🚨':''); chEl.className='fin-chg '+(chg>=0?'up':'down'); }
-  });
-  const finTs = document.getElementById('fin-updated');
-  if (finTs) finTs.textContent = '更新：' + new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
-  htmlWpiRender();
-}
-
-// 首次載入 + 定時刷新
-simulateAviation();  setInterval(simulateAviation,  30 * 60 * 1000);
-simulateFinance();   setInterval(simulateFinance,   10 * 60 * 1000);
-// FIRMS feed 每 15 分鐘更新時間戳（內容由靜態資料維護）
-setInterval(() => {
-  const t = document.getElementById('firms-updated');
-  if (t) t.textContent = '更新：' + new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
-}, 15 * 60 * 1000);
-
-
-
-// ═══════════════════════════════════════════════════════════════
-// 🌐 真實 API Fetchers（透過 allorigins CORS proxy）
-// ═══════════════════════════════════════════════════════════════
-
-// 注意：Yahoo v7/finance/quote 需要 cookie+crumb 驗證（2023 起），改用仍開放的 v8/finance/chart
-async function fetchFinanceData() {
-  const idMap = {
-    'GC=F':    { el:'html-fin-gc',  chg:'html-fin-gc-chg',  ma:'html-fin-gc-ma',  ma30:4980  },
-    'BZ=F':    { el:'html-fin-bz',  chg:'html-fin-bz-chg',  ma:'html-fin-bz-ma',  ma30:67.5  },
-    'USDCHF=X':{ el:'html-fin-chf', chg:'html-fin-chf-chg', ma:'html-fin-chf-ma', ma30:0.810 },
-    '^VIX':    { el:'html-fin-vix', chg:'html-fin-vix-chg', ma:'html-fin-vix-ma', ma30:16.2  },
-    'ZW=F':    { el:'html-fin-zw',  chg:'html-fin-zw-chg',  ma:'html-fin-zw-ma',  ma30:590   },
-  };
-  const stkMap = { 'LMT':'lmt','RTX':'rtx','NOC':'noc','GD':'gd' };
-  const tickers = [...Object.keys(idMap), ...Object.keys(stkMap)];
-
-  // 報價來源鏈：
-  // 1. 同站 /api/yahoo/*（Vercel rewrite 第一方代理，最可靠；GitHub Pages 上會 404 自動跳過）
-  // 2. 免費 CORS 代理，逐一嘗試直到成功
-  const QUOTE_SOURCES = [
-    (sym, qs) => `/api/yahoo/${encodeURIComponent(sym)}?${qs}`,
-    (sym, qs) => `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?${qs}`)}`,
-    (sym, qs) => `https://corsproxy.io/?url=${encodeURIComponent(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?${qs}`)}`,
-    (sym, qs) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?${qs}`)}`,
-  ];
-
-  async function fetchChart(symbol) {
-    const qs = 'interval=1d&range=1mo';
-    let lastErr;
-    for (const source of QUOTE_SOURCES) {
-      try {
-        const res = await fetch(source(symbol, qs), { signal: AbortSignal.timeout(12000) });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        const result = (await res.json())?.chart?.result?.[0];
-        const meta = result?.meta;
-        const price = meta?.regularMarketPrice;
-        if (price == null) throw new Error('no price');
-        const closes = (result.indicators?.quote?.[0]?.close || []).filter(c => c != null);
-        const prev = closes.length >= 2 ? closes[closes.length - 2] : (meta.chartPreviousClose ?? meta.previousClose);
-        const chgPct = prev ? +((price - prev) / prev * 100).toFixed(2) : 0;
-        const ma30 = closes.length ? closes.reduce((s, c) => s + c, 0) / closes.length : null;
-        return { symbol, price, chgPct, ma30 };
-      } catch (e) { lastErr = e; }
-    }
-    throw lastErr || new Error('all proxies failed');
+function renderFinanceSnapshot(finance) {
+  const ids = {'GC=F':'gc','BZ=F':'bz','USDCHF=X':'chf','^VIX':'vix','ZW=F':'zw'};
+  for (const [ticker,id] of Object.entries(ids)) {
+    const q=finance[ticker] || {};
+    const price=document.getElementById('html-fin-'+id);
+    const change=document.getElementById('html-fin-'+id+'-chg');
+    const ma=document.getElementById('html-fin-'+id+'-ma');
+    if(price)price.textContent=Number.isFinite(q.price) ? q.price.toLocaleString('en',{maximumFractionDigits:ticker==='USDCHF=X'?4:2}) : '--';
+    if(change)change.textContent=Number.isFinite(q.chg) ? `${q.chg>=0?'+':''}${q.chg}%（較前收）` : '--';
+    if(ma)ma.textContent=Number.isFinite(q.dev) ? `30交易日均線偏離 ${q.dev}%` : '均線資料不足';
   }
-
-  // allorigins 免費代理同時打 8 個請求容易 5xx：分批送出並失敗重試一次
-  async function fetchChartRetry(symbol, delayMs) {
-    await new Promise(r => setTimeout(r, delayMs));
-    try { return await fetchChart(symbol); }
-    catch (e) {
-      await new Promise(r => setTimeout(r, 2000));
-      return fetchChart(symbol);
-    }
+  for(const t of ['LMT','RTX','NOC','GD']) {
+    const q=finance[t]||{}; const id=t.toLowerCase();
+    const p=document.getElementById('html-stk-'+id), c=document.getElementById('html-stk-'+id+'-c');
+    if(p)p.textContent=Number.isFinite(q.price)?q.price.toFixed(2):'--';
+    if(c)c.textContent=Number.isFinite(q.chg)?`${q.chg}%`:'--';
   }
-  const results = await Promise.allSettled(tickers.map((s, i) => fetchChartRetry(s, i * 400)));
-  const finAssets = [];
-  results.forEach(r => {
-    if (r.status !== 'fulfilled') return;
-    const { symbol, price, chgPct } = r.value;
-    if (idMap[symbol]) {
-      const m = idMap[symbol];
-      const ma30 = r.value.ma30 ?? m.ma30;
-      const devPct = ma30 ? +((price-ma30)/ma30*100).toFixed(1) : 0;
-      const fmt = symbol==='USDCHF=X' ? price.toFixed(4) : price.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2});
-      const col = chgPct>=0?'var(--accent3)':'var(--accent)';
-      const pxEl=document.getElementById(m.el), chEl=document.getElementById(m.chg), maEl=document.getElementById(m.ma);
-      if (pxEl){pxEl.textContent=fmt; pxEl.style.color=col;}
-      if (chEl){chEl.textContent=(chgPct>=0?'+':'')+chgPct+'% 24h'; chEl.className='fin-change '+(chgPct>=0?'up':'down');}
-      if (maEl){maEl.innerHTML='30MA偏離 '+(devPct>=0?'+':'')+devPct+'%'+(Math.abs(devPct)>5?' <span style=\"color:var(--accent3)\">⚠</span>':'');}
-      finAssets.push({ticker:symbol, price, ma30, change:chgPct});
-      if (symbol==='BZ=F'&&ma30){
-        const prem=+(price-ma30).toFixed(2);
-        const el=document.getElementById('fin-war-premium');
-        if (el){el.textContent=(prem>=0?'+$':'-$')+Math.abs(prem)+'/bbl'; el.style.color=prem>5?'var(--accent2)':'var(--accent3)';}
-      }
-    }
-    if (stkMap[symbol]) {
-      const id=stkMap[symbol];
-      const pxEl=document.getElementById('html-stk-'+id), chEl=document.getElementById('html-stk-'+id+'-c');
-      if (pxEl) pxEl.textContent=price.toFixed(2);
-      if (chEl){const flag=(symbol==='NOC'&&chgPct>4)?' 🚨':''; chEl.textContent=(chgPct>=0?'+':'')+chgPct+'%'+flag; chEl.className='fin-chg '+(chgPct>=0?'up':'down');}
-    }
-  });
-
-  // 個別失敗的格子把「載入中」佔位改成 --，避免永遠卡在載入狀態
-  Object.values(idMap).forEach(m => {
-    const chEl = document.getElementById(m.chg);
-    if (chEl && chEl.textContent === '載入中') chEl.textContent = '--';
-  });
-
-  // 有失敗的報價 → 90 秒後自動補抓一次（不必等 10 分鐘的下一輪）
-  const failedCount = results.filter(r => r.status !== 'fulfilled').length;
-  if (failedCount > 0 && !fetchFinanceData._refillTimer) {
-    console.warn(`Finance: ${failedCount} ticker(s) failed, refill in 90s`);
-    fetchFinanceData._refillTimer = setTimeout(() => {
-      fetchFinanceData._refillTimer = null;
-      fetchFinanceData();
-    }, 90 * 1000);
-  }
-
-  if (!finAssets.length) {
-    console.warn('Finance fetch failed: all tickers unavailable');
-    return;
-  }
-
-  HTML_WPI_STATE.finance.assets = finAssets;
+  const oil=finance['BZ=F']; const prem=document.getElementById('fin-war-premium');
+  if(prem)prem.textContent=Number.isFinite(oil?.price)&&Number.isFinite(oil?.ma30)?`$${(oil.price-oil.ma30).toFixed(2)}/bbl`:'--';
   const ts=document.getElementById('fin-updated');
-  if (ts) ts.textContent='更新：'+new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
-  htmlWpiRender();
+  if(ts)ts.textContent='後端快照：'+observedTime()+' · 報價可能為休市前最後一筆';
 }
+async function fetchFinanceData() {} // Refreshed with the common backend snapshot.
 
-async function fetchPolymarketLive() {
-  try {
-    const res = await fetch('https://gamma-api.polymarket.com/markets?active=true&closed=false&limit=200',{signal:AbortSignal.timeout(10000)});
-    if (!res.ok) throw new Error();
-    const raw = await res.json();
-    const markets = Array.isArray(raw)?raw:(raw.data||[]);
-    const kw = ['ukraine','russia','iran','taiwan','nuclear','war','military','strike','attack','conflict'];
-    // 排除運動／娛樂盤的誤中（例：Will Iran win the FIFA World Cup?）
-    const ex = ['world cup','fifa','olympic','super bowl','nba','nfl','mlb','album','grammy','oscar','bitcoin','eurovision'];
-    const filtered = markets.filter(m=>{
-      const q=(m.question||'').toLowerCase();
-      return kw.some(k=>q.includes(k)) && !ex.some(e=>q.includes(e));
-    }).slice(0,8);
-    if (filtered.length) {
-      HTML_WPI_STATE.poly = filtered.map(m=>{
-        let yes=50;
-        try{yes=parseFloat(JSON.parse(m.outcomePrices||'["0.5"]')[0])*100;}catch(e){}
-        // gamma API 的 volume 是字串，必須轉數字，否則 WPI 加總會變 NaN
-        return {yes_pct:yes,volume:parseFloat(m.volume)||1};
-      });
-      htmlWpiRender();
-    }
-  } catch(e){console.warn('Polymarket fetch failed');}
-}
+// Market cards and the score share the same validated backend snapshot.
+async function fetchPolymarketLive() {}
 
 const WGLOBE_PTS = [-1433,-840,13,-1311,-840,13,-1189,-840,2,-1067,-840,2,-944,-840,2,-822,-840,13,-700,-840,13,-578,-840,1,-456,-840,2,-333,-840,13,-211,-840,13,-89,-840,13,33,-840,13,156,-840,13,278,-840,13,400,-840,13,522,-840,13,644,-840,2,767,-840,2,889,-840,13,1011,-840,13,1133,-840,13,1256,-840,13,1378,-840,2,1500,-840,2,1622,-840,2,-1433,-818,13,-1311,-818,13,-1189,-818,13,-1067,-818,2,-944,-818,2,-822,-818,13,-700,-818,2,-333,-818,13,-211,-818,13,-89,-818,1,33,-818,2,156,-818,13,278,-818,13,400,-818,13,522,-818,13,644,-818,13,767,-818,13,889,-818,2,1011,-818,2,1133,-818,13,1256,-818,2,1378,-818,2,1500,-818,13,-1434,-796,13,-1313,-796,2,-1191,-796,13,-1069,-796,2,-947,-796,1,-825,-796,13,-459,-796,13,-216,-796,13,-94,-796,13,28,-796,1,150,-796,2,272,-796,1,394,-796,2,516,-796,13,637,-796,13,759,-796,2,881,-796,13,1003,-796,2,1125,-796,1,1247,-796,1,1369,-796,13,1491,-796,1,-1497,-774,13,-1397,-774,0,-1296,-774,1,-1195,-774,2,-1094,-774,2,-993,-774,2,-892,-774,13,-791,-774,2,-287,-774,2,-186,-774,13,-86,-774,0,15,-774,0,116,-774,1,217,-774,0,318,-774,1,419,-774,1,520,-774,1,620,-774,1,721,-774,2,822,-774,2,923,-774,13,1024,-774,2,1125,-774,1,1226,-774,2,1326,-774,2,1427,-774,2,1528,-774,2,1629,-774,13,-1369,-752,26,-1283,-752,0,-1197,-752,2,-1111,-752,2,-1025,-752,13,-939,-752,1,-853,-752,1,-767,-752,2,-680,-752,0,-164,-752,1,-78,-752,1,9,-752,1,95,-752,1,181,-752,1,267,-752,1,353,-752,1,439,-752,1,525,-752,2,611,-752,13,698,-752,2,784,-752,1,870,-752,1,956,-752,2,1042,-752,2,1128,-752,0,1214,-752,0,1300,-752,2,1387,-752,1,1473,-752,1,1559,-752,1,1645,-752,47,-897,-730,0,-671,-730,0,-145,-730,13,-69,-730,0,6,-730,0,81,-730,1,156,-730,0,232,-730,2,307,-730,2,382,-730,0,457,-730,1,533,-730,1,608,-730,13,683,-730,13,758,-730,0,834,-730,0,909,-730,1,984,-730,2,1059,-730,1,1135,-730,0,1210,-730,0,1285,-730,1,1360,-730,2,1436,-730,1,1511,-730,2,1586,-730,1,1661,-730,2,-663,-708,1,73,-708,1,140,-708,1,207,-708,13,274,-708,13,341,-708,0,408,-708,0,474,-708,0,541,-708,0,608,-708,1,675,-708,13,742,-708,0,809,-708,1,876,-708,1,943,-708,1,1010,-708,1,1077,-708,1,1143,-708,1,1210,-708,0,1277,-708,0,1344,-708,2,1411,-708,0,1478,-708,1,1545,-708,0,1612,-708,13,-654,-686,1,431,-686,0,491,-686,1,551,-686,0,612,-686,1,672,-686,1,793,-686,1,853,-686,1,913,-686,1,974,-686,0,1034,-686,0,1094,-686,2,1154,-686,2,1215,-686,1,1275,-686,0,1335,-686,2,1396,-686,1,1456,-686,0,-646,-664,0,563,-664,13,1112,-664,13,1332,-664,0,-676,-554,47,-698,-532,22,-716,-510,12,-731,-488,34,-698,-488,31,-743,-466,41,-711,-466,24,-679,-466,25,1690,-466,47,-722,-444,45,-691,-444,35,-661,-444,33,1710,-444,21,-731,-422,47,-701,-422,33,-671,-422,33,1467,-422,43,1734,-422,34,-709,-400,35,-680,-400,12,-651,-400,18,1761,-400,45,-714,-378,20,-686,-378,35,-658,-378,9,-631,-378,8,-603,-378,8,-575,-378,28,1430,-378,23,1458,-378,43,1485,-378,47,1764,-378,36,-718,-356,27,-691,-356,12,-664,-356,12,-637,-356,8,-609,-356,9,-582,-356,8,1393,-356,28,1420,-356,16,1447,-356,8,1474,-356,21,1501,-356,44,-693,-334,35,-667,-334,21,-641,-334,9,-614,-334,8,-588,-334,16,-561,-334,16,-535,-334,16,203,-334,33,229,-334,35,255,-334,30,1178,-334,9,1204,-334,27,1230,-334,16,1362,-334,15,1389,-334,5,1415,-334,12,1441,-334,12,1468,-334,5,1494,-334,30,-694,-312,35,-668,-312,9,-643,-312,27,-617,-312,16,-591,-312,16,-565,-312,15,-540,-312,16,-514,-312,47,180,-312,12,206,-312,33,232,-312,33,258,-312,18,283,-312,21,1158,-312,16,1184,-312,9,1209,-312,18,1235,-312,27,1261,-312,18,1286,-312,12,1312,-312,12,1338,-312,33,1364,-312,33,1389,-312,33,1415,-312,25,1441,-312,12,1466,-312,27,1492,-312,19,1518,-312,43,-693,-290,35,-668,-290,27,-643,-290,5,-618,-290,18,-593,-290,21,-567,-290,23,-542,-290,23,-517,-290,37,187,-290,6,212,-290,12,237,-290,27,263,-290,9,288,-290,34,313,-290,30,1168,-290,18,1193,-290,12,1218,-290,12,1244,-290,25,1269,-290,33,1294,-290,33,1319,-290,33,1344,-290,33,1369,-290,11,1395,-290,6,1420,-290,25,1445,-290,12,1470,-290,12,1495,-290,9,1520,-290,38,-691,-268,35,-666,-268,47,-642,-268,21,-617,-268,27,-592,-268,23,-568,-268,23,-543,-268,37,-518,-268,36,-494,-268,43,172,-268,33,196,-268,25,221,-268,12,246,-268,18,270,-268,16,295,-268,18,320,-268,19,1158,-268,33,1182,-268,33,1207,-268,33,1232,-268,33,1256,-268,25,1281,-268,25,1306,-268,33,1330,-268,25,1355,-268,33,1380,-268,5,1404,-268,24,1429,-268,33,1453,-268,25,1478,-268,18,1503,-268,21,1527,-268,44,-687,-246,0,-663,-246,45,-639,-246,23,-614,-246,21,-590,-246,23,-566,-246,23,-542,-246,29,-518,-246,22,-493,-246,44,160,-246,24,184,-246,25,208,-246,12,232,-246,9,257,-246,9,281,-246,15,305,-246,5,329,-246,23,450,-246,18,1152,-246,33,1176,-246,33,1200,-246,33,1225,-246,33,1249,-246,33,1273,-246,25,1297,-246,33,1321,-246,25,1345,-246,33,1370,-246,33,1394,-246,12,1418,-246,33,1442,-246,12,1466,-246,16,1491,-246,32,1515,-246,43,-682,-224,4,-658,-224,34,-634,-224,30,-610,-224,30,-586,-224,30,-563,-224,22,-539,-224,21,-515,-224,23,-491,-224,21,-467,-224,22,-444,-224,44,-420,-224,44,151,-224,24,175,-224,12,199,-224,18,223,-224,8,246,-224,8,270,-224,18,294,-224,15,318,-224,23,342,-224,23,437,-224,16,461,-224,23,1151,-224,12,1174,-224,12,1198,-224,33,1222,-224,12,1246,-224,33,1270,-224,33,1293,-224,33,1317,-224,25,1341,-224,8,1365,-224,9,1389,-224,8,1412,-224,12,1436,-224,8,1460,-224,8,1484,-224,37,-698,-202,31,-675,-202,4,-651,-202,26,-628,-202,30,-604,-202,29,-581,-202,23,-558,-202,23,-534,-202,23,-511,-202,30,-487,-202,23,-464,-202,30,-440,-202,27,-417,-202,22,146,-202,5,169,-202,8,193,-202,9,216,-202,8,239,-202,8,263,-202,9,286,-202,8,310,-202,27,333,-202,23,450,-202,21,474,-202,30,1201,-202,12,1224,-202,8,1247,-202,25,1271,-202,25,1294,-202,12,1318,-202,12,1341,-202,12,1365,-202,9,1388,-202,9,1412,-202,8,1435,-202,9,1458,-202,23,1482,-202,38,-690,-180,26,-667,-180,26,-643,-180,45,-620,-180,43,-597,-180,43,-574,-180,30,-551,-180,23,-528,-180,21,-505,-180,21,-481,-180,21,-458,-180,23,-435,-180,21,-412,-180,30,120,-180,6,143,-180,9,166,-180,8,189,-180,8,212,-180,9,236,-180,16,259,-180,21,282,-180,21,305,-180,16,328,-180,27,351,-180,23,444,-180,21,467,-180,27,490,-180,44,1230,-180,9,1253,-180,9,1277,-180,12,1300,-180,18,1323,-180,9,1346,-180,9,1369,-180,9,1392,-180,16,1415,-180,21,1439,-180,9,1785,-180,44,-725,-158,47,-703,-158,17,-680,-158,42,-657,-158,37,-634,-158,37,-611,-158,37,-588,-158,30,-565,-158,30,-542,-158,21,-520,-158,23,-497,-158,19,-474,-158,21,-451,-158,23,-428,-158,21,-405,-158,23,121,-158,10,143,-158,21,166,-158,21,189,-158,16,212,-158,16,235,-158,21,258,-158,21,281,-158,21,303,-158,37,326,-158,21,349,-158,5,372,-158,23,395,-158,30,464,-158,29,486,-158,30,1264,-158,16,1287,-158,18,1309,-158,5,1332,-158,16,1355,-158,9,1424,-158,16,1447,-158,30,-759,-136,11,-736,-136,26,-714,-136,17,-691,-136,41,-668,-136,37,-646,-136,37,-623,-136,29,-600,-136,23,-578,-136,30,-555,-136,23,-532,-136,37,-510,-136,30,-487,-136,19,-465,-136,21,-442,-136,19,-419,-136,45,-397,-136,37,147,-136,27,169,-136,21,192,-136,23,214,-136,21,237,-136,23,260,-136,21,282,-136,21,305,-136,30,328,-136,15,350,-136,21,373,-136,21,396,-136,23,486,-136,29,1301,-136,23,1324,-136,21,1346,-136,23,-768,-114,4,-745,-114,32,-723,-114,41,-700,-114,44,-678,-114,44,-655,-114,44,-633,-114,37,-611,-114,37,-588,-114,37,-566,-114,37,-543,-114,37,-521,-114,30,-498,-114,30,-476,-114,30,-453,-114,21,-431,-114,23,-409,-114,16,-386,-114,23,153,-114,27,175,-114,23,197,-114,21,220,-114,21,242,-114,21,265,-114,23,287,-114,19,310,-114,15,332,-114,5,355,-114,21,377,-114,21,399,-114,30,-775,-92,34,-753,-92,41,-730,-92,44,-708,-92,44,-686,-92,41,-663,-92,44,-641,-92,44,-619,-92,41,-597,-92,41,-574,-92,37,-552,-92,37,-530,-92,41,-507,-92,30,-485,-92,30,-463,-92,23,-441,-92,19,-418,-92,15,-396,-92,9,-374,-92,21,139,-92,16,161,-92,21,184,-92,23,206,-92,21,228,-92,21,250,-92,23,273,-92,23,295,-92,21,317,-92,27,340,-92,45,362,-92,19,384,-92,16,1253,-92,44,1476,-92,22,-780,-70,34,-758,-70,44,-736,-70,44,-714,-70,44,-692,-70,44,-670,-70,44,-647,-70,44,-625,-70,44,-603,-70,44,-581,-70,44,-559,-70,41,-537,-70,39,-514,-70,37,-492,-70,37,-470,-70,30,-448,-70,23,-426,-70,21,-404,-70,9,-381,-70,25,-359,-70,21,128,-70,47,151,-70,19,173,-70,37,195,-70,23,217,-70,30,239,-70,23,261,-70,30,284,-70,23,306,-70,15,328,-70,15,350,-70,21,372,-70,21,394,-70,30,1081,-70,38,1104,-70,39,1126,-70,47,1392,-70,37,1414,-70,37,1436,-70,43,1458,-70,45,1569,-70,39,-807,-48,25,-784,-48,42,-762,-48,44,-740,-48,44,-718,-48,44,-696,-48,44,-674,-48,44,-652,-48,44,-630,-48,44,-608,-48,44,-586,-48,44,-564,-48,44,-542,-48,41,-520,-48,39,-497,-48,39,-475,-48,37,-453,-48,22,-431,-48,30,-409,-48,21,-387,-48,9,121,-48,39,143,-48,43,165,-48,43,187,-48,41,209,-48,44,231,-48,41,253,-48,37,275,-48,29,297,-48,15,319,-48,16,342,-48,15,364,-48,15,386,-48,43,1048,-48,44,1203,-48,41,1379,-48,44,1401,-48,44,1423,-48,22,1445,-48,41,-787,-26,34,-765,-26,44,-743,-26,44,-721,-26,44,-699,-26,44,-677,-26,44,-655,-26,44,-633,-26,44,-611,-26,44,-589,-26,44,-567,-26,44,-545,-26,44,-523,-26,44,-501,-26,41,-479,-26,37,-457,-26,37,-435,-26,39,116,-26,30,138,-26,37,160,-26,43,182,-26,44,204,-26,44,226,-26,41,248,-26,44,270,-26,43,292,-26,37,314,-26,15,336,-26,8,358,-26,9,380,-26,27,402,-26,23,1019,-26,44,1041,-26,44,1107,-26,44,1129,-26,44,1151,-26,44,1195,-26,22,1217,-26,43,1327,-26,47,1371,-26,28,1393,-26,39,-788,-4,20,-766,-4,39,-744,-4,44,-722,-4,44,-700,-4,44,-678,-4,44,-656,-4,44,-634,-4,44,-612,-4,44,-590,-4,39,-568,-4,44,-546,-4,41,-524,-4,39,-502,-4,41,92,-4,47,114,-4,39,136,-4,44,158,-4,41,180,-4,44,202,-4,44,224,-4,44,246,-4,44,268,-4,41,290,-4,29,312,-4,21,334,-4,15,356,-4,22,378,-4,30,400,-4,9,422,-4,21,1016,-4,44,1104,-4,44,1126,-4,37,1148,-4,41,1170,-4,44,1280,-4,46,1324,-4,36,-765,18,47,-743,18,41,-721,18,41,-699,18,44,-677,18,44,-655,18,40,-633,18,44,-611,18,41,-589,18,39,-567,18,41,-545,18,41,-523,18,41,115,18,37,137,18,41,159,18,44,181,18,44,203,18,44,225,18,44,247,18,44,269,18,44,291,18,37,313,18,5,335,18,15,357,18,9,379,18,25,401,18,25,423,18,9,445,18,9,995,18,44,1017,18,47,1039,18,44,1127,18,38,1149,18,37,1171,18,44,-763,40,45,-741,40,34,-719,40,23,-697,40,41,-675,40,41,-653,40,39,-631,40,44,-609,40,30,-587,40,37,-565,40,39,-543,40,37,-521,40,37,97,40,36,119,40,37,141,40,41,163,40,39,185,40,41,207,40,41,229,40,41,251,40,41,273,40,37,295,40,23,317,40,21,339,40,18,361,40,18,383,40,27,405,40,18,427,40,24,449,40,9,472,40,18,979,40,44,1023,40,38,1155,40,22,1177,40,47,-760,62,45,-738,62,19,-716,62,21,-694,62,23,-671,62,30,-649,62,44,-627,62,29,-605,62,38,-583,62,37,-96,62,41,-74,62,41,-52,62,41,-30,62,37,-8,62,43,15,62,47,59,62,37,81,62,37,103,62,19,125,62,21,147,62,29,170,62,22,192,62,23,214,62,23,236,62,22,258,62,23,280,62,21,302,62,21,324,62,21,347,62,27,369,62,45,391,62,45,413,62,18,435,62,12,457,62,25,479,62,24,811,62,46,1010,62,39,1165,62,19,1254,62,29,-822,84,43,-777,84,44,-755,84,43,-733,84,22,-710,84,47,-688,84,21,-666,84,9,-644,84,30,-621,84,29,-599,84,41,-110,84,43,-88,84,30,-65,84,23,-43,84,23,-21,84,23,1,84,23,24,84,21,46,84,21,68,84,23,90,84,21,113,84,27,135,84,21,157,84,16,179,84,21,201,84,21,224,84,23,246,84,16,268,84,15,290,84,9,313,84,16,335,84,21,357,84,29,379,84,19,402,84,45,424,84,9,446,84,33,468,84,12,491,84,6,780,84,46,802,84,30,1002,84,47,1247,84,19,-838,106,41,-748,106,37,-726,106,43,-703,106,19,-636,106,19,-614,106,37,-144,106,30,-121,106,30,-99,106,23,-77,106,21,-54,106,16,-32,106,16,-9,106,16,13,106,5,35,106,16,58,106,16,80,106,16,102,106,15,125,106,16,147,106,9,170,106,9,192,106,9,214,106,16,237,106,9,259,106,9,282,106,8,304,106,18,326,106,9,349,106,23,371,106,30,393,106,15,416,106,33,438,106,6,461,106,6,483,106,25,505,106,10,774,106,23,796,106,30,1043,106,46,1065,106,41,1222,106,47,-875,128,47,-852,128,43,-153,128,21,-131,128,21,-108,128,21,-85,128,15,-63,128,16,-40,128,9,-18,128,9,5,128,8,27,128,16,50,128,8,73,128,8,95,128,8,118,128,8,140,128,8,163,128,8,185,128,9,208,128,9,230,128,8,253,128,12,276,128,8,298,128,12,321,128,12,343,128,8,366,128,15,388,128,18,411,128,24,749,128,42,772,128,21,794,128,30,998,128,41,1020,128,39,1043,128,41,1065,128,37,1088,128,38,-912,150,22,-889,150,29,-866,150,43,-843,150,44,-160,150,10,-137,150,8,-115,150,10,-92,150,8,-69,150,8,-46,150,9,-23,150,8,-1,150,11,22,150,6,45,150,10,68,150,8,90,150,10,113,150,6,136,150,3,159,150,3,182,150,6,204,150,8,227,150,10,250,150,10,273,150,11,295,150,11,318,150,24,341,150,25,364,150,9,387,150,10,432,150,8,455,150,35,478,150,10,500,150,35,751,150,21,774,150,23,796,150,30,979,150,22,1001,150,30,1024,150,37,1047,150,30,1070,150,43,1206,150,37,-994,172,45,-971,172,19,-948,172,37,-925,172,38,-902,172,44,-142,172,10,-119,172,25,-96,172,10,-73,172,10,-50,172,6,-27,172,6,-4,172,6,19,172,10,42,172,6,65,172,24,88,172,10,111,172,3,135,172,3,158,172,3,181,172,3,204,172,3,227,172,10,250,172,6,273,172,6,296,172,6,319,172,11,342,172,24,365,172,33,388,172,10,434,172,35,457,172,6,480,172,6,503,172,6,526,172,6,549,172,35,733,172,36,756,172,18,779,172,21,802,172,23,964,172,43,987,172,38,1010,172,38,1033,172,23,1056,172,39,1217,172,43,-1030,194,45,-1007,194,47,-984,194,27,-890,194,37,-727,194,42,-704,194,44,-144,194,11,-121,194,6,-97,194,3,-74,194,3,-51,194,3,-27,194,3,-4,194,10,19,194,11,43,194,6,66,194,6,89,194,7,113,194,3,136,194,3,159,194,6,183,194,11,206,194,6,229,194,24,253,194,6,276,194,5,299,194,6,323,194,3,346,194,11,369,194,33,416,194,31,439,194,10,462,194,6,486,194,3,509,194,6,532,194,6,556,194,0,742,194,23,766,194,21,789,194,21,812,194,30,836,194,22,952,194,37,976,194,29,999,194,30,1022,194,45,1046,194,45,1092,194,29,-1043,216,32,-1019,216,27,-996,216,23,-783,216,43,-167,216,3,-144,216,3,-120,216,3,-96,216,6,-73,216,10,-49,216,24,-25,216,6,-2,216,3,22,216,6,46,216,6,69,216,6,93,216,3,117,216,6,140,216,6,164,216,11,188,216,33,211,216,24,235,216,3,259,216,6,282,216,3,306,216,6,330,216,6,353,216,31,401,216,10,424,216,33,448,216,6,472,216,3,495,216,3,519,216,3,542,216,11,566,216,3,590,216,6,708,216,8,732,216,16,755,216,21,779,216,23,803,216,21,826,216,23,850,216,30,874,216,47,921,216,39,945,216,37,968,216,38,992,216,32,1016,216,44,1039,216,45,1063,216,43,1110,216,43,-1103,238,8,-1055,238,22,-1031,238,25,-1007,238,18,-982,238,21,-141,238,6,-117,238,3,-93,238,3,-69,238,24,-45,238,10,-21,238,6,3,238,6,27,238,6,51,238,6,75,238,11,100,238,3,124,238,3,148,238,11,172,238,3,196,238,24,220,238,6,244,238,10,268,238,24,292,238,3,316,238,3,340,238,24,388,238,11,412,238,31,436,238,6,460,238,6,484,238,10,508,238,3,532,238,3,556,238,11,701,238,7,725,238,9,749,238,16,773,238,21,797,238,21,821,238,30,845,238,23,869,238,23,893,238,37,917,238,38,941,238,44,965,238,38,989,238,45,1013,238,45,1037,238,38,1061,238,38,1085,238,43,1109,238,43,1133,238,43,1158,238,29,1206,238,29,-1115,260,27,-1090,260,18,-1066,260,32,-1041,260,12,-1017,260,7,-992,260,16,-772,260,47,-136,260,6,-111,260,10,-87,260,4,-62,260,24,-38,260,11,-13,260,3,11,260,10,36,260,24,60,260,3,85,260,24,109,260,24,134,260,3,158,260,3,183,260,3,207,260,3,232,260,3,256,260,3,281,260,7,305,260,4,330,260,6,378,260,35,403,260,33,427,260,10,452,260,10,476,260,6,501,260,47,574,260,4,599,260,24,623,260,31,648,260,31,672,260,35,697,260,10,721,260,12,746,260,18,770,260,15,795,260,21,819,260,23,844,260,30,868,260,30,892,260,39,917,260,36,941,260,28,966,260,44,990,260,47,1015,260,47,1039,260,32,1064,260,37,1088,260,43,1113,260,38,1137,260,38,1162,260,30,1186,260,45,-1101,282,18,-1076,282,34,-1051,282,33,-1026,282,8,-1001,282,18,-976,282,21,-826,282,43,-103,282,11,-78,282,6,-53,282,6,-28,282,10,-3,282,3,22,282,24,47,282,3,72,282,6,97,282,24,122,282,11,147,282,6,172,282,11,197,282,3,222,282,3,247,282,3,272,282,3,297,282,6,322,282,6,347,282,17,372,282,11,397,282,3,422,282,11,447,282,6,472,282,6,522,282,12,547,282,33,571,282,45,596,282,31,621,282,7,646,282,6,671,282,35,696,282,25,721,282,10,746,282,8,771,282,21,796,282,27,821,282,38,846,282,47,871,282,26,896,282,26,921,282,34,946,282,47,971,282,45,996,282,46,1021,282,47,1046,282,29,1071,282,38,1096,282,44,1121,282,38,1146,282,30,1171,282,22,1196,282,38,-1111,304,8,-1086,304,27,-1060,304,24,-1035,304,10,-1009,304,16,-984,304,23,-958,304,37,-933,304,43,-907,304,43,-882,304,47,-856,304,43,-831,304,43,-91,304,18,-66,304,31,-40,304,11,-15,304,6,11,304,6,36,304,6,62,304,6,88,304,10,113,304,10,139,304,10,164,304,6,215,304,3,241,304,3,266,304,0,292,304,6,317,304,7,343,304,3,368,304,6,394,304,10,419,304,6,445,304,6,470,304,3,496,304,6,521,304,35,547,304,31,572,304,31,598,304,24,623,304,6,649,304,11,674,304,35,700,304,31,725,304,8,751,304,8,776,304,29,802,304,28,827,304,26,853,304,17,878,304,14,904,304,0,929,304,17,955,304,17,980,304,34,1006,304,28,1031,304,47,1057,304,30,1082,304,22,1108,304,45,1133,304,30,1159,304,29,1184,304,38,1210,304,47,-1147,326,6,-1121,326,25,-1095,326,12,-1069,326,24,-1043,326,12,-1017,326,25,-990,326,16,-964,326,23,-938,326,37,-912,326,43,-886,326,43,-860,326,43,-834,326,40,-808,326,43,-76,326,25,-50,326,7,-24,326,33,2,326,11,28,326,11,54,326,6,80,326,3,106,326,10,132,326,5,211,326,25,367,326,8,394,326,6,420,326,6,446,326,7,472,326,12,498,326,35,524,326,31,550,326,7,576,326,24,603,326,11,629,326,7,655,326,4,681,326,4,707,326,5,733,326,16,759,326,45,785,326,45,811,326,28,838,326,17,864,326,14,890,326,14,916,326,14,942,326,0,968,326,26,994,326,17,1020,326,20,1046,326,45,1073,326,38,1099,326,22,1125,326,30,1151,326,30,1177,326,30,1203,326,30,1308,326,20,-1184,348,12,-1157,348,25,-1130,348,27,-1103,348,24,-1077,348,33,-1050,348,25,-1023,348,9,-996,348,18,-969,348,21,-943,348,30,-916,348,37,-889,348,37,-862,348,43,-835,348,43,-809,348,43,-782,348,43,-59,348,27,-32,348,25,-5,348,10,22,348,24,49,348,33,75,348,31,102,348,11,370,348,6,397,348,6,424,348,6,451,348,12,477,348,10,504,348,31,531,348,33,558,348,4,584,348,6,611,348,10,638,348,7,665,348,26,692,348,20,718,348,34,745,348,34,772,348,45,799,348,14,826,348,26,852,348,14,879,348,14,906,348,14,933,348,17,960,348,14,986,348,14,1013,348,17,1040,348,20,1067,348,38,1094,348,23,1120,348,37,1147,348,30,1174,348,23,1335,348,43,1361,348,43,1388,348,28,-1222,370,47,-1194,370,38,-1166,370,25,-1139,370,25,-1111,370,6,-1084,370,18,-1056,370,27,-1029,370,18,-1001,370,9,-974,370,16,-946,370,23,-918,370,37,-891,370,37,-863,370,37,-836,370,29,-808,370,43,-781,370,43,-65,370,34,-37,370,33,73,370,27,101,370,27,294,370,27,321,370,35,349,370,45,376,370,33,404,370,9,431,370,8,459,370,8,486,370,35,541,370,18,569,370,6,597,370,25,624,370,11,652,370,10,679,370,24,707,370,7,734,370,47,762,370,26,789,370,26,817,370,24,845,370,26,872,370,1,900,370,26,927,370,4,955,370,31,982,370,35,1010,370,17,1037,370,35,1065,370,24,1092,370,18,1120,370,7,1148,370,30,1175,370,30,1203,370,30,1285,370,28,1368,370,36,1395,370,45,-1232,392,32,-1204,392,38,-1175,392,10,-1147,392,12,-1119,392,33,-1090,392,25,-1062,392,14,-1033,392,18,-1005,392,9,-977,392,9,-948,392,30,-920,392,30,-892,392,43,-863,392,43,-835,392,43,-806,392,37,-778,392,38,-750,392,47,-68,392,27,-40,392,33,-11,392,33,216,392,45,272,392,45,301,392,18,329,392,10,358,392,45,386,392,45,414,392,35,443,392,31,471,392,19,556,392,24,585,392,11,613,392,11,641,392,24,670,392,27,698,392,34,727,392,14,755,392,24,783,392,10,812,392,6,840,392,10,869,392,6,897,392,4,925,392,4,954,392,34,982,392,45,1011,392,10,1039,392,24,1067,392,35,1096,392,33,1124,392,12,1152,392,32,1266,392,29,1408,392,22,-1213,414,32,-1184,414,25,-1155,414,12,-1125,414,12,-1096,414,25,-1067,414,16,-1037,414,18,-1008,414,9,-979,414,16,-949,414,16,-920,414,30,-891,414,30,-861,414,37,-832,414,43,-803,414,30,-773,414,43,-744,414,43,-70,414,45,-40,414,18,-11,414,12,18,414,34,136,414,34,194,414,47,224,414,38,253,414,32,282,414,32,341,414,20,429,414,19,458,414,23,488,414,16,546,414,10,576,414,6,605,414,10,634,414,24,664,414,24,693,414,12,722,414,35,752,414,24,781,414,35,810,414,31,840,414,11,869,414,31,898,414,7,928,414,7,957,414,17,986,414,10,1016,414,24,1045,414,11,1074,414,35,1104,414,10,1133,414,12,1162,414,32,1192,414,30,1221,414,23,1250,414,43,1280,414,28,-1223,436,36,-1192,436,33,-1162,436,8,-1132,436,33,-1101,436,32,-1071,436,27,-1041,436,27,-1010,436,9,-980,436,16,-949,436,21,-919,436,30,-889,436,43,-858,436,43,-828,436,43,-797,436,43,-767,436,37,-737,436,40,-706,436,43,-8,436,30,23,436,29,53,436,27,114,436,38,175,436,38,205,436,43,235,436,23,266,436,16,418,436,45,448,436,21,539,436,7,570,436,3,600,436,10,630,436,10,661,436,31,691,436,25,722,436,25,752,436,33,782,436,5,813,436,6,843,436,26,873,436,7,904,436,17,934,436,25,965,436,11,995,436,24,1025,436,35,1056,436,24,1086,436,11,1116,436,24,1147,436,24,1177,436,27,1208,436,16,1238,436,21,1268,436,28,1299,436,42,1329,436,40,1420,436,28,1451,436,36,-1232,458,45,-1200,458,18,-1169,458,32,-1137,458,34,-1106,458,27,-1074,458,12,-1043,458,9,-1011,458,18,-980,458,16,-948,458,30,-916,458,40,-885,458,43,-853,458,41,-822,458,40,-790,458,41,-759,458,38,-727,458,37,-696,458,40,-664,458,36,-601,458,47,-1,458,30,30,458,45,62,458,36,93,458,45,125,458,30,156,458,45,188,458,27,220,458,30,251,458,22,283,458,16,346,458,9,409,458,9,441,458,9,472,458,18,535,458,12,567,458,10,598,458,12,630,458,24,661,458,11,693,458,24,725,458,12,756,458,24,788,458,25,819,458,18,851,458,45,882,458,10,914,458,33,945,458,20,977,458,45,1009,458,24,1040,458,25,1072,458,25,1103,458,25,1135,458,12,1166,458,18,1198,458,15,1229,458,21,1261,458,23,1293,458,28,1324,458,38,1356,458,42,-1241,480,28,-1208,480,45,-1175,480,30,-1142,480,45,-1110,480,25,-1077,480,25,-1044,480,8,-1011,480,9,-978,480,21,-945,480,38,-912,480,40,-879,480,41,-847,480,40,-814,480,42,-781,480,40,-748,480,41,-715,480,28,-682,480,40,-583,480,29,-551,480,29,-25,480,30,8,480,30,41,480,29,74,480,30,107,480,29,140,480,28,173,480,23,206,480,44,238,480,43,271,480,27,304,480,21,337,480,16,370,480,8,403,480,9,436,480,9,469,480,18,501,480,25,534,480,12,567,480,12,600,480,12,633,480,12,666,480,12,699,480,12,732,480,12,765,480,25,797,480,18,830,480,9,863,480,9,896,480,7,929,480,24,962,480,31,995,480,19,1028,480,12,1060,480,27,1093,480,27,1126,480,18,1159,480,25,1192,480,16,1225,480,29,1258,480,29,1291,480,36,1323,480,29,1356,480,40,1389,480,42,1422,480,36,-1250,502,47,-1216,502,38,-1181,502,47,-1147,502,45,-1113,502,12,-1078,502,8,-1044,502,18,-1010,502,27,-975,502,30,-941,502,42,-906,502,41,-872,502,46,-838,502,46,-803,502,42,-769,502,42,-735,502,36,-700,502,46,-666,502,47,22,502,23,56,502,36,90,502,30,125,502,43,159,502,38,193,502,38,228,502,37,262,502,30,297,502,23,331,502,27,365,502,21,400,502,21,434,502,18,468,502,18,503,502,18,537,502,9,571,502,9,606,502,18,640,502,18,675,502,12,709,502,18,743,502,9,778,502,12,812,502,9,846,502,35,881,502,20,915,502,35,950,502,12,984,502,34,1018,502,19,1053,502,27,1087,502,36,1121,502,38,1156,502,18,1190,502,21,1224,502,32,1259,502,29,1293,502,29,1328,502,42,1362,502,45,1396,502,42,1431,502,36,-1259,524,42,-1223,524,36,-1187,524,38,-1151,524,43,-1115,524,9,-1079,524,21,-1043,524,23,-1007,524,29,-971,524,40,-935,524,42,-899,524,46,-863,524,42,-826,524,42,-754,524,36,-718,524,28,-682,524,42,-646,524,36,-610,524,42,-574,524,36,-69,524,30,-33,524,27,3,524,30,75,524,30,111,524,23,147,524,37,183,524,38,219,524,38,255,524,37,291,524,37,327,524,30,363,524,23,399,524,27,436,524,27,472,524,23,508,524,21,544,524,18,580,524,23,616,524,18,652,524,9,688,524,9,724,524,18,760,524,9,796,524,16,832,524,21,868,524,36,904,524,28,940,524,42,976,524,19,1012,524,20,1049,524,28,1085,524,32,1121,524,22,1157,524,38,1193,524,28,1229,524,29,1265,524,29,1301,524,29,1337,524,29,1373,524,26,1409,524,36,-1648,546,26,-1268,546,38,-1230,546,36,-1192,546,42,-1154,546,42,-1116,546,40,-1078,546,40,-1040,546,41,-1002,546,42,-964,546,42,-927,546,42,-889,546,36,-851,546,36,-775,546,28,-737,546,28,-699,546,20,-661,546,36,-623,546,28,-585,546,26,-15,546,37,99,546,38,175,546,38,213,546,38,251,546,38,289,546,38,327,546,38,365,546,30,403,546,30,441,546,30,479,546,30,517,546,23,555,546,22,593,546,38,631,546,21,669,546,21,707,546,18,745,546,21,783,546,21,820,546,27,858,546,21,896,546,19,934,546,42,972,546,45,1010,546,36,1048,546,36,1086,546,34,1124,546,17,1162,546,45,1200,546,32,1238,546,45,1276,546,29,1314,546,45,1352,546,28,1580,546,22,-1318,568,34,-1278,568,34,-1238,568,34,-1197,568,28,-1157,568,46,-1117,568,46,-1077,568,42,-1037,568,42,-996,568,46,-956,568,28,-916,568,28,-755,568,20,-715,568,20,-675,568,28,-635,568,17,-32,568,32,88,568,47,129,568,40,249,568,40,289,568,38,329,568,38,370,568,40,410,568,38,450,568,37,490,568,38,530,568,38,571,568,29,611,568,36,651,568,29,691,568,29,731,568,29,771,568,29,812,568,40,852,568,36,892,568,40,932,568,22,972,568,29,1012,568,40,1053,568,36,1093,568,20,1133,568,20,1173,568,34,1213,568,28,1254,568,28,1294,568,26,1334,568,28,1374,568,34,1575,568,22,1615,568,17,-1586,590,47,-1544,590,20,-1373,590,26,-1330,590,34,-1287,590,26,-1245,590,42,-1202,590,46,-1159,590,28,-1117,590,42,-1074,590,36,-1031,590,28,-988,590,28,-775,590,20,-732,590,17,-647,590,17,79,590,22,122,590,40,165,590,40,250,590,40,293,590,40,336,590,39,378,590,40,421,590,39,464,590,40,507,590,40,549,590,29,592,590,38,635,590,40,677,590,36,720,590,39,763,590,36,806,590,36,848,590,29,891,590,40,934,590,36,976,590,42,1019,590,42,1062,590,40,1105,590,42,1147,590,20,1190,590,36,1233,590,28,1276,590,36,1318,590,28,1361,590,40,1404,590,28,1532,590,47,1617,590,26,-1617,612,28,-1572,612,36,-1526,612,26,-1480,612,34,-1435,612,34,-1389,612,26,-1343,612,36,-1298,612,26,-1252,612,28,-1206,612,36,-1161,612,42,-1115,612,36,-1069,612,28,-1024,612,20,-978,612,20,-750,612,17,-476,612,13,-430,612,28,72,612,42,118,612,28,164,612,40,255,612,40,301,612,40,346,612,42,392,612,39,438,612,36,483,612,40,529,612,40,575,612,36,620,612,36,666,612,36,712,612,28,757,612,28,803,612,28,849,612,28,894,612,40,940,612,46,986,612,28,1031,612,36,1077,612,36,1123,612,36,1168,612,36,1214,612,36,1260,612,36,1305,612,36,1351,612,36,1397,612,17,1442,612,26,1488,612,20,1534,612,17,1671,612,34,1716,612,14,-1702,634,17,-1603,634,17,-1554,634,45,-1505,634,17,-1456,634,14,-1407,634,28,-1358,634,28,-1309,634,34,-1260,634,26,-1210,634,28,-1161,634,28,-1112,634,17,-1063,634,20,-1014,634,17,-965,634,17,-916,634,17,-719,634,47,-670,634,26,-473,634,2,-424,634,28,116,634,17,165,634,42,264,634,40,313,634,36,362,634,28,411,634,36,460,634,40,509,634,40,558,634,39,608,634,42,657,634,36,706,634,28,755,634,28,804,634,28,853,634,28,902,634,28,951,634,28,1001,634,42,1050,634,36,1099,634,28,1148,634,28,1197,634,36,1246,634,28,1295,634,26,1345,634,28,1394,634,17,1443,634,26,1492,634,34,1541,634,28,1590,634,26,1639,634,17,1688,634,17,1738,634,26,1787,634,26,-1800,656,17,-1747,656,7,-1640,656,17,-1587,656,26,-1534,656,26,-1480,656,28,-1427,656,34,-1374,656,17,-1321,656,20,-1267,656,26,-1214,656,28,-1161,656,20,-1108,656,17,-1054,656,17,-1001,656,17,-948,656,17,-895,656,28,-735,656,17,-682,656,14,-522,656,28,-469,656,1,-415,656,14,-202,656,4,-149,656,0,170,656,28,277,656,36,330,656,28,437,656,28,490,656,28,543,656,36,596,656,20,650,656,20,703,656,20,756,656,20,810,656,28,863,656,28,916,656,20,969,656,26,1023,656,26,1076,656,20,1129,656,20,1182,656,28,1236,656,28,1289,656,26,1342,656,17,1395,656,26,1449,656,17,1502,656,20,1555,656,26,1608,656,34,1662,656,17,1715,656,17,1768,656,17,-1800,678,26,-1625,678,17,-1567,678,4,-1509,678,26,-1451,678,20,-1392,678,17,-1334,678,20,-1276,678,20,-1218,678,17,-1160,678,17,-1101,678,17,-1043,678,17,-927,678,14,-752,678,17,-694,678,14,-519,678,28,-461,678,1,-403,678,13,-344,678,26,180,678,20,238,678,28,296,678,28,354,678,28,529,678,20,587,678,17,645,678,17,704,678,17,762,678,17,820,678,17,878,678,17,937,678,26,995,678,17,1053,678,20,1111,678,17,1170,678,20,1228,678,36,1286,678,14,1344,678,28,1402,678,26,1461,678,20,1519,678,20,1577,678,17,1635,678,20,1694,678,14,1752,678,26,-1607,700,17,-1543,700,17,-1478,700,17,-1157,700,17,-1092,700,17,-1028,700,7,-835,700,47,-771,700,17,-706,700,17,-514,700,47,-449,700,2,-385,700,13,-321,700,14,-256,700,2,258,700,4,709,700,17,773,700,17,837,700,17,902,700,14,966,700,26,1030,700,17,1095,700,17,1159,700,20,1223,700,20,1288,700,14,1352,700,20,1416,700,7,1481,700,7,1545,700,17,-1224,722,14,-1152,722,14,-1008,722,28,-864,722,28,-792,722,17,-505,722,2,-433,722,2,-361,722,13,-289,722,26,719,722,17,791,722,17,863,722,7,935,722,17,1007,722,17,1079,722,14,1151,722,7,1223,722,7,1439,722,17,-491,744,1,-409,744,2,-327,744,13,-246,744,26,572,744,2,900,744,17,981,744,17,1063,744,17,-946,766,17,-851,766,17,-661,766,13,-566,766,13,-471,766,2,-376,766,2,-281,766,13,668,766,0,1048,766,14,-894,788,2,-781,788,13,-667,788,1,-554,788,1,-441,788,1,-328,788,13,-214,788,13,126,788,0,1032,788,14,-822,810,14,-700,810,0,-578,810,1,-456,810,1,-333,810,2,-211,810,0,-333,832,14];
 const WGLOBE_LC = [[248,251,255],[242,248,255],[237,244,255],[254,250,223],[250,243,226],[247,243,193],[254,234,203],[242,235,212],[244,235,180],[237,234,175],[249,227,193],[247,222,190],[237,225,178],[230,240,254],[228,233,232],[226,237,178],[226,232,175],[225,227,215],[228,226,174],[213,232,188],[212,224,201],[212,228,167],[196,225,178],[195,223,161],[243,217,187],[233,217,178],[208,217,204],[208,218,167],[185,217,186],[184,217,171],[185,217,159],[228,210,181],[188,210,169],[226,202,171],[190,202,172],[199,190,169],[172,214,174],[171,214,156],[169,208,162],[161,212,162],[162,207,163],[153,208,155],[161,202,164],[159,202,151],[140,201,146],[163,193,156],[136,193,159],[133,173,167]];  // 真實地表色盤（取樣 Natural Earth II 柵格 · 中位切割量化）[r,g,b]
@@ -4276,7 +4060,7 @@ function renderWarMap(json){
   WarGlobe.setData(regs, hs);
   const cntEl=document.getElementById('warmap-count');
   if(cntEl) cntEl.textContent = hs.length
-    ? '🔥 '+hs.length+' 處活躍衝突火點 · 🛰️ NASA FIRMS 24h'
+    ? '🔥 '+hs.length+' 筆監測區熱異常（地圖顯示筆數） · 🛰️ NASA FIRMS 24h'
     : '🛰️ NASA FIRMS · 暫無衝突區火點';
 }
 
@@ -4336,7 +4120,7 @@ function renderFirms(firms, eonetEvents) {
   const deltaEl = document.getElementById('firms-delta');
   const feed    = document.getElementById('firms-feed');
 
-  if (!firms || typeof firms.total_24h !== 'number') {
+  if (!firms || firms.error || firms.stale || typeof firms.total_24h !== 'number') {
     if (countEl) countEl.textContent = '--';
     if (deltaEl) deltaEl.textContent = '--';
     return;
@@ -4397,7 +4181,7 @@ function renderFirms(firms, eonetEvents) {
   }
 
   const updEl = document.getElementById('firms-updated');
-  if (updEl) updEl.textContent = '更新：' + new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+  if (updEl) updEl.textContent = '快照：' + observedTime();
 
   htmlWpiRender();
 }

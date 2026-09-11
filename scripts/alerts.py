@@ -2,7 +2,7 @@
 WARHUBS - 推播通知系統
 透過 Telegram Bot（與 Discord Webhook）推送：
   1) 每小時定時戰情回報（可用 DIGEST_EVERY_HOURS 調整間隔）
-  2) 即時異常警報（等級升高／五角大廈披薩爆量／衝突火點激增）
+  2) 即時異常警報（等級升高／五角大廈披薩爆量／監測區熱異常像元激增）
 由 fetch_data.py 在每次資料更新後呼叫。跨 run 的狀態（上次回報時段、
 上次異常旗標）存在 data.json 的 "_notify" 欄位，由呼叫端讀出上一份傳入、
 再把新狀態寫回，因為 GitHub Actions 每次都是全新 process。
@@ -43,16 +43,19 @@ HOTSPOT_SURGE_RATIO = float(os.environ.get("HOTSPOT_SURGE_RATIO", "") or 1.4)
 HOTSPOT_SURGE_MIN   = _int("HOTSPOT_SURGE_MIN", 12)          # 至少幾處才視為激增
 
 LEVEL_EMOJI = {"NORMAL": "🟢", "ELEVATED": "🟡", "HIGH": "🟠", "CRITICAL": "🔴"}
-LEVEL_ORDER = ["NORMAL", "ELEVATED", "HIGH", "CRITICAL"]
+LEVEL_ORDER = ["LOW", "MODERATE", "ELEVATED", "HIGH", "CRITICAL"]
 SITE = "https://warhubs.com"
 
 
 # ─── 訊息組裝 ──────────────────────────────────────────────
+def _fmt_score(value):
+    return "資料不足" if value is None else f"{value:.1f}"
+
 def _fmt_regions(regions):
     lines = []
-    for r in sorted(regions or [], key=lambda x: x.get("score", 0), reverse=True)[:5]:
+    for r in sorted(regions or [], key=lambda x: x.get("score") if x.get("score") is not None else -1, reverse=True)[:5]:
         e = LEVEL_EMOJI.get(r.get("level"), "⚪")
-        lines.append(f"  {e} {r.get('name','?')}  {round(r.get('score',0))}  ({r.get('level','')})")
+        lines.append(f"  {e} {r.get('name','?')}  {_fmt_score(r.get('score'))}  ({r.get('level','')})")
     return "\n".join(lines) or "  （無資料）"
 
 def _fmt_news(news, n=3):
@@ -64,7 +67,9 @@ def _fmt_news(news, n=3):
 
 def _fmt_aviation(aviation):
     """全球軍機動態摘要（無人機優先，附加油機/預警機/偵察機）。"""
-    s = (aviation or {}).get("summary") or {}
+    if not aviation or aviation.get("error"):
+        return "✈️ 全球軍機：資料不可用"
+    s = aviation.get("summary") or {}
     return (f"✈️ 全球軍機：無人機 {s.get('uav',0)}・加油機 {s.get('tankers',0)}"
             f"・預警機 {s.get('awacs',0)}・偵察機 {s.get('c4isr',0)}（共 {s.get('total',0)} 架）")
 
@@ -90,17 +95,19 @@ def build_digest(data: dict) -> str:
     emoji = LEVEL_EMOJI.get(score.get("alert_level"), "⚠️")
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     firms = data.get("firms", {})
-    hs = len((firms.get("conflict_hotspots") or []))
+    hs = firms.get("conflict_total")
+    hs = "資料不足" if hs is None or firms.get("stale") else hs
     return (
-        f"🛰️ *WARHUBS 每小時戰情回報*\n"
+        f"🛰️ *WARHUBS 定時觀測回報*\n"
         f"{now}\n\n"
-        f"{emoji} *綜合威脅指數：{score.get('combined_score',0):.1f} / 100*　等級：*{score.get('alert_level','?')}*\n\n"
+        f"{emoji} *WPI 觀察指數：{_fmt_score(score.get('combined_score'))} / 100*　等級：*{score.get('alert_level','?')}*\n\n"
         f"🗺️ 地區風險：\n{_fmt_regions(data.get('regions'))}\n\n"
-        f"🍕 五角大廈披薩指數：{score.get('pizza_score',0):.1f}　·　DEFCON {data.get('defcon_level','—')}\n"
+        f"🍕 五角大廈披薩指數：{_fmt_score(score.get('pizza_score'))}　·　DEFCON {data.get('defcon_level','—')}\n"
         f"{_fmt_pizza_shops(data.get('pizza'))}\n"
         f"{_fmt_aviation(data.get('aviation'))}\n"
-        f"🔥 衝突火點：{hs} 處（NASA FIRMS 24h）\n\n"
+        f"🔥 監測區熱異常像元：{hs} 處（NASA FIRMS 24h）\n\n"
         f"📡 最新戰情頭條：\n{_fmt_news(data.get('news'))}\n\n"
+        f"資料覆盖率：{(data.get('score',{}).get('coverage',0)*100):.0f}% · 未校準為開戰機率\n"
         f"🔗 {SITE}"
     ).strip()
 
@@ -114,9 +121,10 @@ def build_escalation(data: dict, old_level: str) -> str:
         f"{e} *WARHUBS 戰情警報：等級升高* {e}\n"
         f"{now}\n\n"
         f"⚠️ 等級 *{old_level} → {new_level}*\n"
-        f"🎯 綜合威脅指數：*{score.get('combined_score',0):.1f} / 100*\n\n"
+        f"🎯 WPI 觀察指數：*{_fmt_score(score.get('combined_score'))} / 100*\n\n"
         f"🗺️ 地區風險：\n{_fmt_regions(data.get('regions'))}\n\n"
         f"📡 最新頭條：\n{_fmt_news(data.get('news'))}\n\n"
+        f"資料覆盖率：{(data.get('score',{}).get('coverage',0)*100):.0f}% · 未校準為開戰機率\n"
         f"🔗 {SITE}"
     ).strip()
 
@@ -131,7 +139,8 @@ def build_pizza_alert(data: dict, shops: list) -> str:
         f"{now}\n\n"
         f"Pentagon 周邊披薩店下班後仍爆滿（EXTREME）：{names}\n"
         f"最高達平時 *{pct}%*　·　DEFCON {data.get('defcon_level','—')}\n\n"
-        f"（歷史上美軍重大夜間行動前常見的領先指標）\n"
+        f"（人流異常並非軍事行動證據）\n"
+        f"資料覆盖率：{(data.get('score',{}).get('coverage',0)*100):.0f}% · 未校準為開戰機率\n"
         f"🔗 {SITE}"
     ).strip()
 
@@ -139,10 +148,11 @@ def build_pizza_alert(data: dict, shops: list) -> str:
 def build_hotspot_alert(data: dict, now_cnt: int, prev_cnt: int) -> str:
     now = datetime.now(timezone.utc).strftime("%H:%M UTC")
     return (
-        f"🔥 *WARHUBS 異常：衝突火點激增*\n"
+        f"🔥 *WARHUBS 異常：監測區熱異常像元激增*\n"
         f"{now}\n\n"
-        f"NASA FIRMS 監測區衝突火點：*{prev_cnt} → {now_cnt} 處*\n\n"
+        f"NASA FIRMS 監測區監測區熱異常像元：*{prev_cnt} → {now_cnt} 處*\n\n"
         f"🗺️ 地區風險：\n{_fmt_regions(data.get('regions'))}\n\n"
+        f"資料覆盖率：{(data.get('score',{}).get('coverage',0)*100):.0f}% · 未校準為開戰機率\n"
         f"🔗 {SITE}"
     ).strip()
 
@@ -216,13 +226,13 @@ async def run_notifications(data: dict, prev_notify: dict | None = None,
     bucket = int(now.timestamp() // 3600) // DIGEST_EVERY_HOURS
 
     firms = data.get("firms", {})
-    hs_cnt = len(firms.get("conflict_hotspots") or [])
+    hs_cnt = firms.get("conflict_total") if not firms.get("stale") and not firms.get("error") else None
     extreme_shops = [s for s in (data.get("pizza") or [])
                      if (s.get("spike_magnitude") or "").upper() == "EXTREME"]
     has_extreme = len(extreme_shops) > 0
 
     new_notify = {"bucket": bucket, "level": new_level,
-                  "pizza_extreme": has_extreme, "hotspots": hs_cnt}
+                  "pizza_extreme": has_extreme, "hotspots": hs_cnt, "hotspot_counter_version": 2}
 
     # 收件對象：個人 chat 永遠收；公開頻道依 scope 決定
     personal = [TELEGRAM_CHAT_ID]
@@ -251,7 +261,7 @@ async def run_notifications(data: dict, prev_notify: dict | None = None,
         alert_msgs.append(build_pizza_alert(data, extreme_shops))
 
     prev_hs = prev_notify.get("hotspots", 0) or 0
-    if ALERT_HOTSPOT and hs_cnt >= HOTSPOT_SURGE_MIN and prev_hs > 0 \
+    if ALERT_HOTSPOT and prev_notify.get("hotspot_counter_version") == 2 and hs_cnt is not None and hs_cnt >= HOTSPOT_SURGE_MIN and prev_hs > 0 \
             and hs_cnt >= prev_hs * HOTSPOT_SURGE_RATIO:
         alert_msgs.append(build_hotspot_alert(data, hs_cnt, prev_hs))
 

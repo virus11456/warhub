@@ -1,0 +1,37 @@
+name: Verify data integrity
+on:
+  pull_request:
+    paths: ['scripts/**', 'tests/**', 'api/**', 'index.html', 'vercel.json', '.github/workflows/**']
+  push:
+    branches: [main]
+    paths: ['scripts/**', 'tests/**', 'api/**', 'index.html', 'vercel.json', '.github/workflows/**']
+concurrency:
+  group: verify-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: pip install -r scripts/requirements.txt
+      - run: python -m unittest discover -s tests -v
+      - run: node --test tests/test_api.mjs tests/test_deploy.mjs
+      - run: npm install --no-save --ignore-scripts jsdom@30.0.1
+      - run: node tests/test_frontend.cjs
+      - name: Check inline JavaScript
+        run: |
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          parts = re.findall(r'<script(?:\s[^>]*)?>(.*?)</script>', Path('index.html').read_text(), re.S)
+          Path('/tmp/warhub-inline.js').write_text('\n'.join(parts))
+          PY
+          node --check /tmp/warhub-inline.js
