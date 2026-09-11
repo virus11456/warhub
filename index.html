@@ -3395,7 +3395,7 @@ function renderTwNews(json){
       +'<span class="news-topic" style="color:'+c+'">'+escapeHtml(n.topic||'台海')+'</span>'
       +'<span class="news-time">'+newsAgo(n.ts)+'</span>'
       +'<a class="news-title" href="'+escapeHtml(n.url||'#')+'" target="_blank" rel="noopener">'
-      +escapeHtml(n.title_zh || (/[\u3400-\u9fff]/.test(n.title||'') ? n.title : '中文翻譯暫時無法取得（點擊查看原文）'))+' <span class="news-src">— '+escapeHtml(n.domain||'')+'</span></a>'
+      +escapeHtml(chineseTitle(n.title_zh, n.title))+' <span class="news-src">— '+escapeHtml(n.domain||'')+'</span></a>'
       +'</div>';
   }).join('');
   var upd=document.getElementById('twnews-updated');
@@ -3550,7 +3550,7 @@ function renderNews(json){
       +'<span class="news-topic" style="color:'+c+'">'+escapeHtml(n.topic||'全球')+'</span>'
       +'<span class="news-time">'+newsAgo(n.ts)+'</span>'
       +'<a class="news-title" href="'+escapeHtml(n.url||'#')+'" target="_blank" rel="noopener">'
-      +escapeHtml(n.title_zh || (/[\u3400-\u9fff]/.test(n.title||'') ? n.title : '中文翻譯暫時無法取得（點擊查看原文）'))+' <span class="news-src">— '+escapeHtml(n.domain||'')+'</span></a>'
+      +escapeHtml(chineseTitle(n.title_zh, n.title))+' <span class="news-src">— '+escapeHtml(n.domain||'')+'</span></a>'
       +'</div>';
   }).join('');
   const upd=document.getElementById('news-updated');
@@ -3596,83 +3596,15 @@ function renderTicker(json) {
   el.innerHTML = html + html; // 複製一份做無縫循環
 }
 
-// ─── Polymarket 市場問句「英文→繁中」規則式翻譯 ────
-//   Polymarket 盤口標題是英文，且句型高度固定（Will X invade Y before…？等）。
-//   用實體字典＋日期正規化＋句型樣板轉成自然中文；無樣板可套時退回「實體替換英文」。
-//   保留原始英文於 title 供滑鼠懸停對照，避免翻譯失真。
-const PM_ENTITIES = [
-  ["the U.S.","美國"],["the US","美國"],["U.S.-Iran","美伊"],["US-Iran","美伊"],
-  ["United States","美國"],["U.S.","美國"],["US","美國"],
-  ["Iranian regime","伊朗政權"],["Iranian","伊朗"],["Iran","伊朗"],
-  ["Israeli parliament","以色列國會"],["Israeli","以色列"],["Israel","以色列"],
-  ["Taiwan","台灣"],["Chinese","中國"],["China","中國"],["Ukrainian","烏克蘭"],["Ukraine","烏克蘭"],
-  ["Russian","俄羅斯"],["Russia","俄羅斯"],["Philippines","菲律賓"],["Japan","日本"],
-  ["North Korea","北韓"],["South Korea","南韓"],["Venezuela","委內瑞拉"],["NATO","北約"],
-  ["Netanyahu","納坦雅胡"],
-  ["Strait of Hormuz","荷莫茲海峽"],["Hormuz","荷莫茲海峽"],["Kharg Island","哈爾克島"],
-  ["Pokrovka","波克羅夫卡"],["Pokrovsk","波克羅夫斯克"],["Bakhmut","巴赫姆特"],
-  ["Mohammad Khatami","哈塔米（Khatami）"],["Moshe Feiglin","費格林（Feiglin）"],
-];
-const PM_MONTHS = {january:1,february:2,march:3,april:4,may:5,june:6,july:7,
-  august:8,september:9,october:10,november:11,december:12};
-function pmDate(s){
-  let m;
-  if((m=s.match(/\bby (?:the )?end of (\d{4})\??$/i))) return {zh:`${m[1]} 年底前`, head:s.slice(0,m.index).trim()};
-  if((m=s.match(/\bend of (\d{4})\??$/i)))            return {zh:`${m[1]} 年底`,   head:s.slice(0,m.index).trim()};
-  if((m=s.match(/\bbefore (\d{4})\??$/i)))            return {zh:`${m[1]} 年前`,   head:s.slice(0,m.index).trim()};
-  if((m=s.match(/\bin (\d{4})\??$/i)))                return {zh:`${m[1]} 年`,     head:s.slice(0,m.index).trim()};
-  if((m=s.match(/\bby ([A-Za-z]+) (\d{1,2})(?:,\s*(\d{4}))?\??$/i))){
-    const mo=PM_MONTHS[m[1].toLowerCase()];
-    if(mo) return {zh:`${m[3]?m[3]+' 年 ':''}${mo}/${m[2]} 前`, head:s.slice(0,m.index).trim()};
-  }
-  if((m=s.match(/\bby (Q[1-4]) (\d{4})\??$/i)))       return {zh:`${m[2]} 年 ${m[1]} 前`, head:s.slice(0,m.index).trim()};
-  return null;
+// 只顯示已取得的中文標題；保留原文於連結與 tooltip，不猜測事件語意。
+function chineseTitle(translated, original) {
+  const hasChinese = value => typeof value === 'string' && /[\u3400-\u9fff]/.test(value);
+  if (hasChinese(translated)) return translated;
+  if (hasChinese(original)) return original;
+  return '中文翻譯暫時無法取得（點擊查看原文）';
 }
-function pmEnt(s){
-  let out=s;
-  for(const [en,zh] of PM_ENTITIES) out=out.replace(new RegExp(en.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'g'), zh);
-  return out;
-}
-const PM_VERBS=[['capture','攻佔'],['recapture','奪回'],['retake','奪回'],['seize','奪取'],
-  ['occupy','佔領'],['invade','入侵'],['strike','打擊'],['attack','攻擊'],['launch','發動'],
-  ['dissolved','遭解散'],['dissolve','解散'],['sign','簽署'],['resign','辭職'],['happen','發生'],['join','加入']];
-function pmVerbs(s){let o=s;for(const[en,zh]of PM_VERBS)o=o.replace(new RegExp('\\b'+en+'\\b','gi'),zh);return o;}
-function zhMarket(q){
-  if(!q) return q;
-  if(MARKET_TRANSLATIONS.has(q)) return MARKET_TRANSLATIONS.get(q);
-  const s=q.trim().replace(/\s+/g,' ');
-  const d=pmDate(s), dz=d?d.zh:'', head=d?d.head:s.replace(/\?$/,'');
-  let m;
-  if((m=head.match(/^Will (?:the )?(.+?) invade (.+?)$/i)))          return `${pmEnt(m[1])}會${dz?'在 '+dz:''}入侵${pmEnt(m[2])}嗎？`;
-  if((m=head.match(/^Will (?:the )?(.+?) (?:capture|take|seize|retake|recapture|occupy) (.+?)$/i)))
-                                                                     return `${pmEnt(m[1])}會${dz?'在 '+dz:''}攻佔${pmEnt(m[2])}嗎？`;
-  if((m=head.match(/^Will (?:the )?(.+?) (?:take|gain) control of (.+?)$/i)))
-                                                                     return `${pmEnt(m[1])}會${dz?'在 '+dz:''}控制${pmEnt(m[2])}嗎？`;
-  if((m=head.match(/^Will the (.+?) regime fall$/i)))                return `${pmEnt(m[1])}政權會${dz?'在 '+dz:''}垮台嗎？`;
-  if((m=head.match(/^(.+?) closes its airspace$/i)))                 return `${pmEnt(m[1])}會${dz?'在 '+dz:''}關閉領空？`;
-  if((m=head.match(/^(.+?) (?:full )?airspace closure$/i)))          return `${pmEnt(m[1])}${dz?'於 '+dz:''}全面關閉領空？`;
-  if((m=head.match(/^(.+?) x (.+?) military clash$/i)))              return `${pmEnt(m[1])}與${pmEnt(m[2])}${dz?'於 '+dz:''}爆發軍事衝突？`;
-  if((m=head.match(/^(.+?) (?:x |vs\.? |[-–])(.+?) ceasefire$/i)))   return `${pmEnt(m[1])}與${pmEnt(m[2])}${dz?'於 '+dz:''}達成停火？`;
-  if((m=head.match(/^Will there be an? (.+?) ceasefire$/i)))         return `${pmEnt(m[1])}${dz?'於 '+dz:''}達成停火嗎？`;
-  if((m=head.match(/^(.+?) Final Nuclear Deal$/i)))                  return `${pmEnt(m[1])}${dz?'於 '+dz:''}達成最終核子協議？`;
-  if((m=head.match(/^Will (?:the )?(.+?) (?:use|test) a nuclear weapon$/i)))
-                                                                     return `${pmEnt(m[1])}會${dz?'在 '+dz:''}使用或試爆核武嗎？`;
-  if((m=head.match(/^(.+?) charges Hormuz fees$/i)))                 return `${pmEnt(m[1])}${dz?'於 '+dz:''}對荷莫茲海峽收取通行費？`;
-  if((m=head.match(/^(.+?) no longer under (.+?) control$/i)))       return `${pmEnt(m[1])}${dz?'於 '+dz:''}不再由${pmEnt(m[2])}控制？`;
-  if((m=head.match(/^(.+?) dissolved$/i)))                          return `${pmEnt(m[1])}${dz?'於 '+dz:''}遭解散？`;
-  if((m=head.match(/^Will (.+?) be head of state in (.+?)$/i)))      return `${pmEnt(m[1])}會${dz?'於 '+dz:''}成為${pmEnt(m[2])}國家元首嗎？`;
-  if((m=head.match(/^Will (.+?) be (?:the )?(?:next |out as )?Prime Minister of (.+?)$/i))){
-    if(/out as/i.test(head)) return `${pmEnt(m[1])}會${dz?'於 '+dz:''}卸任${pmEnt(m[2])}總理嗎？`;
-    return `${pmEnt(m[1])}會成為${pmEnt(m[2])}下一任總理嗎？`;
-  }
-  if((m=head.match(/^Will (.+?) join (.+?)$/i)))                     return `${pmEnt(m[1])}會${dz?'在 '+dz:''}加入${pmEnt(m[2])}嗎？`;
-  if((m=head.match(/^Will (\d+) Fed rate cuts happen$/i)))          return `${dz?dz.replace('年前','年').replace('年底','年'):''}會發生 ${m[1]} 次 Fed（聯準會）降息嗎？`;
-  if((m=head.match(/^Will (.+?) GDP growth in (Q[1-4]) (\d{4}) be between ([\d.]+)% and ([\d.]+)%$/i)))
-    return `${pmEnt(m[1])} ${m[3]} 年 ${m[2]} GDP 成長率介於 ${m[4]}%～${m[5]}%？`;
-  // 無樣板可套：去掉 Will/be、實體＋動詞替換後包起來（安全網，罕見）
-  let f=head.replace(/^Will (?:the )?/i,'').replace(/\bbe\b/gi,'');
-  f=pmVerbs(pmEnt(f)).replace(/\s+/g,'').trim();
-  return f + (dz?`（${dz}）`:'') + '？';
+function zhMarket(q) {
+  return chineseTitle(MARKET_TRANSLATIONS.get(q), q);
 }
 
 // ─── 渲染 Polymarket 卡片（從 data/data.json 的 polymarket array）────
