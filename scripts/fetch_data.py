@@ -2378,7 +2378,7 @@ async def main():
     from data_quality import source_health
     output["source_health"] = source_health(output)
 
-    # 推播：每小時定時回報 + 即時異常（未設定 Secrets 則自動跳過）；狀態寫回 _notify
+    # 推播：更新完成後按時段去重回報 + 異常（未設定 Secrets 則自動跳過）；狀態寫回 _notify
     try:
         if os.environ.get("WARHUB_NO_NOTIFY") == "1":
             raise RuntimeError("notifications disabled for local verification")
@@ -2389,7 +2389,9 @@ async def main():
         output["_notify"] = await run_notifications(
             output, prev_notify, prev_level, force_test=force_test)
     except Exception as e:
-        log.warning(f"notify skipped: {e}")
+        if prev_notify:
+            output["_notify"] = prev_notify
+        log.warning(f"notify skipped: {type(e).__name__}")
 
     DATA_FILE.write_text(json.dumps(output, ensure_ascii=False, indent=2), encoding="utf-8")
 
