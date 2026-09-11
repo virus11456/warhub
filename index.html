@@ -1403,7 +1403,7 @@
 
       <!-- 說明 -->
       <div style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim);line-height:1.6;margin-bottom:.6rem">
-        冷戰時 KGB 監視五角大廈深夜外送作為早期預警。<strong style="color:var(--accent4)">PizzINT</strong>：Pentagon 周邊披薩店突發爆單、深夜外送量暴增 → 五角大廈正在加班策劃。
+        冷戰時 KGB 監視五角大廈深夜外送作為早期預警。<strong style="color:var(--accent4)">PizzINT</strong>：觀察 Pentagon 周邊餐廳人流變化，無法直接確認外送訂單、軍方加班或行動規劃。
       </div>
 
       <!-- 🍺 加班指數（PizzINT × 酒吧反向 交叉判讀）-->
@@ -1636,7 +1636,7 @@
           <span style="color:var(--accent3)">50<br><small>MED</small></span>
           <span style="color:var(--accent2)">100<br><small>MAX</small></span>
         </div>
-        <div class="wpi-formula">WPI = 0.28<em>P</em> + 0.18<em>A</em> + 0.10<em>G</em> + 0.14<em>Z</em> + 0.10<em>F</em> + 0.12<em>S</em> + 0.08<em>W</em></div>
+        <div class="wpi-formula">WPI = 有效因子加權總和 ÷ 有效權重總和；覆蓋至少 60% 且至少 3 個有效因子才出分</div>
       </div>
 
       <!-- 右：三級警戒 + 地區熱度 -->
@@ -1703,7 +1703,7 @@
       </div>
     </div>
     <div style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim);margin-bottom:.8rem;padding:.5rem .7rem;background:rgba(0,207,232,.05);border-left:2px solid var(--accent4)">
-      真實資金下注 · 準確率 <span style="color:var(--accent1)">94%</span>（事件前一個月）· 2025 年地緣政治交易量 <span style="color:var(--accent3)">$33B+</span>
+      市場價格代表參與者對特定事件的定價；本站未驗證其預測準確率。不同到期日及事件定義不可直接比較。
     </div>
     <div class="poly-grid" id="poly-list-container">
       <div style="grid-column:1/-1;text-align:center;padding:1.4rem;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">載入即時 Polymarket 戰爭預測市場…</div>
@@ -2020,7 +2020,7 @@
     <div class="fin-premium">
       ⛽ 油價相對均線差額：布倫特較 30日均價高出
       <strong style="color:var(--accent3);font-size:.82rem" id="fin-war-premium"> --</strong>
-      &nbsp;— 溢價超過 $8 通常代表市場已預期軍事行動
+      &nbsp;— 均線差額亦受供需等因素影響，不能單獨判定市場預期軍事行動
     </div>
     <div style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim);margin:.65rem 0 .3rem;letter-spacing:2px">軍工類股 DEFENSE STOCKS</div>
     <div class="fin-stocks" id="fin-stocks-list">
@@ -2059,29 +2059,7 @@
         由《原子科學家公報》設定。<span style="color:var(--accent)">2026年調整至 85 秒</span>，象徵多種全球災難風險，並非核戰倒數。<a href="https://thebulletin.org/doomsday-clock/2026-statement/" target="_blank" rel="noopener">2026 官方公告 ↗</a>
       </div>
 
-      <div class="section-title">核持有國警戒狀態</div>
-      <div style="display:flex;flex-direction:column;gap:0.5rem;">
-        <div style="display:grid;grid-template-columns:1fr auto;background:var(--bg3);border:1px solid var(--border);padding:0.6rem;gap:0.5rem;">
-          <div style="font-size:0.78rem;">🇷🇺 俄羅斯 — 核武威懾言論</div>
-          <div class="risk-pill critical">HIGH</div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr auto;background:var(--bg3);border:1px solid var(--border);padding:0.6rem;gap:0.5rem;">
-          <div style="font-size:0.78rem;">🇺🇸 美國 — DEFCON 維持3級</div>
-          <div class="risk-pill medium">ALERT</div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr auto;background:var(--bg3);border:1px solid var(--border);padding:0.6rem;gap:0.5rem;">
-          <div style="font-size:0.78rem;">🇨🇳 中國 — 核彈頭快速擴張中</div>
-          <div class="risk-pill high">HIGH</div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr auto;background:var(--bg3);border:1px solid var(--border);padding:0.6rem;gap:0.5rem;">
-          <div style="font-size:0.78rem;">🇮🇳🇵🇰 印巴核對峙</div>
-          <div class="risk-pill medium">WATCH</div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr auto;background:var(--bg3);border:1px solid var(--border);padding:0.6rem;gap:0.5rem;">
-          <div style="font-size:0.78rem;">🇮🇷 伊朗 — 濃縮鈾接近武器級</div>
-          <div class="risk-pill high">ELEVATED</div>
-        </div>
-      </div>
+      <p style="color:var(--text-dim)">未接入可核實的各國核警戒等級來源，暫不顯示等級。</p>
 
       <div class="section-title" style="margin-top:1rem">核試場地震監測（USGS 72h）</div>
       <div id="nuclear-seismic" style="display:flex;flex-direction:column;gap:0.35rem;font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);">
@@ -2089,7 +2067,7 @@
       </div>
 
       <div style="margin-top:1rem;padding:0.7rem;background:rgba(170,0,255,0.05);border:1px solid rgba(170,0,255,0.2);font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);">
-        ☢️ Polymarket 核武使用概率：5%（2026年）。低但非零。
+        核武相關盤口應逐筆核對事件定義及到期日；目前不提供固定機率。
       </div>
     </div>
 
@@ -2539,9 +2517,19 @@ async function fetchRealPizzaData() {
     if(live)live.textContent=age >= 0 && age < 6*3600000 ? '定期資料快照' : '資料已過期';
     if(json.score?.model_version !== 'wpi-4.0') {
       json.polymarket=[]; json.pizza_index=null; json.defcon_level=null;
+      const list=document.getElementById('poly-list-container');if(list)list.textContent='舊版盤口尚未核驗，等待新版資料。';
       const poly=document.getElementById('poly-updated-time');if(poly)poly.textContent='等待新版市場篩選資料';
     }
 
+
+    if(json.score?.model_version !== 'wpi-4.0' || !(age>=0 && age<6*3600000)) {
+      json.pizza=(json.pizza||[]).map(s=>({...s,busyness:null,is_open:null,status:'unavailable',spike:false,percentage_of_usual:null}));
+    }
+    for(const source of ['food','strat']) {
+      if(json[source]?.schema_version !== 2) {
+        if(json[source])json[source]={...json[source],breadth_up:0,items:(json[source].items||[]).map(i=>({...i,yoy_pct:null,incomplete:true,anomaly:'partial'}))};
+      }
+    }
 
     // 用後端資料覆蓋 PIZZA_SHOPS_DATA（保留 icon 等前端專屬欄位）
     try {
