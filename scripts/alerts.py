@@ -1,14 +1,14 @@
 """
 WARHUBS - 推播通知系統
 透過 Telegram Bot（與 Discord Webhook）推送：
-  1) 每小時定時戰情回報（可用 DIGEST_EVERY_HOURS 調整間隔）
+  1) 資料更新後觀測回報（DIGEST_EVERY_HOURS 為去重時段，非獨立定時器）
   2) 即時異常警報（等級升高／五角大廈披薩爆量／監測區熱異常像元激增）
 由 fetch_data.py 在每次資料更新後呼叫。跨 run 的狀態（上次回報時段、
 上次異常旗標）存在 data.json 的 "_notify" 欄位，由呼叫端讀出上一份傳入、
 再把新狀態寫回，因為 GitHub Actions 每次都是全新 process。
 """
 
-import asyncio
+import hashlib
 import aiohttp
 import os
 from datetime import datetime, timezone
@@ -35,7 +35,7 @@ def _on(name, default=True):
         return default
     return v.strip().lower() in ("1", "true", "yes", "on")
 
-DIGEST_EVERY_HOURS  = max(1, _int("DIGEST_EVERY_HOURS", 1))   # 定時回報間隔（小時）
+DIGEST_EVERY_HOURS  = max(1, _int("DIGEST_EVERY_HOURS", 1))   # 摘要去重時段（小時）
 ALERT_ESCALATION    = _on("ALERT_ESCALATION", True)          # 等級升高
 ALERT_PIZZA         = _on("ALERT_PIZZA", True)               # 披薩爆量
 ALERT_HOTSPOT       = _on("ALERT_HOTSPOT", True)             # 火點激增
@@ -98,7 +98,7 @@ def build_digest(data: dict) -> str:
     hs = firms.get("conflict_total")
     hs = "資料不足" if hs is None or firms.get("stale") else hs
     return (
-        f"🛰️ *WARHUBS 定時觀測回報*\n"
+        f"🛰️ *WARHUBS 更新觀測回報*\n"
         f"{now}\n\n"
         f"{emoji} *WPI 觀察指數：{_fmt_score(score.get('combined_score'))} / 100*　等級：*{score.get('alert_level','?')}*\n\n"
         f"🗺️ 地區風險：\n{_fmt_regions(data.get('regions'))}\n\n"
@@ -160,20 +160,21 @@ def build_hotspot_alert(data: dict, now_cnt: int, prev_cnt: int) -> str:
 # ─── 發送 ──────────────────────────────────────────────────
 async def send_telegram(session, text, chat_id):
     if not (TELEGRAM_BOT_TOKEN and chat_id):
-        return
+        return False
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    # Plain text: source titles and INSUFFICIENT_DATA must never become markup.
     payload = {"chat_id": chat_id, "text": text,
-               "parse_mode": "Markdown", "disable_web_page_preview": True}
+               "disable_web_page_preview": True}
     async with session.post(url, json=payload) as resp:
-        if resp.status == 200:
-            print(f"✅ Telegram 推播成功 → {chat_id}")
-        else:
-            print(f"❌ Telegram 失敗 ({chat_id}): {await resp.text()}")
+        body = await resp.json()
+        ok = resp.status == 200 and body.get("ok") is True
+        print("✅ Telegram 推播成功" if ok else f"❌ Telegram 推播失敗 HTTP {resp.status}")
+        return ok
 
 
 async def send_discord(session, text, level="NORMAL"):
     if not DISCORD_WEBHOOK:
-        return
+        return False
     color = {"NORMAL": 0x00ff88, "ELEVATED": 0xffaa00,
              "HIGH": 0xff6600, "CRITICAL": 0xff0000}.get(level, 0x00cfe8)
     payload = {"embeds": [{
@@ -182,33 +183,45 @@ async def send_discord(session, text, level="NORMAL"):
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }]}
     async with session.post(DISCORD_WEBHOOK, json=payload) as resp:
-        if resp.status in (200, 204):
-            print("✅ Discord 推播成功")
-        else:
-            print(f"❌ Discord 失敗: {await resp.text()}")
+        ok = resp.status in (200, 204)
+        print("✅ Discord 推播成功" if ok else f"❌ Discord 推播失敗 HTTP {resp.status}")
+        return ok
 
 
-async def _send_all(messages, level="NORMAL", tg_chats=None):
-    """把每則訊息送到指定的 Telegram 對象（可多個）＋ Discord。
-    tg_chats 未給時預設只送個人 chat。"""
+def _target_key(kind, target):
+    # Public data must not disclose private chat IDs or webhook credentials.
+    return hashlib.sha256(f"{kind}:{target}".encode()).hexdigest()
+
+
+async def _send_all(messages, level="NORMAL", tg_chats=None, completed=None):
+    """Return acknowledged results per destination; skip previously acknowledged targets."""
     if not messages:
-        return
-    tg_chats = [c for c in (tg_chats if tg_chats is not None else [TELEGRAM_CHAT_ID]) if c]
-    # 去重（避免個人 chat 與頻道設成同一個時重複發）
-    seen, uniq = set(), []
-    for c in tg_chats:
-        if c not in seen:
-            seen.add(c); uniq.append(c)
-    tg_chats = uniq
-    if not (TELEGRAM_BOT_TOKEN and tg_chats) and not DISCORD_WEBHOOK:
+        return {}
+    completed = completed or {}
+    chats = list(dict.fromkeys(c for c in (
+        tg_chats if tg_chats is not None else [TELEGRAM_CHAT_ID]) if c))
+    targets = [(_target_key("telegram", c), "telegram", c)
+               for c in chats if TELEGRAM_BOT_TOKEN]
+    if DISCORD_WEBHOOK:
+        targets.append((_target_key("discord", DISCORD_WEBHOOK), "discord", DISCORD_WEBHOOK))
+    results = {key: True for key, _, _ in targets if completed.get(key)}
+    pending = [t for t in targets if not completed.get(t[0])]
+    if not targets:
         print("ℹ️ 未設定推播 Secrets，跳過推播")
-        return
-    async with aiohttp.ClientSession() as session:
-        for msg in messages:
-            print(f"\n{'='*40}\n{msg}\n{'='*40}")
-            tasks = [send_telegram(session, msg, c) for c in tg_chats]
-            tasks.append(send_discord(session, msg, level))
-            await asyncio.gather(*tasks)
+        return {}
+    async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=15)) as session:
+        for key, kind, target in pending:
+            results[key] = True
+            for msg in messages:
+                try:
+                    ok = (await send_telegram(session, msg, target) if kind == "telegram"
+                          else await send_discord(session, msg, level))
+                except Exception as exc:
+                    # Exception strings may contain bot tokens or webhook URLs.
+                    print(f"❌ {kind} 推播例外：{type(exc).__name__}")
+                    ok = False
+                results[key] = results[key] and ok
+    return results
 
 
 # ─── 主流程：定時回報 + 即時異常 ─────────────────────────────
@@ -231,7 +244,7 @@ async def run_notifications(data: dict, prev_notify: dict | None = None,
                      if (s.get("spike_magnitude") or "").upper() == "EXTREME"]
     has_extreme = len(extreme_shops) > 0
 
-    new_notify = {"bucket": bucket, "level": new_level,
+    new_notify = {"bucket": prev_notify.get("bucket"), "level": new_level,
                   "pizza_extreme": has_extreme, "hotspots": hs_cnt, "hotspot_counter_version": 2}
 
     # 收件對象：個人 chat 永遠收；公開頻道依 scope 決定
@@ -241,15 +254,16 @@ async def run_notifications(data: dict, prev_notify: dict | None = None,
 
     # 測試：直接送一則到個人＋頻道，確認連線
     if force_test:
-        await _send_all(["🔔 *WARHUBS 推播測試*\nTelegram／Discord 連線正常，"
+        result = await _send_all(["🔔 *WARHUBS 推播測試*\nTelegram／Discord 連線正常，"
                          "之後定時回報與異常警報都會送到這裡。\n\n" + build_digest(data)],
                         new_level, tg_chats=both)
+        new_notify["delivery"] = {"test": result}
         return new_notify
 
     msgs, alert_msgs = [], []
 
     # 1) 定時回報：時段跳動才送（抗排程抖動、不重複）
-    if prev_notify.get("bucket") != bucket:
+    if prev_notify.get("bucket") != bucket or prev_notify.get("delivery_version") != 1:
         msgs.append(build_digest(data))
 
     # 2) 即時異常（邊緣觸發：條件「新成立」才推，避免洗版）
@@ -266,6 +280,18 @@ async def run_notifications(data: dict, prev_notify: dict | None = None,
         alert_msgs.append(build_hotspot_alert(data, hs_cnt, prev_hs))
 
     # 異常警報：個人＋公開頻道都推；定時摘要：依頻道 scope
-    await _send_all(alert_msgs, new_level, tg_chats=both)
-    await _send_all(msgs, new_level, tg_chats=digest_targets)
+    alerts = await _send_all(alert_msgs, new_level, tg_chats=both)
+    receipts = (prev_notify.get("digest_receipts", {})
+                if prev_notify.get("digest_attempt_bucket") == bucket else {})
+    digest = await _send_all(msgs, new_level, tg_chats=digest_targets, completed=receipts)
+    if msgs:
+        new_notify["digest_receipts"] = {k: True for k, ok in digest.items() if ok}
+        new_notify["digest_attempt_bucket"] = bucket
+        if digest and all(digest.values()):
+            new_notify["bucket"] = bucket
+    else:
+        new_notify["digest_receipts"] = receipts
+        new_notify["digest_attempt_bucket"] = bucket
+    new_notify["delivery_version"] = 1
+    new_notify["delivery"] = {"checked_at": now.isoformat(), "alerts": alerts, "digest": digest}
     return new_notify
