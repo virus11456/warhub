@@ -38,7 +38,11 @@ async def main():
                     'updated_at':data['updated_at'],'score':data['score'],
                     'sources':data['source_health'],
                     'food':data.get('food'),'strat':data.get('strat'),'usda':data.get('usda',{}).get('items') if data.get('usda') else None}
-            Path('validated-snapshot.json').write_text(json.dumps(data,ensure_ascii=False))
+            Path('validated-snapshot.json').write_text(json.dumps(data,ensure_ascii=False,allow_nan=False))
+            export=Path('validated-data');export.mkdir(exist_ok=True)
+            for name in ['DATA_FILE','HISTORY_FILE','FOOD_HISTORY_FILE','STRAT_HISTORY_FILE','PLA_HISTORY_FILE','METRICS_DAILY_FILE']:
+                source=getattr(f,name)
+                if source.exists():shutil.copyfile(source,export/source.name)
         except Exception as exc:
             report={'status':'failed','failure_type':type(exc).__name__,'seconds':round(time.monotonic()-start)}
         Path('snapshot-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))

@@ -2,7 +2,7 @@
 // Vercel Serverless Function — 即時讀取 GitHub 上的最新 data/ 檔案
 //
 // 為什麼需要它：本站是靜態部署，data/*.json 會被凍結在「最後一次成功
-// 部署」的快照。資料機器人每 15 分鐘 commit 一次，若每次都觸發 Vercel
+// 部署」的快照。資料機器人約每 2 小時 commit 一次，若每次都觸發 Vercel
 // 重新部署，會用爆免費方案的每日部署上限（部署被 BLOCKED、網站就卡在
 // 舊快照不再更新）。這支函式改為「即時」從 GitHub 讀最新檔案，前台打
 // 這支 API 就永遠拿到最新資料，完全不需要為了資料更新而重新部署。
@@ -22,9 +22,13 @@ export default async function handler(req, res) {
   // 去掉貼上時常見的前後空白／換行（否則 Authorization 標頭失效 → GitHub 404）
   const raw = process.env.GITHUB_TOKEN || '';
   const token = raw.trim();
+  // Preview must read its own revision, so unmerged schemas never mix with main.
+  const ref = process.env.VERCEL_ENV === 'preview'
+    ? (process.env.VERCEL_GIT_COMMIT_REF || process.env.VERCEL_GIT_COMMIT_SHA || 'main')
+    : 'main';
   try {
     const gh = await fetch(
-      `https://api.github.com/repos/${REPO}/contents/data/${f}?ref=main`,
+      `https://api.github.com/repos/${REPO}/contents/data/${f}?ref=${encodeURIComponent(ref)}`,
       { signal: AbortSignal.timeout(8000), headers: {
           'Accept': 'application/vnd.github.raw',
           'User-Agent': 'warhub-data-fn',
