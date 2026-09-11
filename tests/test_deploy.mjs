@@ -39,6 +39,13 @@ test('deployment gate preserves code updates and fresh data without unnecessary 
     assert.equal(gate(deployed), 0, 'archive and data changes skip deployment');
     const archiveIgnored = spawnSync('git', ['-c', `core.excludesfile=${ignoreFile}`, 'check-ignore', '--no-index', archive], { cwd });
     assert.equal(archiveIgnored.status, 0, 'archives stay out of the public deployment');
+    mkdirSync(join(cwd, '.agents/skills/warhub-news'), { recursive: true });
+    const skill = '.agents/skills/warhub-news/SKILL.md';
+    writeFileSync(join(cwd, skill), 'collector skill');
+    writeFileSync(join(cwd, 'AGENTS.md'), 'collector maintenance'); commit();
+    assert.equal(gate(deployed), 0, 'agent instructions do not rebuild the public site');
+    const skillIgnored = spawnSync('git', ['-c', `core.excludesfile=${ignoreFile}`, 'check-ignore', '--no-index', skill], { cwd });
+    assert.equal(skillIgnored.status, 0, 'skills stay out of the public deployment');
     writeFileSync(join(cwd, 'index.html'), 'new code'); commit();
     writeFileSync(join(cwd, 'data/data.json'), '{"updated":2}'); commit();
     assert.equal(gate(deployed), 1, 'later data commit cannot hide undeployed code');
