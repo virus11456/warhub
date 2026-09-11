@@ -1,26 +1,70 @@
 {
-  "updated_at": "2026-09-11T00:20:56.890557+00:00",
+  "updated_at": "2026-09-11T04:08:59.986607+00:00",
+  "collection": {
+    "mode": "full",
+    "slow_refresh": true,
+    "history_refresh": false,
+    "slow_attempted_at": "2026-09-11T04:04:28.059757+00:00",
+    "history_attempted_at": null,
+    "reused_sources": [],
+    "duration_seconds": {
+      "bars": 0.0,
+      "wikipedia_anxiety": 0.206,
+      "aviation": 0.312,
+      "pizzint": 0.331,
+      "eonet": 0.582,
+      "polymarket": 0.843,
+      "gnews": 1.005,
+      "firms": 1.165,
+      "nuclear_seismic": 1.888,
+      "usda_esr": 2.362,
+      "notams": 39.391,
+      "food_imports": 66.609,
+      "gdelt": 153.162,
+      "food_history": 0.001,
+      "strategic_imports": 113.028,
+      "strategic_history": 0.001,
+      "tw_military_news": 0.47,
+      "pla_sorties": 0.361,
+      "finance": 4.386,
+      "fred": 0.509
+    },
+    "initialization": {
+      "workflow_run": 34560794537,
+      "code_commit": "e4cdb851a6839c22aa139ce359f861511e89a2a2",
+      "notifications_sent": false,
+      "historical_backfill": false
+    }
+  },
   "score": {
-    "pizza_score": 15.0,
-    "polymarket_score": 15.21,
-    "combined_score": 15.13,
-    "alert_level": "NORMAL"
+    "model_version": "wpi-4.0",
+    "combined_score": 23.2,
+    "alert_level": "LOW",
+    "pizza_score": null,
+    "polymarket_score": 21.06715856906939,
+    "factors": {
+      "p": 21.07,
+      "a": 0.0,
+      "g": null,
+      "z": null,
+      "f": null,
+      "s": 60.91,
+      "w": 26.7
+    },
+    "coverage": 0.66,
+    "is_probability": false
   },
   "pizza": [
     {
       "name": "We, The Pizza",
-      "busyness": 0,
+      "busyness": null,
       "is_open": false,
       "status": "closed",
-      "baseline": 35,
+      "baseline": null,
       "spike": false,
       "spike_magnitude": null,
       "percentage_of_usual": null,
       "sparkline": [
-        8,
-        0,
-        null,
-        null,
         null,
         null,
         null,
@@ -40,28 +84,28 @@
         13,
         12,
         13,
+        null,
+        null,
+        null,
+        null,
         null
       ],
-      "is_closed_now": false,
+      "is_closed_now": true,
       "place_id": "ChIJS1rpOC-3t4kRsLyM6aftM8k",
       "address": "https://www.google.com/maps/place/We,+The+Pizza/@38.8663614,-77.0588449,15.76z/data=!3m1!5s0x89b7b72f331803b7:0x7edf0a3adffa41c8!4m6!3m5!1s0x89b7b72f38e95a4b:0xc933eda7e98cbcb0!8m2!3d38.8551791!4d-77.049733!16s%2Fg%2F1q62g66vf?entry=ttu&g_ep=EgoyMDI1MDYxNi4wIKXMDSoASAFQAw%3D%3D",
       "data_source": "none",
-      "recorded_at": "2026-09-11T00:10:22.739Z"
+      "recorded_at": "2026-09-11T03:53:56.939Z"
     },
     {
       "name": "Pizzato Pizza",
-      "busyness": 0,
-      "is_open": false,
-      "status": "closed",
-      "baseline": 35,
+      "busyness": null,
+      "is_open": null,
+      "status": "unavailable",
+      "baseline": null,
       "spike": false,
       "spike_magnitude": null,
       "percentage_of_usual": null,
       "sparkline": [
-        100,
-        2,
-        null,
-        0,
         100,
         0,
         4,
@@ -81,28 +125,28 @@
         0,
         100,
         100,
+        null,
+        null,
+        null,
+        null,
         null
       ],
       "is_closed_now": false,
       "place_id": "ChIJrbin_Qm3t4kRVSytw_2DM1g",
       "address": "https://www.google.com/maps/place/Pizzato+Pizza/@38.8791607,-77.096414,15.18z/data=!4m6!3m5!1s0x89b7b709fda7b8ad:0x583383fdc3ad2c55!8m2!3d38.8806865!4d-77.089827!16s%2Fg%2F11v5zglw6h?entry=ttu&g_ep=EgoyMDI1MDYxNy4wIKXMDSoASAFQAw%3D%3D",
       "data_source": "none",
-      "recorded_at": "2026-09-11T00:10:22.739Z"
+      "recorded_at": "2026-09-11T03:53:56.939Z"
     },
     {
       "name": "Papa Johns Pizza",
-      "busyness": 0,
-      "is_open": false,
-      "status": "closed",
-      "baseline": 35,
+      "busyness": null,
+      "is_open": null,
+      "status": "unavailable",
+      "baseline": null,
       "spike": false,
       "spike_magnitude": null,
       "percentage_of_usual": null,
       "sparkline": [
-        46,
-        0,
-        null,
-        23,
         null,
         null,
         null,
@@ -122,28 +166,28 @@
         11,
         2,
         87,
+        null,
+        null,
+        null,
+        null,
         null
       ],
       "is_closed_now": false,
       "place_id": "ChIJo03BaX-3t4kRbyhPM0rTuqM",
       "address": "https://www.google.com/maps/place/Papa+Johns+Pizza/@38.8292633,-77.1901741,11.83z/data=!4m6!3m5!1s0x89b7b77f69c14da3:0xa3bad34a334f286f!8m2!3d38.8606821!4d-77.0922272!16s%2Fg%2F11t104lmtl?entry=ttu&g_ep=EgoyMDI1MDYxNy4wIKXMDSoASAFQAw%3D%3D",
       "data_source": "none",
-      "recorded_at": "2026-09-11T00:10:22.739Z"
+      "recorded_at": "2026-09-11T03:53:56.939Z"
     },
     {
       "name": "Domino's Pizza (Pentagon Closest)",
-      "busyness": 0,
-      "is_open": false,
-      "status": "closed",
-      "baseline": 35,
+      "busyness": null,
+      "is_open": null,
+      "status": "unavailable",
+      "baseline": null,
       "spike": false,
       "spike_magnitude": null,
       "percentage_of_usual": null,
       "sparkline": [
-        100,
-        100,
-        null,
-        0,
         null,
         null,
         null,
@@ -163,28 +207,28 @@
         100,
         0,
         0,
+        null,
+        null,
+        null,
+        null,
         null
       ],
       "is_closed_now": false,
       "place_id": "ChIJI6ACK7q2t4kRFcPtFhUuYhU",
       "address": "https://www.google.com/maps/place/Domino's+Pizza/@38.8627308,-77.0879692,17z/data=!3m1!4b1!4m6!3m5!1s0x89b7b6ba2b02a023:0x15622e1516edc315!8m2!3d38.8627267!4d-77.0853943!16s%2Fg%2F1wbryp46?entry=ttu&g_ep=EgoyMDI1MDYxNi4wIKXMDSoASAFQAw%3D%3D",
       "data_source": "none",
-      "recorded_at": "2026-09-11T00:10:22.739Z"
+      "recorded_at": "2026-09-11T03:53:56.939Z"
     },
     {
       "name": "Extreme Pizza",
-      "busyness": 0,
+      "busyness": null,
       "is_open": false,
       "status": "closed",
-      "baseline": 35,
+      "baseline": null,
       "spike": false,
       "spike_magnitude": null,
       "percentage_of_usual": null,
       "sparkline": [
-        68,
-        0,
-        null,
-        null,
         null,
         null,
         null,
@@ -204,28 +248,28 @@
         100,
         47,
         85,
+        null,
+        null,
+        null,
+        null,
         null
       ],
-      "is_closed_now": false,
+      "is_closed_now": true,
       "place_id": "ChIJcYireCe3t4kR4d9trEbGYjc",
       "address": "https://www.google.com/maps/place/Extreme+Pizza/@38.8602396,-77.0585603,17z/data=!3m1!4b1!4m6!3m5!1s0x89b7b72778ab8871:0x3762c646ac6ddfe1!8m2!3d38.8602396!4d-77.0559854!16s%2Fg%2F12llsn19l?entry=ttu&g_ep=EgoyMDI1MDYxNi4wIKXMDSoASAFQAw%3D%3D",
       "data_source": "none",
-      "recorded_at": "2026-09-11T00:10:22.739Z"
+      "recorded_at": "2026-09-11T03:53:56.939Z"
     },
     {
       "name": "District Pizza Palace",
-      "busyness": 0,
-      "is_open": false,
-      "status": "closed",
-      "baseline": 35,
+      "busyness": null,
+      "is_open": null,
+      "status": "unavailable",
+      "baseline": null,
       "spike": false,
       "spike_magnitude": null,
       "percentage_of_usual": null,
       "sparkline": [
-        32,
-        8,
-        null,
-        55,
         null,
         null,
         null,
@@ -245,38 +289,42 @@
         2,
         8,
         100,
+        null,
+        null,
+        null,
+        null,
         null
       ],
       "is_closed_now": false,
       "place_id": "ChIJ42QeLXu3t4kRnArvcaz2o3A",
       "address": "https://www.google.com/maps/place/District+Pizza+Palace/@38.8527414,-77.0557157,17z/data=!3m1!4b1!4m6!3m5!1s0x89b7b77b2d1e64e3:0x70a3f6ac71ef0a9c!8m2!3d38.8527414!4d-77.0531408!16s%2Fg%2F11vc1fb80v?entry=ttu&g_ep=EgoyMDI1MDYxNi4wIKXMDSoASAFQAw%3D%3D",
       "data_source": "none",
-      "recorded_at": "2026-09-11T00:10:22.739Z"
+      "recorded_at": "2026-09-11T03:53:56.939Z"
     },
     {
       "name": "Nighthawk Brewery & Pizza",
-      "busyness": 0,
-      "is_open": false,
-      "status": "closed",
-      "baseline": 35,
+      "busyness": null,
+      "is_open": null,
+      "status": "unavailable",
+      "baseline": null,
       "spike": false,
       "place_id": null,
       "address": null
     }
   ],
-  "pizza_index": 15,
+  "pizza_index": null,
   "pizza_events": [],
-  "defcon_level": 4,
+  "defcon_level": 5,
   "defcon_details": {
-    "at_time": "2026-09-11T00:00:00.000Z",
-    "defcon_severity_decimal": 0.147,
+    "at_time": "2026-09-11T03:00:00.000Z",
+    "defcon_severity_decimal": 0.0404,
     "raw_index": 0,
-    "smoothed_index": 14.7,
+    "smoothed_index": 4.04,
     "open_places": 0,
     "total_places": 6,
     "intensity_score": 0,
     "breadth_score": 0,
-    "night_multiplier": 0.98,
+    "night_multiplier": 1.14,
     "persistence_factor": 1,
     "places_above_150": 0,
     "places_above_200": 0,
@@ -292,269 +340,667 @@
     {
       "id": "0x5db999fad322cea2914535aae5517060c3f80ad6d8c0231cde2124a434d16846",
       "question": "Will the U.S. invade Iran before 2027?",
-      "yes_price": 0.155,
-      "no_price": 0.845,
-      "volume": 65381181.599167,
+      "yes_price": 0.165,
+      "no_price": 0.835,
+      "volume": 65406789.106753066,
       "category": "geopolitics",
       "slug": "will-the-us-invade-iran-before-2027",
-      "end_date": "2027-01-01T04:59:00Z"
+      "end_date": "2027-01-01T04:59:00Z",
+      "risk_score": 16.5
     },
     {
-      "id": "0x2368d2604c9c2b95bc98c51bd50c66e5351caebf05b9fe79d3398c387fe29a89",
-      "question": "Will 7 Fed rate cuts happen in 2026?",
-      "yes_price": 0.0005,
-      "no_price": 0.9995,
-      "volume": 3519561.7951670005,
+      "id": "0x524ce344b80a160c237d91a33efdd8b82468b0dc0d33f60d500f8bf69b80b8bb",
+      "question": "Israel x Iran ceasefire continues through September 30?",
+      "yes_price": 0.845,
+      "no_price": 0.155,
+      "volume": 1824125.6167000008,
       "category": "geopolitics",
-      "slug": "will-7-fed-rate-cuts-happen-in-2026",
-      "end_date": "2026-12-31T00:00:00Z"
+      "slug": "israel-x-iran-ceasefire-continues-through-september-30",
+      "end_date": "2026-09-30T20:29:00Z",
+      "risk_score": 15.5
     },
     {
-      "id": "0xcd9079a837d72a0eafde1dc692c819940bd030a295ddc67f27590e98df33878c",
-      "question": "US announces end of Iranian blockade by September 14, 2026?",
-      "yes_price": 0.027,
-      "no_price": 0.973,
-      "volume": 1397295.916830002,
+      "id": "0x2dcbc71a3f8108936e768b503d565fbda7a644b2a0bd9ed45f74982a2bb11fba",
+      "question": "Israel x Iran ceasefire continues through November 30?",
+      "yes_price": 0.635,
+      "no_price": 0.365,
+      "volume": 199142.67342399995,
       "category": "geopolitics",
-      "slug": "us-announces-end-of-iranian-blockade-by-september-14-2026",
-      "end_date": "2026-09-15T03:59:00Z"
+      "slug": "israel-x-iran-ceasefire-continues-through-november-30",
+      "end_date": "2026-11-30T20:29:00Z",
+      "risk_score": 36.5
     },
     {
-      "id": "0x4914bfdd892a48c341b5e0f41ec10475a815f2277273110b16f95e21084bfe75",
-      "question": "Will 6 Fed rate cuts happen in 2026?",
-      "yes_price": 0.0005,
-      "no_price": 0.9995,
-      "volume": 4218729.105319998,
+      "id": "0x5759fb62768738cda38232974fa399fd8bfbbe6c04d891a2c4cdb71731f8f692",
+      "question": "Will the US strike 9 countries in 2026?",
+      "yes_price": 0.2925,
+      "no_price": 0.7075,
+      "volume": 105494.79302700002,
       "category": "geopolitics",
-      "slug": "will-6-fed-rate-cuts-happen-in-2026",
-      "end_date": "2026-12-31T00:00:00Z"
+      "slug": "will-the-us-strike-9-countries-in-2026",
+      "end_date": "2027-01-01T04:59:00Z",
+      "risk_score": 29.25
     },
     {
-      "id": "0x3e0845c4736ae232c57b347d05f6145650416dfd3adb0fa5d7ddd335c64a84ca",
-      "question": "Will Iran withdraw from the NPT before 2027?",
-      "yes_price": 0.146,
-      "no_price": 0.854,
-      "volume": 503571.912776,
+      "id": "0x1c4c6a698f0591ddf0c96e1beb56f8c75112ef849331bf3b0388f14830a7421d",
+      "question": "Israel x Iran ceasefire continues through December 31?",
+      "yes_price": 0.585,
+      "no_price": 0.415,
+      "volume": 505524.24297500006,
       "category": "geopolitics",
-      "slug": "will-iran-withdraw-from-the-npt-before-2027",
-      "end_date": "2027-01-01T04:59:00Z"
-    },
-    {
-      "id": "0x30174f3f46398e37c96a07b45916e01eab9a8a854ecb624ac73a91a8490fd074",
-      "question": "US announces end of Iranian blockade by September 30, 2026?",
-      "yes_price": 0.145,
-      "no_price": 0.855,
-      "volume": 3007109.8736399985,
-      "category": "geopolitics",
-      "slug": "us-announces-end-of-iranian-blockade-by-september-30-2026-20260727171615364-722-649-646-561-213-644-414-831",
-      "end_date": "2026-10-01T03:59:00Z"
-    },
-    {
-      "id": "0xcfbc2e5fbabb9e8a03bf234367244d4c97eaaf3ac33e2ba001541ee3e0e62416",
-      "question": "Israel closes its airspace by September 30?",
-      "yes_price": 0.9655,
-      "no_price": 0.0345,
-      "volume": 2477997.9679329996,
-      "category": "geopolitics",
-      "slug": "israel-closes-its-airspace-by-september-30",
-      "end_date": "2026-10-01T03:59:00Z"
-    },
-    {
-      "id": "0xd9fb1184af0064e5e34b129f5b79afa5a17b7e32f2953ab05efed82315fee6d4",
-      "question": "Will China invade Taiwan by end of 2026?",
-      "yes_price": 0.0405,
-      "no_price": 0.9595,
-      "volume": 41148162.41805083,
-      "category": "geopolitics",
-      "slug": "will-china-invade-taiwan-before-2027",
-      "end_date": "2026-12-31T00:00:00Z"
-    },
-    {
-      "id": "0xd4e77ba6f29fc093509d24f508631abd445ecf506bbdc9c4c80e60256a318527",
-      "question": "Will no Fed rate cuts happen in 2026?",
-      "yes_price": 0.9265,
-      "no_price": 0.0735,
-      "volume": 8236142.977016998,
-      "category": "geopolitics",
-      "slug": "will-no-fed-rate-cuts-happen-in-2026",
-      "end_date": "2026-12-31T00:00:00Z"
-    },
-    {
-      "id": "0xaece8d6062d3e3eb9845b32441a4ab06eb2ef332c0228bc6a36add450647c7c4",
-      "question": "Will 4 Fed rate cuts happen in 2026?",
-      "yes_price": 0.0025,
-      "no_price": 0.9975,
-      "volume": 2696773.124764,
-      "category": "geopolitics",
-      "slug": "will-4-fed-rate-cuts-happen-in-2026",
-      "end_date": "2026-12-31T00:00:00Z"
-    },
-    {
-      "id": "0xa467b14d51f01b957109d9cbb1d6c124fab2a089d52ed8f471d23c2812e743b7",
-      "question": "Xi Jinping out before 2027?",
-      "yes_price": 0.0385,
-      "no_price": 0.9615,
-      "volume": 13150031.863749988,
-      "category": "geopolitics",
-      "slug": "xi-jinping-out-before-2027",
-      "end_date": "2027-01-01T04:59:00Z"
-    },
-    {
-      "id": "0x4090a61387fac4a1c1ea18e5effc8b1b9bdf6b5c0c274f84a8e028772d568da1",
-      "question": "Will Russia capture Bilytske by September 30, 2026?",
-      "yes_price": 0.175,
-      "no_price": 0.825,
-      "volume": 67426.206659,
-      "category": "geopolitics",
-      "slug": "will-russia-capture-bilytske-by-september-30-2026-564",
-      "end_date": "2026-10-01T03:59:00Z"
-    },
-    {
-      "id": "0xde64f0c49c7b26baa1ed2ebb7097574de5532c2237b779ab9b415e822c12a0a0",
-      "question": "Iran-Oman Hormuz Agreement by September 30?",
-      "yes_price": 0.265,
-      "no_price": 0.735,
-      "volume": 480692.8049399999,
-      "category": "geopolitics",
-      "slug": "iran-oman-hormuz-agreement-by-september-30-823-929",
-      "end_date": "2026-10-01T03:59:00Z"
-    },
-    {
-      "id": "0x71dd44fa5059fbed28a279172185d3623aa34ce86be1936281df26b5d1b87200",
-      "question": "US announces end of Iranian blockade by September 21, 2026?",
-      "yes_price": 0.085,
-      "no_price": 0.915,
-      "volume": 683645.9869610002,
-      "category": "geopolitics",
-      "slug": "us-announces-end-of-iranian-blockade-by-september-21-2026",
-      "end_date": "2026-09-22T03:59:00Z"
-    },
-    {
-      "id": "0x0844f5be2e87761e128eac1b68d4880b47aa06ff4108be71eaaf7ed3fc463d41",
-      "question": "Will Xi Jinping visit US by September 30?",
-      "yes_price": 0.9475,
-      "no_price": 0.0525,
-      "volume": 186412.00817800002,
-      "category": "geopolitics",
-      "slug": "will-xi-jinping-visit-us-by-september-30",
-      "end_date": "2026-09-30T23:59:00Z"
-    },
-    {
-      "id": "0x7ee722a07e0f84405f1267bc1c84eb95bd6348454453abf445618e778af8fd18",
-      "question": "Will 5 Fed rate cuts happen in 2026?",
-      "yes_price": 0.0015,
-      "no_price": 0.9985,
-      "volume": 2949875.1238709996,
-      "category": "geopolitics",
-      "slug": "will-5-fed-rate-cuts-happen-in-2026",
-      "end_date": "2026-12-31T00:00:00Z"
+      "slug": "israel-x-iran-ceasefire-continues-through-december-31-415",
+      "end_date": "2026-12-31T20:29:00Z",
+      "risk_score": 41.5
     },
     {
       "id": "0xe6d5e5da83874cd82c9b651a8a5d4fc541a800a295fb62e85124b4f5a04a4b7d",
       "question": "Will China invade Taiwan by December 31, 2027?",
       "yes_price": 0.115,
       "no_price": 0.885,
-      "volume": 3140128.676659999,
+      "volume": 3146943.4966599997,
       "category": "geopolitics",
       "slug": "will-china-invade-taiwan-by-december-31-2027",
-      "end_date": "2028-01-01T04:59:00Z"
+      "end_date": "2028-01-01T04:59:00Z",
+      "risk_score": 11.5
     },
     {
-      "id": "0x46ca741da4abd7ffa993f59ac65bfe83de43ae027accac71d263a493e44064e7",
-      "question": "US announces end of Iranian blockade by December 31, 2026?",
-      "yes_price": 0.5805,
-      "no_price": 0.4195,
-      "volume": 1566607.4970879995,
+      "id": "0x3a3becf905da80c4f5a7d886514120d52febd9635bf13522924888cd9da803f3",
+      "question": "Israel x Iran ceasefire continues through September 15?",
+      "yes_price": 0.915,
+      "no_price": 0.085,
+      "volume": 32612.115382999997,
       "category": "geopolitics",
-      "slug": "us-announces-end-of-iranian-blockade-by-december-31-2026-20260727171803489-375-949-645-919-269-157-255-857",
-      "end_date": "2027-01-01T04:59:00Z"
+      "slug": "israel-x-iran-ceasefire-continues-through-september-15",
+      "end_date": "2026-09-30T20:29:00Z",
+      "risk_score": 8.5
     },
     {
-      "id": "0x8d4966e84ae80f24b2e14643fdd45364e354229e11e2c17903b4b1763cfbe67c",
-      "question": "Will 3 Fed rate cuts happen in 2026?",
-      "yes_price": 0.0065,
-      "no_price": 0.9935,
-      "volume": 2819878.5290599996,
+      "id": "0x36fd215387f80bb2ff1c059436f52394a5accababc77dea98d4ba3b6770c884e",
+      "question": "US x Iran Effective Ceasefire by September 11?",
+      "yes_price": 0.675,
+      "no_price": 0.325,
+      "volume": 101925.36790900004,
       "category": "geopolitics",
-      "slug": "will-3-fed-rate-cuts-happen-in-2026",
-      "end_date": "2026-12-31T00:00:00Z"
+      "slug": "us-x-iran-effective-ceasefire-by-september-11",
+      "end_date": "2026-09-11T23:59:00Z",
+      "risk_score": 32.5
     },
     {
-      "id": "0xb55b2b13aee7a480ab0695912a65cb34a5fe5e84d5da810873d9c3e1182f9fd0",
-      "question": "Will the Iranian regime fall by September 30?",
-      "yes_price": 0.0105,
-      "no_price": 0.9895,
-      "volume": 2083205.3773720008,
+      "id": "0x88c6800dd5cebb3ccbc554b93493a678f74d39b1b29f637f234576a8993c10df",
+      "question": "US x Iran Effective Ceasefire by September 30?",
+      "yes_price": 0.755,
+      "no_price": 0.245,
+      "volume": 186581.81868899998,
       "category": "geopolitics",
-      "slug": "will-the-iranian-regime-fall-by-september-30-20260629143335077",
-      "end_date": "2026-10-01T03:59:00Z"
+      "slug": "us-x-iran-effective-ceasefire-by-september-30",
+      "end_date": "2026-09-30T23:59:00Z",
+      "risk_score": 24.5
+    },
+    {
+      "id": "0x2167ab5c0d163f85195ccea4d11734e4ba53913c838c6720fb815794128c68f2",
+      "question": "China x Philippines military clash before 2027?",
+      "yes_price": 0.285,
+      "no_price": 0.715,
+      "volume": 464703.836909,
+      "category": "geopolitics",
+      "slug": "china-x-philippines-military-clash-before-2027-20260723214807932",
+      "end_date": "2027-01-01T04:59:00Z",
+      "risk_score": 28.5
+    },
+    {
+      "id": "0xc3d5708780de5528998aeb53ca90e7ade64804f9f2386392a681435d5c42b44d",
+      "question": "Israel x Iran ceasefire continues through October 31?",
+      "yes_price": 0.735,
+      "no_price": 0.265,
+      "volume": 525538.2607699999,
+      "category": "geopolitics",
+      "slug": "israel-x-iran-ceasefire-continues-through-october-31",
+      "end_date": "2026-10-31T20:29:00Z",
+      "risk_score": 26.5
+    },
+    {
+      "id": "0x5ca616aaa0e1e5df6c38439f8bee4b96bacfe32f8f39cb2f1604c0196548662f",
+      "question": "Will China invade Taiwan by September 30, 2026?",
+      "yes_price": 0.0035,
+      "no_price": 0.9965,
+      "volume": 2113540.3390490003,
+      "category": "geopolitics",
+      "slug": "will-china-invade-taiwan-by-september-30-2026",
+      "end_date": "2026-10-01T03:59:00Z",
+      "risk_score": 0.35
+    },
+    {
+      "id": "0x4c80df6f557bb0b9de08c0301ebdce500dd9bdc58400d9269fb8fab1709ed584",
+      "question": "China x Taiwan military clash before 2027?",
+      "yes_price": 0.067,
+      "no_price": 0.933,
+      "volume": 3342344.5683830013,
+      "category": "geopolitics",
+      "slug": "china-x-taiwan-military-clash-before-2027",
+      "end_date": "2027-01-01T04:59:00Z",
+      "risk_score": 6.7
+    },
+    {
+      "id": "0x601b72cf13b40689481896f58e9cfeb26e0c39353235edb55d2370311b9d60ac",
+      "question": "US x Iran Effective Ceasefire by September 18?",
+      "yes_price": 0.705,
+      "no_price": 0.295,
+      "volume": 58143.826503,
+      "category": "geopolitics",
+      "slug": "us-x-iran-effective-ceasefire-by-september-18",
+      "end_date": "2026-09-18T23:59:00Z",
+      "risk_score": 29.5
+    },
+    {
+      "id": "0x84c625fdccf5c5246a15e476361e4563033906ee225800e1136c0d737596a72f",
+      "question": "Russia x Ukraine ceasefire by December 31, 2026?",
+      "yes_price": 0.135,
+      "no_price": 0.865,
+      "volume": 844481.1120830002,
+      "category": "geopolitics",
+      "slug": "russia-x-ukraine-ceasefire-by-december-31-2026",
+      "end_date": "2026-12-31T21:59:00Z",
+      "risk_score": 86.5
+    },
+    {
+      "id": "0x3de0f3d7d7efb40cde68e814d40a0b232832083653c8e78260eb999baa967de0",
+      "question": "US strike on Cuba by December 31?",
+      "yes_price": 0.135,
+      "no_price": 0.865,
+      "volume": 5216148.01312,
+      "category": "geopolitics",
+      "slug": "us-strike-on-cuba-by-december-31",
+      "end_date": "2027-01-01T04:59:00Z",
+      "risk_score": 13.5
+    },
+    {
+      "id": "0xde5c4c7f05b34f4774d07fec9aa9cf880555f95ddcce4c7830ab09daecc493c4",
+      "question": "Russia x Ukraine ceasefire by October 31, 2026?",
+      "yes_price": 0.055,
+      "no_price": 0.945,
+      "volume": 677024.4358380002,
+      "category": "geopolitics",
+      "slug": "russia-x-ukraine-ceasefire-by-october-31-2026",
+      "end_date": "2026-10-31T21:59:00Z",
+      "risk_score": 94.5
+    },
+    {
+      "id": "0x1f6926c8e2a2d7caf40dbf7e64f422dc7f06a5c4da435ec1b256abb82283396d",
+      "question": "Pakistan military action against Yemen by December 31, 2026?",
+      "yes_price": 0.165,
+      "no_price": 0.835,
+      "volume": 3059.446299,
+      "category": "geopolitics",
+      "slug": "pakistan-military-action-against-yemen-by-december-31-2026-20260909",
+      "end_date": "2026-12-31T20:59:00Z",
+      "risk_score": 16.5
+    },
+    {
+      "id": "0x5c19f205507ce03ff5f3be08a8090a5969ea6870cc07b902a4ca2e61dfe48fdd",
+      "question": "Russia x Ukraine ceasefire agreement by December 31, 2026?",
+      "yes_price": 0.22,
+      "no_price": 0.78,
+      "volume": 2595885.1692620004,
+      "category": "geopolitics",
+      "slug": "russia-x-ukraine-ceasefire-agreement-by-december-31-2026",
+      "end_date": "2027-01-01T04:59:00Z",
+      "risk_score": 78.0
+    },
+    {
+      "id": "0x917b070cd100acb5e6f4bafbf36f35af5ac047390b2916d05d836adf97a9f293",
+      "question": "Will there be Saudi Arabian military action against Yemen by September 15, 2026?",
+      "yes_price": 0.81,
+      "no_price": 0.19,
+      "volume": 20540.518406,
+      "category": "geopolitics",
+      "slug": "will-there-be-saudi-arabian-military-action-against-yemen-by-september-15-2026",
+      "end_date": "2026-09-15T20:59:00Z",
+      "risk_score": 81.0
+    },
+    {
+      "id": "0x4167e22670f31e5f93d132f78108f3fae809bd15cadf78983eff096845ed1415",
+      "question": "Ukraine signs peace deal with Russia before 2027?",
+      "yes_price": 0.105,
+      "no_price": 0.895,
+      "volume": 2716326.025697999,
+      "category": "geopolitics",
+      "slug": "ukraine-signs-peace-deal-with-russia-before-2027",
+      "end_date": "2027-01-01T04:59:00Z",
+      "risk_score": 89.5
+    },
+    {
+      "id": "0x6c3f1009a0c91ba9f7aae44aeadf86863b0d433b60f7a090fd00c945019aa32f",
+      "question": "Russia x Ukraine ceasefire agreement by October 31, 2026?",
+      "yes_price": 0.095,
+      "no_price": 0.905,
+      "volume": 1597936.4730899984,
+      "category": "geopolitics",
+      "slug": "russia-x-ukraine-ceasefire-agreement-by-october-31-2026",
+      "end_date": "2026-11-01T03:59:00Z",
+      "risk_score": 90.5
+    },
+    {
+      "id": "0xa466e17524bcc473279c4ca86f4f1fb01932946a8204e68f6ca96628f8bf2b5e",
+      "question": "China x Japan military clash before 2027?",
+      "yes_price": 0.065,
+      "no_price": 0.935,
+      "volume": 1339254.9934239995,
+      "category": "geopolitics",
+      "slug": "china-x-japan-military-clash-before-2027",
+      "end_date": "2027-01-01T04:59:00Z",
+      "risk_score": 6.5
+    },
+    {
+      "id": "0x8011cff605bac25673a202332b678e823cd7d82abad9e9770db01ea625808229",
+      "question": "Will Russia invade another country in 2026?",
+      "yes_price": 0.065,
+      "no_price": 0.935,
+      "volume": 460612.92667600024,
+      "category": "geopolitics",
+      "slug": "will-russia-invade-another-country-in-2026",
+      "end_date": "2027-01-01T04:59:00Z",
+      "risk_score": 6.5
+    },
+    {
+      "id": "0xe34a08b2a8d0f9e5033dc1bc1ee153509e414196c3e8044d5e99b64b974eeea6",
+      "question": "Israel x Turkey military clash before 2027?",
+      "yes_price": 0.125,
+      "no_price": 0.875,
+      "volume": 416919.54344200005,
+      "category": "geopolitics",
+      "slug": "israel-x-turkey-military-clash-before-2027",
+      "end_date": "2027-01-01T04:59:00Z",
+      "risk_score": 12.5
+    },
+    {
+      "id": "0xf2bf04609e7458df56c9bb4b1e051286dea11da1c944bbc1dafbcc6b76904e52",
+      "question": "NATO x Russia military clash by December 31, 2026?",
+      "yes_price": 0.215,
+      "no_price": 0.785,
+      "volume": 1821849.8858290007,
+      "category": "geopolitics",
+      "slug": "nato-x-russia-military-clash-by-december-31-2026-244-538-582",
+      "end_date": "2027-01-01T04:59:00Z",
+      "risk_score": 21.5
+    },
+    {
+      "id": "0x057da165b096d1f3a59d87bcad68649aecd18dc25c89a6d083530d1aaac18146",
+      "question": "Will China invade Taiwan by June 30, 2027?",
+      "yes_price": 0.075,
+      "no_price": 0.925,
+      "volume": 442678.486291,
+      "category": "geopolitics",
+      "slug": "will-china-invade-taiwan-by-june-30-2027",
+      "end_date": "2027-07-01T03:59:00Z",
+      "risk_score": 7.5
+    },
+    {
+      "id": "0x762c1716efde11ed42489cd413f7f3f39ca34520982dc676e1ed8d98f6cb9ca2",
+      "question": "Pakistan military action against Yemen by October 31, 2026?",
+      "yes_price": 0.1,
+      "no_price": 0.9,
+      "volume": 1276.339018,
+      "category": "geopolitics",
+      "slug": "pakistan-military-action-against-yemen-by-october-31-2026-20260909",
+      "end_date": "2026-10-31T20:59:00Z",
+      "risk_score": 10.0
+    },
+    {
+      "id": "0x5554affca1eb02e9f0f18f4100a71b4bd71c7f2627ec48e7753319806fce0ae9",
+      "question": "Iran blockade lifted before Xi visits US?",
+      "yes_price": 0.065,
+      "no_price": 0.935,
+      "volume": 1429.1678979999997,
+      "category": "geopolitics",
+      "slug": "iran-blockade-lifted-before-xi-visits-us",
+      "end_date": "2026-12-31T23:59:00Z",
+      "risk_score": 6.5
+    },
+    {
+      "id": "0x2d4f0c95e41efde8159dbc8e44a4d6d0e9caebcf835ce98094924f4b1bc5f968",
+      "question": "Israel x Lebanon Effective Ceasefire by September 11?",
+      "yes_price": 0.0255,
+      "no_price": 0.9745,
+      "volume": 2992.3011889999993,
+      "category": "geopolitics",
+      "slug": "israel-x-lebanon-effective-ceasefire-by-september-11",
+      "end_date": "2026-09-11T23:59:00Z",
+      "risk_score": 97.45
+    },
+    {
+      "id": "0x96498c10c79ecaafa2bbb92ada36c7ff617913b03d9220f8c95ce7d6776a0b0c",
+      "question": "Will China blockade Taiwan in 2026?",
+      "yes_price": 0.0485,
+      "no_price": 0.9515,
+      "volume": 351370.25251799996,
+      "category": "geopolitics",
+      "slug": "will-china-blockade-taiwan-by-in-2026",
+      "end_date": "2027-01-01T04:59:00Z",
+      "risk_score": 4.85
+    },
+    {
+      "id": "0xa84fb47f9c33fd7e05571361bc472e164fc32b9a461397ece5125702922f1058",
+      "question": "Pakistan military action against Yemen by September 30, 2026?",
+      "yes_price": 0.0725,
+      "no_price": 0.9275,
+      "volume": 990.6495310000001,
+      "category": "geopolitics",
+      "slug": "pakistan-military-action-against-yemen-by-september-30-2026-20260909",
+      "end_date": "2026-09-30T20:59:00Z",
+      "risk_score": 7.25
+    },
+    {
+      "id": "0x1015d806e33eebde7edb0762f1197051575f6286b5f06261d8e4ff4d34c90697",
+      "question": "Will the U.S. invade Mexico in 2026?",
+      "yes_price": 0.014,
+      "no_price": 0.986,
+      "volume": 253846.07504200007,
+      "category": "geopolitics",
+      "slug": "will-the-us-invade-mexico-in-2026",
+      "end_date": "2027-01-01T04:59:00Z",
+      "risk_score": 1.4
+    },
+    {
+      "id": "0x2349e6f85eaf78e840acb16ca11723bdbb51d070b8ea6439f1d05f95574ac45d",
+      "question": "Israel military action against Greater Beirut by September 30?",
+      "yes_price": 0.125,
+      "no_price": 0.875,
+      "volume": 20483.153196999996,
+      "category": "geopolitics",
+      "slug": "israel-military-action-against-greater-beirut-by-september-30",
+      "end_date": "2026-09-30T20:59:00Z",
+      "risk_score": 12.5
+    },
+    {
+      "id": "0x0ce9d09caf450b46d3c942a3fb5ca2e68b165988583a3f7a3831a201d312e411",
+      "question": "Israel military action against Syria by September 30, 2026?",
+      "yes_price": 0.165,
+      "no_price": 0.835,
+      "volume": 6314.533766999998,
+      "category": "geopolitics",
+      "slug": "israel-military-action-against-syria-by-september-30-2026-21",
+      "end_date": "2026-09-30T20:59:00Z",
+      "risk_score": 16.5
+    },
+    {
+      "id": "0x28dc4873a85a2d4f4d5dbbaead6dc575071492eacf43415ff2a8d0076f83324c",
+      "question": "Iran blockade lifted before Iran-Oman Hormuz agreement?",
+      "yes_price": 0.235,
+      "no_price": 0.765,
+      "volume": 7142.982225,
+      "category": "geopolitics",
+      "slug": "iran-blockade-lifted-before-iran-oman-hormuz-agreement",
+      "end_date": "2026-12-31T23:59:00Z",
+      "risk_score": 23.5
+    },
+    {
+      "id": "0x4f7977fc43aca35bfbe8e3b5969f00bfd659e75b0ebf1e2aa263ac99ffed386f",
+      "question": "Israel x Lebanon Effective Ceasefire by September 18?",
+      "yes_price": 0.055,
+      "no_price": 0.945,
+      "volume": 2472.722083,
+      "category": "geopolitics",
+      "slug": "israel-x-lebanon-effective-ceasefire-by-september-18",
+      "end_date": "2026-09-18T23:59:00Z",
+      "risk_score": 94.5
+    },
+    {
+      "id": "0x57ddcc290f39f5b13299b92bf0c48a65fc5fb9190f227e0510fcdd44c4edb431",
+      "question": "Israel military action against Yemen by September 30?",
+      "yes_price": 0.072,
+      "no_price": 0.928,
+      "volume": 1642.8191479999998,
+      "category": "geopolitics",
+      "slug": "israel-military-action-against-yemen-by-september-30",
+      "end_date": "2026-09-30T20:59:00Z",
+      "risk_score": 7.2
+    },
+    {
+      "id": "0x3285179b99df57b0390e480f8e69d340e5fa38496b263225df90ef389e2958f4",
+      "question": "Will the US officially declare war on Iran by December 31, 2026?",
+      "yes_price": 0.0225,
+      "no_price": 0.9775,
+      "volume": 843032.0615109997,
+      "category": "geopolitics",
+      "slug": "will-the-us-officially-declare-war-on-iran-by-december-31-2026-746",
+      "end_date": "2027-01-01T04:59:00Z",
+      "risk_score": 2.25
+    },
+    {
+      "id": "0xb7ca42c3a0324b32cad3e64b29cc372d5e941a41f7f23f787806439854be9021",
+      "question": "Will India strike Pakistan by December 31, 2026?",
+      "yes_price": 0.105,
+      "no_price": 0.895,
+      "volume": 328152.32696499984,
+      "category": "geopolitics",
+      "slug": "will-india-strike-pakistan-by-december-31-2026",
+      "end_date": "2027-01-01T04:59:00Z",
+      "risk_score": 10.5
+    },
+    {
+      "id": "0xae554f30b7ba3de62193b969264d817329c44111cbb0364042a091e229b24d66",
+      "question": "Russia x Ukraine ceasefire agreement by November 30, 2027?",
+      "yes_price": 0.655,
+      "no_price": 0.345,
+      "volume": 711.098029,
+      "category": "geopolitics",
+      "slug": "russia-x-ukraine-ceasefire-agreement-by-november-30-2027",
+      "end_date": "2027-12-01T04:59:00Z",
+      "risk_score": 34.5
+    },
+    {
+      "id": "0x713ab27f31c1d8080ea3b9c21c8a021609f8fcb7aad13a87b8b069265e7fdfda",
+      "question": "Will the US strike 8 countries in 2026?",
+      "yes_price": 0.6565,
+      "no_price": 0.3435,
+      "volume": 319733.129516,
+      "category": "geopolitics",
+      "slug": "will-the-us-strike-8-countries-in-2026",
+      "end_date": "2027-01-01T04:59:00Z",
+      "risk_score": 65.65
+    },
+    {
+      "id": "0x3e365cd4a3ed1b8486bf270c69791a070886fd4398d9d4dccc055817aa8efbe8",
+      "question": "Ukraine signs peace deal with Russia by October 31?",
+      "yes_price": 0.0345,
+      "no_price": 0.9655,
+      "volume": 11062.913400000005,
+      "category": "geopolitics",
+      "slug": "ukraine-signs-peace-deal-with-russia-by-october-31",
+      "end_date": "2026-11-01T03:59:00Z",
+      "risk_score": 96.55
+    },
+    {
+      "id": "0x8049586fa3bffd56d1ccde63f55269a26424a505b757c92b32cffe61cb986b6a",
+      "question": "Israel x Lebanon Effective Ceasefire by September 30?",
+      "yes_price": 0.095,
+      "no_price": 0.905,
+      "volume": 2763.174642,
+      "category": "geopolitics",
+      "slug": "israel-x-lebanon-effective-ceasefire-by-september-30",
+      "end_date": "2026-09-30T23:59:00Z",
+      "risk_score": 90.5
+    },
+    {
+      "id": "0x80ebf0a88a44bf737d4047b3accd7108285c69b84257e5c684bdc4c715c81139",
+      "question": "Will the U.S. invade Cuba in 2026?",
+      "yes_price": 0.065,
+      "no_price": 0.935,
+      "volume": 3292857.2374400008,
+      "category": "geopolitics",
+      "slug": "will-the-us-invade-cuba-in-2026",
+      "end_date": "2027-01-01T04:59:00Z",
+      "risk_score": 6.5
+    },
+    {
+      "id": "0x2a4fcda5c1598fc8621cf96cabc410f9f23a2d0336c3bff5070a37a663d39e94",
+      "question": "NATO x Russia military clash by October 31, 2026?",
+      "yes_price": 0.075,
+      "no_price": 0.925,
+      "volume": 436964.1930020001,
+      "category": "geopolitics",
+      "slug": "nato-x-russia-military-clash-by-october-31-2026",
+      "end_date": "2026-11-01T03:59:00Z",
+      "risk_score": 7.5
+    },
+    {
+      "id": "0x2be7ddb2a929da1b7f0e3f6b18693f232ebc7e1e2e6fd3d293748b4a981cc2b7",
+      "question": "Ukraine strikes another tanker in the Caspian Sea by September 30, 2026?",
+      "yes_price": 0.125,
+      "no_price": 0.875,
+      "volume": 1487.4357170000003,
+      "category": "geopolitics",
+      "slug": "ukraine-strikes-another-tanker-in-the-caspian-sea-by-september-30-2026",
+      "end_date": "2026-09-30T20:59:00Z",
+      "risk_score": 12.5
+    },
+    {
+      "id": "0x849e6c0abbb37a1d95608c5483cc55b7c03578bb345750981e24724cd3c3de11",
+      "question": "Israel military action against Lebanon on September 11?",
+      "yes_price": 0.735,
+      "no_price": 0.265,
+      "volume": 8992.718024000002,
+      "category": "geopolitics",
+      "slug": "israel-military-action-against-lebanon-on-september-11-20260903",
+      "end_date": "2026-09-11T23:59:00Z",
+      "risk_score": 73.5
+    },
+    {
+      "id": "0x08f1d018dc73d4df073a64f7184ab77aff8a977c076e28383a65394668a39be9",
+      "question": "Russia x Ukraine ceasefire agreement by September 30, 2027?",
+      "yes_price": 0.635,
+      "no_price": 0.365,
+      "volume": 674.577837,
+      "category": "geopolitics",
+      "slug": "russia-x-ukraine-ceasefire-agreement-by-september-30-2027",
+      "end_date": "2027-10-01T03:59:00Z",
+      "risk_score": 36.5
     }
   ],
+  "finance": {
+    "GC=F": {
+      "price": 4345.3,
+      "chg": -1.6,
+      "ma30": 4376.4833,
+      "dev": -0.7,
+      "observed_at": "2026-09-11T03:58:51+00:00"
+    },
+    "BZ=F": {
+      "price": 108.51,
+      "chg": 7.21,
+      "ma30": 90.023,
+      "dev": 20.5,
+      "observed_at": "2026-09-11T03:58:38+00:00"
+    },
+    "USDCHF=X": {
+      "price": 0.8134,
+      "chg": 0.42,
+      "ma30": 0.808,
+      "dev": 0.7,
+      "observed_at": "2026-09-11T04:08:54+00:00"
+    },
+    "^VIX": {
+      "price": 17.84,
+      "chg": 8.38,
+      "ma30": 15.359,
+      "dev": 16.2,
+      "observed_at": "2026-09-10T20:15:01+00:00"
+    },
+    "ZW=F": {
+      "price": 736.5,
+      "chg": 3.55,
+      "ma30": 685.9083,
+      "dev": 7.4,
+      "observed_at": "2026-09-11T03:56:06+00:00"
+    },
+    "LMT": {
+      "price": 530.12,
+      "chg": 1.08,
+      "ma30": 572.0553,
+      "dev": -7.3,
+      "observed_at": "2026-09-10T20:02:35+00:00"
+    },
+    "RTX": {
+      "price": 198.12,
+      "chg": 0.29,
+      "ma30": 214.004,
+      "dev": -7.4,
+      "observed_at": "2026-09-10T20:00:02+00:00"
+    },
+    "NOC": {
+      "price": 518.95,
+      "chg": 0.66,
+      "ma30": 552.134,
+      "dev": -6.0,
+      "observed_at": "2026-09-10T20:00:02+00:00"
+    },
+    "GD": {
+      "price": 354.25,
+      "chg": 0.45,
+      "ma30": 381.2347,
+      "dev": -7.1,
+      "observed_at": "2026-09-10T20:00:03+00:00"
+    },
+    "^TNX": {
+      "price": 4.944,
+      "chg": 2.21,
+      "ma30": 4.7049,
+      "dev": 5.1,
+      "observed_at": "2026-09-10T18:59:54+00:00"
+    },
+    "^FVX": {
+      "price": 4.733,
+      "chg": 2.58,
+      "ma30": 4.4207,
+      "dev": 7.1,
+      "observed_at": "2026-09-10T18:59:54+00:00"
+    },
+    "^TYX": {
+      "price": 5.361,
+      "chg": 1.42,
+      "ma30": 5.232,
+      "dev": 2.5,
+      "observed_at": "2026-09-10T18:59:54+00:00"
+    }
+  },
+  "fred": {
+    "em_oas": 1.35,
+    "hy_oas": 2.71
+  },
   "aviation": {
     "summary": {
       "tankers": 9,
-      "awacs": 3,
+      "awacs": 0,
       "uav": 0,
-      "transport": 39,
+      "transport": 33,
       "fighter": 0,
-      "c4isr": 9,
-      "total": 278
+      "c4isr": 4,
+      "total": 197,
+      "anomaly_pct": -0.8,
+      "baseline_7d": 198.7
     },
     "aircraft": [
-      {
-        "icao24": "AEDB56",
-        "callsign": "GRYHK06",
-        "type": "E-2 Hawkeye",
-        "type_code": "E2",
-        "role": "awacs",
-        "alt_ft": 11375,
-        "lat": 35.919983,
-        "lon": -76.89909,
-        "region": "北美"
-      },
-      {
-        "icao24": "AE7454",
-        "callsign": "GRYHK07",
-        "type": "E-2 Hawkeye",
-        "type_code": "E2",
-        "role": "awacs",
-        "alt_ft": 1525,
-        "lat": 35.055679,
-        "lon": -76.827449,
-        "region": "北美"
-      },
-      {
-        "icao24": "7CF8F5",
-        "callsign": "WGTL06",
-        "type": "E-7A Wedgetail",
-        "type_code": "E737",
-        "role": "awacs",
-        "alt_ft": 31000,
-        "lat": -34.689148,
-        "lon": 150.825413,
-        "region": "南太平洋"
-      },
       {
         "icao24": "7CF864",
         "callsign": "ASY716",
         "type": "A332",
         "type_code": "A332",
         "role": "tanker",
-        "alt_ft": 40000,
-        "lat": null,
-        "lon": null,
-        "region": "未知"
+        "alt_ft": 19025,
+        "lat": -34.112595,
+        "lon": 138.626862,
+        "region": "南太平洋"
       },
       {
-        "icao24": "C2C377",
-        "callsign": "HUSK40",
+        "icao24": "7CF9C8",
+        "callsign": "THUM",
         "type": "A332",
         "type_code": "A332",
         "role": "tanker",
-        "alt_ft": 475,
-        "lat": 45.310501,
-        "lon": -75.65434,
-        "region": "北美"
+        "alt_ft": 20025,
+        "lat": -24.844045,
+        "lon": 151.86448,
+        "region": "南太平洋"
       },
       {
         "icao24": "AE04E7",
@@ -562,65 +1008,32 @@
         "type": "KC-135R",
         "type_code": "K35R",
         "role": "tanker",
-        "alt_ft": 25975,
-        "lat": 37.589082,
-        "lon": -97.961718,
+        "alt_ft": 1275,
+        "lat": 37.640159,
+        "lon": -97.264103,
         "region": "北美"
       },
       {
-        "icao24": "ADFF10",
+        "icao24": "7CF9C9",
+        "callsign": "—",
+        "type": "A332",
+        "type_code": "A332",
+        "role": "tanker",
+        "alt_ft": 20500,
+        "lat": null,
+        "lon": null,
+        "region": "未知"
+      },
+      {
+        "icao24": "AE0425",
         "callsign": "—",
         "type": "KC-135R",
         "type_code": "K35R",
         "role": "tanker",
-        "alt_ft": 22000,
-        "lat": 33.969681,
-        "lon": -97.12071,
-        "region": "北美"
-      },
-      {
-        "icao24": "AE068D",
-        "callsign": "—",
-        "type": "KC-135R",
-        "type_code": "K35R",
-        "role": "tanker",
-        "alt_ft": 21025,
-        "lat": 33.92483,
-        "lon": -87.043594,
-        "region": "北美"
-      },
-      {
-        "icao24": "AE0260",
-        "callsign": "—",
-        "type": "KC-135R",
-        "type_code": "K35R",
-        "role": "tanker",
-        "alt_ft": 22925,
-        "lat": 43.957073,
-        "lon": -82.685186,
-        "region": "北美"
-      },
-      {
-        "icao24": "AE0146",
-        "callsign": "—",
-        "type": "KC-135R",
-        "type_code": "K35R",
-        "role": "tanker",
-        "alt_ft": 1900,
-        "lat": 43.108911,
-        "lon": -78.820119,
-        "region": "北美"
-      },
-      {
-        "icao24": "AE068F",
-        "callsign": "—",
-        "type": "KC-135R",
-        "type_code": "K35R",
-        "role": "tanker",
-        "alt_ft": 25000,
-        "lat": 33.201464,
-        "lon": -78.686222,
-        "region": "北美"
+        "alt_ft": 2325,
+        "lat": null,
+        "lon": null,
+        "region": "未知"
       },
       {
         "icao24": "AE035F",
@@ -628,7 +1041,40 @@
         "type": "KC-135R",
         "type_code": "K35R",
         "role": "tanker",
+        "alt_ft": 17200,
+        "lat": null,
+        "lon": null,
+        "region": "未知"
+      },
+      {
+        "icao24": "AE0654",
+        "callsign": "—",
+        "type": "KC-135R",
+        "type_code": "K35R",
+        "role": "tanker",
         "alt_ft": 0,
+        "lat": null,
+        "lon": null,
+        "region": "未知"
+      },
+      {
+        "icao24": "AE025C",
+        "callsign": "—",
+        "type": "KC-135R",
+        "type_code": "K35R",
+        "role": "tanker",
+        "alt_ft": 21025,
+        "lat": null,
+        "lon": null,
+        "region": "未知"
+      },
+      {
+        "icao24": "AE04F7",
+        "callsign": "—",
+        "type": "KC-135R",
+        "type_code": "K35R",
+        "role": "tanker",
+        "alt_ft": 23000,
         "lat": null,
         "lon": null,
         "region": "未知"
@@ -639,82 +1085,38 @@
         "type": "P-8 Poseidon",
         "type_code": "P8",
         "role": "c4isr",
-        "alt_ft": 17000,
-        "lat": -34.447586,
-        "lon": 140.350734,
+        "alt_ft": -125,
+        "lat": -34.768051,
+        "lon": 138.159142,
         "region": "南太平洋"
       },
       {
-        "icao24": "7CF9CD",
-        "callsign": "TRDT",
-        "type": "P-8 Poseidon",
-        "type_code": "P8",
-        "role": "c4isr",
-        "alt_ft": 0,
-        "lat": -34.717266,
-        "lon": 138.613563,
-        "region": "南太平洋"
-      },
-      {
-        "icao24": "7CFA98",
-        "callsign": "TRDT2",
-        "type": "P-8 Poseidon",
-        "type_code": "P8",
-        "role": "c4isr",
-        "alt_ft": 0,
-        "lat": -34.717472,
-        "lon": 138.615203,
-        "region": "南太平洋"
-      },
-      {
-        "icao24": "AE041B",
+        "icao24": "AE687B",
         "callsign": "—",
-        "type": "E-6B Mercury",
-        "type_code": "E6",
+        "type": "P-8 Poseidon",
+        "type_code": "P8",
         "role": "c4isr",
-        "alt_ft": 20875,
-        "lat": 38.623357,
-        "lon": -97.388288,
+        "alt_ft": 4600,
+        "lat": 47.667969,
+        "lon": -117.473461,
         "region": "北美"
       },
       {
-        "icao24": "AE57CB",
+        "icao24": "AE67C3",
         "callsign": "—",
         "type": "P-8 Poseidon",
         "type_code": "P8",
         "role": "c4isr",
-        "alt_ft": 22000,
-        "lat": 32.117703,
-        "lon": -82.031885,
-        "region": "北美"
+        "alt_ft": 30000,
+        "lat": -27.994095,
+        "lon": 119.767187,
+        "region": "南太平洋"
       },
       {
-        "icao24": "AE67E0",
+        "icao24": "AE678D",
         "callsign": "—",
         "type": "P-8 Poseidon",
         "type_code": "P8",
-        "role": "c4isr",
-        "alt_ft": 33000,
-        "lat": null,
-        "lon": null,
-        "region": "未知"
-      },
-      {
-        "icao24": "AE67C9",
-        "callsign": "—",
-        "type": "P-8 Poseidon",
-        "type_code": "P8",
-        "role": "c4isr",
-        "alt_ft": 27000,
-        "lat": null,
-        "lon": null,
-        "region": "未知"
-      },
-      {
-        "icao24": "C2B215",
-        "callsign": "—",
-        "type": "P3",
-        "type_code": "P3",
         "role": "c4isr",
         "alt_ft": 0,
         "lat": null,
@@ -722,70 +1124,37 @@
         "region": "未知"
       },
       {
-        "icao24": "AECD8C",
-        "callsign": "—",
-        "type": "E-6B Mercury",
-        "type_code": "E6",
-        "role": "c4isr",
-        "alt_ft": 9950,
-        "lat": null,
-        "lon": null,
-        "region": "未知"
+        "icao24": "8016E8",
+        "callsign": "116",
+        "type": "C295",
+        "type_code": "C295",
+        "role": "transport",
+        "alt_ft": 8100,
+        "lat": 27.048706,
+        "lon": 77.907732,
+        "region": "27.0,77.9"
       },
       {
-        "icao24": "AE57D5",
-        "callsign": "2011",
+        "icao24": "7CF83B",
+        "callsign": "ASY742",
         "type": "C-130J",
         "type_code": "C30J",
         "role": "transport",
-        "alt_ft": 1075,
-        "lat": 21.2713,
-        "lon": -158.123067,
-        "region": "21.3,-158.1"
-      },
-      {
-        "icao24": "7CF837",
-        "callsign": "ASY720",
-        "type": "C-130J",
-        "type_code": "C30J",
-        "role": "transport",
-        "alt_ft": 10100,
-        "lat": -28.036926,
-        "lon": 152.426535,
+        "alt_ft": 6525,
+        "lat": -33.394574,
+        "lon": 150.739765,
         "region": "南太平洋"
       },
       {
-        "icao24": "7CF9C5",
-        "callsign": "ASY737",
+        "icao24": "AE1460",
+        "callsign": "BLINR87",
         "type": "C-17 Globemaster III",
         "type_code": "C17",
         "role": "transport",
-        "alt_ft": 20825,
-        "lat": 34.199478,
-        "lon": -118.238619,
-        "region": "北美"
-      },
-      {
-        "icao24": "AE10E9",
-        "callsign": "C2003",
-        "type": "C-130J",
-        "type_code": "C30J",
-        "role": "transport",
-        "alt_ft": 25000,
-        "lat": 67.063852,
-        "lon": -157.251185,
-        "region": "67.1,-157.3"
-      },
-      {
-        "icao24": "AE10EA",
-        "callsign": "C2004",
-        "type": "C-130J",
-        "type_code": "C30J",
-        "role": "transport",
-        "alt_ft": 2075,
-        "lat": 38.813068,
-        "lon": -121.292542,
-        "region": "北美"
+        "alt_ft": 0,
+        "lat": null,
+        "lon": null,
+        "region": "未知"
       },
       {
         "icao24": "AE57D4",
@@ -793,56 +1162,178 @@
         "type": "C-130J",
         "type_code": "C30J",
         "role": "transport",
+        "alt_ft": 20000,
+        "lat": 56.940903,
+        "lon": -156.926651,
+        "region": "56.9,-156.9"
+      },
+      {
+        "icao24": "4CA420",
+        "callsign": "C286",
+        "type": "C295",
+        "type_code": "C295",
+        "role": "transport",
+        "alt_ft": 12875,
+        "lat": 53.424728,
+        "lon": -7.097168,
+        "region": "歐洲"
+      },
+      {
+        "icao24": "AE5C96",
+        "callsign": "KANTO20",
+        "type": "C-130J",
+        "type_code": "C30J",
+        "role": "transport",
+        "alt_ft": 700,
+        "lat": 35.706684,
+        "lon": 139.370324,
+        "region": "歐亞 / 中東"
+      },
+      {
+        "icao24": "AE6472",
+        "callsign": "KING99",
+        "type": "C-130J",
+        "type_code": "C30J",
+        "role": "transport",
         "alt_ft": 0,
-        "lat": 57.736073,
-        "lon": -152.505695,
-        "region": "57.7,-152.5"
+        "lat": 61.251526,
+        "lon": -149.809672,
+        "region": "61.3,-149.8"
       },
       {
-        "icao24": "ADFDEC",
-        "callsign": "CASTL30",
-        "type": "C-130",
-        "type_code": "C130",
+        "icao24": "C87F36",
+        "callsign": "KNG50",
+        "type": "B350",
+        "type_code": "B350",
         "role": "transport",
-        "alt_ft": 2100,
-        "lat": 39.727798,
-        "lon": -74.690373,
+        "alt_ft": 0,
+        "lat": -40.209239,
+        "lon": 175.399319,
+        "region": "南太平洋"
+      },
+      {
+        "icao24": "C87F39",
+        "callsign": "KNG53",
+        "type": "B350",
+        "type_code": "B350",
+        "role": "transport",
+        "alt_ft": 900,
+        "lat": -40.201584,
+        "lon": 175.369507,
+        "region": "南太平洋"
+      },
+      {
+        "icao24": "880416",
+        "callsign": "MTL221",
+        "type": "C295",
+        "type_code": "C295",
+        "role": "transport",
+        "alt_ft": 12550,
+        "lat": 14.813481,
+        "lon": 100.750315,
+        "region": "西太平洋"
+      },
+      {
+        "icao24": "AE6C13",
+        "callsign": "OTIS42",
+        "type": "C-130J",
+        "type_code": "C30J",
+        "role": "transport",
+        "alt_ft": 5450,
+        "lat": 35.885956,
+        "lon": -78.691387,
         "region": "北美"
       },
       {
-        "icao24": "AE0563",
-        "callsign": "CHILI55",
-        "type": "C-5M Super Galaxy",
-        "type_code": "C5M",
+        "icao24": "AE0816",
+        "callsign": "RCH213",
+        "type": "C-17 Globemaster III",
+        "type_code": "C17",
         "role": "transport",
-        "alt_ft": 3100,
-        "lat": 29.273621,
-        "lon": -98.546571,
+        "alt_ft": 31000,
+        "lat": 44.495636,
+        "lon": -73.827667,
         "region": "北美"
       },
       {
-        "icao24": "AE03D4",
-        "callsign": "CNV3218",
+        "icao24": "AE07DF",
+        "callsign": "RCH289",
+        "type": "C-17 Globemaster III",
+        "type_code": "C17",
+        "role": "transport",
+        "alt_ft": 36000,
+        "lat": 43.940741,
+        "lon": -88.544794,
+        "region": "北美"
+      },
+      {
+        "icao24": "AE4F16",
+        "callsign": "RCH447",
+        "type": "C-17 Globemaster III",
+        "type_code": "C17",
+        "role": "transport",
+        "alt_ft": 30000,
+        "lat": 43.133649,
+        "lon": -90.710133,
+        "region": "北美"
+      },
+      {
+        "icao24": "AE49C3",
+        "callsign": "RCH545",
+        "type": "C-17 Globemaster III",
+        "type_code": "C17",
+        "role": "transport",
+        "alt_ft": 36000,
+        "lat": null,
+        "lon": null,
+        "region": "未知"
+      },
+      {
+        "icao24": "6831F4",
+        "callsign": "RK23037",
+        "type": "C295",
+        "type_code": "C295",
+        "role": "transport",
+        "alt_ft": 18000,
+        "lat": null,
+        "lon": null,
+        "region": "未知"
+      },
+      {
+        "icao24": "ADFE88",
+        "callsign": "ROLER09",
         "type": "C-130",
         "type_code": "C130",
         "role": "transport",
-        "alt_ft": 19675,
-        "lat": 34.955237,
-        "lon": -115.399246,
+        "alt_ft": 22000,
+        "lat": 38.384491,
+        "lon": -105.825747,
         "region": "北美"
       }
     ],
+    "region_counts": {
+      "南太平洋": 6,
+      "北美": 13,
+      "未知": 10,
+      "27.0,77.9": 1,
+      "56.9,-156.9": 1,
+      "歐洲": 1,
+      "歐亞 / 中東": 1,
+      "西太平洋": 1,
+      "21.2,-157.8": 1,
+      "59.0,-138.8": 1
+    },
     "source": "https://opendata.adsb.fi/api/v2/mil",
     "trends": {
       "tankers": {
-        "d1": -30,
+        "d1": -33,
         "d7": 9,
         "d30": -10
       },
       "awacs": {
-        "d1": 87,
-        "d7": 200,
-        "d30": 117
+        "d1": -100,
+        "d7": -100,
+        "d30": -100
       },
       "uav": {
         "d1": -100,
@@ -850,26 +1341,26 @@
         "d30": -100
       },
       "c4isr": {
-        "d1": -10,
-        "d7": 83,
-        "d30": 193
+        "d1": -57,
+        "d7": -20,
+        "d30": 29
       }
     }
   },
   "firms": {
-    "total_24h": 20233,
-    "high_conf_count": 5166,
-    "delta_pct": "+211%",
-    "delta_ratio": 2.1128,
+    "total_24h": 20477,
+    "high_conf_count": 5243,
+    "delta_pct": "+215%",
+    "delta_ratio": 2.1503,
     "by_region": {
-      "oceania": 2907,
+      "oceania": 3081,
       "south_america": 4215,
-      "other": 6277,
-      "asia": 693,
+      "other": 6307,
+      "asia": 697,
       "africa": 4047,
       "europe_russia": 1433,
       "middle_east": 329,
-      "north_america": 332
+      "north_america": 368
     },
     "conflict_hotspots": [
       {
@@ -1023,6 +1514,18 @@
         "region": "iraq"
       }
     ],
+    "conflict_counts": {
+      "korea": 8,
+      "syria": 125,
+      "iran": 478,
+      "iraq": 50,
+      "ukraine": 633,
+      "russia": 59,
+      "taiwan": 1
+    },
+    "conflict_total": 1354,
+    "baseline_kind": "fixed_reference_not_7day_mean",
+    "observed_at": "2026-09-10T23:44:00Z",
     "baseline_24h": 6500,
     "source": "https://firms.modaps.eosdis.nasa.gov/data/active_fire/modis-c6.1/csv/MODIS_C6_1_Global_24h.csv"
   },
@@ -1031,171 +1534,171 @@
       "id": "EONET_24184",
       "title": "Tropical Storm Norbert",
       "category": "Severe Storms",
-      "date": null,
-      "lat": null,
-      "lon": null,
+      "date": "2026-09-10T18:00:00Z",
+      "lat": 16.5,
+      "lon": -119.9,
       "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_24184"
     },
     {
       "id": "EONET_24189",
       "title": "Wildfire MEERS, Comanche, Oklahoma",
       "category": "Wildfires",
-      "date": null,
-      "lat": null,
-      "lon": null,
+      "date": "2026-09-08T16:57:00Z",
+      "lat": 34.840579,
+      "lon": -98.67792,
       "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_24189"
     },
     {
       "id": "EONET_24185",
       "title": "Wildfire Kurk, San Saba, Texas",
       "category": "Wildfires",
-      "date": null,
-      "lat": null,
-      "lon": null,
+      "date": "2026-09-08T16:39:00Z",
+      "lat": 31.060181,
+      "lon": -98.653084,
       "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_24185"
     },
     {
       "id": "EONET_24192",
       "title": "Wildfire PINTO, Stephens, Oklahoma",
       "category": "Wildfires",
-      "date": null,
-      "lat": null,
-      "lon": null,
+      "date": "2026-09-08T12:44:00Z",
+      "lat": 34.413611,
+      "lon": -97.5925,
       "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_24192"
     },
     {
       "id": "EONET_24187",
       "title": "Wildfire Moonshine, Albany, Wyoming",
       "category": "Wildfires",
-      "date": null,
-      "lat": null,
-      "lon": null,
+      "date": "2026-09-07T19:58:00Z",
+      "lat": 41.95365,
+      "lon": -105.321617,
       "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_24187"
     },
     {
       "id": "EONET_24100",
       "title": "Wildfire S7, Broward, Florida",
       "category": "Wildfires",
-      "date": null,
-      "lat": null,
-      "lon": null,
+      "date": "2026-09-04T15:16:00Z",
+      "lat": 26.3258333,
+      "lon": -80.4997222,
       "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_24100"
     },
     {
       "id": "EONET_24096",
       "title": "Wildfire Needles, Oglala Lakota, South Dakota",
       "category": "Wildfires",
-      "date": null,
-      "lat": null,
-      "lon": null,
+      "date": "2026-09-04T13:53:00Z",
+      "lat": 43.30421421,
+      "lon": -102.311123,
       "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_24096"
     },
     {
       "id": "EONET_24095",
       "title": "Incident Complex Rattlesnake Complex, Prairie, Montana",
       "category": "Wildfires",
-      "date": null,
-      "lat": null,
-      "lon": null,
+      "date": "2026-09-04T12:59:00Z",
+      "lat": 46.586036,
+      "lon": -104.927967,
       "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_24095"
     },
     {
       "id": "EONET_2736",
       "title": "Iceberg B22A",
       "category": "Sea and Lake Ice",
-      "date": null,
-      "lat": null,
-      "lon": null,
+      "date": "2026-09-04T00:00:00Z",
+      "lat": -69.79,
+      "lon": 167.34,
       "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_2736"
     },
     {
       "id": "EONET_5359",
       "title": "Iceberg A76C",
       "category": "Sea and Lake Ice",
-      "date": null,
-      "lat": null,
-      "lon": null,
+      "date": "2026-09-04T00:00:00Z",
+      "lat": -53.29,
+      "lon": -26.88,
       "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_5359"
     },
     {
       "id": "EONET_6288",
       "title": "Iceberg D32",
       "category": "Sea and Lake Ice",
-      "date": null,
-      "lat": null,
-      "lon": null,
+      "date": "2026-09-04T00:00:00Z",
+      "lat": -57.75,
+      "lon": -37.39,
       "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_6288"
     },
     {
       "id": "EONET_6320",
       "title": "Iceberg A81",
       "category": "Sea and Lake Ice",
-      "date": null,
-      "lat": null,
-      "lon": null,
+      "date": "2026-09-04T00:00:00Z",
+      "lat": -58.71,
+      "lon": -47.34,
       "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_6320"
     },
     {
       "id": "EONET_6424",
       "title": "Iceberg D33B",
       "category": "Sea and Lake Ice",
-      "date": null,
-      "lat": null,
-      "lon": null,
+      "date": "2026-09-04T00:00:00Z",
+      "lat": -59.08,
+      "lon": -51.03,
       "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_6424"
     },
     {
       "id": "EONET_6474",
       "title": "Iceberg D35",
       "category": "Sea and Lake Ice",
-      "date": null,
-      "lat": null,
-      "lon": null,
+      "date": "2026-09-04T00:00:00Z",
+      "lat": -60.41,
+      "lon": -44.63,
       "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_6474"
     },
     {
       "id": "EONET_12716",
       "title": "Iceberg A85",
       "category": "Sea and Lake Ice",
-      "date": null,
-      "lat": null,
-      "lon": null,
+      "date": "2026-09-04T00:00:00Z",
+      "lat": -62.41,
+      "lon": -53.92,
       "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_12716"
     },
     {
       "id": "EONET_23611",
       "title": "Hurricane Karina",
       "category": "Severe Storms",
-      "date": null,
-      "lat": null,
-      "lon": null,
+      "date": "2026-09-07T00:00:00Z",
+      "lat": 23,
+      "lon": -145.7,
       "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_23611"
     },
     {
       "id": "EONET_23612",
       "title": "Hurricane Lowell",
       "category": "Severe Storms",
-      "date": null,
-      "lat": null,
-      "lon": null,
+      "date": "2026-09-10T18:00:00Z",
+      "lat": 29,
+      "lon": -168.3,
       "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_23612"
     },
     {
       "id": "EONET_23738",
       "title": "Tropical Storm Krovanh",
       "category": "Severe Storms",
-      "date": null,
-      "lat": null,
-      "lon": null,
+      "date": "2026-09-09T06:00:00Z",
+      "lat": 34.3,
+      "lon": 135.9,
       "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_23738"
     },
     {
       "id": "EONET_23800",
       "title": "Cyclone Marie",
       "category": "Severe Storms",
-      "date": null,
-      "lat": null,
-      "lon": null,
+      "date": "2026-09-08T12:00:00Z",
+      "lat": 25.5,
+      "lon": -127.1,
       "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_23800"
     }
   ],
@@ -1227,17 +1730,87 @@
   },
   "news": [
     {
-      "title": "Yemen risks return to civil war as Iran-backed Houthis target vital oil shipping route",
-      "url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxNNUtUUkVTY2pGUHNtdWNvWkdycXhzbjUxczFmTVQ2V0JQUnE4bzRkei0yTGwxWXFOQndNVThvaWwwT2tBUEszM2RfQWt4OFV6MEZENUxVeEM2SVZ0bERET1hra0hzTWxWWmFER3RXQkJqZHdVbG1yOXN4T2F5X1didHdibVhFVWtDWmdFRVhFV0FsajlqRkt2cTlBcFFXNjZXdTc5ZDZMYzZId3FJQnhfdWszWjMxd2p2Zkh2VS1n0gHDAUFVX3lxTE9GVWxHdWd4TjVsXzh4djNmeHBkdDlvd1JjTS1jb0tnbmNkazFaTXJMNUFST3JpTkdHb216VnNBLXRuU3BvS0l2OXNJU1ZvcW1ja2VCbVZHS19WU0dENERqeHBFd1VXY2hOWUc0REVFX0ctbWkyMV9MTU95UjkwVUs2NmlzanA1TUMtS3J4eHBSeDhTQ2hOMDRFbkVDQkM1NE1SdFh6OUJsemJpWlNaR3AwSUxVeUd3OFphSklma2ZsTWtjRQ?oc=5",
-      "domain": "PBS",
-      "ts": "2026-09-11T00:05:43+00:00",
+      "title": "Russia and China oppose push to reactivate UN Iran sanctions committee",
+      "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxPRHVycXJRNjRMMlNQNm5HZHJ0Zkd5Mm1EcjhoWnF1cTZzYVNRaVFXbjVLQ1JTdFFQQ2VLaE9tcmhPOGJaQTB0WjhET0dtZm85S0hLMlVhb2FaVXVxXzh1bE03RGlwUEZ4OXpwQmh4b2s3NWl3STNWZDNjVmxmVno2NUZkQXVVUldScGZpdjlPSEhEZ2lYZEx6YzdCcFlLbUdKRjJMWl9kQU5hM3NlR3pNd2NSS05kd2Nsd3UyS21ZVQ?oc=5",
+      "domain": "thenationalnews.com",
+      "ts": "2026-09-11T03:33:45+00:00",
+      "topic": "俄烏"
+    },
+    {
+      "title": "Iran war largely ignored at the Republican midterm convention",
+      "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxPX2RGbHZpVzZOQUdHMVRRSUNaSUdKTHJzUnFzRzFKc3ZmNk5FNnk2MTV1TmFsV3VpWkhMbWQxV0VnVWZDV2lsbjlaa1gzaGREN1BNTG9Xeno2UmxmR1NzVVNQM3ViVjZqZEZlVHlsR3ZRTkZiZ3poaV9sZWVUbkdzVkpfbTc3RVRxaUFaTUJKUHNzWTRhREF2akFSV2o4WE9ZNThrQ18tdjlJZk9aMWYxa2x5R0xjLVlhWC1n?oc=5",
+      "domain": "NBC News",
+      "ts": "2026-09-11T03:23:00+00:00",
       "topic": "中東"
     },
     {
-      "title": "An Israeli strike in Gaza kills at least 4, including children, and other Mideast developments",
-      "url": "https://news.google.com/rss/articles/CBMipgFBVV95cUxNMi1lNm91a2VNZ2pET3pySXpRdExjT01OZ2dTbmxRblk4ME5ZZko0aElVbFdrV1gyY2VWcmJPUkREbWZBdGNJYmZyQmIwOVVJWmdyT3J1cHhhTzNCTFlTZzN5UEk1bE5DVVl5bDhaVkh6Q0xDcEtkVWM5SEtGb05XcUc3dGh6dUZEOWQ3czNqWndFelg3ZEJtSXZlcXNPalFCSF9LbWtR?oc=5",
-      "domain": "AP News",
-      "ts": "2026-09-10T22:20:00+00:00",
+      "title": "Ukraine war briefing: Nato ‘foils Russian undersea cable sabotage drill’",
+      "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxQMWNZTmJyMWFFX05iclJhSXo4clItb2JtdGhReDVOaWtMNjZzYl9uNEFMeDE4N19TNl9jR0hVWExWZXowaUdlSWExYTJ3R1BJS1BKamVZc3NfclZpcnQwRVlOYmNzQnYySWtQWGFMdklqUEtoaUdKeTVsVkd1UUs1cnNmaGM4M2hHNWt5ZlJzdGw3SW9UMldPYlNPVUVramprdWdXNVRhcG1UNmh1Y3k0ajMxOUI3UQ?oc=5",
+      "domain": "The Guardian",
+      "ts": "2026-09-11T02:33:00+00:00",
+      "topic": "俄烏"
+    },
+    {
+      "title": "Houthi rebels take key Red Sea city in Yemen, as Iran’s wartime leverage grows",
+      "url": "https://news.google.com/rss/articles/CBMirgFBVV95cUxQWUYwT2ZBY29SQkhnbTRHTnIxTXVTWndGampQSVo0VlpHUkdDb0lGTkZOMXB0TFVxcEFFcVpWcUZ5RHNEd3NuZTk0ZnZBaFBWU1ZrN3hGNEdHVGtjWkJ5WF9xMU5tUnJlQWl1U1RGWVZuMkhFbjdvRHEtTmw1a2FmRVJ2d2phMTM3V0hLY3poSF9tME54RkZnand2VUV4TW50YnhueDlnc2p6UUp0VEE?oc=5",
+      "domain": "washingtonpost.com",
+      "ts": "2026-09-11T02:25:12+00:00",
+      "topic": "中東"
+    },
+    {
+      "title": "Trump says he has no regrets about starting the Iran war as U.S. dials up economic pressure",
+      "url": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxPaDdpRzBrT19IbmVjTHhNTlVZTGl6TjdqWFF3a1o2MnBrMmJSUHdEaWRVUnpJVjNyNGdra0thd2RuQnJOWWl1czBKTXlPNDR3TVJXbHR2OWpvNU9wbmxFZEpOQnVpejJaQnhseS1rSmVfMWRIOFp0WTJKczNVUml3SnFKcjdnZUF20gGOAUFVX3lxTE92bWZWZzlSTGIwYnBDM3lTSHctMFNNdFhsTm5GUXNNcGpwYi0zQ3E3YXF5bllSdGRvUDlkMnlnODBXcGRTS3FMWmtldFlJeUF1XzZBcGc1a01aM2s3OFlXSHMteWpGQTcyd2RlckducjNOU1NOc2s5aWFKakF3b0xINFJhTW9Gd1o4Uk5wY2c?oc=5",
+      "domain": "CNBC",
+      "ts": "2026-09-11T01:43:00+00:00",
+      "topic": "中東"
+    },
+    {
+      "title": "Behind the Scenes, Vance Gathered Unvarnished Views of the Iran War",
+      "url": "https://news.google.com/rss/articles/CBMiigFBVV95cUxPdDc4c2JiRUtCb2Z1cVpwZE83UWtvN2Zmb1RmQ1VXTEV6VGFiY3FFTWtSd05pNnR0UUktVlcwSGdFT2MxWExrSERfX2JxZVlPcGJJbVRtak5zal82UmFqRFhKU01KLVhpWGpSc1dpVFJRVGhXUy0tUW1jU2NQY2d6QWR5d0NYSXVFVnc?oc=5",
+      "domain": "The New York Times",
+      "ts": "2026-09-11T01:17:31+00:00",
+      "topic": "中東"
+    },
+    {
+      "title": "US issues new sanctions targeting Iran’s proxies",
+      "url": "https://news.google.com/rss/articles/CBMijwFBVV95cUxPTlJrbGVJNFNNckhOUHZtUUpGTVRZSjVwb2U5REluc0RQdWRhMnR5RkZVaU5lQ2lQdmJ2a2hKaVNWeEdYR2s4bERZWUlXSGNzdVRiM0hldEg2YUh0VUNYSG0wOVlSZUFqNEZBanNNSkRDS2d5anJZZkNfeTN2WmRQT1AtYUhLTnZiUG03eEZnSQ?oc=5",
+      "domain": "Anadolu Ajansı",
+      "ts": "2026-09-11T00:56:51+00:00",
+      "topic": "中東"
+    },
+    {
+      "title": "Bessent says 'a large bank' will be sanctioned on Monday as part of Iran strategy",
+      "url": "https://news.google.com/rss/articles/CBMidEFVX3lxTE5hRjZwbjNmOUdKVjQ5ZVVIZmVQSXB0Z1BoV1BORjdNeUpYTV85UVNGbmJKd1VzQXVBaVdHVmdlREo3SlZlM2RPejZCOE5PWjlvMEVOSHJCS1lGS0RfUmkyeUJDcmZib2dsYmw3bElaQmdGX3Jm0gF6QVVfeXFMT0E3MGJucVFXdU9uVE5aQWJBLUk4YUI5VXNHWmloV1M0MWtNc2tPQm10YmRKczA3bHVhWktCdFd3N3VQcG5CNzBhTVJybVBUWVNRYWt0SWE3ekQzWnZ4bVhHekRKRThSa3ZsMUVUS2lEalF2UXJwb1FxRUE?oc=5",
+      "domain": "CNBC",
+      "ts": "2026-09-11T00:54:00+00:00",
+      "topic": "中東"
+    },
+    {
+      "title": "Trump says he does not regret Iran war despite impact it may have on midterm elections",
+      "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxNZmZLSXdlTkU0cmx1cTlYYV9KVUliY1k4aUNpNjQxZ2ZyamhIWklodVVZTW1rZkhhNEpwQmM0dFQycmhpR2NzeGVReVYyYjNtV281QlpyMDVHeFUzLTUteGc1NTl6SWhUdzQyZUtlblFkdTVPYUZ0bkt5WTg5dm9walJFeUE0aWJrQjVjZk5KY01OUUFPeHZ4b2pWVGZybWtIb3NOOVFBak9ZajA0WlQ3T3FzeHV2Zw?oc=5",
+      "domain": "Reuters",
+      "ts": "2026-09-11T00:16:00+00:00",
+      "topic": "中東"
+    },
+    {
+      "title": "Trump: I have no regrets over Iran war, I'd do it again",
+      "url": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE1XUHI4TEZlVGZtZDlFYXFuR2tsUmw1enMwZWkwWHpPV1JNR2c0RmFsU2hFb0pKd2k5UExNMjVrZC00NDYtV2dhNV9ZTXZTUWVFQ3VjeldneUxDZw?oc=5",
+      "domain": "Israel National News",
+      "ts": "2026-09-11T00:11:26+00:00",
+      "topic": "中東"
+    },
+    {
+      "title": "Yemen's Iran-backed Houthi rebels seize strategic Red Sea port city of Mocha",
+      "url": "https://news.google.com/rss/articles/CBMihwFBVV95cUxOUmhxMGpwcUp4ekxXQnBpSUMxazB5dnZfb2JVQThIb0c4Tk15TklsNDhyVmEwMHFTV3kwWm5JUExnbld4SkVIQ25jakVoRzNNR1UtLW80R3FfakwzVTVTRnZ3OGJCTGNYUWh0VzFHd1FQTUktQ1lPZEJUeWxDcWMyalBDazVXZGc?oc=5",
+      "domain": "France 24",
+      "ts": "2026-09-10T22:55:00+00:00",
+      "topic": "中東"
+    },
+    {
+      "title": "Watch Rep. Crawford: Iran Ballistic Missiles Remain Nuclear Threat",
+      "url": "https://news.google.com/rss/articles/CBMirgFBVV95cUxNU1JEdXdrYzZ6RUc3S1NscUtpdS1fcEJpaHJob3RsaDhDd1U1SmJrdVVfVjdxYm13TFc0Zlo2TzJDMjdfY0tUUUZYSjAwcEJGd0t1UHppY2g2Q2haX2t4RTF5V1Y0dVdwVG1LcjNzdFdqM0NScExXR0VVclp5TGFGeVdLeUFmMmV6WG16Mmx6eWZBRmtKVXNwU3U4YzdBclU5TWFPYmlaMnBPVFowQWc?oc=5",
+      "domain": "Bloomberg.com",
+      "ts": "2026-09-10T22:46:23+00:00",
       "topic": "中東"
     },
     {
@@ -1245,20 +1818,6 @@
       "url": "https://news.google.com/rss/articles/CBMimgFBVV95cUxNaFhUYUhHOUpHTEZrTmhmbllNR0s4WXJxZUlLZnVadWxmbXE5NGV0a2xzd3NLNDBRcW0wR2laRnpGUUNxTkppeW9CdzhZRFNjY1gyQWRIcTZMZFFqOGRseGE1TmxwSW9nMTdTNmVfcTMwSzd1bkZwOW85SUhMUVpZMEJlS05sX05rNGsxc1AzWEVjVm4wTmhYVEZ3?oc=5",
       "domain": "Time Magazine",
       "ts": "2026-09-10T21:53:30+00:00",
-      "topic": "中東"
-    },
-    {
-      "title": "Russian strike hits shopping centre in central Ukraine",
-      "url": "https://news.google.com/rss/articles/CBMikgFBVV95cUxPYzFNUEpSZGdUM3VzUFBJTGR0cWRLT0pyWXpla1NEOWNYSEZod0t2NlMwZ3hlUExpTkozSG13b2Q2Sy1FZmFZRXJwY2dGZTV1RUtZc1M4VjhJZXI3NlAtQm84Z1hJRlN2U0lhSmE1TjQwMDZza2Q5NU1uZHNsTGU0QVNDWnVwVzFnNmY0d0dkc0k2d9IBlwFBVV95cUxOaVlnNnFabzJYWkM0YmNzWDhONHQ3QldJU0hKM2d3ZEdGRU5KRHRWSjRZeHZXTWtyTEc0RTdKSEc5TV9ORk9WZ0w1QjBXS0dPazgydjJVamNFbjFhTXozeXFtMHFkbG5EMkRPUVd5X3NaNmYxV1U2VmNMaWF3MHlScFpmNDkwSXBNTjVLZS1BbndwSmxORThV?oc=5",
-      "domain": "aljazeera.com",
-      "ts": "2026-09-10T21:27:09+00:00",
-      "topic": "俄烏"
-    },
-    {
-      "title": "Behind the Scenes, Vance Gathered Unvarnished Views of the Iran War",
-      "url": "https://news.google.com/rss/articles/CBMiigFBVV95cUxPdDc4c2JiRUtCb2Z1cVpwZE83UWtvN2Zmb1RmQ1VXTEV6VGFiY3FFTWtSd05pNnR0UUktVlcwSGdFT2MxWExrSERfX2JxZVlPcGJJbVRtak5zal82UmFqRFhKU01KLVhpWGpSc1dpVFJRVGhXUy0tUW1jU2NQY2d6QWR5d0NYSXVFVnc?oc=5",
-      "domain": "The New York Times",
-      "ts": "2026-09-10T20:38:27+00:00",
       "topic": "中東"
     },
     {
@@ -1274,66 +1833,11 @@
       "domain": "Reuters",
       "ts": "2026-09-10T20:32:11+00:00",
       "topic": "中東"
-    },
-    {
-      "title": "Trump says the Iran war is worth the price. The bill keeps growing.",
-      "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxNaDdtM3hkMy1QRlRva2pOdWpSTHFuSmxuR1RZOFZqWDE5cDZnVkc3V2g5Z0JLY09sRVBGUXBTSk5DY2dsTmN1S3RDYWdWVktOcVlpeFNZdXNVYkVkYW5uWHNSYVp1RkNNcl9MSjFWVGdiaUFRcnFkZmRydU1COXhXdHQxcmJRTldNOHJFb1A3SHVmUlVVbXVqZGVQbWhYRnJPOVpZVTBnQ1gyWUY3NDQtZ1NiX2JFdw?oc=5",
-      "domain": "Politico",
-      "ts": "2026-09-10T20:30:00+00:00",
-      "topic": "中東"
-    },
-    {
-      "title": "Russian strikes kill 15 in Ukraine as Canada offers aid for air defences",
-      "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxQNHFka3hjaHZQXy1CMHJmckVoUjlVS3Ywbmt3eFJRcFJ3YWhmNzZacy1lWWdFNFQwSEZLbmE3eU1qYUNONWw5eGl5UjYyaWdVblBqeHNOSlRpTlpLYVZsYlQybGthTzZrTXhMNWNyVmpZc003a291TW00TjB0SHNuRzhZMm85bUVDaURYdVBuc1ZMYnZOZHo5NFI2c1BHUFdBNFpYdzF4Y2cwS25XVFRXcDcxWXlCUm_SAbwBQVVfeXFMUFo5TW1OeF9IalExb3RiMlJ4SHRHRUFJaHdONFpyV2JRRUJrNFJFUGNDc1lVYy0wUVhhMGdLZ2VNOG1yQl94R2JDeFFsRWVEYTZnMHZhLXNLdWNKVVF6LWZrT2VkVzd3cEVfd2hjSmRIUllLcm4xcV8za0djU3kyUXJkTlB3UTB6djFROExKQ0J6TG5aWEhaazNCa2tINFQwY0tpalBmZW55MGI0WF9FNkJrYml2UUV3Q0ZTMnA?oc=5",
-      "domain": "aljazeera.com",
-      "ts": "2026-09-10T20:06:03+00:00",
-      "topic": "俄烏"
-    },
-    {
-      "title": "Trump on Iran war regrets: \"You can always question yourself a little bit\"",
-      "url": "https://news.google.com/rss/articles/CBMie0FVX3lxTE5pc19CZFZSSS1aYjAyZUhWb0RaQzIyVE9tUTFseEtBZllmdC1yOW5vQzZDVkZ1Rnp5NVhqMF92SXFwUU1ub1N1WkFlbF9YT0laTXBDbFhDVHQwcjkya0FXa2NSb1ZJeC14SmJfYjNJSjRuNHNtQ0c5NXpKdw?oc=5",
-      "domain": "Axios",
-      "ts": "2026-09-10T20:02:23+00:00",
-      "topic": "中東"
-    },
-    {
-      "title": "Iran is producing ballistic missiles again: Report",
-      "url": "https://news.google.com/rss/articles/CBMifkFVX3lxTFB2a2VfR210Ri00YlR4QUE5VkhYLWlUQm5QdlU2VTFYNTFJbXVzQVMzeEs0SWZWOExzZWlJeGhGU0czRjZDaHRhSWYyRkdWem1Td1dxQkJZV1VhdTdtenAwYkNnc0g1ODBkNVZRMzB2cVd5RnYwUDdxSi1sRUFkUdIBgwFBVV95cUxOY2owVk5zZkRqWHVoM0tkd2dmM0x5aDNqVXRIQkVMM2NGb1lUNlBybmR5eV8xaURidzZXNjVZSmtqREZIc2tBanRVTGNDZE9ZSTNGNmZoalVaV0VZVHVsbHoxWjdPRkZCREFJM200ek9iZDl6WDV6T0hCMXN6LTJBMTBYYw?oc=5",
-      "domain": "The Hill",
-      "ts": "2026-09-10T19:42:00+00:00",
-      "topic": "中東"
-    },
-    {
-      "title": "Saudi Arabia Is Becoming Ground Zero for an Even Bigger Iran War",
-      "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxNc2VIbDl6V3pGVkVYaUtGOE5KdkswV3hpUGhxclBGWG5DR21QRDM3R0ZvMEctendFMTA3TGt5RzlWaWFDNC1UejE4b0lTSjRfc1VZRDBYaE9lMUhtQmhnaEN0UnJ2UjFaUjVsUUI4RmNmVm1xTjZGRlpNZG15S1BnNUhKX0tMa1NnRUs0Vzd5RDRTcThWWW9QRTM5ZWhBbjQ?oc=5",
-      "domain": "Newsweek",
-      "ts": "2026-09-10T19:29:00+00:00",
-      "topic": "中東"
-    },
-    {
-      "title": "Orthodox church sends medieval prince’s remains to Russian troops in Ukraine",
-      "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxOWnBDY21uSzQ0emUxSy1KdjFhWERud0R6bTFBVXFva2dudHFkNjhRbEJwZlRuX2U1NnVHVUxlY0Nfc216SGJBX3hlNllCOEJPWU1wRTdFaEhDcGhDdnUxa2hYcjFEVUJvRHNJT1BYVVpEMWV2U0M1RDJRSHk0MlVOUTNjZFJ5LUgxZWx4Smd0SVJGT1FVS2Z4Q29LTS1UcE5PSko0T3JPaDh4LU9PQUxObERqM0QwV002Z3c4?oc=5",
-      "domain": "The Guardian",
-      "ts": "2026-09-10T19:21:00+00:00",
-      "topic": "俄烏"
-    },
-    {
-      "title": "Iran war costs US households $860 more in higher energy prices, economist says",
-      "url": "https://news.google.com/rss/articles/CBMirgFBVV95cUxPMjlDMlJUWXQtNVZlN2hoMnZtUnM2eGdrX3JqZ3ZNNDVIdjBvSmF6dXRKWGp3aEpGM0IwMno1c3FPWEUyQ1dxZTY5NmpzTmNlTWVUelBjaU5rdFhBLWxsRUdaXzRLSXc5aW1TMmtYYUVwNllLQ3F0eDAzRUxwVkt0OXFHcFlvNFVLWWF2MmFBd1BjVEpXeXpBMmtOZFV2V2RrdWVWQ1FSUl9uM3YyckHSAbMBQVVfeXFMTjBJbmEwZEwzX0xvRFBxOEdzOEpHWS10amFwcHExNE83WkR5dE14UGZEaVpCYnB6WHV6VHN2Y2FKMEQ5V3JraV91ckVVU3RIS0d5a2xqWWVqVmhNdmdzX0NMbjJPRjFFU1ptbWpDdDFjSWZGaENIdUdoTGx5NzZRUTRQeUhscWM1M2E4RVlIXzNhaWVnVnFEUzBLLTNEenU5NVhvVDBFU1ZKRXdHdWdrNmg2aWs?oc=5",
-      "domain": "Fox Business",
-      "ts": "2026-09-10T18:23:00+00:00",
-      "topic": "中東"
-    },
-    {
-      "title": "OFAC Issues Expansive Sanctions Targeting Iran’s Civil Aviation Sector",
-      "url": "https://news.google.com/rss/articles/CBMipgFBVV95cUxPOXlWZldkZndVU1N3ck1vVHFjM1Vtem93SWFDeEZKN2swSkhNRlZmTzRWX21XTDE1QjVGUmFRbDFpQVAtUjM1V0s0ZmJBVXRraGlRUXhkeHVYMC1Ud3I2RVVBeVpTSlNMRmYxRVl1aEFoRGo3S3hkTzZZVzBfckJlclp6T21WTkptN3hfbm9HRXpJQmxXNngzZ1lDZUNDanZHdlI4OF9R?oc=5",
-      "domain": "globaltradeandsanctionslaw.com",
-      "ts": "2026-09-10T17:58:14+00:00",
-      "topic": "中東"
     }
   ],
   "food": {
-    "updated_at": "2026-09-10T04:57:11.018793+00:00",
+    "schema_version": 2,
+    "updated_at": "2026-09-11T04:04:28.079753+00:00",
     "ref_month": "2026-07",
     "prev_year_month": "2025-07",
     "exporters": [
@@ -1351,25 +1855,56 @@
         "name": "大豆",
         "wan_ton": 975.1,
         "prev_wan_ton": 1076.5,
-        "yoy_pct": -9.4
+        "yoy_pct": null,
+        "incomplete": true,
+        "reporter_codes": [
+          "124",
+          "76",
+          "842"
+        ],
+        "reporter_codes_prev": [
+          "124",
+          "32",
+          "76",
+          "804"
+        ]
       },
       {
         "cmd": "1001",
         "name": "小麥",
         "wan_ton": 17.3,
         "prev_wan_ton": 35.0,
-        "yoy_pct": -50.7
+        "yoy_pct": null,
+        "incomplete": true,
+        "reporter_codes": [
+          "124",
+          "36"
+        ],
+        "reporter_codes_prev": [
+          "124",
+          "36"
+        ]
       },
       {
         "cmd": "1005",
         "name": "玉米",
         "wan_ton": 7.1,
         "prev_wan_ton": 0.1,
-        "yoy_pct": 9600.3
+        "yoy_pct": null,
+        "incomplete": true,
+        "reporter_codes": [
+          "76",
+          "842"
+        ],
+        "reporter_codes_prev": [
+          "251",
+          "76",
+          "842"
+        ]
       }
     ],
-    "breadth_up": 1,
-    "note": "出口國回推（因中國停報，改由各主要出口國「對中國出口」海關數據回推推估）· 月資料約 3–4 月落差 · 結構性背景指標"
+    "breadth_up": 0,
+    "note": "出口國鏡像合計（涵蓋範圍有限，缺值不表示中國停止公布）· 月資料約 3–4 月落差 · 結構性背景指標"
   },
   "food_hist": [
     {
@@ -1844,23 +2379,59 @@
     }
   ],
   "strat": {
-    "updated_at": "2026-09-10T05:00:27.393072+00:00",
+    "schema_version": 2,
+    "updated_at": "2026-09-11T04:07:01.224755+00:00",
     "ref_month": "2026-07",
     "prev_year_month": "2025-07",
     "items": [
+      {
+        "cmd": "4001",
+        "name": "天然橡膠",
+        "use": "輪胎・密封件",
+        "wan_ton": null,
+        "prev_wan_ton": null,
+        "yoy_pct": null,
+        "anomaly": "partial",
+        "incomplete": true,
+        "reporters": 0,
+        "reporters_prev": 3,
+        "hi": "進口高於比較期；可能涉及民用需求、價格、庫存與申報時間，原因待查。",
+        "lo": "進口低於比較期；可能涉及替代來源、需求與申報時間，不能推定動用戰備儲備。"
+      },
       {
         "cmd": "2604",
         "name": "鎳礦砂",
         "use": "特殊鋼・超合金",
         "wan_ton": 1.1,
         "prev_wan_ton": 614.9,
-        "yoy_pct": -99.8,
-        "anomaly": "partial",
+        "yoy_pct": null,
+        "anomaly": "",
         "reporters": 1,
         "reporters_prev": 2,
+        "reporter_codes": [
+          "36"
+        ],
+        "reporter_codes_prev": [
+          "36",
+          "608"
+        ],
         "incomplete": true,
-        "hi": "不鏽鋼、噴射引擎超合金、電池用鎳需求升高，指向軍工/國防產能擴張",
-        "lo": "改用庫存或冶煉調整，也可能反映製造業放緩"
+        "hi": "進口高於比較期；可能涉及民用需求、價格、庫存與申報時間，原因待查。",
+        "lo": "進口低於比較期；可能涉及替代來源、需求與申報時間，不能推定動用戰備儲備。"
+      },
+      {
+        "cmd": "2610",
+        "name": "鉻礦砂",
+        "use": "裝甲鋼・不鏽鋼",
+        "wan_ton": null,
+        "prev_wan_ton": null,
+        "yoy_pct": null,
+        "anomaly": "partial",
+        "incomplete": true,
+        "reporters": 0,
+        "reporters_prev": 2,
+        "hi": "進口高於比較期；可能涉及民用需求、價格、庫存與申報時間，原因待查。",
+        "lo": "進口低於比較期；可能涉及替代來源、需求與申報時間，不能推定動用戰備儲備。"
       },
       {
         "cmd": "2601",
@@ -1868,16 +2439,26 @@
         "use": "鋼鐵（戰爭核心）",
         "wan_ton": 9034.0,
         "prev_wan_ton": 10011.5,
-        "yoy_pct": -9.8,
+        "yoy_pct": null,
         "anomaly": "",
         "reporters": 2,
         "reporters_prev": 4,
+        "reporter_codes": [
+          "36",
+          "76"
+        ],
+        "reporter_codes_prev": [
+          "36",
+          "699",
+          "710",
+          "76"
+        ],
         "incomplete": true,
-        "hi": "鋼鐵產能全開（造艦、彈藥、基建），強烈的備戰/擴產訊號",
-        "lo": "經濟走弱，或改用國內礦與儲備、降低海運遭封鎖的曝險（戰前也可能出現）"
+        "hi": "進口高於比較期；可能涉及民用需求、價格、庫存與申報時間，原因待查。",
+        "lo": "進口低於比較期；可能涉及替代來源、需求與申報時間，不能推定動用戰備儲備。"
       }
     ],
-    "note": "出口國回推（因中國停報，改由各主要出口國「對中國出口」海關數據回推推估）· 月資料約 3–4 月落差 · 單月僅供參考、看趨勢 · 抓不到經俄/伊等不通報管道"
+    "note": "出口國鏡像合計（涵蓋範圍有限，缺值不表示中國停止公布）· 月資料約 3–4 月落差 · 單月僅供參考、看趨勢 · 抓不到經俄/伊等不通報管道"
   },
   "strat_hist": [
     {
@@ -2163,17 +2744,59 @@
   ],
   "tw_news": [
     {
+      "title": "顧立雄曝台海戰略！鬆口國軍作戰準備「開戰不等美軍」：計畫沒把美軍介入當前提",
+      "url": "https://news.google.com/rss/articles/CBMiUkFVX3lxTE11OVl1RmdXNlh3cWlHcWpoYS1vSEZiTW9OYUwydlVxNWVrbWkxeW5hU0UwbXg3RU1GbWZNc0FIWHYzVzVTUWQwTUNLNjVoRG1VNEE?oc=5",
+      "domain": "鏡報",
+      "ts": "2026-09-11T04:03:54+00:00",
+      "topic": "台海"
+    },
+    {
+      "title": "9月11日台海早資訊",
+      "url": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE1EWGlmY0RhN0dMZHBib200dk53XzVyak1HZF9Sb3NILTNCQWZ1MUc1b21YWHgzRlJycHI2MkxzSjRJUzRoMWI2UEREcDhDRzF5eWtSN3k1cEhqTTZPeFVhSG90Z1dOZw?oc=5",
+      "domain": "hkcna.hk",
+      "ts": "2026-09-11T02:44:00+00:00",
+      "topic": "台海"
+    },
+    {
+      "title": "中國Kimi模型遭控「偷用美國AI」 解放軍監控資料意外流入Anthropic",
+      "url": "https://news.google.com/rss/articles/CBMiXEFVX3lxTFA0SXpYTTZZTnVlRU5XX1hzZjdDNUdDLXdybHV3MXJRYVFhS0sxYjBDMHEwMjJZNElUa1dJVjVyV2VTc0lGaHdwSG1pbFB6T1p5blZrR29vdEtUWmJI?oc=5",
+      "domain": "太報 TaiSounds",
+      "ts": "2026-09-11T02:43:16+00:00",
+      "topic": "台海"
+    },
+    {
+      "title": "中共21機艦船台海周邊活動　國軍嚴密監控應處",
+      "url": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE1vSTQ2YWEzLTVnWE5wVzNpT3NDXzVTMnJyUDlHRHNvT3NYMkptRThzekdOS3Z0VWR5ZTBFUjZSallWSng4WE5FMTZyd0pTbkRDc1NCdVR2ZGo1Z9IBX0FVX3lxTFAwdGdEeUtGZnFidHdxelVaWHBLRTJhUzZEUlV1Rk80MWhiZ1NoWkRNRVBhdUx6TkpJUVJ4aVZRck9fOGhoZlJNeThCQ3RORk1UcnBuT0Zpak5ibkhTTFNV?oc=5",
+      "domain": "經濟日報",
+      "ts": "2026-09-11T02:01:12+00:00",
+      "topic": "台海"
+    },
+    {
+      "title": "中共解放軍臺海周邊海、空域動態",
+      "url": "https://news.google.com/rss/articles/CBMi_AFBVV95cUxPNmM0OS1DY0stOF9nVVhoODhlcjY1cWNOQUFoQzFwYXB5Yi11dG5JaWdlcmNCek4yNGlpRjNwYlcyRVZYNjdOSk9oVEI1V3VtMlZWNGFwT2x6OGhvU1NwM0g4dmRBS1p6MFEzS3ZEcW4xVWJiQUtaOFJOcDVET1ZSa0hDTlpmZlVrd21tSThRNUl6enZOTFhLQk4tUWl4dFYtU3oxVkV4SG1iYmtjV3VpWWlrZmxiOW01enZocDBuU0l2TDJra1I3QUl3RFM5WENWMXZsOEVxOWZlXzJRdVI1SnBnUDdaUkJsMm9CWFVTakNvRC1rMy05c3g4d2E?oc=5",
+      "domain": "Yahoo新聞",
+      "ts": "2026-09-11T01:29:45+00:00",
+      "topic": "台海"
+    },
+    {
+      "title": "中共21機艦擾台 國軍嚴密監控適切應處",
+      "url": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE8yOUVvYzBJTkFKaWFyYy0wQzNCRVpaT2pPTGE4QW91Zk5WeERDVFVXMWpjczVOSEVtanNLMlVlNkZnd0lsRWR0ckJXa3p6TnhEeUgwSV82eW90c1NrNF9oWNIBZkFVX3lxTE9fZXpXQkJnbTB1Z1ZmZVhyemN1Sjd4cEUtS3o0YnhXU2VpT1BaVXYzWHROWnJkSjNwY21lbWp0OUM4YTI5YWlPMksyeENIaUkzZUNPdHNrZGc2dE9UcUFvWjlUTS12UQ?oc=5",
+      "domain": "自由軍武頻道",
+      "ts": "2026-09-11T01:19:00+00:00",
+      "topic": "共軍機艦"
+    },
+    {
+      "title": "陸克文示警台海風險 北京恐2028年對台動武",
+      "url": "https://news.google.com/rss/articles/CBMiYEFVX3lxTFBEaC0wTnk5YXA3cHhkRl9DWF9kVl8tVjF3R2VLV1gtcFZGeUNXOUJSZWJJYVgwV0RjdDlXcTU0Tl94eUd3TlpuUm1aVlhGSGwwVlRiYV9FY2cwXzRkcDlsc9IBZkFVX3lxTFA1bjFTaXU4a0FvR1E4SUlCTlk2T0hyS19EckxEbDZNTm9jWUh5UXVPOVBmTXYzOXUtTk1pNjFIaFhkVXdHQzBjeHV4LVQwLTAyYTA1TjVrTVhjS2xxR1JVdlhyQ1lkUQ?oc=5",
+      "domain": "大纪元",
+      "ts": "2026-09-11T00:41:00+00:00",
+      "topic": "台海"
+    },
+    {
       "title": "陸文浩觀點：共軍2030能犯台？兩棲戰力還差多少？ | 陸文浩 | 評論",
       "url": "https://news.google.com/rss/articles/CBMiTkFVX3lxTE9Ga3RYTWRZcHpMb19CZWtWaXRmQkhCZ00zYml3TDdjMUJ0TkNOaXNMWlVfQkVoWkZNV19MQVdGWmF4enVPeGFJOGlCMmNRdw?oc=5",
       "domain": "風傳媒",
       "ts": "2026-09-10T22:50:00+00:00",
-      "topic": "台海"
-    },
-    {
-      "title": "真實事件改編台海諜戰劇《交鋒》熱播- 中國",
-      "url": "https://news.google.com/rss/articles/CBMidEFVX3lxTFBrRldiNVVrNHBtOE92aTlLbmVuckZNRC1aN0dlTThUM1RtejBEZjlWaFVMTUE1ZVNhN3NqOW1qTGVLbFNrUnphcG5FX21OQWg5NjFIb1BrbHF0T3JoLU1jT3pkUzJPQ2M1WEtTTmIxaFpWN2xt?oc=5",
-      "domain": "大公文匯網",
-      "ts": "2026-09-10T20:18:17+00:00",
       "topic": "台海"
     },
     {
@@ -2193,7 +2816,7 @@
     {
       "title": "台軍：解放軍27機艦船台海周邊活動",
       "url": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE9vTkdsT2pJc1pBQ1Bja18zR0hhdUtVOE1ieXhOdThnTTdwV2RIU3VMS1NjdzVzeWtCd2tZZVFfRmhfZEgwdk13cXdzMEhSVGRDd2YzeW5KWVFrN0oxMXZpWGpLTGtQUQ?oc=5",
-      "domain": "Hkcna.Hk",
+      "domain": "hkcna.hk",
       "ts": "2026-09-10T13:14:00+00:00",
       "topic": "台海"
     },
@@ -2203,52 +2826,10 @@
       "domain": "中時新聞網",
       "ts": "2026-09-10T12:28:15+00:00",
       "topic": "台海"
-    },
-    {
-      "title": "晚安快評》美國的台海戰略底牌（何溢誠）",
-      "url": "https://news.google.com/rss/articles/CBMibkFVX3lxTE1xeFMyWVJuVV9zWV9NUldlbm5lMDRNdXlVS3AxUUZNRUZSWklhcTlZbUxVM0pSTVB2NUVFX2FZYVhfVEFlcWItc1hkcTBLaEJMSXYzdHl4bHBFT0JrMzhkVTBsS2xPVkNpVFE3LTNR?oc=5",
-      "domain": "中時新聞網",
-      "ts": "2026-09-10T12:00:30+00:00",
-      "topic": "台海"
-    },
-    {
-      "title": "台海空中交鋒！ 美軍P-8A遭共軍連3次廣播驅離- 政治",
-      "url": "https://news.google.com/rss/articles/CBMickFVX3lxTE1zYTllWFZ0NUprd1FHSmlqQ0xSbHhQU2NJZ052ZmJSVVRSSEJhbHZzNTFUeVFNTFdOdVB2QTJXOTByZkIxUTk2X0NkMXFrVHJkXzR1eEJ1ZklYekpLRldXQ29PQ01IN0hkQmhXR0hQV0hqZw?oc=5",
-      "domain": "華視新聞網",
-      "ts": "2026-09-10T11:20:00+00:00",
-      "topic": "台海"
-    },
-    {
-      "title": "川習會前關注台海 谷立言：衝突恐重創全球經濟",
-      "url": "https://news.google.com/rss/articles/CBMixgJBVV95cUxNWGc5QWdnQXhUTUNnb1RTUnEtUWtPcEdkQ01Bci1icTAtMzZQRWVYWWlSZk5yT2VFTUg4bnhuYjNmUEJiLVVEMWdsc3JhdkhubTBPaHNuQjRyenp5aFBzZUtWa2hDeTJrdmRLRE1ueTBLRlNCamk1cm54d2lOOWgtbWFvZC1YLTJFZnJGRU9qVnVpdE1KVW1oMTlUVTl5T2VjQllWQUtlU1d0eUY3OEJCMjc3cUh4WGVyQU96UDNpVTBsMDJVYldLcGNjb09KZ3Uzc2ZYamI2TlNwQjlNLUpfRko3SzBNOXNfeUVoWU90cTRpX185WjlMNExMcWh5WEpVUGp1Z2txQlY3TGlDNTc4T0JjVHF6cDRTQmNGdXBkQzJWWmxmeV91U3ZjcHdHTk8xYllOVzJBc1B1ZVFYVWFKRWk2VGR2UQ?oc=5",
-      "domain": "Yahoo新聞",
-      "ts": "2026-09-10T11:16:16+00:00",
-      "topic": "台海"
-    },
-    {
-      "title": "法國主流媒體聚焦台海 吳志中籲國際共同維護和平",
-      "url": "https://news.google.com/rss/articles/CBMi3AJBVV95cUxPX3VLaXJTRTliaVU2Sng1N3VNQXRzM3BWZEU3RnE1a1AtMkZoUGJLZ2xSU2p2NUZjNklqNzBWREQ1cUplajR2Yk9neUJwMHRIdXlMNGhDcHpfNlBIS0N3LUs4X042bnNIRTF5V05sRjNKa3pycmV2eVExY1k2OVRsSG1zM2NweURCZDBQaHhMZFBBRDJkSDR3UDF2R2didmxHclU1ejIzTVE5SGZhVnZZUndlX1MyVzRBNGdsZjJxdGJfOGcwa2tXMXNjVlZGX3pnZExIbGpCMzZqeFJ5X3Z6QUZVWjJtRkZ4TzlabzlSUTNBcXAtR2RXZUpkeDk5R21sVTkzSDlZZkwzemk0TjhSbGxhTHI4Y2d0NmtGQ21fajFaZFpSSkFTcE9YYllPSUVfbUdKODYwRXJ2cGYxN0tyazJ3b1hFcndGVzNQcmtDS29TX0d3TFJhaUEtQ1g?oc=5",
-      "domain": "Yahoo新聞",
-      "ts": "2026-09-10T11:11:30+00:00",
-      "topic": "台海"
-    },
-    {
-      "title": "菲控共軍對巡邏機多次發射照明彈　批中侵犯主權",
-      "url": "https://news.google.com/rss/articles/CBMiWEFVX3lxTE5jVkl1QW5aWk1TcERmdFpkWUFqemZyY0lFX1czZE51MFJ1S2k1VEQ2R0o0SUZNLWJkYkMxem9QNEhlelFVVS1RWHJjbkVnYnBxVXBTOVFWUDDSAV5BVV95cUxOQl9KcnVRdUROMzBlQTVqbU5xNzRMZkhfMjZZZXZTZkVKTUlfTjhiLVdlRGRVd0Jpb2JzNjFodVFlRE1wNUpPZFc3cjRmSVd6NGtJSzgxZF9OdlFGQ0JB?oc=5",
-      "domain": "鏡新聞",
-      "ts": "2026-09-10T11:05:00+00:00",
-      "topic": "台海"
-    },
-    {
-      "title": "中國「國安劇」《交鋒》洩共軍少將被台灣吸收 梁文傑：可借鑑保防教育",
-      "url": "https://news.google.com/rss/articles/CBMiyAJBVV95cUxPWEkzQ0swc01ibVdkT3ZyYkgyNExUUE5GeWVjc0Y3Y2pUa2J5MUphWkVGWGpyTzBZU182UnNKSEhwTmNTamdnZ3M0a2lTYjRNZ0hQU2FHeHBHb1JvXzdvblB2bTRhV3VTVmlRa0ctUDg3UktMTG9rcDRNMDFKSDdoQ181dWxIS2FsY0drc0tfU0o2NGs0ZGNzMG4tcjlGYWRCX01EemNGNXI2aEdRZWdpVkwxMlY0T3dGcmQ1TVFzUG1ZX2M3c1VEYmluY3lfU0tSU3JXVzVqaXFiU094RVZ0OEF2cTlpOG5fMW55VFVHYTJvUF80RWZwUFRRbG9DS2g1VWQ0ODBFYVdWamJyM1FyRnh5dzlEZVBnSEludWNkUENxenF0b1dPY2tvREh6MmlET3VfWklWNE80S29wUUpBcFA0MS11al9l?oc=5",
-      "domain": "Yahoo新聞",
-      "ts": "2026-09-10T10:24:54+00:00",
-      "topic": "台海"
     }
   ],
   "pla": {
-    "updated_at": "2026-09-11T00:20:58.228059+00:00",
+    "updated_at": "2026-09-11T04:10:57.728207+00:00",
     "days": [
       {
         "date": "2026-08-13",
@@ -2339,2079 +2920,985 @@
         "date": "2026-09-10",
         "aircraft": 27,
         "ships": 0
+      },
+      {
+        "date": "2026-09-11",
+        "aircraft": 21,
+        "ships": 0,
+        "source_title": "中共21機艦擾台 國軍嚴密監控適切應處 - 自由軍武頻道",
+        "source_url": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE8yOUVvYzBJTkFKaWFyYy0wQzNCRVpaT2pPTGE4QW91Zk5WeERDVFVXMWpjczVOSEVtanNLMlVlNkZnd0lsRWR0ckJXa3p6TnhEeUgwSV82eW90c1NrNF9oWNIBZkFVX3lxTE9fZXpXQkJnbTB1Z1ZmZVhyemN1Sjd4cEUtS3o0YnhXU2VpT1BaVXYzWHROWnJkSjNwY21lbWp0OUM4YTI5YWlPMksyeENIaUkzZUNPdHNrZGc2dE9UcUFvWjlUTS12UQ?oc=5",
+        "date_basis": "publication_date",
+        "verified": false
       }
     ],
     "baseline": 11,
     "latest": {
-      "date": "2026-09-10",
-      "aircraft": 27,
-      "ships": 0
+      "date": "2026-09-11",
+      "aircraft": 21,
+      "ships": 0,
+      "source_title": "中共21機艦擾台 國軍嚴密監控適切應處 - 自由軍武頻道",
+      "source_url": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE8yOUVvYzBJTkFKaWFyYy0wQzNCRVpaT2pPTGE4QW91Zk5WeERDVFVXMWpjczVOSEVtanNLMlVlNkZnd0lsRWR0ckJXa3p6TnhEeUgwSV82eW90c1NrNF9oWNIBZkFVX3lxTE9fZXpXQkJnbTB1Z1ZmZVhyemN1Sjd4cEUtS3o0YnhXU2VpT1BaVXYzWHROWnJkSjNwY21lbWp0OUM4YTI5YWlPMksyeENIaUkzZUNPdHNrZGc2dE9UcUFvWjlUTS12UQ?oc=5",
+      "date_basis": "publication_date",
+      "verified": false
     },
-    "note": "每日共軍擾台架次（國防部戰報，自新聞標題擷取）· 每日一報、非即時 · 過去 30 天滾動累積"
+    "note": "新聞標題架次估計（未逐筆核對國防部，發稿日非觀測日）· 非即時 · 過去 30 天滾動累積"
   },
   "usda": {
-    "updated_at": "2026-09-10T20:59:22.450651+00:00",
+    "schema_version": 2,
+    "updated_at": "2026-09-11T04:04:30.442302+00:00",
     "week_ending": "2026-08-27",
     "items": [
       {
         "name": "大豆",
+        "commodity_code": 801,
+        "market_year": 2026,
+        "week": "2026-08-27",
+        "market_year_start": "2025-09-01T00:00:00",
+        "market_year_end": "2026-08-31T00:00:00",
+        "release_at": "2026-09-03T08:30:21.55",
         "week_net_kt": 0.0,
+        "next_year_net_kt": 972.0,
         "outstanding_kt": 141.0,
         "commit_kt": 12498.1,
-        "week": "2026-08-27"
+        "incomplete": false,
+        "stale": true
       },
       {
         "name": "小麥",
-        "week_net_kt": 0.0,
-        "outstanding_kt": 0.0,
-        "commit_kt": 336.0,
-        "week": "2026-06-04"
+        "commodity_code": 107,
+        "market_year": 2027,
+        "week": null,
+        "market_year_start": "2026-06-01T00:00:00",
+        "market_year_end": "2027-05-31T00:00:00",
+        "release_at": "2026-09-03T08:30:21.55",
+        "week_net_kt": null,
+        "next_year_net_kt": null,
+        "outstanding_kt": null,
+        "commit_kt": null,
+        "incomplete": true,
+        "stale": true
       },
       {
         "name": "玉米",
+        "commodity_code": 401,
+        "market_year": 2026,
+        "week": "2026-08-27",
+        "market_year_start": "2025-09-01T00:00:00",
+        "market_year_end": "2026-08-31T00:00:00",
+        "release_at": "2026-09-03T08:30:21.55",
         "week_net_kt": 0.0,
+        "next_year_net_kt": 0.0,
         "outstanding_kt": 0.0,
         "commit_kt": 0.0,
-        "week": "2026-08-27"
+        "incomplete": false,
+        "stale": true
       }
     ],
     "hist": {
       "soy": [
         {
-          "w": "2024-09-05",
-          "commit": 4968.6,
-          "outs": 4917.6,
-          "exp": 51.0,
-          "net": 1072.2
-        },
-        {
-          "w": "2024-09-12",
-          "commit": 5942.6,
-          "outs": 5815.8,
-          "exp": 126.7,
-          "net": 973.9
-        },
-        {
-          "w": "2024-09-19",
-          "commit": 6812.3,
-          "outs": 6513.2,
-          "exp": 299.1,
-          "net": 869.7
-        },
-        {
-          "w": "2024-09-26",
-          "commit": 7538.0,
-          "outs": 7039.1,
-          "exp": 499.0,
-          "net": 725.7
-        },
-        {
-          "w": "2024-10-03",
-          "commit": 8121.4,
-          "outs": 6918.3,
-          "exp": 1203.1,
-          "net": 583.4
-        },
-        {
-          "w": "2024-10-10",
-          "commit": 9121.1,
-          "outs": 6698.2,
-          "exp": 2423.0,
-          "net": 999.7
-        },
-        {
-          "w": "2024-10-17",
-          "commit": 10410.3,
-          "outs": 6182.4,
-          "exp": 4228.0,
-          "net": 1289.2
-        },
-        {
-          "w": "2024-10-24",
-          "commit": 11125.3,
-          "outs": 5367.8,
-          "exp": 5757.5,
-          "net": 715.0
-        },
-        {
-          "w": "2024-10-31",
-          "commit": 12348.0,
-          "outs": 4940.0,
-          "exp": 7408.0,
-          "net": 1222.7
-        },
-        {
-          "w": "2024-11-07",
-          "commit": 13529.1,
-          "outs": 4509.8,
-          "exp": 9019.3,
-          "net": 1181.1
-        },
-        {
-          "w": "2024-11-14",
-          "commit": 14726.1,
-          "outs": 4199.1,
-          "exp": 10527.0,
-          "net": 1197.0
-        },
-        {
-          "w": "2024-11-21",
-          "commit": 15813.1,
-          "outs": 4318.6,
-          "exp": 11494.5,
-          "net": 1087.0
-        },
-        {
-          "w": "2024-11-28",
-          "commit": 16482.8,
-          "outs": 3741.9,
-          "exp": 12740.9,
-          "net": 669.7
-        },
-        {
-          "w": "2024-12-05",
-          "commit": 17187.8,
-          "outs": 3603.4,
-          "exp": 13584.4,
-          "net": 705.0
-        },
-        {
-          "w": "2024-12-12",
-          "commit": 17836.0,
-          "outs": 3210.0,
-          "exp": 14626.0,
-          "net": 648.2
-        },
-        {
-          "w": "2024-12-19",
-          "commit": 18246.6,
-          "outs": 2938.7,
-          "exp": 15308.0,
-          "net": 410.6
-        },
-        {
-          "w": "2024-12-26",
-          "commit": 18864.3,
-          "outs": 2804.4,
-          "exp": 16059.9,
-          "net": 617.7
-        },
-        {
-          "w": "2025-01-02",
-          "commit": 19036.1,
-          "outs": 2326.0,
-          "exp": 16710.0,
-          "net": 171.8
-        },
-        {
-          "w": "2025-01-09",
-          "commit": 19182.1,
-          "outs": 2055.3,
-          "exp": 17126.8,
-          "net": 146.0
-        },
-        {
-          "w": "2025-01-16",
-          "commit": 20070.7,
-          "outs": 2449.4,
-          "exp": 17621.3,
-          "net": 888.6
-        },
-        {
-          "w": "2025-01-23",
-          "commit": 20216.1,
-          "outs": 2444.2,
-          "exp": 17771.9,
-          "net": 145.3
-        },
-        {
-          "w": "2025-01-30",
-          "commit": 20424.8,
-          "outs": 2305.0,
-          "exp": 18119.8,
-          "net": 208.7
-        },
-        {
-          "w": "2025-02-06",
-          "commit": 20646.8,
-          "outs": 1974.8,
-          "exp": 18672.0,
-          "net": 222.0
-        },
-        {
-          "w": "2025-02-13",
-          "commit": 20748.0,
-          "outs": 1854.7,
-          "exp": 18893.3,
-          "net": 101.2
-        },
-        {
-          "w": "2025-02-20",
-          "commit": 20950.2,
-          "outs": 1569.8,
-          "exp": 19380.4,
-          "net": 202.2
-        },
-        {
-          "w": "2025-02-27",
-          "commit": 21156.0,
-          "outs": 1439.0,
-          "exp": 19717.0,
-          "net": 205.7
-        },
-        {
-          "w": "2025-03-06",
-          "commit": 21364.3,
-          "outs": 1363.1,
-          "exp": 20001.2,
-          "net": 208.3
-        },
-        {
-          "w": "2025-03-13",
-          "commit": 21634.2,
-          "outs": 1223.6,
-          "exp": 20410.6,
-          "net": 269.9
-        },
-        {
-          "w": "2025-03-20",
-          "commit": 21836.5,
-          "outs": 953.5,
-          "exp": 20883.0,
-          "net": 202.3
-        },
-        {
-          "w": "2025-03-27",
-          "commit": 22122.4,
-          "outs": 598.5,
-          "exp": 21523.9,
-          "net": 285.9
-        },
-        {
-          "w": "2025-04-03",
-          "commit": 22263.6,
-          "outs": 395.5,
-          "exp": 21868.1,
-          "net": 141.3
-        },
-        {
-          "w": "2025-04-10",
-          "commit": 22336.4,
-          "outs": 264.3,
-          "exp": 22072.2,
-          "net": 72.8
-        },
-        {
-          "w": "2025-04-17",
-          "commit": 22338.2,
-          "outs": 198.3,
-          "exp": 22139.9,
-          "net": 1.8
-        },
-        {
-          "w": "2025-04-24",
-          "commit": 22477.7,
-          "outs": 132.2,
-          "exp": 22345.4,
-          "net": 139.4
-        },
-        {
-          "w": "2025-05-01",
-          "commit": 22479.8,
-          "outs": 66.2,
-          "exp": 22413.5,
-          "net": 2.1
-        },
-        {
-          "w": "2025-05-08",
-          "commit": 22479.8,
-          "outs": 66.2,
-          "exp": 22413.5,
-          "net": 0.0
-        },
-        {
-          "w": "2025-05-15",
-          "commit": 22479.8,
-          "outs": 66.2,
-          "exp": 22413.5,
-          "net": 0.0
-        },
-        {
-          "w": "2025-05-22",
-          "commit": 22479.6,
-          "outs": 66.1,
-          "exp": 22413.5,
-          "net": -0.2
-        },
-        {
-          "w": "2025-05-29",
-          "commit": 22478.5,
-          "outs": 0.0,
-          "exp": 22478.5,
-          "net": -1.1
-        },
-        {
-          "w": "2025-06-05",
-          "commit": 22478.5,
-          "outs": 0.0,
-          "exp": 22478.5,
-          "net": 0.0
-        },
-        {
-          "w": "2025-06-12",
-          "commit": 22478.5,
-          "outs": 0.0,
-          "exp": 22478.5,
-          "net": 0.0
-        },
-        {
-          "w": "2025-06-19",
-          "commit": 22478.5,
-          "outs": 0.0,
-          "exp": 22478.5,
-          "net": 0.0
-        },
-        {
-          "w": "2025-06-26",
-          "commit": 22478.5,
-          "outs": 0.0,
-          "exp": 22478.5,
-          "net": 0.0
-        },
-        {
-          "w": "2025-07-03",
-          "commit": 22478.5,
-          "outs": 0.0,
-          "exp": 22478.5,
-          "net": 0.0
-        },
-        {
-          "w": "2025-07-10",
-          "commit": 22478.5,
-          "outs": 0.0,
-          "exp": 22478.5,
-          "net": 0.0
-        },
-        {
-          "w": "2025-07-17",
-          "commit": 22478.5,
-          "outs": 0.0,
-          "exp": 22478.5,
-          "net": 0.0
-        },
-        {
-          "w": "2025-07-24",
-          "commit": 22478.5,
-          "outs": 0.0,
-          "exp": 22478.5,
-          "net": 0.0
-        },
-        {
-          "w": "2025-07-31",
-          "commit": 22478.5,
-          "outs": 0.0,
-          "exp": 22478.5,
-          "net": 0.0
-        },
-        {
-          "w": "2025-08-07",
-          "commit": 22478.5,
-          "outs": 0.0,
-          "exp": 22478.5,
-          "net": 0.0
-        },
-        {
-          "w": "2025-08-14",
-          "commit": 22478.5,
-          "outs": 0.0,
-          "exp": 22478.5,
-          "net": 0.0
-        },
-        {
-          "w": "2025-08-21",
-          "commit": 22478.5,
-          "outs": 0.0,
-          "exp": 22478.5,
-          "net": 0.0
-        },
-        {
-          "w": "2025-08-28",
-          "commit": 22478.5,
-          "outs": 0.0,
-          "exp": 22478.5,
-          "net": 0.0
-        },
-        {
-          "w": "2025-09-04",
-          "commit": 22546.3,
-          "outs": 0.0,
-          "exp": 22546.3,
-          "net": 67.8
-        },
-        {
           "w": "2025-10-30",
+          "market_year": 2026,
+          "net": 232.0,
+          "next_net": 0.0,
           "commit": 232.0,
           "outs": 232.0,
-          "exp": 0.0,
-          "net": 232.0
+          "exp": 0.0
         },
         {
           "w": "2025-11-06",
+          "market_year": 2026,
+          "net": 232.0,
+          "next_net": 0.0,
           "commit": 464.0,
           "outs": 464.0,
-          "exp": 0.0,
-          "net": 232.0
+          "exp": 0.0
         },
         {
           "w": "2025-11-13",
+          "market_year": 2026,
+          "net": -100.0,
+          "next_net": 0.0,
           "commit": 364.0,
           "outs": 364.0,
-          "exp": 0.0,
-          "net": -100.0
+          "exp": 0.0
         },
         {
           "w": "2025-11-20",
+          "market_year": 2026,
+          "net": 2142.0,
+          "next_net": 0.0,
           "commit": 2506.0,
           "outs": 2506.0,
-          "exp": 0.0,
-          "net": 2142.0
+          "exp": 0.0
         },
         {
           "w": "2025-11-27",
+          "market_year": 2026,
+          "net": 509.0,
+          "next_net": 0.0,
           "commit": 3015.0,
           "outs": 3015.0,
-          "exp": 0.0,
-          "net": 509.0
+          "exp": 0.0
         },
         {
           "w": "2025-12-04",
+          "market_year": 2026,
+          "net": 1011.0,
+          "next_net": 0.0,
           "commit": 4026.0,
           "outs": 3955.0,
-          "exp": 71.0,
-          "net": 1011.0
+          "exp": 71.0
         },
         {
           "w": "2025-12-11",
+          "market_year": 2026,
+          "net": 1383.0,
+          "next_net": 0.0,
           "commit": 5409.0,
           "outs": 5136.0,
-          "exp": 273.0,
-          "net": 1383.0
+          "exp": 273.0
         },
         {
           "w": "2025-12-18",
+          "market_year": 2026,
+          "net": 617.0,
+          "next_net": 0.0,
           "commit": 6026.0,
           "outs": 5367.0,
-          "exp": 659.0,
-          "net": 617.0
+          "exp": 659.0
         },
         {
           "w": "2025-12-25",
+          "market_year": 2026,
+          "net": 396.4,
+          "next_net": 66.0,
           "commit": 6422.4,
           "outs": 5628.0,
-          "exp": 794.4,
-          "net": 396.4
+          "exp": 794.4
         },
         {
           "w": "2026-01-01",
+          "market_year": 2026,
+          "net": 470.1,
+          "next_net": 0.0,
           "commit": 6892.5,
           "outs": 5701.0,
-          "exp": 1191.5,
-          "net": 470.1
+          "exp": 1191.5
         },
         {
           "w": "2026-01-08",
+          "market_year": 2026,
+          "net": 1224.1,
+          "next_net": 0.0,
           "commit": 8116.6,
           "outs": 6024.0,
-          "exp": 2092.6,
-          "net": 1224.1
+          "exp": 2092.6
         },
         {
           "w": "2026-01-15",
+          "market_year": 2026,
+          "net": 1303.5,
+          "next_net": -66.0,
           "commit": 9420.1,
           "outs": 6734.0,
-          "exp": 2686.1,
-          "net": 1303.5
+          "exp": 2686.1
         },
         {
           "w": "2026-01-22",
+          "market_year": 2026,
+          "net": 233.5,
+          "next_net": 0.0,
           "commit": 9653.6,
           "outs": 6139.0,
-          "exp": 3514.6,
-          "net": 233.5
+          "exp": 3514.6
         },
         {
           "w": "2026-01-29",
+          "market_year": 2026,
+          "net": 233.0,
+          "next_net": 0.0,
           "commit": 9886.6,
           "outs": 5563.0,
-          "exp": 4323.6,
-          "net": 233.0
+          "exp": 4323.6
         },
         {
           "w": "2026-02-05",
+          "market_year": 2026,
+          "net": 286.1,
+          "next_net": 0.0,
           "commit": 10172.7,
           "outs": 5103.0,
-          "exp": 5069.7,
-          "net": 286.1
+          "exp": 5069.7
         },
         {
           "w": "2026-02-12",
+          "market_year": 2026,
+          "net": 415.5,
+          "next_net": 0.0,
           "commit": 10588.2,
           "outs": 4767.0,
-          "exp": 5821.2,
-          "net": 415.5
+          "exp": 5821.2
         },
         {
           "w": "2026-02-19",
+          "market_year": 2026,
+          "net": 75.5,
+          "next_net": 0.0,
           "commit": 10663.8,
           "outs": 4503.0,
-          "exp": 6160.8,
-          "net": 75.5
+          "exp": 6160.8
         },
         {
           "w": "2026-02-26",
+          "market_year": 2026,
+          "net": 153.1,
+          "next_net": 0.0,
           "commit": 10816.9,
           "outs": 3987.0,
-          "exp": 6829.9,
-          "net": 153.1
+          "exp": 6829.9
         },
         {
           "w": "2026-03-05",
+          "market_year": 2026,
+          "net": 83.1,
+          "next_net": 0.0,
           "commit": 10899.9,
           "outs": 3593.0,
-          "exp": 7306.9,
-          "net": 83.1
+          "exp": 7306.9
         },
         {
           "w": "2026-03-12",
+          "market_year": 2026,
+          "net": 79.9,
+          "next_net": 0.0,
           "commit": 10979.8,
           "outs": 3127.0,
-          "exp": 7852.8,
-          "net": 79.9
+          "exp": 7852.8
         },
         {
           "w": "2026-03-19",
+          "market_year": 2026,
+          "net": 263.0,
+          "next_net": 0.0,
           "commit": 11242.8,
           "outs": 2725.0,
-          "exp": 8517.8,
-          "net": 263.0
+          "exp": 8517.8
         },
         {
           "w": "2026-03-26",
+          "market_year": 2026,
+          "net": 141.0,
+          "next_net": 0.0,
           "commit": 11383.8,
           "outs": 2525.0,
-          "exp": 8858.8,
-          "net": 141.0
+          "exp": 8858.8
         },
         {
           "w": "2026-04-02",
+          "market_year": 2026,
+          "net": 124.7,
+          "next_net": 0.0,
           "commit": 11508.5,
           "outs": 2219.0,
-          "exp": 9289.5,
-          "net": 124.7
+          "exp": 9289.5
         },
         {
           "w": "2026-04-09",
+          "market_year": 2026,
+          "net": 15.8,
+          "next_net": 0.0,
           "commit": 11524.3,
           "outs": 1889.0,
-          "exp": 9635.3,
-          "net": 15.8
+          "exp": 9635.3
         },
         {
           "w": "2026-04-16",
+          "market_year": 2026,
+          "net": 11.2,
+          "next_net": 0.0,
           "commit": 11535.5,
           "outs": 1454.0,
-          "exp": 10081.5,
-          "net": 11.2
+          "exp": 10081.5
         },
         {
           "w": "2026-04-23",
+          "market_year": 2026,
+          "net": 199.2,
+          "next_net": 0.0,
           "commit": 11734.7,
           "outs": 1338.0,
-          "exp": 10396.7,
-          "net": 199.2
+          "exp": 10396.7
         },
         {
           "w": "2026-04-30",
+          "market_year": 2026,
+          "net": 66.9,
+          "next_net": 0.0,
           "commit": 11801.6,
           "outs": 1204.0,
-          "exp": 10597.6,
-          "net": 66.9
+          "exp": 10597.6
         },
         {
           "w": "2026-05-07",
+          "market_year": 2026,
+          "net": 68.6,
+          "next_net": 0.0,
           "commit": 11870.2,
           "outs": 936.0,
-          "exp": 10934.2,
-          "net": 68.6
+          "exp": 10934.2
         },
         {
           "w": "2026-05-14",
+          "market_year": 2026,
+          "net": 5.0,
+          "next_net": 0.0,
           "commit": 11875.3,
           "outs": 669.0,
-          "exp": 11206.3,
-          "net": 5.0
+          "exp": 11206.3
         },
         {
           "w": "2026-05-21",
+          "market_year": 2026,
+          "net": 4.3,
+          "next_net": 0.0,
           "commit": 11879.6,
           "outs": 536.0,
-          "exp": 11343.6,
-          "net": 4.3
+          "exp": 11343.6
         },
         {
           "w": "2026-05-28",
+          "market_year": 2026,
+          "net": 74.8,
+          "next_net": 0.0,
           "commit": 11954.4,
           "outs": 402.0,
-          "exp": 11552.4,
-          "net": 74.8
+          "exp": 11552.4
         },
         {
           "w": "2026-06-04",
+          "market_year": 2026,
+          "net": 2.1,
+          "next_net": 0.0,
           "commit": 11956.4,
           "outs": 336.0,
-          "exp": 11620.4,
-          "net": 2.1
+          "exp": 11620.4
         },
         {
           "w": "2026-06-11",
+          "market_year": 2026,
+          "net": 2.3,
+          "next_net": 0.0,
           "commit": 11958.7,
           "outs": 202.0,
-          "exp": 11756.7,
-          "net": 2.3
+          "exp": 11756.7
         },
         {
           "w": "2026-06-18",
+          "market_year": 2026,
+          "net": 1.5,
+          "next_net": 200.0,
           "commit": 11960.2,
           "outs": 134.0,
-          "exp": 11826.2,
-          "net": 1.5
+          "exp": 11826.2
         },
         {
           "w": "2026-06-25",
+          "market_year": 2026,
+          "net": 65.4,
+          "next_net": 0.0,
           "commit": 12025.6,
           "outs": 134.0,
-          "exp": 11891.6,
-          "net": 65.4
+          "exp": 11891.6
         },
         {
           "w": "2026-07-02",
+          "market_year": 2026,
+          "net": 202.1,
+          "next_net": 0.0,
           "commit": 12227.7,
           "outs": 68.0,
-          "exp": 12159.7,
-          "net": 202.1
+          "exp": 12159.7
         },
         {
           "w": "2026-07-09",
+          "market_year": 2026,
+          "net": 133.9,
+          "next_net": 1056.0,
           "commit": 12361.6,
           "outs": 136.0,
-          "exp": 12225.6,
-          "net": 133.9
+          "exp": 12225.6
         },
         {
           "w": "2026-07-16",
+          "market_year": 2026,
+          "net": 70.6,
+          "next_net": 1006.0,
           "commit": 12432.2,
           "outs": 141.0,
-          "exp": 12291.2,
-          "net": 70.6
+          "exp": 12291.2
         },
         {
           "w": "2026-07-23",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 519.0,
           "commit": 12432.2,
           "outs": 141.0,
-          "exp": 12291.2,
-          "net": 0.0
+          "exp": 12291.2
         },
         {
           "w": "2026-07-30",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 330.0,
           "commit": 12432.2,
           "outs": 141.0,
-          "exp": 12291.2,
-          "net": 0.0
+          "exp": 12291.2
         },
         {
           "w": "2026-08-06",
+          "market_year": 2026,
+          "net": 65.9,
+          "next_net": 1446.0,
           "commit": 12498.1,
           "outs": 141.0,
-          "exp": 12357.1,
-          "net": 65.9
+          "exp": 12357.1
         },
         {
           "w": "2026-08-13",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 1131.0,
           "commit": 12498.1,
           "outs": 141.0,
-          "exp": 12357.1,
-          "net": 0.0
+          "exp": 12357.1
         },
         {
           "w": "2026-08-20",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 1101.0,
           "commit": 12498.1,
           "outs": 141.0,
-          "exp": 12357.1,
-          "net": 0.0
+          "exp": 12357.1
         },
         {
           "w": "2026-08-27",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 972.0,
           "commit": 12498.1,
           "outs": 141.0,
-          "exp": 12357.1,
-          "net": 0.0
+          "exp": 12357.1
         }
       ],
-      "wheat": [
-        {
-          "w": "2024-06-06",
-          "commit": 67.5,
-          "outs": 67.5,
-          "exp": 0.0,
-          "net": 5.0
-        },
-        {
-          "w": "2024-06-13",
-          "commit": 67.5,
-          "outs": 67.5,
-          "exp": 0.0,
-          "net": 0.0
-        },
-        {
-          "w": "2024-06-20",
-          "commit": 67.5,
-          "outs": 67.5,
-          "exp": 0.0,
-          "net": 0.0
-        },
-        {
-          "w": "2024-06-27",
-          "commit": 67.5,
-          "outs": 67.5,
-          "exp": 0.0,
-          "net": 0.0
-        },
-        {
-          "w": "2024-07-04",
-          "commit": 69.0,
-          "outs": 69.0,
-          "exp": 0.0,
-          "net": 1.5
-        },
-        {
-          "w": "2024-07-11",
-          "commit": 141.3,
-          "outs": 74.0,
-          "exp": 67.3,
-          "net": 72.3
-        },
-        {
-          "w": "2024-07-18",
-          "commit": 141.2,
-          "outs": 71.8,
-          "exp": 69.4,
-          "net": -0.1
-        },
-        {
-          "w": "2024-07-25",
-          "commit": 141.2,
-          "outs": 71.3,
-          "exp": 69.8,
-          "net": 0.0
-        },
-        {
-          "w": "2024-08-01",
-          "commit": 141.2,
-          "outs": 70.2,
-          "exp": 70.9,
-          "net": 0.0
-        },
-        {
-          "w": "2024-08-08",
-          "commit": 139.3,
-          "outs": 1.2,
-          "exp": 138.1,
-          "net": -1.9
-        },
-        {
-          "w": "2024-08-15",
-          "commit": 139.3,
-          "outs": 0.7,
-          "exp": 138.6,
-          "net": 0.0
-        },
-        {
-          "w": "2024-08-22",
-          "commit": 139.2,
-          "outs": 0.6,
-          "exp": 138.6,
-          "net": -0.0
-        },
-        {
-          "w": "2024-08-29",
-          "commit": 139.2,
-          "outs": 0.6,
-          "exp": 138.6,
-          "net": 0.0
-        },
-        {
-          "w": "2024-09-05",
-          "commit": 139.2,
-          "outs": 0.6,
-          "exp": 138.6,
-          "net": 0.0
-        },
-        {
-          "w": "2024-09-12",
-          "commit": 139.2,
-          "outs": 0.6,
-          "exp": 138.6,
-          "net": 0.0
-        },
-        {
-          "w": "2024-09-19",
-          "commit": 139.1,
-          "outs": 0.5,
-          "exp": 138.6,
-          "net": -0.1
-        },
-        {
-          "w": "2024-09-26",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": -0.0
-        },
-        {
-          "w": "2024-10-03",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2024-10-10",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2024-10-17",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2024-10-24",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2024-10-31",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2024-11-07",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2024-11-14",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2024-11-21",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2024-11-28",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2024-12-05",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2024-12-12",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2024-12-19",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2024-12-26",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2025-01-02",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2025-01-09",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2025-01-16",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2025-01-23",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2025-01-30",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2025-02-06",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2025-02-13",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2025-02-20",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2025-02-27",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2025-03-06",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2025-03-13",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2025-03-20",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2025-03-27",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2025-04-03",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2025-04-10",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2025-04-17",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2025-04-24",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2025-05-01",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2025-05-08",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2025-05-15",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2025-05-22",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2025-05-29",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2025-06-05",
-          "commit": 139.1,
-          "outs": 0.0,
-          "exp": 139.1,
-          "net": 0.0
-        },
-        {
-          "w": "2025-11-06",
-          "commit": 130.0,
-          "outs": 130.0,
-          "exp": 0.0,
-          "net": 130.0
-        },
-        {
-          "w": "2025-11-13",
-          "commit": 190.0,
-          "outs": 190.0,
-          "exp": 0.0,
-          "net": 60.0
-        },
-        {
-          "w": "2025-11-20",
-          "commit": 387.0,
-          "outs": 387.0,
-          "exp": 0.0,
-          "net": 197.0
-        },
-        {
-          "w": "2025-11-27",
-          "commit": 385.0,
-          "outs": 385.0,
-          "exp": 0.0,
-          "net": -2.0
-        },
-        {
-          "w": "2025-12-04",
-          "commit": 387.0,
-          "outs": 387.0,
-          "exp": 0.0,
-          "net": 2.0
-        },
-        {
-          "w": "2025-12-11",
-          "commit": 387.0,
-          "outs": 387.0,
-          "exp": 0.0,
-          "net": 0.0
-        },
-        {
-          "w": "2025-12-18",
-          "commit": 258.6,
-          "outs": 190.0,
-          "exp": 68.6,
-          "net": -128.4
-        },
-        {
-          "w": "2025-12-25",
-          "commit": 198.6,
-          "outs": 130.0,
-          "exp": 68.6,
-          "net": -60.0
-        },
-        {
-          "w": "2026-01-01",
-          "commit": 198.6,
-          "outs": 130.0,
-          "exp": 68.6,
-          "net": 0.0
-        },
-        {
-          "w": "2026-01-08",
-          "commit": 198.6,
-          "outs": 130.0,
-          "exp": 68.6,
-          "net": 0.0
-        },
-        {
-          "w": "2026-01-15",
-          "commit": 198.6,
-          "outs": 130.0,
-          "exp": 68.6,
-          "net": 0.0
-        },
-        {
-          "w": "2026-01-22",
-          "commit": 198.6,
-          "outs": 130.0,
-          "exp": 68.6,
-          "net": 0.0
-        },
-        {
-          "w": "2026-01-29",
-          "commit": 263.6,
-          "outs": 195.0,
-          "exp": 68.6,
-          "net": 65.0
-        },
-        {
-          "w": "2026-02-05",
-          "commit": 263.6,
-          "outs": 195.0,
-          "exp": 68.6,
-          "net": 0.0
-        },
-        {
-          "w": "2026-02-12",
-          "commit": 263.6,
-          "outs": 195.0,
-          "exp": 68.6,
-          "net": 0.0
-        },
-        {
-          "w": "2026-02-19",
-          "commit": 263.6,
-          "outs": 195.0,
-          "exp": 68.6,
-          "net": 0.0
-        },
-        {
-          "w": "2026-02-26",
-          "commit": 263.7,
-          "outs": 195.0,
-          "exp": 68.7,
-          "net": 0.1
-        },
-        {
-          "w": "2026-03-05",
-          "commit": 332.6,
-          "outs": 65.0,
-          "exp": 267.6,
-          "net": 68.9
-        },
-        {
-          "w": "2026-03-12",
-          "commit": 332.6,
-          "outs": 65.0,
-          "exp": 267.6,
-          "net": 0.0
-        },
-        {
-          "w": "2026-03-19",
-          "commit": 336.0,
-          "outs": 0.0,
-          "exp": 336.0,
-          "net": 3.4
-        },
-        {
-          "w": "2026-03-26",
-          "commit": 336.0,
-          "outs": 0.0,
-          "exp": 336.0,
-          "net": 0.0
-        },
-        {
-          "w": "2026-04-02",
-          "commit": 336.0,
-          "outs": 0.0,
-          "exp": 336.0,
-          "net": 0.0
-        },
-        {
-          "w": "2026-04-09",
-          "commit": 336.0,
-          "outs": 0.0,
-          "exp": 336.0,
-          "net": 0.0
-        },
-        {
-          "w": "2026-04-16",
-          "commit": 336.0,
-          "outs": 0.0,
-          "exp": 336.0,
-          "net": 0.0
-        },
-        {
-          "w": "2026-04-23",
-          "commit": 336.0,
-          "outs": 0.0,
-          "exp": 336.0,
-          "net": 0.0
-        },
-        {
-          "w": "2026-04-30",
-          "commit": 336.0,
-          "outs": 0.0,
-          "exp": 336.0,
-          "net": 0.0
-        },
-        {
-          "w": "2026-05-07",
-          "commit": 336.0,
-          "outs": 0.0,
-          "exp": 336.0,
-          "net": 0.0
-        },
-        {
-          "w": "2026-05-14",
-          "commit": 336.0,
-          "outs": 0.0,
-          "exp": 336.0,
-          "net": 0.0
-        },
-        {
-          "w": "2026-05-21",
-          "commit": 336.0,
-          "outs": 0.0,
-          "exp": 336.0,
-          "net": 0.0
-        },
-        {
-          "w": "2026-05-28",
-          "commit": 336.0,
-          "outs": 0.0,
-          "exp": 336.0,
-          "net": 0.0
-        },
-        {
-          "w": "2026-06-04",
-          "commit": 336.0,
-          "outs": 0.0,
-          "exp": 336.0,
-          "net": 0.0
-        }
-      ],
+      "wheat": [],
       "corn": [
         {
-          "w": "2024-09-05",
-          "commit": 13.4,
-          "outs": 13.4,
-          "exp": 0.0,
-          "net": 13.4
-        },
-        {
-          "w": "2024-09-12",
-          "commit": 13.4,
-          "outs": 13.4,
-          "exp": 0.0,
-          "net": 0.0
-        },
-        {
-          "w": "2024-09-19",
-          "commit": 6.4,
-          "outs": 2.6,
-          "exp": 3.7,
-          "net": -7.0
-        },
-        {
-          "w": "2024-09-26",
-          "commit": 6.4,
-          "outs": 2.6,
-          "exp": 3.7,
-          "net": 0.0
-        },
-        {
-          "w": "2024-10-03",
-          "commit": 6.4,
-          "outs": 0.0,
-          "exp": 6.4,
-          "net": 0.0
-        },
-        {
-          "w": "2024-10-10",
-          "commit": 6.4,
-          "outs": 0.0,
-          "exp": 6.4,
-          "net": 0.0
-        },
-        {
-          "w": "2024-10-17",
-          "commit": 16.4,
-          "outs": 10.0,
-          "exp": 6.4,
-          "net": 10.0
-        },
-        {
-          "w": "2024-10-24",
-          "commit": 16.4,
-          "outs": 10.0,
-          "exp": 6.4,
-          "net": 0.0
-        },
-        {
-          "w": "2024-10-31",
-          "commit": 25.4,
-          "outs": 19.0,
-          "exp": 6.4,
-          "net": 9.0
-        },
-        {
-          "w": "2024-11-07",
-          "commit": 25.4,
-          "outs": 15.0,
-          "exp": 10.4,
-          "net": 0.0
-        },
-        {
-          "w": "2024-11-14",
-          "commit": 25.9,
-          "outs": 15.5,
-          "exp": 10.4,
-          "net": 0.5
-        },
-        {
-          "w": "2024-11-21",
-          "commit": 26.3,
-          "outs": 10.5,
-          "exp": 15.9,
-          "net": 0.5
-        },
-        {
-          "w": "2024-11-28",
-          "commit": 26.3,
-          "outs": 10.0,
-          "exp": 16.3,
-          "net": 0.0
-        },
-        {
-          "w": "2024-12-05",
-          "commit": 26.3,
-          "outs": 10.0,
-          "exp": 16.3,
-          "net": 0.0
-        },
-        {
-          "w": "2024-12-12",
-          "commit": 26.3,
-          "outs": 10.0,
-          "exp": 16.3,
-          "net": 0.0
-        },
-        {
-          "w": "2024-12-19",
-          "commit": 26.3,
-          "outs": 10.0,
-          "exp": 16.3,
-          "net": 0.0
-        },
-        {
-          "w": "2024-12-26",
-          "commit": 26.3,
-          "outs": 10.0,
-          "exp": 16.3,
-          "net": 0.0
-        },
-        {
-          "w": "2025-01-02",
-          "commit": 26.3,
-          "outs": 7.0,
-          "exp": 19.3,
-          "net": 0.0
-        },
-        {
-          "w": "2025-01-09",
-          "commit": 26.3,
-          "outs": 4.0,
-          "exp": 22.3,
-          "net": 0.0
-        },
-        {
-          "w": "2025-01-16",
-          "commit": 32.3,
-          "outs": 10.0,
-          "exp": 22.3,
-          "net": 6.0
-        },
-        {
-          "w": "2025-01-23",
-          "commit": 32.3,
-          "outs": 10.0,
-          "exp": 22.3,
-          "net": 0.0
-        },
-        {
-          "w": "2025-01-30",
-          "commit": 32.3,
-          "outs": 4.0,
-          "exp": 28.3,
-          "net": 0.0
-        },
-        {
-          "w": "2025-02-06",
-          "commit": 32.3,
-          "outs": 4.0,
-          "exp": 28.3,
-          "net": 0.0
-        },
-        {
-          "w": "2025-02-13",
-          "commit": 32.3,
-          "outs": 0.0,
-          "exp": 32.3,
-          "net": 0.0
-        },
-        {
-          "w": "2025-02-20",
-          "commit": 32.3,
-          "outs": 0.0,
-          "exp": 32.3,
-          "net": 0.0
-        },
-        {
-          "w": "2025-02-27",
-          "commit": 32.3,
-          "outs": 0.0,
-          "exp": 32.3,
-          "net": 0.0
-        },
-        {
-          "w": "2025-03-06",
-          "commit": 32.3,
-          "outs": 0.0,
-          "exp": 32.3,
-          "net": 0.0
-        },
-        {
-          "w": "2025-03-13",
-          "commit": 32.7,
-          "outs": 0.2,
-          "exp": 32.5,
-          "net": 0.4
-        },
-        {
-          "w": "2025-03-20",
-          "commit": 32.7,
-          "outs": 0.1,
-          "exp": 32.6,
-          "net": 0.0
-        },
-        {
-          "w": "2025-03-27",
-          "commit": 32.7,
-          "outs": 0.1,
-          "exp": 32.6,
-          "net": 0.0
-        },
-        {
-          "w": "2025-04-03",
-          "commit": 32.7,
-          "outs": 0.1,
-          "exp": 32.6,
-          "net": -0.0
-        },
-        {
-          "w": "2025-04-10",
-          "commit": 32.7,
-          "outs": 0.1,
-          "exp": 32.6,
-          "net": 0.0
-        },
-        {
-          "w": "2025-04-17",
-          "commit": 32.7,
-          "outs": 0.0,
-          "exp": 32.7,
-          "net": 0.0
-        },
-        {
-          "w": "2025-04-24",
-          "commit": 32.7,
-          "outs": 0.0,
-          "exp": 32.7,
-          "net": 0.0
-        },
-        {
-          "w": "2025-05-01",
-          "commit": 32.7,
-          "outs": 0.0,
-          "exp": 32.7,
-          "net": 0.0
-        },
-        {
-          "w": "2025-05-08",
-          "commit": 32.7,
-          "outs": 0.0,
-          "exp": 32.7,
-          "net": 0.0
-        },
-        {
-          "w": "2025-05-15",
-          "commit": 32.7,
-          "outs": 0.0,
-          "exp": 32.7,
-          "net": 0.0
-        },
-        {
-          "w": "2025-05-22",
-          "commit": 32.7,
-          "outs": 0.0,
-          "exp": 32.7,
-          "net": 0.0
-        },
-        {
-          "w": "2025-05-29",
-          "commit": 32.7,
-          "outs": 0.0,
-          "exp": 32.7,
-          "net": 0.0
-        },
-        {
-          "w": "2025-06-05",
-          "commit": 32.7,
-          "outs": 0.0,
-          "exp": 32.7,
-          "net": 0.0
-        },
-        {
-          "w": "2025-06-12",
-          "commit": 32.7,
-          "outs": 0.0,
-          "exp": 32.7,
-          "net": 0.0
-        },
-        {
-          "w": "2025-06-19",
-          "commit": 32.7,
-          "outs": 0.0,
-          "exp": 32.7,
-          "net": 0.0
-        },
-        {
-          "w": "2025-06-26",
-          "commit": 32.7,
-          "outs": 0.0,
-          "exp": 32.7,
-          "net": 0.0
-        },
-        {
-          "w": "2025-07-03",
-          "commit": 32.7,
-          "outs": 0.0,
-          "exp": 32.7,
-          "net": 0.0
-        },
-        {
-          "w": "2025-07-10",
-          "commit": 32.7,
-          "outs": 0.0,
-          "exp": 32.7,
-          "net": 0.0
-        },
-        {
-          "w": "2025-07-17",
-          "commit": 32.7,
-          "outs": 0.0,
-          "exp": 32.7,
-          "net": 0.0
-        },
-        {
-          "w": "2025-07-24",
-          "commit": 32.7,
-          "outs": 0.0,
-          "exp": 32.7,
-          "net": 0.0
-        },
-        {
-          "w": "2025-07-31",
-          "commit": 32.7,
-          "outs": 0.0,
-          "exp": 32.7,
-          "net": 0.0
-        },
-        {
-          "w": "2025-08-07",
-          "commit": 32.7,
-          "outs": 0.0,
-          "exp": 32.7,
-          "net": 0.0
-        },
-        {
-          "w": "2025-08-14",
-          "commit": 32.7,
-          "outs": 0.0,
-          "exp": 32.7,
-          "net": 0.0
-        },
-        {
-          "w": "2025-08-21",
-          "commit": 32.7,
-          "outs": 0.0,
-          "exp": 32.7,
-          "net": 0.0
-        },
-        {
-          "w": "2025-08-28",
-          "commit": 32.7,
-          "outs": 0.0,
-          "exp": 32.7,
-          "net": 0.0
-        },
-        {
           "w": "2025-09-04",
-          "commit": 32.7,
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
+          "commit": 0.0,
           "outs": 0.0,
-          "exp": 32.7,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2025-09-11",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2025-09-18",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2025-09-25",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2025-10-02",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2025-10-09",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2025-10-16",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2025-10-23",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2025-10-30",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2025-11-06",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2025-11-13",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2025-11-20",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2025-11-27",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2025-12-04",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2025-12-11",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2025-12-18",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2025-12-25",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-01-01",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-01-08",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-01-15",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-01-22",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-01-29",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-02-05",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-02-12",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-02-19",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-02-26",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-03-05",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-03-12",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-03-19",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-03-26",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-04-02",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-04-09",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-04-16",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-04-23",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-04-30",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-05-07",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-05-14",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-05-21",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-05-28",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-06-04",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-06-11",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-06-18",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-06-25",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-07-02",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-07-09",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-07-16",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-07-23",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-07-30",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-08-06",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-08-13",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-08-20",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         },
         {
           "w": "2026-08-27",
+          "market_year": 2026,
+          "net": 0.0,
+          "next_net": 0.0,
           "commit": 0.0,
           "outs": 0.0,
-          "exp": 0.0,
-          "net": 0.0
+          "exp": 0.0
         }
       ]
     },
-    "note": "美國對中國每週出口銷售（USDA FAS ESR）· 週更 · 淨銷售=本週新訂單、未裝運=已訂未運"
+    "note": "USDA 美國對中國出口銷售；每商品依官方行銷年度查詢。當年度與下一年度淨銷售分列，非總進口。"
   },
   "wikipedia": {
-    "score": 25.1,
-    "mean_ratio": 1.0,
+    "score": 26.7,
+    "mean_ratio": 1.07,
     "pages": [
       {
         "title": "World_War_III",
-        "latest": 1514,
+        "latest": 1462,
         "baseline": 1409,
-        "ratio": 1.07
+        "ratio": 1.04
       },
       {
         "title": "Nuclear_warfare",
-        "latest": 497,
+        "latest": 494,
         "baseline": 468,
         "ratio": 1.06
       },
       {
         "title": "Doomsday_Clock",
-        "latest": 1094,
-        "baseline": 1085,
-        "ratio": 1.01
+        "latest": 1258,
+        "baseline": 1084,
+        "ratio": 1.16
       },
       {
         "title": "Fallout_shelter",
-        "latest": 142,
-        "baseline": 151,
-        "ratio": 0.94
+        "latest": 166,
+        "baseline": 146,
+        "ratio": 1.14
       },
       {
         "title": "Emergency_Alert_System",
-        "latest": 484,
-        "baseline": 514,
+        "latest": 479,
+        "baseline": 508,
         "ratio": 0.94
       }
     ]
@@ -4507,82 +3994,38 @@
   },
   "bars": {
     "available": false,
-    "bars": [
-      {
-        "name": "Sine Irish Pub",
-        "live_available": false,
-        "live_busyness": null,
-        "forecasted": null,
-        "delta": null,
-        "open": null
-      },
-      {
-        "name": "Freddie's Beach Bar",
-        "live_available": false,
-        "live_busyness": null,
-        "forecasted": null,
-        "delta": null,
-        "open": null
-      },
-      {
-        "name": "Highline RxR",
-        "live_available": false,
-        "live_busyness": null,
-        "forecasted": null,
-        "delta": null,
-        "open": null
-      },
-      {
-        "name": "Ireland's Four Courts",
-        "live_available": false,
-        "live_busyness": null,
-        "forecasted": null,
-        "delta": null,
-        "open": null
-      }
-    ],
-    "open_count": 0,
-    "total": 4,
-    "reason": "目前無酒吧即時資料（可能皆未營業）"
+    "reason": "非下班時段（僅美東 16–24 時查詢）",
+    "et_hour": 0,
+    "bars": []
   },
   "regions": [
     {
       "key": "ukraine",
       "name": "俄烏戰爭",
       "flag": "🇺🇦",
-      "score": 45.8,
-      "level": "HIGH",
+      "score": null,
+      "level": "INSUFFICIENT_DATA",
+      "coverage": 0.35,
+      "model_version": "wpi-4.0",
       "factors": {
-        "poly": 17.5,
-        "gdelt": 100.0,
-        "gdelt_delta": 34.4,
-        "notam": 40,
-        "notam_danger": 5,
-        "notam_closure": false,
-        "firms": 72,
-        "firms_hotspots": 6,
-        "avi": 0,
-        "avi_count": 0
+        "poly": 69.3,
+        "firms_hotspots": 692,
+        "avi_count": 1
       },
-      "top_market": "Will Russia capture Bilytske by September 30, 2026?"
+      "top_market": "Ukraine signs peace deal with Russia before 2027?"
     },
     {
       "key": "mideast",
       "name": "美伊 / 中東",
       "flag": "🇮🇷",
-      "score": 37.8,
-      "level": "ELEVATED",
+      "score": null,
+      "level": "INSUFFICIENT_DATA",
+      "coverage": 0.35,
+      "model_version": "wpi-4.0",
       "factors": {
-        "poly": 18.0,
-        "gdelt": 58.8,
-        "gdelt_delta": -14.4,
-        "notam": 32,
-        "notam_danger": 4,
-        "notam_closure": false,
-        "firms": 100.0,
-        "firms_hotspots": 9,
-        "avi": 0,
-        "avi_count": 0
+        "poly": 16.7,
+        "firms_hotspots": 653,
+        "avi_count": 1
       },
       "top_market": "Will the U.S. invade Iran before 2027?"
     },
@@ -4590,36 +4033,28 @@
       "key": "taiwan",
       "name": "台海",
       "flag": "🇹🇼",
-      "score": 2.2,
-      "level": "WATCH",
+      "score": null,
+      "level": "INSUFFICIENT_DATA",
+      "coverage": 0.35,
+      "model_version": "wpi-4.0",
       "factors": {
-        "poly": 4.7,
-        "notam": 0,
-        "notam_danger": 0,
-        "notam_closure": false,
-        "firms": 0,
-        "firms_hotspots": 0,
-        "avi": 0,
-        "avi_count": 0
+        "poly": 6.8,
+        "firms_hotspots": 1,
+        "avi_count": 1
       },
-      "top_market": "Will China invade Taiwan by end of 2026?"
+      "top_market": "China x Taiwan military clash before 2027?"
     },
     {
       "key": "korea",
       "name": "朝鮮半島",
       "flag": "🇰🇵",
-      "score": 0.3,
-      "level": "WATCH",
+      "score": null,
+      "level": "INSUFFICIENT_DATA",
+      "coverage": 0,
+      "model_version": "wpi-4.0",
       "factors": {
-        "gdelt": 0.9,
-        "gdelt_delta": -43.1,
-        "notam": 0,
-        "notam_danger": 0,
-        "notam_closure": false,
-        "firms": 0,
-        "firms_hotspots": 0,
-        "avi": 0,
-        "avi_count": 0
+        "firms_hotspots": 8,
+        "avi_count": 1
       },
       "top_market": null
     },
@@ -4627,20 +4062,16 @@
       "key": "southsea",
       "name": "南海爭議",
       "flag": "🌊",
-      "score": 0.2,
-      "level": "WATCH",
+      "score": null,
+      "level": "INSUFFICIENT_DATA",
+      "coverage": 0.35,
+      "model_version": "wpi-4.0",
       "factors": {
-        "gdelt": 0.6,
-        "gdelt_delta": 10.2,
-        "notam": 0,
-        "notam_danger": 0,
-        "notam_closure": false,
-        "firms": 0,
+        "poly": 28.5,
         "firms_hotspots": 0,
-        "avi": 0,
-        "avi_count": 0
+        "avi_count": 1
       },
-      "top_market": null
+      "top_market": "China x Philippines military clash before 2027?"
     }
   ],
   "sources": {
@@ -4655,6 +4086,110 @@
     "bars": "https://besttime.app/",
     "wikipedia": "https://wikimedia.org/api/rest_v1/",
     "notam": "https://notams.aim.faa.gov/"
+  },
+  "source_health": {
+    "pizza": {
+      "label": "PizzINT",
+      "status": "unavailable",
+      "observed_at": "2026-09-11T03:00:00.000Z",
+      "note": "0 店有即時人流；未觀測不等同已打烊"
+    },
+    "polymarket": {
+      "label": "Polymarket",
+      "status": "available",
+      "observed_at": null,
+      "note": ""
+    },
+    "aviation": {
+      "label": "ADS-B",
+      "status": "available",
+      "observed_at": null,
+      "note": ""
+    },
+    "firms": {
+      "label": "NASA FIRMS",
+      "status": "available",
+      "observed_at": "2026-09-10T23:44:00Z",
+      "note": ""
+    },
+    "gdelt": {
+      "label": "GDELT",
+      "status": "stale",
+      "observed_at": null,
+      "note": "0/5 地區取得新資料；舊值不計分"
+    },
+    "notams": {
+      "label": "FAA NOTAM",
+      "status": "stale",
+      "observed_at": null,
+      "note": "0/5 地區取得新資料；舊值不計分"
+    },
+    "wikipedia": {
+      "label": "Wikipedia",
+      "status": "available",
+      "observed_at": null,
+      "note": ""
+    },
+    "news": {
+      "label": "Google News",
+      "status": "available",
+      "observed_at": null,
+      "note": ""
+    },
+    "tw_news": {
+      "label": "台海新聞",
+      "status": "available",
+      "observed_at": null,
+      "note": ""
+    },
+    "nuclear_seismic": {
+      "label": "USGS",
+      "status": "available",
+      "observed_at": null,
+      "note": "5/5 測區查詢成功；地震不等於核試驗"
+    },
+    "eonet": {
+      "label": "NASA EONET",
+      "status": "available",
+      "observed_at": null,
+      "note": ""
+    },
+    "finance": {
+      "label": "Yahoo Finance",
+      "status": "available",
+      "observed_at": null,
+      "note": ""
+    },
+    "food": {
+      "label": "Comtrade 糧食",
+      "status": "partial",
+      "observed_at": "2026-09-11T04:04:28.079753+00:00",
+      "note": "觀測期間：2026-07；與抓取時間不同"
+    },
+    "strat": {
+      "label": "Comtrade 物資",
+      "status": "partial",
+      "observed_at": "2026-09-11T04:07:01.224755+00:00",
+      "note": "觀測期間：2026-07；與抓取時間不同"
+    },
+    "usda": {
+      "label": "USDA ESR",
+      "status": "stale",
+      "observed_at": "2026-09-11T04:04:30.442302+00:00",
+      "note": "觀測期間：2026-08-27；與抓取時間不同"
+    },
+    "bars": {
+      "label": "BestTime",
+      "status": "unavailable",
+      "observed_at": null,
+      "note": "非下班時段（僅美東 16–24 時查詢）"
+    },
+    "fred": {
+      "label": "FRED",
+      "status": "available",
+      "observed_at": null,
+      "note": ""
+    }
   },
   "_notify": {
     "bucket": 496968,
