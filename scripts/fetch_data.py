@@ -2160,59 +2160,73 @@ def calculate_score(pizza_index, polymarket, **sources):
 
 
 async def main():
+    import time
+    from collection_policy import plan
+    try:
+        previous = json.loads(DATA_FILE.read_text(encoding="utf-8"))
+        if not isinstance(previous, dict): previous = {}
+    except (OSError, ValueError):
+        previous = {}
+    collection = plan(previous, os.environ.get("WARHUB_COLLECTION_MODE", "full"))
+    async def measured(name, call):
+        started = time.monotonic()
+        try:
+            return await call
+        finally:
+            collection["duration_seconds"][name] = round(time.monotonic() - started, 3)
     async with aiohttp.ClientSession() as session:
-        pizzint_task  = asyncio.create_task(fetch_pizzint(session))
-        poly_task     = asyncio.create_task(fetch_polymarket(session))
-        aviation_task = asyncio.create_task(fetch_aviation(session))
-        firms_task    = asyncio.create_task(fetch_firms(session))
-        eonet_task    = asyncio.create_task(fetch_eonet(session))
-        gdelt_task    = asyncio.create_task(fetch_gdelt(session))
-        news_task     = asyncio.create_task(fetch_gnews(session))
-        food_task     = asyncio.create_task(fetch_food_imports(session))
-        usda_task     = asyncio.create_task(fetch_usda_esr(session))
-        seismic_task  = asyncio.create_task(fetch_nuclear_seismic(session))
-        wiki_task     = asyncio.create_task(fetch_wikipedia_anxiety(session))
-        notam_task    = asyncio.create_task(fetch_notams(session))
-        bars_task     = asyncio.create_task(fetch_bars(session))
+        pizzint_task  = asyncio.create_task(measured("pizzint", fetch_pizzint(session)))
+        poly_task     = asyncio.create_task(measured("polymarket", fetch_polymarket(session)))
+        aviation_task = asyncio.create_task(measured("aviation", fetch_aviation(session)))
+        firms_task    = asyncio.create_task(measured("firms", fetch_firms(session)))
+        eonet_task    = asyncio.create_task(measured("eonet", fetch_eonet(session)))
+        gdelt_task    = asyncio.create_task(measured("gdelt", fetch_gdelt(session)))
+        news_task     = asyncio.create_task(measured("gnews", fetch_gnews(session)))
+        food_task     = asyncio.create_task(measured("food_imports", fetch_food_imports(session))) if collection["slow_refresh"] else None
+        usda_task     = asyncio.create_task(measured("usda_esr", fetch_usda_esr(session))) if collection["slow_refresh"] else None
+        seismic_task  = asyncio.create_task(measured("nuclear_seismic", fetch_nuclear_seismic(session)))
+        wiki_task     = asyncio.create_task(measured("wikipedia_anxiety", fetch_wikipedia_anxiety(session)))
+        notam_task    = asyncio.create_task(measured("notams", fetch_notams(session)))
+        bars_task     = asyncio.create_task(measured("bars", fetch_bars(session)))
         (pizzint_data, polymarket, aviation, firms, eonet,
          gdelt, news, nuclear_seismic, wikipedia, notams, bars) = await asyncio.gather(
             pizzint_task, poly_task, aviation_task, firms_task, eonet_task,
             gdelt_task, news_task, seismic_task, wiki_task, notam_task, bars_task
         )
-        food = await food_task
-        usda = await usda_task
+        food = await food_task if food_task else previous.get("food")
+        usda = await usda_task if usda_task else previous.get("usda")
         try:
-            food_hist = await fetch_food_history(session)
+            food_hist = await measured("food_history", fetch_food_history(session)) if collection["history_refresh"] else previous.get("food_hist")
         except Exception as e:
             log.warning(f"food history skipped: {e}")
             food_hist = []
         try:
-            strat = await fetch_strategic_imports(session)
+            strat = await measured("strategic_imports", fetch_strategic_imports(session)) if collection["slow_refresh"] else previous.get("strat")
         except Exception as e:
             log.warning(f"strategic imports skipped: {e}")
             strat = {}
         try:
-            strat_hist = await fetch_strategic_history(session)
+            strat_hist = await measured("strategic_history", fetch_strategic_history(session)) if collection["history_refresh"] else previous.get("strat_hist")
         except Exception as e:
             log.warning(f"strategic history skipped: {e}")
             strat_hist = []
         try:
-            tw_news = await fetch_tw_military_news(session)
+            tw_news = await measured("tw_military_news", fetch_tw_military_news(session))
         except Exception as e:
             log.warning(f"tw military news skipped: {e}")
             tw_news = []
         try:
-            pla = await fetch_pla_sorties(session)
+            pla = await measured("pla_sorties", fetch_pla_sorties(session))
         except Exception as e:
             log.warning(f"pla history skipped: {e}")
             pla = {}
         try:
-            finance = await fetch_finance(session)
+            finance = await measured("finance", fetch_finance(session))
         except Exception as e:
             log.warning(f"finance skipped: {e}")
             finance = {}
         try:
-            fred = await fetch_fred(session)
+            fred = await measured("fred", fetch_fred(session)) if collection["slow_refresh"] else previous.get("fred")
         except Exception as e:
             log.warning(f"fred skipped: {e}")
             fred = {}
@@ -2273,6 +2287,7 @@ async def main():
 
     output = {
         "updated_at":    datetime.now(timezone.utc).isoformat(),
+        "collection":    collection,
         "score":         score,
         "pizza":         pizza_shops,
         "pizza_index":   pizza_index,

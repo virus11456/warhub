@@ -150,3 +150,34 @@ class Pipeline(unittest.IsolatedAsyncioTestCase):
             self.assertIsNone(data['score']['combined_score'])
             self.assertEqual(data['source_health']['pizza']['status'],'unavailable')
             self.assertNotIn('_notify',data)
+
+    async def test_fast_pipeline_preserves_slow_data_without_querying_it(self):
+        from contextlib import ExitStack
+        from unittest.mock import AsyncMock
+        import copy
+        funcs=['pizzint','aviation','firms','gdelt','nuclear_seismic','wikipedia_anxiety','notams','bars','pla_sorties','finance']
+        lists=['polymarket','eonet','gnews','tw_military_news']
+        previous={'food': {'schema_version':2, 'updated_at':'2026-09-01T00:00:00+00:00', 'items':[{'wan_ton':12}]},
+                  'usda':None, 'strat':{}, 'fred':{}, 'food_hist':[{'month':'2026-07'}], 'strat_hist':[]}
+        original=copy.deepcopy(previous)
+        with tempfile.TemporaryDirectory() as td, ExitStack() as stack:
+            stack.enter_context(patch.dict('os.environ',{'WARHUB_NO_NOTIFY':'1','WARHUB_COLLECTION_MODE':'fast'}))
+            stack.enter_context(patch.object(f,'DATA_DIR',Path(td)))
+            for name in ['DATA_FILE','HISTORY_FILE','METRICS_DAILY_FILE']:
+                stack.enter_context(patch.object(f,name,Path(td)/(name+'.json')))
+            f.DATA_FILE.write_text(json.dumps(previous))
+            slow=[]
+            for name in ['food_imports','usda_esr','strategic_imports','fred','food_history','strategic_history']:
+                slow.append(stack.enter_context(patch.object(f,'fetch_'+name,AsyncMock(side_effect=AssertionError('slow source queried')))))
+            for name in funcs+lists:
+                value=[] if name in lists else {}
+                if name=='aviation':value={'error':'missing'}
+                stack.enter_context(patch.object(f,'fetch_'+name,AsyncMock(return_value=value)))
+            await f.main()
+            data=json.loads(f.DATA_FILE.read_text())
+            for key,value in original.items(): self.assertEqual(data[key],value)
+            for mock in slow: mock.assert_not_called()
+            self.assertEqual(data['source_health']['food']['status'],'stale')
+            self.assertIn('polymarket',data['collection']['duration_seconds'])
+            self.assertNotIn('food_imports',data['collection']['duration_seconds'])
+            self.assertNotIn('_notify',data)
