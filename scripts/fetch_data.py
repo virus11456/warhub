@@ -721,12 +721,26 @@ async def fetch_eonet(session: aiohttp.ClientSession) -> list[dict]:
 # ─────────────────────────────────────────────────────────────
 # GDELT — 全球新聞衝突報導強度（早期預警的領先指標）
 # ─────────────────────────────────────────────────────────────
+GDELT_BUDGET_SECONDS = 45
+NOTAM_BUDGET_SECONDS = 30
+
+def source_region_order(mapping, slot=None):
+    """Rotate the first query by two-hour UTC slot to avoid budget starvation."""
+    items = list(mapping.items())
+    if not items: return items
+    if slot is None: slot = int(datetime.now(timezone.utc).timestamp() // 7200)
+    offset = slot % len(items)
+    return items[offset:] + items[:offset]
+
+class SourceBackoff(Exception):
+    """Stop this collection cycle on access denial or upstream rate limiting."""
+
 async def fetch_gdelt(session: aiohttp.ClientSession) -> dict:
     """
     對每個地區查詢 GDELT 48h 新聞量強度（佔全球報導百分比）。
     API 限速每 5 秒 1 請求（共享 IP 上更嚴）→ 逐區串行 + 重試遞增退避；
     仍失敗的地區沿用上一輪 data.json 的數值（標記 stale），確保
-    地區風險分數不會因單次限流缺新聞因子。
+    保留歷史可追溯性；舊值不納入地區評分。
     回傳 {region_key: {latest, avg48h, delta_pct[, stale]}}
     """
     # 上一輪的數值作為 fallback
@@ -737,47 +751,61 @@ async def fetch_gdelt(session: aiohttp.ClientSession) -> dict:
         pass
 
     out = {}
-    first = True
-    for key, cfg in REGIONS.items():
-        if not first:
-            await asyncio.sleep(5)
-        first = False
-        params = {
-            "query": cfg["gdelt_q"],
-            "mode": "timelinevol", "timespan": "48h", "format": "json",
-        }
-        # GDELT 對 GitHub 共享 runner IP 幾乎必被限速（回非 JSON → 失敗、沿用舊值）。
-        # 因此「快速失敗」：少重試、短退避、短逾時，避免每次 run 白耗數分鐘（省 Actions 額度）。
-        for attempt, backoff in ((1, 3), (2, 0)):
-            try:
-                async with session.get(
-                    GDELT_API, params=params,
-                    timeout=aiohttp.ClientTimeout(total=12),
-                    headers={"User-Agent": USER_AGENT},
-                ) as resp:
-                    text = await resp.text()
-                data = json.loads(text)  # 限速時會回純文字錯誤訊息 → 進 except
-                points = data["timeline"][0]["data"]
-                vals = [p["value"] for p in points if p.get("value") is not None]
-                if not vals:
+    async def collect():
+        first = True
+        for key, cfg in source_region_order(REGIONS):
+            if not first:
+                await asyncio.sleep(5)
+            first = False
+            params = {
+                "query": cfg["gdelt_q"],
+                "mode": "timelinevol", "timespan": "48h", "format": "json",
+            }
+            # GDELT 對 GitHub 共享 runner IP 幾乎必被限速（回非 JSON → 失敗、沿用舊值）。
+            # 因此「快速失敗」：少重試、短退避、短逾時，避免每次 run 白耗數分鐘（省 Actions 額度）。
+            for attempt, backoff in ((1, 3), (2, 0)):
+                try:
+                    async with session.get(
+                        GDELT_API, params=params,
+                        timeout=aiohttp.ClientTimeout(total=12),
+                        headers={"User-Agent": USER_AGENT},
+                    ) as resp:
+                        if resp.status in (401, 403, 429):
+                            raise SourceBackoff(f"HTTP {resp.status}")
+                        resp.raise_for_status()
+                        text = await resp.text()
+                    data = json.loads(text)  # 限速時會回純文字錯誤訊息 → 進 except
+                    points = data["timeline"][0]["data"]
+                    vals = [p["value"] for p in points if p.get("value") is not None]
+                    if not vals:
+                        break
+                    # 用最後 6 個點當「目前強度」，對比 48h 平均 → 上升/下降
+                    latest = sum(vals[-6:]) / len(vals[-6:])
+                    avg48  = sum(vals) / len(vals)
+                    delta  = ((latest - avg48) / avg48 * 100) if avg48 else 0
+                    out[key] = {
+                        "observed_at": datetime.now(timezone.utc).isoformat(),
+                        "latest": round(latest, 3),
+                        "avg48h": round(avg48, 3),
+                        "delta_pct": round(delta, 1),
+                    }
                     break
-                # 用最後 6 個點當「目前強度」，對比 48h 平均 → 上升/下降
-                latest = sum(vals[-6:]) / len(vals[-6:])
-                avg48  = sum(vals) / len(vals)
-                delta  = ((latest - avg48) / avg48 * 100) if avg48 else 0
-                out[key] = {
-                    "observed_at": datetime.now(timezone.utc).isoformat(),
-                    "latest": round(latest, 3),
-                    "avg48h": round(avg48, 3),
-                    "delta_pct": round(delta, 1),
-                }
-                break
-            except Exception as e:
-                if backoff:
-                    await asyncio.sleep(backoff)
-                else:
-                    log.warning(f"GDELT {key} failed after retries: {e}")
+                except SourceBackoff:
+                    raise
+                except Exception as e:
+                    if backoff:
+                        await asyncio.sleep(backoff)
+                    else:
+                        log.warning(f"GDELT {key} failed after retries: {e}")
 
+            if key not in out and key in prev:
+                out[key] = {**prev[key], "stale": True}
+
+    try:
+        await asyncio.wait_for(collect(), timeout=GDELT_BUDGET_SECONDS)
+    except (TimeoutError, SourceBackoff) as exc:
+        log.warning("fetch_gdelt: stopped within source budget (%s); missing regions remain stale", type(exc).__name__)
+    for key in REGIONS:
         if key not in out and key in prev:
             out[key] = {**prev[key], "stale": True}
 
@@ -1726,44 +1754,60 @@ async def fetch_notams(session: aiohttp.ClientSession) -> dict:
     }
 
     out = {}
-    for key, firs in REGION_FIRS.items():
-        total = danger = 0
-        closure = False
-        ok = 0
-        for fir in firs:
-            for attempt in (1, 2):
-                try:
-                    async with session.post(
-                        NOTAM_API,
-                        data={"searchType": "0", "designatorsForLocation": fir},
-                        timeout=aiohttp.ClientTimeout(total=20),
-                        headers=headers,
-                    ) as resp:
-                        resp.raise_for_status()
-                        data = await resp.json(content_type=None)
-                    if not isinstance(data.get("notamList"), list):
-                        raise ValueError("missing notamList")
-                    notams = data["notamList"]
-                    ok += 1
-                    total += len(notams)
-                    for n in notams:
-                        msg = (n.get("icaoMessage") or "") + " " + (n.get("traditionalMessage") or "")
-                        if NOTAM_DANGER_RE.search(msg):
-                            danger += 1
-                        if NOTAM_CLOSURE_RE.search(msg):
-                            closure = True
-                    break
-                except Exception as e:
-                    if attempt == 2:
-                        log.warning(f"NOTAM {fir} failed: {e}")
-                    else:
-                        await asyncio.sleep(5)
-            await asyncio.sleep(1.5)
-        if ok == len(firs):
-            score = min(100.0, danger * 8 + (40 if closure else 0))
-            out[key] = {"observed_at": datetime.now(timezone.utc).isoformat(), "firs": firs, "total": total, "danger": danger,
-                        "closure": closure, "score": round(score, 1)}
-        elif key in prev:
+    async def collect():
+        first_request = True
+        for key, firs in source_region_order(REGION_FIRS):
+            total = danger = 0
+            closure = False
+            ok = 0
+            for fir in firs:
+                if not first_request:
+                    await asyncio.sleep(1.5)
+                first_request = False
+                for attempt in (1, 2):
+                    try:
+                        async with session.post(
+                            NOTAM_API,
+                            data={"searchType": "0", "designatorsForLocation": fir},
+                            timeout=aiohttp.ClientTimeout(total=20),
+                            headers=headers,
+                        ) as resp:
+                            if resp.status in (401, 403, 429):
+                                raise SourceBackoff(f"HTTP {resp.status}")
+                            resp.raise_for_status()
+                            data = await resp.json(content_type=None)
+                        if not isinstance(data.get("notamList"), list):
+                            raise ValueError("missing notamList")
+                        notams = data["notamList"]
+                        ok += 1
+                        total += len(notams)
+                        for n in notams:
+                            msg = (n.get("icaoMessage") or "") + " " + (n.get("traditionalMessage") or "")
+                            if NOTAM_DANGER_RE.search(msg):
+                                danger += 1
+                            if NOTAM_CLOSURE_RE.search(msg):
+                                closure = True
+                        break
+                    except SourceBackoff:
+                        raise
+                    except Exception as e:
+                        if attempt == 2:
+                            log.warning(f"NOTAM {fir} failed: {e}")
+                        else:
+                            await asyncio.sleep(5)
+            if ok == len(firs):
+                score = min(100.0, danger * 8 + (40 if closure else 0))
+                out[key] = {"observed_at": datetime.now(timezone.utc).isoformat(), "firs": firs, "total": total, "danger": danger,
+                            "closure": closure, "score": round(score, 1)}
+            elif key in prev:
+                out[key] = {**prev[key], "stale": True}
+
+    try:
+        await asyncio.wait_for(collect(), timeout=NOTAM_BUDGET_SECONDS)
+    except (TimeoutError, SourceBackoff) as exc:
+        log.warning("fetch_notams: stopped within source budget (%s); missing regions remain stale", type(exc).__name__)
+    for key in REGION_FIRS:
+        if key not in out and key in prev:
             out[key] = {**prev[key], "stale": True}
 
     fresh = sum(1 for v in out.values() if not v.get("stale"))
