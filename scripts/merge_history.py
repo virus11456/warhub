@@ -51,11 +51,12 @@ def _union_days(local: dict, remote: dict, key="aircraft") -> dict:
 
 
 def _union_months(local: dict, remote: dict) -> dict:
-    """月歷史：遠端有而本地無的月份補上（本地為準，只補缺）。"""
+    """月歷史：補齊缺月，已核驗的遠端值優先於本地舊格式。"""
     lm = dict((local or {}).get("months") or {})
     rm = (remote or {}).get("months") or {}
     for k, v in rm.items():
-        lm.setdefault(k, v)
+        if k not in lm or (v.get("schema_version") == 2 and lm[k].get("schema_version") != 2):
+            lm[k] = v
     return lm
 
 
