@@ -42,5 +42,11 @@ def source_health(data):
             status = 'available' if n else 'unavailable'
             note = f'{n} 店有即時人流；未觀測不等同已打烊'
             observed = (data.get('defcon_details') or {}).get('at_time')
+        if key in (data.get('collection') or {}).get('reused_sources', []):
+            note += '；本輪沿用慢資料，未重新查詢，原觀測時間不變'
+            from collection_policy import elapsed_hours
+            age = elapsed_hours((data.get('collection') or {}).get('slow_attempted_at'), datetime.now(timezone.utc))
+            if status in ('available', 'partial') and (age is None or age >= 6):
+                status = 'stale'
         out[key] = {'label':label, 'status':status, 'observed_at':observed, 'note':note}
     return out

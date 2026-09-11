@@ -2,9 +2,14 @@ name: Update data
 
 on:
   schedule:
-    - cron: '23 */2 * * *'  # 每 2 小時第 23 分：每小時對免費 2,000 分鐘/月額度太多（曾兩度用爆被擋），改每 2 小時 ≈ 1,500 分/月，穩在額度內
+    - cron: '23 */2 * * *'  # 每 2 小時第 23 分；實際觸發可能延遲，額度須依實測耗時評估
   workflow_dispatch:
     inputs:
+      collection_mode:
+        description: 'auto：快資料每輪、慢資料6小時、歷史24小時；fast：只更新快資料；full：完整流程'
+        type: choice
+        options: [auto, fast, full]
+        default: auto
       test_push:
         description: '傳一則測試推播到 Telegram/Discord（驗證連線）'
         type: boolean
@@ -46,6 +51,7 @@ jobs:
           USDA_FAS_API_KEY: ${{ secrets.USDA_FAS_API_KEY }}
           # 選填：FRED 免費 API key（設定後啟用 EM／高收益信用利差封存）
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          WARHUB_COLLECTION_MODE: ${{ inputs.collection_mode || 'auto' }}
           TEST_PUSH: ${{ inputs.test_push }}
           # 選填：到 Settings → Secrets and variables → Actions → Variables 設定可調整推播行為
           DIGEST_EVERY_HOURS: ${{ vars.DIGEST_EVERY_HOURS }}
