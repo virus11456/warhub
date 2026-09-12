@@ -22,7 +22,7 @@ description: "Maintain WARHUB collector orchestration, source freshness, schedul
 
 ## 執行與資料規則
 
-先讀 `scripts/collection_policy.py`、`scripts/collection_guard.py` 與 `.github/workflows/update-data.yml`。目前 workflow 每兩小時第 23 分排程，110 分鐘內已有快照即跳過；`auto` 每輪快來源、6 小時檢查慢來源、24 小時檢查歷史。來源內部快取可能更久。排程設定不等於準時執行保證，以 Actions 實際時間判斷延遲。
+先讀 `scripts/collection_policy.py`、`scripts/collection_guard.py` 與 `.github/workflows/update-data.yml`。目前 workflow 每小時第 23 分檢查，110 分鐘內已有快照即跳過（使用 runner 內建 python3，略過環境設定、安裝、來源請求、提交與通知）；正常每約兩小時實際收集一次，增加檢查機會不代表每小時抓資料。排程漏跑或延遲仍可能發生，不能當作獨立備援；`auto` 每輪快來源、6 小時檢查慢來源、24 小時檢查歷史。來源內部快取可能更久。排程設定不等於準時執行保證，以 Actions 實際時間判斷延遲。
 
 `python scripts/fetch_data.py` 會寫正式資料，直接執行預設 `full`，且不會自動經過 workflow 的間隔守門員，還可能發送正常通知。不得把這個命令當作離線驗證。依當次授權決定是否執行收集／通知，skill 本身不授予發送訊息權限。需要實際收集但不通知時使用 `WARHUB_NO_NOTIFY=1`；需要快來源才用 `WARHUB_COLLECTION_MODE=fast`，不要為了檢查而增加排程或反覆強制更新。
 
