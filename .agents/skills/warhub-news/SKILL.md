@@ -40,3 +40,7 @@ Google 舊流程保留給未指定 provider 的本機相容用途，已有 GitHu
 ## 金鑰更換紀錄
 
 使用者於 2026-09-12 確認已設定 Groq Secret，並告知 key 上限一年。實際期限以 Groq 控制台為準；以此設定日計算的年度更換檢查日為 2027-09-12，應在到期前完成替換。更換流程為產生新 key、更新同名 GitHub Actions Secret `GROQ_API_KEY`、以不發通知的翻譯測試驗證，再撤銷舊 key；若舊 key 已暴露，應儘快撤銷並替換。不可把金鑰值寫入 skill、程式、log 或 commit。此紀錄不是已設定的自動提醒。
+
+## 只補譯現有標題
+
+`Translate saved titles`（`.github/workflows/translate-titles.yml`）僅手動觸發於 main，與收集 workflow 共用 `update-data` concurrency；使用 `scripts/refresh_translations.py` 讀現有快照並補譯。它不抓來源、不算分、不發通知、不改 `updated_at` 或原觀測時間。全部標題有效才原子寫回 data.json，失敗不寫入；一般 push 遇到遠端更新即失敗，不強制覆蓋。這個手動修復提交可由 Git 歷史追溯，不新增一份偽裝成新觀測的收集封存。不要為驗證 key 而執行整套爬蟲。驗證 `tests/test_refresh_translations.py`。
