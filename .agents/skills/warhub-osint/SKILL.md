@@ -56,3 +56,9 @@ description: "Maintain WARHUB ADS-B, FIRMS, EONET, GDELT, USGS, Wikipedia and FA
 每輪從GitHub checkout保留的最近32批原始archive驗證並重建SQLite索引（暫存記憶體），summary寫data.json.gdelt_events_sampling.index；舊原始archive不刪除，可離線全量重建。index視窗之外的事件可能無法連結，不代表原始資料消失。summary標示已處理批次與內部缺批；仍未加入前台事件列表。
 
 tests/test_gdelt_sampling.py驗證6h限制、錯誤保留舊資料、archive還原與跨目錄重建；tests/test_deploy.mjs驗證來源新增不部署。主workflow對此額外步驟設2分鐘上限且錯誤不阻斷其他資料提交；強制逾時可能來不及寫attempted_at，不能宣稱所有失敗都已保存。
+
+## FAA 跨輪退避與正式介面
+
+fetch_notams遇401／403／429沿用cooldown_active／cooldown_deadline，預設6小時，Retry-After秒數限制1至24小時，保存到地區cooldown_until。冷卻期間零請求、原觀測時間不變且stale；無歷史值只記缺資料，不填零。成功恢復的地區用新觀測取代冷卻標記。測試test_notam_backoff.py覆蓋首次拒絕、跨輪重用及到期恢復。此機制只减少無效請求，不代表資料恢復。
+
+FAA官方NMS頁與FAQ目前指引透過7-AWA-NAIMES@faa.gov申請NMS-API存取及文件：https://www.faa.gov/about/initiatives/notam 、https://www.faa.gov/about/initiatives/notam/faqs 。現有NOTAM Search網頁端點不是已授權的新API；未取得介面文件及存取前不能猜測URL或宣稱已遷移。申請或寄信需依使用者授權，skill不授予外部訊息權限。
