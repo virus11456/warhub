@@ -16,6 +16,7 @@ import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 from pla_counts import usable_days
+from pla_official import is_official, view as official_view
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 DATA_FILE = DATA_DIR / "data.json"
@@ -44,6 +45,10 @@ def _union_days(local: dict, remote: dict, key="aircraft") -> dict:
     rd = usable_days((remote or {}).get("days") or {})
     for k, v in rd.items():
         cur = ld.get(k)
+        if is_official(v) or (cur and is_official(cur)):
+            if is_official(v) and (not cur or not is_official(cur) or v.get('checked_at','') > cur.get('checked_at','')):
+                ld[k] = v
+            continue
         if cur and cur.get('verified') and not v.get('verified'):
             continue
         if (not cur) or (v.get('verified') and not cur.get('verified')) or (v.get(key, 0) or 0) > (cur.get(key, 0) or 0):
@@ -71,21 +76,17 @@ def merge_pla():
     from datetime import timedelta
     cutoff = (datetime.now(timezone.utc) + timedelta(hours=8) - timedelta(days=30)).date().isoformat()
     days = {d: v for d, v in days.items() if d >= cutoff}
-    PLA_FILE.write_text(json.dumps({"days": days}, ensure_ascii=False), encoding="utf-8")
+    legacy = {**(remote or {}).get('unverified_days', {}), **(local or {}).get('unverified_days', {})}
+    for d,row in list(days.items()):
+        if not is_official(row):
+            legacy.setdefault(d,row); del days[d]
+    PLA_FILE.write_text(json.dumps({"days": days, "unverified_days": legacy}, ensure_ascii=False), encoding="utf-8")
 
     # 依聯集後的歷史，重算 data.json 的 pla 區塊，讓圖表立即一致
     data = _load(DATA_FILE)
     if data is None:
         return
-    series = [{"date": d, **days[d]} for d in sorted(days)]
-    acs = [x["aircraft"] for x in series]
-    baseline = sorted(acs)[len(acs) // 2] if acs else 0
-    data["pla"] = {
-        "updated_at": datetime.now(timezone.utc).isoformat(),
-        "days": series, "baseline": baseline,
-        "latest": series[-1] if series else None,
-        "note": "新聞標題架次估計（未逐筆核對國防部，發稿日非觀測日）· 非即時 · 過去 30 天滾動累積",
-    }
+    data["pla"] = official_view(days)
     DATA_FILE.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
 

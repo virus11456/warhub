@@ -11,7 +11,7 @@ description: "Maintain WARHUB Google News RSS collectors, Traditional Chinese ti
 |---|---|
 | `fetch_gnews` | Google News RSS `news.google.com/rss/search`；`data.json.news`，保留原文、連結、發稿時間與來源 |
 | `fetch_tw_military_news` | 台灣語系 RSS `hl=zh-TW&gl=TW&ceid=TW:zh-Hant`；`data.json.tw_news` |
-| `fetch_pla_sorties` | 共機相關 RSS 標題；`data.json.pla` 與 `data/pla_adiz.json`，30 天滾動歷史 |
+| `fetch_pla_sorties` | 空軍官方完整日報；`data.json.pla` 與 `data/pla_adiz.json`，30 天滾動歷史 |
 
 每輪快來源抓取；發稿日不等於事件日。先比較 HTTP／RSS 解析、篩選後筆數、快取沿用和翻譯結果，分辨無新聞與無譯文。Google News 標題不會填補 GDELT 的量化新聞強度。
 
@@ -29,13 +29,15 @@ Google 舊流程保留給未指定 provider 的本機相容用途，已有 GitHu
 
 前端 `chineseTitle`／`zhMarket` 共用中文結果。失敗顯示中文未取得提示並保留原文入口，不用字詞替換假裝翻譯；同時報告缺譯數，不能把提示當成已翻譯。要提高未來成功率須處理來源故障／可用的翻譯服務，不能只補當前快照就聲稱永久修好。
 
-## 架次解析
+## 官方架次
 
-`21機艦`、`21機艦船` 是混合總數，不能記成 21 架飛機。只接受明確架次或可辨識的單獨機數；排除機型號碼、跨期累計。保存 `source_title`、`source_url`、`date_basis=publication_date`、`verified=False`；只有實際核對來源的紀錄才能標 verified。
+`fetch_pla_sorties` 使用 `scripts/pla_official.py` 讀空軍官方空情動態列表及完整日報（air.mnd.gov.tw）。每輪列表1次，最多3篇缺漏／新日報；最新已存日報每6小時重新核對修訂。沿用全站間隔，不新增排程。解析失敗保留原資料及 checked_at，不改為零，不退回新聞標題估計。
 
-同一天不同新聞不是可直接加總的獨立觀測。目前最大值合併只是估計；保留已核實紀錄，`usable_days` 防止舊混合總數從歷史合併回流。無來源的舊紀錄不是已核實，不能用填滿圖表當驗證。
+解析器驗證官方URL、日報日期與明確24小時06:00至06:00起訖一致、非未來期間。`aircraft`為偵獲共機總架次，`area_aircraft`與`area_description`保留括號內特定空域子集，不能一律称為越線；共艦與公務船分開。零架次有效，缺欄位為null。保留 source_url、source_title、period_start、period_end、checked_at、date_basis=period_end、source_kind=mnd_daily_report。verified指通過官方日報格式及口徑核驗，不代表自行驗證實際軍事活動。
 
-驗證 `tests/test_translations.py`（Groq 完整 id 對應、限流停止與快取跨輪保留）、`tests/test_news_translation.py`、`tests/test_pla_counts.py` 與涉及畫面的 `tests/test_frontend.cjs`；覆蓋翻譯失敗／原文變更、混合機艦數、機型數字與歷史合併。測試用 mock，不呼叫翻譯 API。
+舊新聞估計留在 pla_adiz.json 的 unverified_days，不納入官方圖表及基準。合併以官方紀錄及較新checked_at優先，可接受較小修訂值，不取最大值。官方days滾動30日，缺日保留空白；首頁列表只有12篇，不能宣稱全部30天已核實。舊估計與原版本仍可追溯，尚未全歷史回補。
+
+驗證 tests/test_pla_official.py、tests/test_pla_counts.py、tests/test_frontend.cjs。純離線fixture，不執行整套爬蟲或通知。官方網站若改格式，解析失敗需核對原文後更新，不放寬為任意標題數字匹配。
 
 ## 金鑰更換紀錄
 
