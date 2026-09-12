@@ -37,6 +37,9 @@ test('deployment gate preserves code updates and fresh data without unnecessary 
     const archive = `archives/2026/09/20260911T060211_${'a'.repeat(64)}.json.gz`;
     writeFileSync(join(cwd, archive), 'compressed snapshot fixture'); commit();
     assert.equal(gate(deployed), 0, 'archive and data changes skip deployment');
+    mkdirSync(join(cwd,'archives/gdelt-events'),{recursive:true});
+    writeFileSync(join(cwd,`archives/gdelt-events/20260912141500_${'b'.repeat(64)}.json.gz`),'source fixture'); commit();
+    assert.equal(gate(deployed),0,'GDELT source archives skip deployment');
     const archiveIgnored = spawnSync('git', ['-c', `core.excludesfile=${ignoreFile}`, 'check-ignore', '--no-index', archive], { cwd });
     assert.equal(archiveIgnored.status, 0, 'archives stay out of the public deployment');
     mkdirSync(join(cwd, '.agents/skills/warhub-news'), { recursive: true });
