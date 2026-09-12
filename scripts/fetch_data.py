@@ -752,8 +752,13 @@ async def fetch_gdelt(session: aiohttp.ClientSession) -> dict:
     except Exception:
         pass
 
+    from gdelt_quality import timeline_metrics, cooldown_active, cooldown_deadline
+    if cooldown_active(prev):
+        return {k: {**v, 'stale': True} for k,v in prev.items() if k in REGIONS}
+    cooldown = None
     out = {}
     async def collect():
+        nonlocal cooldown
         first = True
         for key, cfg in source_region_order(REGIONS):
             if not first:
@@ -773,24 +778,12 @@ async def fetch_gdelt(session: aiohttp.ClientSession) -> dict:
                         headers={"User-Agent": USER_AGENT},
                     ) as resp:
                         if resp.status in (401, 403, 429):
+                            cooldown = cooldown_deadline(getattr(resp, 'headers', {}))
                             raise SourceBackoff(f"HTTP {resp.status}")
                         resp.raise_for_status()
                         text = await resp.text()
                     data = json.loads(text)  # 限速時會回純文字錯誤訊息 → 進 except
-                    points = data["timeline"][0]["data"]
-                    vals = [p["value"] for p in points if p.get("value") is not None]
-                    if not vals:
-                        break
-                    # 用最後 6 個點當「目前強度」，對比 48h 平均 → 上升/下降
-                    latest = sum(vals[-6:]) / len(vals[-6:])
-                    avg48  = sum(vals) / len(vals)
-                    delta  = ((latest - avg48) / avg48 * 100) if avg48 else 0
-                    out[key] = {
-                        "observed_at": datetime.now(timezone.utc).isoformat(),
-                        "latest": round(latest, 3),
-                        "avg48h": round(avg48, 3),
-                        "delta_pct": round(delta, 1),
-                    }
+                    out[key] = timeline_metrics(data)
                     break
                 except SourceBackoff:
                     raise
@@ -811,6 +804,9 @@ async def fetch_gdelt(session: aiohttp.ClientSession) -> dict:
         if key not in out and key in prev:
             out[key] = {**prev[key], "stale": True}
 
+    if cooldown:
+        for key in REGIONS:
+            out.setdefault(key, {'stale': True})['cooldown_until'] = cooldown
     fresh = sum(1 for v in out.values() if not v.get("stale"))
     log.info(f"GDELT: {fresh}/{len(REGIONS)} fresh, {len(out) - fresh} carried over")
     return out
