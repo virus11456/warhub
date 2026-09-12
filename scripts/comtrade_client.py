@@ -6,6 +6,7 @@ import time
 import weakref
 from datetime import datetime, timezone, timedelta
 import aiohttp
+from source_archive import save_comtrade
 
 STATES = weakref.WeakKeyDictionary()
 
@@ -20,14 +21,23 @@ class Client:
         self.status = 'not_queried'
         self.cooldown_until = (saved or {}).get('cooldown_until')
         self.stopped = False
+        self.cache = {}
+        self.cache_hits = 0
+        self.archived = 0
+        self.archive_dir = os.getenv('WARHUB_SOURCE_ARCHIVE_DIR')
 
     def report(self):
         return {'mode': 'authenticated' if self.key else 'public_preview',
                 'status': self.status, 'requests': self.requests,
-                'successes': self.successes, 'cooldown_until': self.cooldown_until}
+                'successes': self.successes, 'cooldown_until': self.cooldown_until,
+                'cache_hits': self.cache_hits, 'archived': self.archived}
 
     async def query(self, session, params):
         async with self.lock:
+            cache_key = tuple(sorted((k, str(v)) for k, v in params.items()))
+            if cache_key in self.cache:
+                self.cache_hits += 1
+                return dict(self.cache[cache_key])
             now = datetime.now(timezone.utc)
             try:
                 if now < datetime.fromisoformat(self.cooldown_until):
@@ -64,6 +74,12 @@ class Client:
                     response.raise_for_status()
                     body = await response.json(content_type=None)
                 weights = parse_weights(body, query)
+                if self.archive_dir:
+                    # Disk failures must fail collection, never silently discard observations.
+                    save_comtrade(self.archive_dir, query, body['data'], weights,
+                                  'authenticated' if self.key else 'public_preview')
+                    self.archived += 1
+                self.cache[cache_key] = dict(weights)
                 self.successes += 1
                 self.status = 'available' if weights else 'empty'
                 return weights

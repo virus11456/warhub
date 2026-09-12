@@ -68,6 +68,7 @@ jobs:
           TELEGRAM_CHANNEL_SCOPE: ${{ vars.TELEGRAM_CHANNEL_SCOPE }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           BESTTIME_API_KEY: ${{ secrets.BESTTIME_API_KEY }}
+          WARHUB_SOURCE_ARCHIVE_DIR: /tmp/warhub-source-archive
           COMTRADE_API_KEY: ${{ secrets.COMTRADE_API_KEY }}
           USDA_FAS_API_KEY: ${{ secrets.USDA_FAS_API_KEY }}
           # 選填：FRED 免費 API key（設定後啟用 EM／高收益信用利差封存）
@@ -83,6 +84,15 @@ jobs:
           HOTSPOT_SURGE_MIN: ${{ vars.HOTSPOT_SURGE_MIN }}
         run: python scripts/fetch_data.py
 
+      - name: Preserve Comtrade observations if later steps fail
+        if: always() && steps.spacing.outputs.collect == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: comtrade-observations
+          path: /tmp/warhub-source-archive/
+          if-no-files-found: ignore
+          retention-days: 30
+
       - name: Commit data.json
         if: steps.spacing.outputs.collect == 'true'
         run: |
@@ -96,6 +106,9 @@ jobs:
           # Save exactly what the collector produced, before merge guards alter the live view.
           # Keep the new immutable archive outside the checkout across push retries.
           python scripts/archive_snapshot.py --output /tmp/warhub-new-archive
+          if [ -d /tmp/warhub-source-archive ]; then
+            cp -rn /tmp/warhub-source-archive/. /tmp/warhub-new-archive/
+          fi
           for i in 1 2 3 4 5; do
             git fetch origin main
             # 只提交 data/：先把這次算好的 data/ 暫存，工作區「完全對齊」遠端最新

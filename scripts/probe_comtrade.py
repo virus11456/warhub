@@ -1,4 +1,4 @@
-"""One production collector query, without writing data or sending notifications."""
+"""One production collector query, without changing dashboard data or sending notifications."""
 import asyncio
 import os
 import aiohttp
