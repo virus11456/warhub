@@ -22,6 +22,7 @@ import json
 import logging
 import os
 import re
+from translations import cached_titles as translation_cache, update_cache, request_state, translate_groq
 from scoring import MODEL_VERSION, market_risk, market_average, aggregate, calculate_wpi
 from datetime import datetime, timezone
 from pathlib import Path
@@ -864,18 +865,20 @@ async def _translate_titles(session, items, tl="zh-TW", cached_titles=None):
     cached = dict(cached_titles or {})
     if cached_titles is None:
         try:
-            for old in json.loads(DATA_FILE.read_text(encoding="utf-8")).get("news", []):
-                if old.get("title_en") and old.get("title_zh"):
-                    cached[old["title_en"]] = old["title_zh"]
+            cached = translation_cache(json.loads(DATA_FILE.read_text(encoding="utf-8")), "news")
         except (OSError, ValueError, TypeError):
             pass
     cached = {original: translated for original, translated in cached.items()
               if isinstance(translated, str) and re.search(r"[\u3400-\u9fff]", translated)}
-    gate = asyncio.Semaphore(2)
+    if os.environ.get('WARHUB_TRANSLATION_PROVIDER') == 'groq' or os.environ.get('GROQ_API_KEY'):
+        await translate_groq(session, items, cached)
+        return
+    state = request_state(session)
     async def translate(item):
         original = item.get("title_en") or item.get("title", "")
         item["title_en"] = original
         item.pop("title_zh", None)
+        item.pop("translation_error", None)
         item["title"] = original
         if re.search(r"[\u3400-\u9fff]", original):
             item.update(title_zh=original, translation_status="original")
@@ -884,22 +887,35 @@ async def _translate_titles(session, items, tl="zh-TW", cached_titles=None):
             item.update(title=cached[original], title_zh=cached[original], translation_status="cached")
             return
         item["translation_status"] = "unavailable"
-        async with gate:
+        async with state['gate']:
+            if state['failure']:
+                item['translation_error'] = state['failure']
+                return
             try:
                 async with session.get("https://translate.googleapis.com/translate_a/single",
                     params={"client":"gtx", "sl":"auto", "tl":tl, "dt":"t", "q":original},
                     timeout=aiohttp.ClientTimeout(total=8)) as resp:
                     if resp.status != 200:
+                        item['translation_error'] = f'http_{resp.status}'
+                        if resp.status in (401, 403, 429) or resp.status >= 500:
+                            state['failure'] = item['translation_error']
+                        log.warning("title translation unavailable: HTTP %s", resp.status)
                         return
                     data = await resp.json(content_type=None)
                 translated = "".join(seg[0] for seg in data[0] if seg and seg[0]).strip()
                 if translated and re.search(r"[\u3400-\u9fff]", translated):
                     item.update(title=translated, title_zh=translated, translation_status="translated")
+                else:
+                    item['translation_error'] = 'invalid_translation'
             except Exception as exc:
+                item['translation_error'] = type(exc).__name__
                 log.warning("title translation unavailable: %s", type(exc).__name__)
     try:
         await asyncio.wait_for(asyncio.gather(*(translate(item) for item in items)), timeout=30)
     except asyncio.TimeoutError:
+        for item in items:
+            if not item.get('title_zh'):
+                item.setdefault('translation_error', 'budget_exhausted')
         log.warning("title translation budget reached; completed translations retained")
     log.info("Chinese news titles: %s/%s", sum(bool(i.get("title_zh")) for i in items), len(items))
 
@@ -907,14 +923,17 @@ async def _translate_titles(session, items, tl="zh-TW", cached_titles=None):
 async def _translate_market_questions(session, markets):
     cached = {}
     try:
-        old = json.loads(DATA_FILE.read_text(encoding="utf-8")).get("polymarket", [])
-        cached = {m["question"]:m["question_zh"] for m in old if m.get("question_zh")}
+        cached = translation_cache(json.loads(DATA_FILE.read_text(encoding="utf-8")), "polymarket")
     except (OSError, ValueError, TypeError):
         pass
     titles = [{"title":m.get("question", "")} for m in markets]
     await _translate_titles(session, titles, cached_titles=cached)
     for market, title in zip(markets, titles):
         market.pop("question_zh", None)
+        market.pop("translation_error", None)
+        market['translation_status'] = title.get('translation_status', 'unavailable')
+        if title.get('translation_error'):
+            market['translation_error'] = title['translation_error']
         if title.get("title_zh"):
             translated = title["title_zh"]
             # Preserve deadline semantics: a "by" date must not become an event on that date.
@@ -2400,6 +2419,7 @@ async def main():
     output = {
         "updated_at":    datetime.now(timezone.utc).isoformat(),
         "collection":    collection,
+        "translation_cache": update_cache(previous, news, polymarket),
         "score":         score,
         "pizza":         pizza_shops,
         "pizza_index":   pizza_index,
