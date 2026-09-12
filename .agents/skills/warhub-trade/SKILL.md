@@ -74,3 +74,5 @@ trade_api只保存模式、狀態、請求／成功次數、冷卻期限；沒�
 同一國集合的正式修訂可以降低至0；新月份照實顯示部分資料，不拿舊月份湊數。stale資料不算新同比或異常。驗證tests/test_trade_current_preservation.py的覆蓋縮水／換國、基期缺報、修訂為0、換月及原時間保存。
 
 提交前merge_history._union_months也須保護相同月份、schema2/mirror的已知回報國範圍。任何商品失去既有回報國或有效重量時保留遠端整份月觀測，不拼加重疊總量；同範圍或擴大範圍允許數值下修及有效零。中國直報與鏡像不以國家範圍混比；新收到的部分來源仍由原始封存保留。測試tests/test_trade_history_merge.py。
+
+當期food／strat在22小時快取內重用時，cache_reused_at只記快取檢查時間，不改updated_at或資料月份；source_health須註明未重新查詢。再次進入來源抓取先清除上一輪cache_reused_at，避免失敗回退誤稱本輪快取命中。此標記不代表完整回報，也不延長快取有效期。tests/test_trade_cache_status.py以禁止網路的session驗證兩個真實入口。

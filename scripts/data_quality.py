@@ -37,6 +37,8 @@ def source_health(data):
                     status='available' if fresh==len(items) else 'partial' if measured else 'unavailable'
                     if measured and all(r.get('stale') for r in measured): status='stale'
                 note = '觀測期間：' + str(v.get('ref_month') or v.get('week_ending') or '未知') + '；與抓取時間不同'
+        if key in ('food', 'strat') and isinstance(v, dict) and v.get('cache_reused_at'):
+            note += '；沿用22小時來源快取，未重新查詢，原取得時間不變'
         if key == 'fred' and isinstance(v, dict):
             records = v.get('observations') or {}
             valid = [records.get(k, {}) for k in ('em_oas', 'hy_oas')

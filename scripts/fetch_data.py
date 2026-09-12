@@ -1137,6 +1137,7 @@ async def fetch_food_imports(session: aiohttp.ClientSession) -> dict:
     prev = {}
     try:
         prev = json.loads(DATA_FILE.read_text(encoding="utf-8")).get("food") or {}
+        prev.pop("cache_reused_at", None)
     except Exception:
         pass
     if prev.get("updated_at"):
@@ -1145,7 +1146,7 @@ async def fetch_food_imports(session: aiohttp.ClientSession) -> dict:
                    datetime.fromisoformat(prev["updated_at"])).total_seconds()
             if prev.get("schema_version") == 2 and not prev.get("stale") and 0 <= age < 22 * 3600:
                 log.info("food: fresh (<22h), carried over")
-                return prev
+                return {**prev, "cache_reused_at": datetime.now(timezone.utc).isoformat()}
         except Exception:
             pass
 
@@ -1339,6 +1340,7 @@ async def fetch_strategic_imports(session: aiohttp.ClientSession) -> dict:
     prev = {}
     try:
         prev = json.loads(DATA_FILE.read_text(encoding="utf-8")).get("strat") or {}
+        prev.pop("cache_reused_at", None)
     except Exception:
         pass
     if prev.get("updated_at"):
@@ -1347,7 +1349,7 @@ async def fetch_strategic_imports(session: aiohttp.ClientSession) -> dict:
                    datetime.fromisoformat(prev["updated_at"])).total_seconds()
             if prev.get("schema_version") == 2 and not prev.get("stale") and 0 <= age < 22 * 3600:
                 log.info("strat: fresh (<22h), carried over")
-                return prev
+                return {**prev, "cache_reused_at": datetime.now(timezone.utc).isoformat()}
         except Exception:
             pass
 
