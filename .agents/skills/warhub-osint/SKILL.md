@@ -30,3 +30,11 @@ description: "Maintain WARHUB ADS-B, FIRMS, EONET, GDELT, USGS, Wikipedia and FA
 401／403／429保存cooldown_until到各地區紀錄（既有data快照會封存）；Retry-After秒數限制1至24小時，缺少或不可解析時6小時。冷卻期間零來源請求、舊觀測时间不刷新，無歷史數值僅存stale與冷卻欄位。保留區域輪替、來源總時間預算與已完成地區資料。tests/test_gdelt_quality.py、tests/test_source_budgets.py驗證。
 
 其他官方可評估資料為Events、EventMentions、GKG及DOC/GEO產品（https://gdeltproject.org/data.html）。自動新聞事件不等於已證實事件；不可把Events計數替代原timelinevol百分比。批次檔案供應與解析尚待實測，不宣稱已接入。
+
+## Events／Mentions 單批驗證工具
+
+`scripts/probe_gdelt_events.py --output <資料夾>` 最多查lastupdate清單與同批export／mentions ZIP共3次，每次20秒／5MB上限。只允許官方主機、相同批次、有效清單MD5與位元組數，ZIP單一正確檔名／展開50MB上限；不extract路徑。以官方V2 codebook核對61與16欄，保留原始兩份ZIP、manifest、SHA256與帶時間JSON報告。同批檔案存在就驗證重用，報告另存時間版。
+
+事件ID連結mentions、保留無法連結的早期事件數，去重鍵eventID＋mentionTime＋URL＋sentence。不把多篇提及當多個事件；confidence是辨識信心而非事實為真機率。ActionGeo國碼為FIPS，不混用Actor國碼。root13/15/18/19/20僅供候選，不等於軍事事件；不計WPI、不顯示為實證戰況、不發通知。
+
+手動Probe upstream sources選gdelt_events，資料與報告提供30天artifact；正常排程尚未接入，沒有完整時間覆蓋。20260912141500本機樣本：1036事件／3126提及／3064去重提及，其中1980指向更早批次；跨批次索引是下一階段，不能把單批當一天全量。tests/test_gdelt_events_probe.py驗證清單限制、完整性、欄數、提及去重與未連結事件。
