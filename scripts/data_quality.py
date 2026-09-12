@@ -37,6 +37,14 @@ def source_health(data):
                     status='available' if fresh==len(items) else 'partial' if measured else 'unavailable'
                     if measured and all(r.get('stale') for r in measured): status='stale'
                 note = '觀測期間：' + str(v.get('ref_month') or v.get('week_ending') or '未知') + '；與抓取時間不同'
+        if key == 'fred' and isinstance(v, dict):
+            records = v.get('observations') or {}
+            valid = [records.get(k, {}) for k in ('em_oas', 'hy_oas')
+                     if v.get(k) is not None and records.get(k, {}).get('observation_date')]
+            status = 'available' if len(valid) == 2 else 'partial' if valid else 'unavailable'
+            dates = sorted({r['observation_date'] for r in valid})
+            observed = dates[0] if dates else None
+            note = '官方觀測日：' + '、'.join(dates) if dates else '缺少可核實的官方觀測日期'
         if key == 'pizza':
             n = sum(1 for s in v or [] if s.get('busyness') is not None and s.get('is_open'))
             status = 'available' if n else 'unavailable'
