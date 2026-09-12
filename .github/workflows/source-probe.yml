@@ -4,26 +4,43 @@ on:
 permissions:
   contents: read
 jobs:
-  probe:
+  comtrade:
     runs-on: ubuntu-latest
-    timeout-minutes: 4
+    timeout-minutes: 2
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-          cache: pip
-          cache-dependency-path: scripts/requirements.txt
-      - run: pip install -r scripts/requirements.txt
-      - name: Probe without writes or notifications
+      - name: Verify Comtrade credential and one commodity record
         env:
-          USDA_FAS_API_KEY: ${{ secrets.USDA_FAS_API_KEY }}
-          BESTTIME_API_KEY: ${{ secrets.BESTTIME_API_KEY }}
-          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
-          WARHUB_NO_NOTIFY: '1'
-        run: python scripts/probe_sources.py
-      - uses: actions/upload-artifact@v4
-        with:
-          name: source-probe
-          path: probe-report.json
-          retention-days: 7
+          COMTRADE_API_KEY: ${{ secrets.COMTRADE_API_KEY }}
+        run: |
+          python3 - <<'PY'
+          import os, json, urllib.request, urllib.error
+          key = os.environ.get("COMTRADE_API_KEY", "").strip()
+          if not key:
+              raise SystemExit("COMTRADE_PROBE secret_missing")
+          queries = [
+              ("availability", "getDA", "period=202607&reporterCode=36"),
+              ("commodity", "get", "period=202607&reporterCode=36&cmdCode=2601&flowCode=X&partnerCode=156&partner2Code=0&customsCode=C00&motCode=0&maxRecords=1"),
+          ]
+          for name, endpoint, query in queries:
+              req = urllib.request.Request(
+                  "https://comtradeapi.un.org/data/v1/" + endpoint + "/C/M/HS?" + query,
+                  headers={"Ocp-Apim-Subscription-Key": key, "Accept": "application/json"})
+              try:
+                  with urllib.request.urlopen(req, timeout=30) as response:
+                      payload = json.load(response)
+                      status = response.status
+              except urllib.error.HTTPError as exc:
+                  raise SystemExit("COMTRADE_PROBE " + name + " http=" + str(exc.code))
+              except Exception as exc:
+                  raise SystemExit("COMTRADE_PROBE " + name + " error=" + type(exc).__name__)
+              rows = payload.get("data")
+              if payload.get("error") or not isinstance(rows, list):
+                  raise SystemExit("COMTRADE_PROBE " + name + " invalid_payload")
+              scoped = all(str(row.get("reporterCode")) == "36" and str(row.get("period")) == "202607" for row in rows)
+              if not scoped:
+                  raise SystemExit("COMTRADE_PROBE " + name + " scope_mismatch")
+              print("COMTRADE_PROBE " + name + " http=" + str(status) + " rows=" + str(len(rows)) + " scope_valid=true")
+              if name == "commodity" and rows:
+                  row = rows[0]
+                  print("COMTRADE_PROBE sample=" + json.dumps({k: row.get(k) for k in ["period", "reporterCode", "partnerCode", "cmdCode", "flowCode", "netWgt", "primaryValue"]}))
+          PY
