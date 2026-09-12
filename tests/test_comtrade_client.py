@@ -37,7 +37,7 @@ class Tests(unittest.IsolatedAsyncioTestCase):
         session=Session(Response({'data':[{**PARAMS,'netWgt':42}]}))
         with patch('comtrade_client.asyncio.sleep',new_callable=AsyncMock) as sleep:
             self.assertEqual(await client.query(session,PARAMS),{'2601':42})
-            await client.query(session,PARAMS)
+            await client.query(session,{**PARAMS, 'cmdCode':'1001'})
             self.assertGreater(sleep.call_args.args[0],0)
         url, options=session.calls[0]
         self.assertIn('/data/v1/get/',url)
@@ -61,5 +61,5 @@ class Tests(unittest.IsolatedAsyncioTestCase):
         self.assertIn('/public/v1/preview/',session.calls[0][0])
         self.assertNotIn('Ocp-Apim-Subscription-Key',session.calls[0][1]['headers'])
         client.requests=80
-        self.assertIsNone(await client.query(session,PARAMS))
+        self.assertIsNone(await client.query(session,{**PARAMS, 'period':'202608'}))
         self.assertEqual(len(session.calls),1)

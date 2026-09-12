@@ -41,3 +41,5 @@ description: "Maintain WARHUB collector orchestration, source freshness, schedul
 六份分析檔為 `data/data.json`、`history.json`、`metrics_daily.json`、`pla_adiz.json`、`food_history.json`、`strat_history.json`。`scripts/archive_snapshot.py` 在合併保護前保存收集結果，以時間與內容雜湊命名不可覆蓋的 gzip 快照，排除 `_notify`；這是處理後資料封存，不是原始 HTTP 回應備份。保持 `scripts/merge_history.py` 的歷史聯集與資料品質保護，推送重試不能抹除新歷史或遠端程式。
 
 網站 `/api/data` 讀取最新資料；`vercel-ignore-build.cjs` 以最後成功部署比較，純允許資料／封存更新不重建。合併前確認基底最新，避免舊本機 data 覆蓋自然排程的新值。批次提交；依既有使用者授權合併上線，程式變更確認 CI 與部署結果。報告分開說明已驗證結果與仍缺資料的來源，不宣稱「全部正常」。
+
+Comtrade另由scripts/source_archive.py保存逐次驗證後來源欄位，kind=source_observation，與kind未標記的六檔分析快照並存於archives。不可假定所有gzip皆有files欄位；需依kind辨識。正式workflow合併來源紀錄與分析快照後提交，另有30天來源artifact。其他來源仍是處理後快照，不能宣稱所有HTTP回應均已保存。

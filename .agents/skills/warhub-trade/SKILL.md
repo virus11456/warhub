@@ -58,3 +58,11 @@ auto 的慢來源 6 小時只代表檢查資格；有效 Comtrade 當期資料�
 trade_api只保存模式、狀態、請求／成功次數、冷卻期限；沒有金鑰。驗證回應國別、月份、商品、貿易方向、夥伴、運輸與海關總項；同商品重複總項、錯誤範圍、截斷或無效重量拒用。netWgt缺值保持缺值，有效0保留。
 
 `.github/workflows/update-data.yml` 注入COMTRADE_API_KEY。手動 Probe upstream sources 選comtrade（預設）只執行 `scripts/probe_comtrade.py`，透過正式 `_comtrade_one` 查澳洲202607對中國鐵礦砂一筆，無資料寫入、無通知；all才是舊全來源探測。驗證 `tests/test_comtrade_client.py` 的scope、零／缺值、認證header、節流、跨輪冷卻與預算。
+
+## 逐次查詢資料保存
+
+`scripts/source_archive.py` 保存每次通過scope驗證的Comtrade回應：白名單查詢條件、fetched_at、官方回傳重量／金額／估算旗標等欄位與weights_kg。不是完整HTTP封包，不存header、key或任意回應欄位。空資料存空陣列／空字典，不能改成0。內容雜湊與時間命名gzip，不覆蓋舊版本；修訂值另存新檔。
+
+正式workflow設WARHUB_SOURCE_ARCHIVE_DIR，將來源紀錄合併到本輪archives後隨既有資料提交保存GitHub；推送重試時保留遠端archives與本輪新檔。純archives檔案符合既有Vercel略過規則。另上傳30天Actions artifact供後續步驟失敗時取回；workflow被強制取消／逾時前尚未上傳的檔案不保證保存。
+
+手動comtrade probe同樣保存來源artifact（30天），不改正式儀表板資料或推播。來源紀錄從此版啟用後開始；早先只有分析快照／log，不宣稱能還原當時所有原始回應。同session相同查詢重用副本，不再次網路查詢／刷新取得時間／重複存檔；跨輪仍依來源快取與重新核驗政策。驗證tests/test_source_archive.py的round-trip、修訂並存、零與缺值、憑證排除與重用。

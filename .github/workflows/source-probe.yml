@@ -24,11 +24,12 @@ jobs:
       - name: Verify production Comtrade collector
         if: inputs.source == 'comtrade'
         env:
+          WARHUB_SOURCE_ARCHIVE_DIR: /tmp/warhub-source-archive
           COMTRADE_API_KEY: ${{ secrets.COMTRADE_API_KEY }}
           WARHUB_NO_NOTIFY: '1'
         run: python scripts/probe_comtrade.py
       - name: Probe without writes or notifications
-        if: inputs.source == 'all' 
+        if: inputs.source == 'all'
         env:
           USDA_FAS_API_KEY: ${{ secrets.USDA_FAS_API_KEY }}
           BESTTIME_API_KEY: ${{ secrets.BESTTIME_API_KEY }}
@@ -41,3 +42,11 @@ jobs:
           name: source-probe
           path: probe-report.json
           retention-days: 7
+      - name: Preserve Comtrade probe observations
+        if: always() && inputs.source == 'comtrade'
+        uses: actions/upload-artifact@v4
+        with:
+          name: comtrade-observations
+          path: /tmp/warhub-source-archive/
+          if-no-files-found: ignore
+          retention-days: 30
