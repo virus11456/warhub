@@ -72,3 +72,5 @@ trade_api只保存模式、狀態、請求／成功次數、冷卻期限；沒�
 `preserve_current_coverage` 保護food／strat當期整組快照：同ref_month若任一商品失去已知回報國、有效重量變缺值，或相同去年月份的基期覆蓋縮水，保留上一組快照與原updated_at，stale=true、last_attempted_at記本輪時間、refresh_status記原因。參考月倒退也不覆蓋。保留整組避免混用不同時間的總量；新的部分觀測仍留在來源archives，尚不直接拼接。
 
 同一國集合的正式修訂可以降低至0；新月份照實顯示部分資料，不拿舊月份湊數。stale資料不算新同比或異常。驗證tests/test_trade_current_preservation.py的覆蓋縮水／換國、基期缺報、修訂為0、換月及原時間保存。
+
+提交前merge_history._union_months也須保護相同月份、schema2/mirror的已知回報國範圍。任何商品失去既有回報國或有效重量時保留遠端整份月觀測，不拼加重疊總量；同範圍或擴大範圍允許數值下修及有效零。中國直報與鏡像不以國家範圍混比；新收到的部分來源仍由原始封存保留。測試tests/test_trade_history_merge.py。

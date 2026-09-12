@@ -2,14 +2,10 @@
 """
 提交前的歷史資料防覆蓋守門員。
 
-背景：update-data.yml 的提交步驟會 `git reset --soft origin/main` 後 `git add data/`，
-把「這個 run 工作區算出的檔案」整份蓋到最新遠端上。若這個 run 在某個回填 PR 合併「之前」
-checkout（工作區是舊資料），就會把遠端較完整的累積歷史蓋掉——回填進來、但當下新聞已抓不到
-的日子（例如共軍架次的舊日期）會被永久抹除。
-
-解法：提交前先把 origin/main 的歷史檔「聯集」回工作區（逐鍵取較大值 / 補齊缺鍵），
-再依聯集後的 pla 歷史重算 data.json 的 pla 區塊。這樣任何 run 都只會「補齊」歷史、
-永不縮水。此腳本需在 `git fetch origin main` 之後、`git add` 之前執行。
+必須在 git fetch origin main 後執行。工作流程先重設至最新 main 再放回本輪資料，
+此處聯集遠端歷史，避免較早 checkout 的快照抹掉後來補齊的紀錄。
+官方共機資料依核驗來源與檢查時間選擇；同月鏡像貿易避免失去已知回報國，
+不相加重疊總量。維持各類歷史的既有保留期限；原始輪次另由 archives 保存。
 """
 import json
 import subprocess
@@ -57,12 +53,30 @@ def _union_days(local: dict, remote: dict, key="aircraft") -> dict:
 
 
 def _union_months(local: dict, remote: dict) -> dict:
-    """月歷史：補齊缺月，已核驗的遠端值優先於本地舊格式。"""
+    """Union months without losing previously covered reporters.
+
+    Keep a whole saved monthly observation rather than adding overlapping totals.
+    Equal/superset coverage still accepts local downward revisions, including zero.
+    """
+    from trade_quality import FOOD, codes, valid
     lm = dict((local or {}).get("months") or {})
     rm = (remote or {}).get("months") or {}
-    for k, v in rm.items():
-        if k not in lm or (v.get("schema_version") == 2 and lm[k].get("schema_version") != 2):
-            lm[k] = v
+    for month, saved in rm.items():
+        incoming = lm.get(month)
+        if incoming is None or (saved.get("schema_version") == 2 and incoming.get("schema_version") != 2):
+            lm[month] = saved
+            continue
+        if not (saved.get("schema_version") == incoming.get("schema_version") == 2
+                and saved.get("src") == incoming.get("src") == "mirror"):
+            continue
+        for cmd, reporters in (saved.get("coverage") or {}).items():
+            field = FOOD.get(str(cmd), str(cmd))
+            known = codes(reporters)
+            replacement = codes((incoming.get("coverage") or {}).get(cmd))
+            if known and valid(saved.get(field)) and (
+                    not known <= replacement or not valid(incoming.get(field))):
+                lm[month] = saved
+                break
     return lm
 
 
