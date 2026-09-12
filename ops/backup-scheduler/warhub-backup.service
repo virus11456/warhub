@@ -1,0 +1,17 @@
+[Unit]
+Description=WARHUB stale snapshot recovery check
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+DynamicUser=yes
+StateDirectory=warhub-backup
+LoadCredential=github-token:/etc/warhub-backup/github-token
+ExecStart=/usr/bin/python3 /opt/warhub-backup/backup_scheduler.py --state /var/lib/warhub-backup/state.json --apply
+TimeoutStartSec=150
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+UMask=0077
