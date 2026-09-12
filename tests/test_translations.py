@@ -49,6 +49,7 @@ class GroqTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(s.calls),1)
         self.assertEqual(s.calls[0][0],'https://api.groq.com/openai/v1/chat/completions')
         self.assertEqual(s.calls[0][1]['json']['model'],'openai/gpt-oss-20b')
+        self.assertTrue(s.calls[0][1]['json']['response_format']['json_schema']['strict'])
     async def test_missing_key_retains_cache_without_network(self):
         items=[{'title':'known'},{'title':'new'}];s=Session()
         with patch.dict('os.environ',{'GROQ_API_KEY':''}): await translate_groq(s,items,{'known':'已翻譯'})
@@ -73,3 +74,14 @@ class GroqTests(unittest.IsolatedAsyncioTestCase):
         s=Session(); await translate_groq(s,[{'title':f'headline {i}'} for i in range(21)],{})
         self.assertEqual(len(s.calls),3)
         self.assertEqual([len(json.loads(c[1]['json']['messages'][1]['content'])) for c in s.calls],[10,10,1])
+
+    async def test_non_object_completion_does_not_apply(self):
+        class ArrayResponse(Response):
+            async def json(self, **kwargs):
+                return {'choices':[{'finish_reason':'stop', 'message':{'content':'["錯誤格式"]'}}]}
+        class ArraySession(Session):
+            def post(self, url, **kwargs): return ArrayResponse(200, [])
+        items=[{'title':'one'}]
+        await translate_groq(ArraySession(), items, {})
+        self.assertNotIn('title_zh', items[0])
+        self.assertEqual(items[0]['translation_error'], 'groq_ValueError')

@@ -77,11 +77,19 @@ async def translate_groq(session, items, cached):
             async with state['gate']:
                 if state['failure']:
                     return
+                phase = 'request'
                 try:
                     body = {
                         'model': model, 'temperature': 0,
                         'max_completion_tokens': 4096,
-                        'response_format': {'type': 'json_object'},
+                         'response_format': {'type': 'json_schema', 'json_schema': {
+                            'name': 'translated_titles', 'strict': True,
+                            'schema': {'type': 'object', 'additionalProperties': False,
+                                'properties': {'translations': {'type': 'array', 'items': {
+                                    'type': 'object', 'additionalProperties': False,
+                                    'properties': {'id': {'type': 'integer'}, 'text': {'type': 'string'}},
+                                    'required': ['id', 'text']}}},
+                                'required': ['translations']}}},
                         'messages': [
                             {'role': 'system', 'content': (
                                 'Translate each supplied title faithfully into Traditional Chinese (Taiwan). '
@@ -103,13 +111,20 @@ async def translate_groq(session, items, cached):
                             state['failure'] = f'groq_http_{resp.status}'
                             log.warning('Groq translation unavailable: HTTP %s; stopping this collection', resp.status)
                             return
+                        phase = 'response_json'
                         data = await resp.json(content_type=None)
+                    phase = 'response_envelope'
                     choice = data['choices'][0]
                     if choice.get('finish_reason') != 'stop':
                         raise ValueError('incomplete completion')
-                    rows = json.loads(choice['message']['content'])['translations']
+                    phase = 'completion_json'
+                    decoded = json.loads(choice['message']['content'])
+                    if not isinstance(decoded, dict):
+                        raise ValueError('translation root must be an object')
+                    rows = decoded.get('translations')
                     if not isinstance(rows, list) or len(rows) != len(batch):
                         raise ValueError('incomplete translation batch')
+                    phase = 'translation_mapping'
                     mapped = {}
                     for row in rows:
                         ident, text = row.get('id'), row.get('text')
@@ -125,7 +140,7 @@ async def translate_groq(session, items, cached):
                                         translation_provider='groq', translation_model=model)
                 except Exception as exc:
                     state['failure'] = 'groq_' + type(exc).__name__
-                    log.warning('Groq translation unavailable: %s', type(exc).__name__)
+                    log.warning('Groq translation unavailable: %s at %s', type(exc).__name__, phase)
                     return
     try:
         await asyncio.wait_for(batches(), timeout=60)
