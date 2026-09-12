@@ -1108,6 +1108,8 @@ async def fetch_pla_sorties(session: aiohttp.ClientSession) -> dict:
 # 中國自報 Comtrade 落後 ~18 個月 → 改用出口國「對中出口」當即時代理值
 # 免金鑰 public preview 端點；限速嚴 → 逐一請求＋退避，且每日只更新一次
 # ─────────────────────────────────────────────────────────────
+from trade_availability import should_query as trade_should_query, setup as setup_trade_availability
+
 COMTRADE_URL = "https://comtradeapi.un.org/public/v1/preview/C/M/HS"
 FOOD_EXPORTERS = [("76","巴西"),("842","美國"),("32","阿根廷"),
                   ("36","澳洲"),("124","加拿大"),("804","烏克蘭"),("251","法國")]
@@ -1120,6 +1122,8 @@ def _ym_add(ym: int, d: int) -> int:
 
 async def _comtrade_month(session, reporter: str, period: int):
     """某出口國該月對中國(156)出口的 {cmd: 淨重kg}；失敗回 None。"""
+    if not await trade_should_query(session, reporter, period):
+        return None
     params = {"reporterCode": reporter, "flowCode": "X", "partnerCode": "156",
               "cmdCode": "1201,1001,1005", "period": str(period),
               "partner2Code": "0", "motCode": "0"}
@@ -1225,6 +1229,8 @@ HIST_CHINA_BUDGET   = 15        # 每次最多回填幾個「中國直報」月�
 
 async def _comtrade_china_import(session, period: int):
     """中國該月自全世界進口三主糧 {cmd: netWgt kg}；失敗回 None。"""
+    if not await trade_should_query(session, "156", period):
+        return None
     params = {"reporterCode": "156", "flowCode": "M", "partnerCode": "0",
               "cmdCode": "1201,1001,1005", "period": str(period),
               "partner2Code": "0", "motCode": "0"}
@@ -1357,6 +1363,8 @@ for material in STRAT_MATERIALS:
 
 async def _comtrade_one(session, reporter: str, cmd: str, period: int):
     """某出口國該月對中國(156)出口某 HS 商品的淨重(kg)；失敗回 None。"""
+    if not await trade_should_query(session, reporter, period):
+        return None
     params = {"reporterCode": reporter, "flowCode": "X", "partnerCode": "156",
               "cmdCode": cmd, "period": str(period), "partner2Code": "0", "motCode": "0"}
     for attempt, bk in ((1, 8), (2, 15), (3, 0)):
@@ -1466,6 +1474,8 @@ STRAT_HIST_CHINA_BUDGET  = 12     # 每次回填幾個「中國直報」月（�
 async def _comtrade_china_strat(session, period: int):
     """中國該月自全世界進口 4 項戰略物資 {cmd: netWgt kg}；失敗回 None。"""
     cmds = ",".join(m["cmd"] for m in STRAT_MATERIALS)
+    if not await trade_should_query(session, "156", period):
+        return None
     params = {"reporterCode": "156", "flowCode": "M", "partnerCode": "0",
               "cmdCode": cmds, "period": str(period), "partner2Code": "0", "motCode": "0"}
     for attempt, bk in ((1, 8), (2, 15), (3, 0)):
@@ -2216,6 +2226,7 @@ async def main():
         finally:
             collection["duration_seconds"][name] = round(time.monotonic() - started, 3)
     async with aiohttp.ClientSession() as session:
+        trade_catalog = setup_trade_availability(session, previous.get("trade_availability"))
         pizzint_task  = asyncio.create_task(measured("pizzint", fetch_pizzint(session)))
         poly_task     = asyncio.create_task(measured("polymarket", fetch_polymarket(session)))
         aviation_task = asyncio.create_task(measured("aviation", fetch_aviation(session)))
@@ -2329,6 +2340,7 @@ async def main():
     output = {
         "updated_at":    datetime.now(timezone.utc).isoformat(),
         "collection":    collection,
+        "trade_availability": trade_catalog.cache,
         "translation_cache": update_cache(previous, news, polymarket),
         "score":         score,
         "pizza":         pizza_shops,

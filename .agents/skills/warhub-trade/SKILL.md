@@ -42,3 +42,11 @@ auto 的慢來源 6 小時只代表檢查資格；有效 Comtrade 當期資料�
 糧食歷史回查若新結果僅涵蓋舊回報國的子集合，保留原商品值、覆蓋與美國分量；不得將部分新值與舊總量相加。驗證tests/test_trade_quality.py。
 
 官方資料可用性API（getDa）依官方文件需要訂閱key；現有public preview不具同等語意。COMTRADE_API_KEY尚未驗證前，不宣稱已接入，也不能把空資料說成官方尚未公布。月份公布沒有固定期限。來源：https://uncomtrade.org/docs/data-availability/ 。
+
+## 可用性預覽節流
+
+已整合 `scripts/trade_availability.py` 的免金鑰 `public/v1/getDA/C/M/HS`，按reporterCode與period查月度HS資料集，正式main共用session狀態與鎖，避免重複。每輪最多4次額外metadata請求、每次5秒；成功可用快取24小時，未列出／未知6小時；最多512筆保存在data.json.trade_availability，沿用時不刷新checked_at。碰到拒絕、限流、格式錯誤或逾時停止本輪metadata。
+
+只有格式及查詢範圍驗證通過、count=0的明確空結果才略過該國該月商品查詢；名稱為not_listed，不宣稱官方未公布或零貿易。查詢錯誤、expired cache、預算耗尽均沿用原商品查詢流程，不能把未知變成未公布。正面資料集記錄也不能當作商品重量完整或追蹤國全數齊備。尚未使用COMTRADE_API_KEY；有key後須另驗證授權端點。
+
+驗證tests/test_trade_availability.py：空結果、錯誤、錯誤國別／月份、預算、快取過期與同session去重。此module沿用現有收集排程，不觸發額外部署或通知。
