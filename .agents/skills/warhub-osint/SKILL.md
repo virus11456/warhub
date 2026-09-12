@@ -46,3 +46,13 @@ description: "Maintain WARHUB ADS-B, FIRMS, EONET, GDELT, USGS, Wikipedia and FA
 早期事件主檔缺少的mentions保留，後補批次可自動連結；只計已取得首末批次間15分鐘缺漏範圍，沒有gap不等於完整全天。article URL數不是獨立媒體數，也不是已核實事件數。資料庫／summary保存於指定目錄，可重新開啟及累積；原ZIP為重建依據。
 
 手動gdelt_events probe artifact新增index與summary，但每個GitHub runner仍是獨立目錄，尚未跨run下載舊artifact或建立正式排程儲存；不能宣稱伺服器已持續累積。tests/test_gdelt_event_index.py驗證孤立提及後補、去重、修訂版本、缺批與失敗保護。
+
+## 正式定期取樣與跨runner保存
+
+`scripts/collect_gdelt_events.py` 在既有Update data成功收集後檢查data.json.gdelt_events_sampling.attempted_at，至少6小時間隔；fast模式略過，沒有新增cron。每次僅latest單批（最多3請求），不保證完整15分鐘事件流。失敗保留原index／last_success_at，stale=true並記attempted_at，避免頻繁重試；不發通知、不參與WPI。
+
+原始ZIP以base64包入gzip，含manifest／取得時間，保存到archives/gdelt-events/<批次>_<SHA256>.json.gz。沿用來源封存暫存及Git推送重試，純資料／來源archive不部署。artifact是30天復原副本，GitHub archives才是長期資料。Vercel排除archives部署檔案。
+
+每輪從GitHub checkout保留的最近32批原始archive驗證並重建SQLite索引（暫存記憶體），summary寫data.json.gdelt_events_sampling.index；舊原始archive不刪除，可離線全量重建。index視窗之外的事件可能無法連結，不代表原始資料消失。summary標示已處理批次與內部缺批；仍未加入前台事件列表。
+
+tests/test_gdelt_sampling.py驗證6h限制、錯誤保留舊資料、archive還原與跨目錄重建；tests/test_deploy.mjs驗證來源新增不部署。主workflow對此額外步驟設2分鐘上限且錯誤不阻斷其他資料提交；強制逾時可能來不及寫attempted_at，不能宣稱所有失敗都已保存。

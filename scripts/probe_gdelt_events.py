@@ -95,19 +95,15 @@ def summarize(events, mentions, batch):
             'Mentions can refer to events created in earlier batches; not all join locally.']}
 
 
-def main():
-    parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--output',type=Path,required=True)
-    parser.add_argument('--manifest',type=Path)
-    args=parser.parse_args()
-    text=args.manifest.read_text() if args.manifest else read_url(BASE+'lastupdate.txt').decode()
+def collect(output, manifest=None):
+    text=manifest.read_text() if manifest else read_url(BASE+'lastupdate.txt').decode()
     entries=manifest_entries(text)
     batch=entries['export']['batch']
     now=datetime.now(timezone.utc)
     batch_time=datetime.strptime(batch,'%Y%m%d%H%M%S').replace(tzinfo=timezone.utc)
     age=(now-batch_time).total_seconds()
     if not -900 <= age <= 21600: raise ValueError('batch_not_recent')
-    folder=args.output/batch
+    folder=output/batch
     folder.mkdir(parents=True,exist_ok=True)
     (folder/'manifest.txt').write_text(text)
     parsed={}; digests={}
@@ -125,5 +121,13 @@ def main():
     path.write_text(json.dumps(report,ensure_ascii=False,indent=2))
     print(json.dumps({k:v for k,v in report.items() if k!='candidates'},ensure_ascii=False))
     print('Saved report:',path)
+    return folder
+
+def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output',type=Path,required=True)
+    parser.add_argument('--manifest',type=Path)
+    args=parser.parse_args()
+    collect(args.output,args.manifest)
 
 if __name__=='__main__': main()

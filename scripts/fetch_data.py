@@ -2275,6 +2275,8 @@ async def main():
         "collection":    collection,
         "trade_availability": trade_catalog.cache,
         "trade_api": trade_api.report(),
+        # Preserve the independent six-hour sampler state across full snapshot rebuilds.
+        "gdelt_events_sampling": previous.get("gdelt_events_sampling", {}),
         "translation_cache": update_cache(previous, news, polymarket),
         "score":         score,
         "pizza":         pizza_shops,

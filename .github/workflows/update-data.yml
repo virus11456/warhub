@@ -84,11 +84,17 @@ jobs:
           HOTSPOT_SURGE_MIN: ${{ vars.HOTSPOT_SURGE_MIN }}
         run: python scripts/fetch_data.py
 
-      - name: Preserve Comtrade observations if later steps fail
+      - name: Sample and preserve GDELT events at most every six hours
+        if: steps.spacing.outputs.collect == 'true' && inputs.collection_mode != 'fast'
+        timeout-minutes: 2
+        continue-on-error: true
+        run: python scripts/collect_gdelt_events.py --output /tmp/warhub-source-archive
+
+      - name: Preserve source observations if later steps fail
         if: always() && steps.spacing.outputs.collect == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: comtrade-observations
+          name: source-observations
           path: /tmp/warhub-source-archive/
           if-no-files-found: ignore
           retention-days: 30
