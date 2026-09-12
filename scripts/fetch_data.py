@@ -1962,19 +1962,24 @@ async def fetch_fred(session: aiohttp.ClientSession) -> dict:
     """抓 FRED 信用利差（最新一筆）。未設定 FRED_API_KEY 時回傳空 dict（優雅略過）。"""
     if not FRED_API_KEY:
         return {}
-    out = {}
+    from fred_quality import parse_observation
+    out = {"observations": {}}
     for name, sid in FRED_SERIES.items():
-        url = ("https://api.stlouisfed.org/fred/series/observations?series_id=" + sid
-               + "&api_key=" + FRED_API_KEY + "&file_type=json&sort_order=desc&limit=1")
+        params = {"series_id": sid, "api_key": FRED_API_KEY,
+                  "file_type": "json", "sort_order": "desc", "limit": 1}
         try:
-            async with session.get(url, timeout=aiohttp.ClientTimeout(total=15)) as resp:
+            async with session.get("https://api.stlouisfed.org/fred/series/observations",
+                                   params=params, timeout=aiohttp.ClientTimeout(total=15)) as resp:
+                resp.raise_for_status()
                 j = await resp.json(content_type=None)
-            obs = (j or {}).get("observations") or []
-            v = obs[0].get("value") if obs else None
-            out[name] = float(v) if v not in (None, "", ".") else None
+            observation = parse_observation(j)
+            out[name] = observation["value"]
+            out["observations"][name] = {**observation, "series_id": sid}
         except Exception as e:
-            log.warning(f"FRED {sid} fetch failed: {e}")
-    log.info(f"FRED: fetched {len(out)}/{len(FRED_SERIES)} series")
+            out[name] = None
+            out["observations"][name] = {"series_id": sid, "status": "unavailable"}
+            log.warning("FRED %s fetch failed: %s", sid, type(e).__name__)
+    log.info("FRED: fetched %s/%s series", sum(out.get(k) is not None for k in FRED_SERIES), len(FRED_SERIES))
     return out
 
 async def fetch_finance(session: aiohttp.ClientSession) -> dict:
@@ -2072,6 +2077,7 @@ def update_daily_metrics(score: dict, pizza_index, defcon_level, firms: dict,
     fr = fred or {}
     fin_rec["em_oas"] = fr.get("em_oas")
     fin_rec["hy_oas"] = fr.get("hy_oas")
+    fin_rec["fred_observation_dates"] = {k: v.get("observation_date") for k, v in (fr.get("observations") or {}).items()}
     # 「避險群聚」訊號：同時往避險方向明顯偏離 30MA 的指標數（單一指標沒意義、群聚才有）
     THRESH = 5.0   # 偏離 30MA 逾 5% 才算明顯
     cluster = 0
