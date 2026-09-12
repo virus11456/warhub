@@ -60,3 +60,40 @@ def preserve_food_coverage(old,new):
             if 'us_'+field in old:new['us_'+field]=old['us_'+field]
             else:new.pop('us_'+field,None)
     return new
+
+
+def preserve_current_coverage(old, new):
+    """Keep a coherent previous snapshot when a refresh loses known reporters.
+
+    Do not blend totals from different retrievals. Source archives retain the new
+    partial observations; stale snapshots cannot produce a fresh comparison.
+    """
+    if old.get('schema_version') != 2 or new.get('schema_version') != 2:
+        return new
+    old_month, new_month = old.get('ref_month'), new.get('ref_month')
+    if not old_month or not new_month:
+        return new
+    reason = None
+    if new_month < old_month:
+        reason = 'reference_month_regressed'
+    elif new_month == old_month:
+        current = {str(i.get('cmd')): i for i in new.get('items', [])}
+        for item in old.get('items', []):
+            replacement = current.get(str(item.get('cmd')), {})
+            known = codes(item.get('reporter_codes'))
+            if valid(item.get('wan_ton')) and known and (
+                    not known <= codes(replacement.get('reporter_codes')) or
+                    not valid(replacement.get('wan_ton'))):
+                reason = 'reporter_coverage_regressed'
+                break
+            baseline = codes(item.get('reporter_codes_prev'))
+            if (old.get('prev_year_month') == new.get('prev_year_month') and baseline and
+                    valid(item.get('prev_wan_ton')) and
+                    (not baseline <= codes(replacement.get('reporter_codes_prev')) or
+                     not valid(replacement.get('prev_wan_ton')))):
+                reason = 'baseline_coverage_regressed'
+                break
+    if reason is None:
+        return new
+    return {**old, 'stale': True, 'refresh_status': reason,
+            'last_attempted_at': new.get('updated_at')}

@@ -66,3 +66,9 @@ trade_api只保存模式、狀態、請求／成功次數、冷卻期限；沒�
 正式workflow設WARHUB_SOURCE_ARCHIVE_DIR，將來源紀錄合併到本輪archives後隨既有資料提交保存GitHub；推送重試時保留遠端archives與本輪新檔。純archives檔案符合既有Vercel略過規則。另上傳30天Actions artifact供後續步驟失敗時取回；workflow被強制取消／逾時前尚未上傳的檔案不保證保存。
 
 手動comtrade probe同樣保存來源artifact（30天），不改正式儀表板資料或推播。來源紀錄從此版啟用後開始；早先只有分析快照／log，不宣稱能還原當時所有原始回應。同session相同查詢重用副本，不再次網路查詢／刷新取得時間／重複存檔；跨輪仍依來源快取與重新核驗政策。驗證tests/test_source_archive.py的round-trip、修訂並存、零與缺值、憑證排除與重用。
+
+## 當期重新查詢防縮水
+
+`preserve_current_coverage` 保護food／strat當期整組快照：同ref_month若任一商品失去已知回報國、有效重量變缺值，或相同去年月份的基期覆蓋縮水，保留上一組快照與原updated_at，stale=true、last_attempted_at記本輪時間、refresh_status記原因。參考月倒退也不覆蓋。保留整組避免混用不同時間的總量；新的部分觀測仍留在來源archives，尚不直接拼接。
+
+同一國集合的正式修訂可以降低至0；新月份照實顯示部分資料，不拿舊月份湊數。stale資料不算新同比或異常。驗證tests/test_trade_current_preservation.py的覆蓋縮水／換國、基期缺報、修訂為0、換月及原時間保存。
