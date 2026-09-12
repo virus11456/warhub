@@ -1091,107 +1091,16 @@ async def fetch_tw_military_news(session: aiohttp.ClientSession) -> list[dict]:
 
 
 # ─────────────────────────────────────────────────────────────
-# 📈 共軍每日擾台架次趨勢（過去 30 天）
-#   granularity＝每日一筆（國防部每日戰報，非即時）。從台海新聞標題擷取「N架次」，
-#   逐日累積到 pla_adiz.json（滾動 30 天）。無官方 API，故以新聞標題為代理來源。
-# ─────────────────────────────────────────────────────────────
-def _num_before(unit: str, title: str):
-    import re
-    nums = [int(m) for m in re.findall(r'(\d{1,3})\s*' + unit, title)]
-    return max(nums) if nums else None
-
-# Keep extraction and historical validation identical in collection and merge paths.
-from pla_counts import sortie_count as _sortie_count, usable_days as _usable_pla_days
-
-# 專用查詢：直接抓國防部每日戰報「N架次」標題（比一般台海新聞穩定，一次可涵蓋近幾天）
-PLA_SORTIE_QUERY = "共機 架次 OR 擾台 架次 OR 逾越中線 共機 OR 國防部 共機"
-
-# 累計／期間總計字眼：這類標題的「N架次」是一段期間的加總（非單日），
-# 若被當單日代入會造成某天異常暴增（誤植／重複計算）。單日紀錄的「新高／破紀錄」
-# 仍是有效單日值，不在此列。
-PLA_CUMULATIVE_TOKENS = (
-    "累計", "以來", "今年", "本週", "本周", "本月", "上半年", "下半年", "全年",
-    "年度", "近一週", "近一周", "近一月", "近30", "近三十", "過去30", "過去三十",
-    "統計", "總計", "共計", "第7次", "第七次", "圍台軍演",
-)
-
+# 共機每日官方日報：統計截至06:00，缺值不當零；舊新聞估計隔離保存。
 async def fetch_pla_sorties(session: aiohttp.ClientSession) -> dict:
-    from datetime import timedelta
-    import urllib.parse, xml.etree.ElementTree as ET
-    days = {}
-    # 1) 先讀歷史檔
+    from pla_official import collect, view
     try:
-        days = json.loads(PLA_HISTORY_FILE.read_text(encoding="utf-8")).get("days") or {}
-    except Exception:
-        days = {}
-    # 2) 防呆：從上一份 data.json 的 pla 還原，避免歷史檔一時為空造成圖表歸零
-    try:
-        prev_pla = json.loads(DATA_FILE.read_text(encoding="utf-8")).get("pla") or {}
-        for d in (prev_pla.get("days") or []):
-            k = d.get("date")
-            if k and k not in days:
-                days[k] = {field:value for field,value in d.items() if field != 'date'}
-    except Exception:
-        pass
-
-    days = _usable_pla_days(days)
-
-    url = ("https://news.google.com/rss/search?q=" + urllib.parse.quote(PLA_SORTIE_QUERY)
-           + "&hl=zh-TW&gl=TW&ceid=TW:zh-Hant")
-    parsed = 0
-    for attempt, backoff in ((1, 4), (2, 8), (3, 0)):
-        try:
-            async with session.get(url, timeout=aiohttp.ClientTimeout(total=25),
-                    headers={"User-Agent": "Mozilla/5.0 (compatible; warhub/1.0)"}) as resp:
-                raw = await resp.read()
-            root = ET.fromstring(raw)
-            for it in root.findall(".//item")[:30]:
-                title = (it.findtext("title") or "").strip()
-                pub = (it.findtext("pubDate") or "").strip()
-                if ("架" not in title) and ("機" not in title):
-                    continue
-                if not any(k in title for k in ("共機", "軍機", "共軍", "解放軍", "中線", "擾台", "殲")):
-                    continue
-                # 排除「累計／本週／今年以來」等期間總計標題，避免非單日數字被誤植為單日暴增
-                if any(t in title for t in PLA_CUMULATIVE_TOKENS):
-                    continue
-                ac = _sortie_count(title)
-                if ac is None or ac <= 0 or ac > 300:
-                    continue
-                sh = _num_before("艘", title) or 0
-                ts = _news_iso(pub)
-                try:
-                    tp = (datetime.fromisoformat(ts) + timedelta(hours=8)).date().isoformat()
-                except Exception:
-                    continue
-                cur = days.get(tp)
-                if not (cur or {}).get("verified") and ((not cur) or ac > (cur.get("aircraft") or 0)):
-                    days[tp] = {"aircraft": ac, "ships": max(sh, (cur or {}).get("ships", 0)), "source_title": title, "source_url": it.findtext("link"), "date_basis": "publication_date", "verified": False}
-                    parsed += 1
-            break
-        except Exception as e:
-            if backoff:
-                await asyncio.sleep(backoff)
-            else:
-                log.warning(f"PLA sorties fetch failed: {e}")
-    # 滾動保留 30 天
-    cutoff = (datetime.now(timezone.utc) + timedelta(hours=8) - timedelta(days=30)).date().isoformat()
-    days = {d: v for d, v in days.items() if d >= cutoff}
-    try:
-        PLA_HISTORY_FILE.write_text(json.dumps({"days": days}, ensure_ascii=False), encoding="utf-8")
-    except Exception as e:
-        log.warning(f"pla history write error: {e}")
-    series = [{"date": d, **days[d]} for d in sorted(days)]
-    acs = [x["aircraft"] for x in series]
-    baseline = sorted(acs)[len(acs) // 2] if acs else 0     # 中位數
-    latest = series[-1] if series else None
-    log.info(f"PLA ADIZ: {len(series)} days total ({parsed} updated), latest={latest}")
-    return {
-        "updated_at": datetime.now(timezone.utc).isoformat(),
-        "days": series, "baseline": baseline, "latest": latest,
-        "note": "新聞標題架次估計（未逐筆核對國防部，發稿日非觀測日）· 每日一報、非即時 · 過去 30 天滾動累積",
-    }
-
+        history = json.loads(PLA_HISTORY_FILE.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        history = {}
+    history = await collect(session, history, datetime.now(timezone.utc))
+    PLA_HISTORY_FILE.write_text(json.dumps(history, ensure_ascii=False), encoding="utf-8")
+    return view(history['days'])
 
 
 # ─────────────────────────────────────────────────────────────

@@ -1786,7 +1786,8 @@
       共軍擾台・軍演・軍艦穿越台海・國防部戰報 · <strong>新聞訊號、非精確計數</strong>，供趨勢與異常觀察
     </div>
     <div id="pla-wrap" class="pla-wrap" style="display:none">
-      <div class="pla-hd">📈 新聞擷取架次（未核實）· 過去 30 天<span id="pla-latest"></span></div>
+      <div class="pla-hd">📈 官方每日共機架次 · 近 30 天已收錄日報<span id="pla-latest"></span></div>
+      <div id="pla-note" class="pla-legend"></div>
       <div class="fh-chart"><svg id="pla-svg" viewBox="0 0 720 170" preserveAspectRatio="xMidYMid meet"></svg></div>
       <div class="pla-legend" id="pla-legend"></div>
     </div>
@@ -3489,13 +3490,17 @@ function _mdLabel(key){ for(var i=0;i<MD_KEYS.length;i++) if(MD_KEYS[i][0]===key
 
 // ── 📈 每日共軍擾台架次（過去30天）──
 function renderPla(json){
-  const note=document.getElementById('pla-note'); if(note)note.textContent='新聞標題擷取的未核實估計，發稿日未必是觀測日。';
+  const note=document.getElementById('pla-note'); if(note)note.textContent='官方日報：前日06:00至當日06:00（台灣時間）；日期為截止日，架次非不同飛機數。';
   var wrap=document.getElementById('pla-wrap'); if(!wrap) return;
-  var pla=json.pla, days=(pla&&pla.days)||[];
-  if(!days.length){ wrap.style.display='none'; return; }
+  var pla=json.pla, days=((pla&&pla.days)||[]).filter(d=>d.source_kind==='mnd_daily_report' && d.verified===true && Number.isInteger(d.aircraft));
+  if(!days.length){ wrap.style.display=''; document.getElementById('pla-svg').innerHTML=''; document.getElementById('pla-latest').textContent='等待官方日報'; document.getElementById('pla-legend').textContent='未核實舊估計不納入圖表。'; return; }
   wrap.style.display='';
   var svg=document.getElementById('pla-svg'); if(!svg) return;
   var W=720,H=170,padL=34,padR=12,padT=14,padB=26;
+  var latest=days[days.length-1];
+  var byDate=Object.fromEntries(days.map(d=>[d.date,d]));
+  var first=new Date(days[0].date+'T00:00:00Z'), last=new Date(latest.date+'T00:00:00Z');
+  days=[]; for(var dt=first;dt<=last;dt=new Date(dt.getTime()+86400000)){ var key=dt.toISOString().slice(0,10); days.push(byDate[key]||{date:key,aircraft:null}); }
   var n=days.length;
   var base=pla.baseline||0;
   var maxV=Math.max.apply(null, days.map(function(d){return d.aircraft||0;}).concat([base,1]))*1.15;
@@ -3517,9 +3522,10 @@ function renderPla(json){
   // bars: red if elevated (>=1.5x median & >=25)
   var plaHit=[];
   days.forEach(function(d,i){
-    var v=d.aircraft||0, hi=(base>0 && v>=base*1.5 && v>=25);
+    if(d.aircraft===null) return; // Missing dates occupy space, never a zero observation.
+    var v=d.aircraft, hi=(base>0 && v>=base*1.5 && v>=25);
     var by=Y(v), h=Math.max(0,y0-by), cx=CX(i);
-    var tip='<b>'+d.date+'</b><br>共機 '+v+' 架次'+(d.ships?('　共艦 '+d.ships+' 艘'):'')+(hi?'<br>⚠ 異常偏高（≥中位數1.5倍）':'');
+    var tip='<b>'+d.date+'</b><br>共機 '+v+' 架次'+(d.ships!=null?('　共艦 '+d.ships+' 艘'):'')+(hi?'<br>⚠ 異常偏高（≥中位數1.5倍）':'');
     p.push('<rect x="'+(cx-bw/2).toFixed(1)+'" y="'+by.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+h.toFixed(1)
       +'" fill="'+(hi?'#ff4d5e':'var(--accent)')+'" opacity="'+(hi?'.95':'.7')+'"></rect>');
     // 透明全高感應區，滑鼠移到整欄任一處都能看到當日數據
@@ -3532,10 +3538,10 @@ function renderPla(json){
     p.push('<text x="'+CX(n-1)+'" y="'+(H-8)+'" text-anchor="middle" class="fh-svg-axis">'+days[n-1].date.slice(5)+'</text>'); }
   svg.innerHTML=p.join('');
   var lt=document.getElementById('pla-latest');
-  if(lt && pla.latest){ var el=(base>0 && pla.latest.aircraft>=base*1.5 && pla.latest.aircraft>=25);
-    lt.innerHTML='　最新 '+pla.latest.date.slice(5)+'：<b style="color:'+(el?'#ff4d5e':'var(--accent)')+'">'+pla.latest.aircraft+'</b> 架次'+(el?' <span style="color:#ff4d5e">⚠異常偏高</span>':''); }
+  if(lt && latest){ var el=(base>0 && latest.aircraft>=base*1.5 && latest.aircraft>=25);
+    lt.innerHTML='　最新 '+latest.date.slice(5)+'：<b style="color:'+(el?'#ff4d5e':'var(--accent)')+'">'+latest.aircraft+'</b> 架次'+(el?' <span style="color:#ff4d5e">⚠異常偏高</span>':''); }
   var lg=document.getElementById('pla-legend');
-  if(lg) lg.textContent='資料：新聞標題擷取，未逐筆核實；發稿日可能不同於活動日 · 紅柱＝≥中位數1.5倍且≥25架次';
+  if(lg){ lg.textContent='官方日報 · 缺日留空 · 紅柱僅為已收錄日報的相對高值，不代表戰爭機率。 '; var source=document.createElement('a'); if(/^https:\/\/air\.mnd\.gov\.tw\//.test(latest.source_url||'')){source.href=latest.source_url; source.target='_blank'; source.rel='noopener noreferrer'; source.textContent='查看最新官方日報'; lg.appendChild(source);} }
 }
 function renderNews(json){
   const el=document.getElementById('news-list'); if(!el) return;
