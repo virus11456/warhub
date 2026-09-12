@@ -38,3 +38,11 @@ description: "Maintain WARHUB ADS-B, FIRMS, EONET, GDELT, USGS, Wikipedia and FA
 事件ID連結mentions、保留無法連結的早期事件數，去重鍵eventID＋mentionTime＋URL＋sentence。不把多篇提及當多個事件；confidence是辨識信心而非事實為真機率。ActionGeo國碼為FIPS，不混用Actor國碼。root13/15/18/19/20僅供候選，不等於軍事事件；不計WPI、不顯示為實證戰況、不發通知。
 
 手動Probe upstream sources選gdelt_events，資料與報告提供30天artifact；正常排程尚未接入，沒有完整時間覆蓋。20260912141500本機樣本：1036事件／3126提及／3064去重提及，其中1980指向更早批次；跨批次索引是下一階段，不能把單批當一天全量。tests/test_gdelt_events_probe.py驗證清單限制、完整性、欄數、提及去重與未連結事件。
+
+## 跨批次本機索引
+
+`scripts/gdelt_event_index.py --source <批次目錄> --database <SQLite檔>` 純離線匯入已保存且通過manifest／ZIP驗證的批次。以GlobalEventID連結mentions；事件每批版本保留，mentions按eventID＋mentionTime＋URL＋sentence去重，批次來源另存。相同批次相同雜湊不重複匯入，內容變動拒絕而非覆蓋；一批交易寫入，失敗不留下半批。
+
+早期事件主檔缺少的mentions保留，後補批次可自動連結；只計已取得首末批次間15分鐘缺漏範圍，沒有gap不等於完整全天。article URL數不是獨立媒體數，也不是已核實事件數。資料庫／summary保存於指定目錄，可重新開啟及累積；原ZIP為重建依據。
+
+手動gdelt_events probe artifact新增index與summary，但每個GitHub runner仍是獨立目錄，尚未跨run下載舊artifact或建立正式排程儲存；不能宣稱伺服器已持續累積。tests/test_gdelt_event_index.py驗證孤立提及後補、去重、修訂版本、缺批與失敗保護。
