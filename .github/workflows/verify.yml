@@ -36,17 +36,20 @@ jobs:
           PY
           node --check /tmp/warhub-inline.js
 
-      - name: Diagnose translation once
+      - name: Validate Groq translation once
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GROQ_TRANSLATION_MODEL: ${{ vars.GROQ_TRANSLATION_MODEL }}
         run: |
-          python - <<'PY'
+          PYTHONPATH=scripts python - <<'PY'
           import asyncio, aiohttp
+          from translations import translate_groq
           async def main():
-              async with aiohttp.ClientSession() as s:
-                  async with s.get("https://translate.googleapis.com/translate_a/single", params={"client":"gtx","sl":"auto","tl":"zh-TW","dt":"t","q":"Military activity report"},timeout=aiohttp.ClientTimeout(total=15)) as r:
-                      print("TRANSLATION_DIAGNOSTIC_HTTP",r.status)
-                      print("TRANSLATION_DIAGNOSTIC_TYPE",r.headers.get("content-type"))
-                      if r.status == 200:
-                          d=await r.json(content_type=None)
-                          print("TRANSLATION_DIAGNOSTIC_RESULT",repr(d[0])[:500])
+              rows=[{'title':'Will Russia test a nuclear weapon by September 30, 2026?'},{'title':'There is no confirmed military attack.'}]
+              async with aiohttp.ClientSession() as session:
+                  await translate_groq(session,rows,{})
+              for row in rows:
+                  print('GROQ_SMOKE',row.get('title_zh') or row.get('translation_error'))
+              assert all(row.get('title_zh') for row in rows), 'Groq translation unavailable'
           asyncio.run(main())
           PY
