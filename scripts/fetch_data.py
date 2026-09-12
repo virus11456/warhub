@@ -1685,6 +1685,11 @@ async def fetch_notams(session: aiohttp.ClientSession) -> dict:
     except Exception:
         pass
 
+    from gdelt_quality import cooldown_active, cooldown_deadline
+    if cooldown_active(prev):
+        return {key: {**row, "stale": True} for key, row in prev.items()}
+    cooldown = None
+
     headers = {
         "User-Agent": ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                        "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126 Safari/537.36"),
@@ -1696,6 +1701,7 @@ async def fetch_notams(session: aiohttp.ClientSession) -> dict:
 
     out = {}
     async def collect():
+        nonlocal cooldown
         first_request = True
         for key, firs in source_region_order(REGION_FIRS):
             total = danger = 0
@@ -1714,6 +1720,7 @@ async def fetch_notams(session: aiohttp.ClientSession) -> dict:
                             headers=headers,
                         ) as resp:
                             if resp.status in (401, 403, 429):
+                                cooldown = cooldown_deadline(getattr(resp, "headers", {}))
                                 raise SourceBackoff(f"HTTP {resp.status}")
                             resp.raise_for_status()
                             data = await resp.json(content_type=None)
@@ -1751,8 +1758,12 @@ async def fetch_notams(session: aiohttp.ClientSession) -> dict:
         if key not in out and key in prev:
             out[key] = {**prev[key], "stale": True}
 
+    if cooldown:
+        for key in REGION_FIRS:
+            out.setdefault(key, {"stale": True})["cooldown_until"] = cooldown
+
     fresh = sum(1 for v in out.values() if not v.get("stale"))
-    dangers = {k: v["danger"] for k, v in out.items()}
+    dangers = {k: v.get("danger") for k, v in out.items()}
     log.info(f"NOTAM: {fresh}/{len(REGION_FIRS)} fresh ({len(out) - fresh} carried), danger={dangers}")
     return out
 
