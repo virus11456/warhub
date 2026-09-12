@@ -23,3 +23,28 @@ class CollectionGuardTests(unittest.TestCase):
                          {'updated_at':'2099-09-11T12:00:00Z'}]:
             with self.subTest(snapshot=snapshot):
                 self.assertTrue(should_collect(snapshot, now)[0])
+
+
+    def test_hourly_checks_do_not_collect_hourly(self):
+        start = datetime(2026, 9, 12, 0, 23, tzinfo=timezone.utc)
+        snapshot = {}
+        collected = []
+        for minute in range(0, 24 * 60, 60):
+            now = start + timedelta(minutes=minute)
+            if should_collect(snapshot, now)[0]:
+                collected.append(minute)
+                # A three-minute collector records its completion time.
+                snapshot = {'updated_at': (now + timedelta(minutes=3)).isoformat()}
+        self.assertEqual(collected, list(range(0, 24 * 60, 120)))
+
+    def test_missed_check_recovers_without_bunched_collections(self):
+        start = datetime(2026, 9, 12, 0, 23, tzinfo=timezone.utc)
+        snapshot = {'updated_at': (start + timedelta(minutes=3)).isoformat()}
+        collected = []
+        # The due check at 120 is missing; 181 is a delayed duplicate.
+        for minute in [60, 180, 181, 240, 300]:
+            now = start + timedelta(minutes=minute)
+            if should_collect(snapshot, now)[0]:
+                collected.append(minute)
+                snapshot = {'updated_at': now.isoformat()}
+        self.assertEqual(collected, [180, 300])
