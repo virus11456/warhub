@@ -14,6 +14,10 @@ on:
         description: '略過近期更新檢查，強制收集一次（可能觸發正常通知）'
         type: boolean
         default: false
+      quiet:
+        description: '靜默資料更新（不發送任何通知；供備援與驗證）'
+        type: boolean
+        default: false
       test_push:
         description: '傳一則測試推播到 Telegram/Discord（驗證連線）'
         type: boolean
@@ -57,6 +61,7 @@ jobs:
       - name: Fetch data
         if: steps.spacing.outputs.collect == 'true'
         env:
+          WARHUB_NO_NOTIFY: ${{ inputs.quiet && '1' || '0' }}
           WARHUB_TRANSLATION_PROVIDER: groq
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GROQ_TRANSLATION_MODEL: ${{ vars.GROQ_TRANSLATION_MODEL }}

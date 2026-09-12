@@ -45,3 +45,5 @@ description: "Maintain WARHUB collector orchestration, source freshness, schedul
 Comtrade另由scripts/source_archive.py保存逐次驗證後來源欄位，kind=source_observation，與kind未標記的六檔分析快照並存於archives。不可假定所有gzip皆有files欄位；需依kind辨識。正式workflow合併來源紀錄與分析快照後提交，另有30天來源artifact。其他來源仍是處理後快照，不能宣稱所有HTTP回應均已保存。
 
 前端快照讀取會標記即時或備份來源；拒絕無效／過遠未來時間，以及比目前畫面更舊的data.json。重疊請求以資料時間判定，不以回傳順序覆蓋。退回較舊快照時保留原資料時間與較新畫面，過期資料仍不計分；tests/test_frontend.cjs驗證備份標示與反序回傳。
+
+獨立備援入口 scripts/backup_scheduler.py 與 ops/backup-scheduler/：此程式需另行部署至 Linux/systemd，合併不等於啟用。30 分鐘檢查、快照超過130分鐘且無未完成 workflow 才補觸發；保留GitHub110分鐘守門與並行鎖。先寫120分鐘冷卻再POST，逾時不得立即重送；API接受不等於資料成功。預設dry-run，--apply才觸發auto/quiet=true，不推播、不強制全抓。獨立GitHub憑證只需本repo Contents read及Actions write，Actions write仍可管理workflow，新增存取須由操作者授權；不得挪用其他專案憑證。部署前依README確認終端連線、憑證、unit驗證、dry-run及自然timer驗證；tests/test_backup_scheduler.py覆蓋新鮮度、忙碌、冷卻、模糊失敗與損壞狀態。GitHub手動quiet輸入對應WARHUB_NO_NOTIFY=1；一般排程行為維持既有設定。
