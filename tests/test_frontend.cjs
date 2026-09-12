@@ -24,6 +24,30 @@ assert.equal(d.querySelector('#source-health'),null);
 if(mode==='valid'){assert.ok(d.querySelector('#html-wpi-a-desc').textContent.includes('170 架'));assert.ok(d.querySelector('#html-wpi-a-desc').textContent.includes('異常分數 0'));assert.ok(d.querySelector('#html-wpi-f-desc').textContent.includes('11,785 筆'));assert.ok(d.querySelector('#html-wpi-f-desc').textContent.includes('暫不計分'));assert.ok(d.querySelector('#poly-list-container').textContent.includes('美國會在12月31日前打擊古巴嗎？'));assert.ok(d.querySelector('#news-list').textContent.includes('新聞繁體中文標題'));assert.ok(!d.querySelector('#news-list').textContent.includes('English original'));assert.ok(d.querySelector('#strat-grid').textContent.includes('最近歷史參考：2026-06'));assert.ok(d.querySelector('#sh-svg').textContent.includes('缺報'));assert.ok(!d.querySelector('#sh-svg').innerHTML.includes('999'));}
 if(mode==='valid'){
   const w=dom.window;
+  assert.ok(d.querySelector('.live-lbl').textContent.includes('備份'));
+  const accepted=w.eval('DATA_UPDATED_AT');
+  const older={...data,updated_at:new Date(Date.parse(accepted)-3600000).toISOString(),score:{...data.score,combined_score:99}};
+  w.fetch=async(url)=>({ok:true,json:async()=>String(url).includes('data.json')?older:[]});
+  await w.fetchRealPizzaData();
+  assert.equal(w.eval('DATA_UPDATED_AT'),accepted);
+  assert.equal(w.htmlWpiCalc(),42);
+  assert.ok(d.querySelector('#last-update-ts').textContent.includes('未覆蓋'));
+  // An older response completing after a newer request must not win the race.
+  let releaseOld;
+  let first=true;
+  const newer={...data,updated_at:new Date().toISOString()};
+  w.fetch=async(url)=>{
+    if(!String(url).includes('data.json'))return {ok:true,json:async()=>[]};
+    if(first){first=false;return new Promise(resolve=>{releaseOld=()=>resolve({ok:true,json:async()=>older})});}
+    return {ok:true,json:async()=>newer};
+  };
+  const pending=w.fetchRealPizzaData();
+  await w.fetchRealPizzaData();
+  releaseOld();await pending;
+  assert.equal(w.eval('DATA_UPDATED_AT'),newer.updated_at);
+  assert.equal(w.htmlWpiCalc(),42);
+  assert.ok(d.querySelector('#last-update-ts').textContent.includes('未覆蓋'));
+
   const trade={cmd:'4001',name:'天然橡膠',wan_ton:1,yoy_pct:-99,comparison_status:'current_incomplete',current_complete:false,reporter_codes:['764'],expected_reporter_codes:['764','360','458','704'],latest_complete:{month:'2026-03',wan_ton:0},incomplete:true};
   w.renderStrat({strat:{ref_month:'2026-07',items:[trade]}});
   assert.ok(d.querySelector('#strat-grid').textContent.includes('2026-03 · 0 萬噸'));
