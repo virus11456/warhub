@@ -3,9 +3,9 @@ on:
   workflow_dispatch:
     inputs:
       source:
-        description: 'comtrade：只查一筆，使用正式爬蟲；all：原有完整來源探測'
+        description: 'comtrade：單筆查詢；gdelt_events：一批事件與提及；all：完整來源探測'
         type: choice
-        options: [comtrade, all]
+        options: [comtrade, gdelt_events, all]
         default: comtrade
 permissions:
   contents: read
@@ -48,5 +48,16 @@ jobs:
         with:
           name: comtrade-observations
           path: /tmp/warhub-source-archive/
+          if-no-files-found: ignore
+          retention-days: 30
+      - name: Verify one GDELT event batch
+        if: inputs.source == 'gdelt_events'
+        run: python scripts/probe_gdelt_events.py --output /tmp/warhub-gdelt-events
+      - name: Preserve GDELT batch and report
+        if: always() && inputs.source == 'gdelt_events'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gdelt-event-batch
+          path: /tmp/warhub-gdelt-events/
           if-no-files-found: ignore
           retention-days: 30
