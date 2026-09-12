@@ -35,7 +35,7 @@ Google 舊流程保留給未指定 provider 的本機相容用途，已有 GitHu
 
 解析器驗證官方URL、日報日期與明確24小時06:00至06:00起訖一致、非未來期間。`aircraft`為偵獲共機總架次，`area_aircraft`與`area_description`保留括號內特定空域子集，不能一律称為越線；共艦與公務船分開。零架次有效，缺欄位為null。保留 source_url、source_title、period_start、period_end、checked_at、date_basis=period_end、source_kind=mnd_daily_report。verified指通過官方日報格式及口徑核驗，不代表自行驗證實際軍事活動。
 
-舊新聞估計留在 pla_adiz.json 的 unverified_days，不納入官方圖表及基準。合併以官方紀錄及較新checked_at優先，可接受較小修訂值，不取最大值。官方days滾動30日，缺日保留空白；首頁列表只有12篇，不能宣稱全部30天已核實。舊估計與原版本仍可追溯，尚未全歷史回補。
+舊新聞估計留在 pla_adiz.json 的 unverified_days，不納入官方圖表及基準。合併以官方紀錄及較新checked_at優先，可接受較小修訂值，不取最大值。官方days滾動30日，缺日保留空白；首頁列表只有12篇；若需回補更舊日報，從官方列表的 ASP.NET 分頁表單取得第2、3頁，保留 hidden fields 與對應 __EVENTTARGET，不能猜測日報ID。2026-09-12已逐篇取得8/14～9/12共30天完整官方日報並回補；這不代表30天以前歷史已核實。舊估計與原版本仍可追溯。
 
 驗證 tests/test_pla_official.py、tests/test_pla_counts.py、tests/test_frontend.cjs。純離線fixture，不執行整套爬蟲或通知。官方網站若改格式，解析失敗需核對原文後更新，不放寬為任意標題數字匹配。
 
