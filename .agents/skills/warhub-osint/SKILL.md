@@ -22,3 +22,11 @@ description: "Maintain WARHUB ADS-B, FIRMS, EONET, GDELT, USGS, Wikipedia and FA
 目前全球 WPI 的 FIRMS 因子與地區廣域軍機／火點不直接計分；依 `scoring.py` 保留此界線。198 架可見軍機與異常分數 0 可以同時成立，不能用原始筆數填上分數。資料不足的地區留空，不能為了滿版補安全等級。
 
 驗證 `tests/test_source_budgets.py`、`tests/test_integrity.py` 與 `tests/test_frontend.cjs`。用 mock 檢查限流快速停止、來源整體 timeout、部分成功保留、新舊時間不混淆與原始數量仍可展示。若要換 API 或申請 key，先確認官方現行文件和帳戶可用權限，歷史 403／429 不代表永久不可用。
+
+## GDELT 時間與跨輪冷卻
+
+`scripts/gdelt_quality.py` 從DOC timeline的UTC date取observed_at，另記fetched_at、window_start、point_count。至少6點、排序去重檢查，拒絕缺日期、非有限／負數／超過100的百分比、過遠未來與超出49小時窗口；最新點超過6小時標stale，不計分。6小時是本專案容忍門檻，不是官方服務承諾。
+
+401／403／429保存cooldown_until到各地區紀錄（既有data快照會封存）；Retry-After秒數限制1至24小時，缺少或不可解析時6小時。冷卻期間零來源請求、舊觀測时间不刷新，無歷史數值僅存stale與冷卻欄位。保留區域輪替、來源總時間預算與已完成地區資料。tests/test_gdelt_quality.py、tests/test_source_budgets.py驗證。
+
+其他官方可評估資料為Events、EventMentions、GKG及DOC/GEO產品（https://gdeltproject.org/data.html）。自動新聞事件不等於已證實事件；不可把Events計數替代原timelinevol百分比。批次檔案供應與解析尚待實測，不宣稱已接入。

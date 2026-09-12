@@ -1,3 +1,4 @@
+from datetime import datetime, timezone, timedelta
 import asyncio
 import json
 import sys
@@ -31,7 +32,7 @@ class Session:
         self.status, self.hang_after, self.calls, self.cancelled = status, hang_after, 0, False
     def request(self, *args, **kwargs):
         self.calls += 1
-        payload={'timeline':[{'data':[{'value':1},{'value':2}]}], 'notamList':[]}
+        payload={'timeline':[{'data':[{'value':1,'date':(datetime.now(timezone.utc)-timedelta(minutes=15*i)).strftime('%Y%m%dT%H%M%SZ')} for i in range(6)]}], 'notamList':[]}
         return Response(self, self.status, payload, self.hang_after is not None and self.calls > self.hang_after)
     get = post = request
 
@@ -63,7 +64,7 @@ class SourceBudgets(unittest.IsolatedAsyncioTestCase):
                     out=await fn(session)
                     self.assertEqual(session.calls,1)
                     self.assertEqual(set(out),{'a','b'})
-                    for row in out.values(): self.assertEqual(row,{**old,'stale':True})
+                    for row in out.values(): self.assertEqual({k:v for k,v in row.items() if k!='cooldown_until'},{**old,'stale':True})
 
     async def test_timeout_keeps_completed_region_and_cancels_pending_request(self):
         for fn,budget in [(f.fetch_gdelt,'GDELT_BUDGET_SECONDS'),(f.fetch_notams,'NOTAM_BUDGET_SECONDS')]:
