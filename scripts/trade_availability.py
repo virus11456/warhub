@@ -1,4 +1,5 @@
 """Bounded public dataset-catalog checks, never proof of commodity-level coverage."""
+import os
 import asyncio
 import time
 import weakref
@@ -27,6 +28,8 @@ class Availability:
                 ttl=86400 if row['status']=='available' else 21600
                 if 0<=age<ttl:return row['status']!='not_listed'
             except (KeyError,TypeError,ValueError):pass
+            # Authenticated commodity queries avoid extra public preflight traffic.
+            if os.getenv("COMTRADE_API_KEY", "").strip(): return True
             # Expired negative cache must never suppress a source request.
             if self.stopped or self.requests>=MAX_REQUESTS or self.elapsed>=16:return True
             self.requests+=1
