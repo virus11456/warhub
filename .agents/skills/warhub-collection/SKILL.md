@@ -43,3 +43,5 @@ description: "Maintain WARHUB collector orchestration, source freshness, schedul
 網站 `/api/data` 讀取最新資料；`vercel-ignore-build.cjs` 以最後成功部署比較，純允許資料／封存更新不重建。合併前確認基底最新，避免舊本機 data 覆蓋自然排程的新值。批次提交；依既有使用者授權合併上線，程式變更確認 CI 與部署結果。報告分開說明已驗證結果與仍缺資料的來源，不宣稱「全部正常」。
 
 Comtrade另由scripts/source_archive.py保存逐次驗證後來源欄位，kind=source_observation，與kind未標記的六檔分析快照並存於archives。不可假定所有gzip皆有files欄位；需依kind辨識。正式workflow合併來源紀錄與分析快照後提交，另有30天來源artifact。其他來源仍是處理後快照，不能宣稱所有HTTP回應均已保存。
+
+前端快照讀取會標記即時或備份來源；拒絕無效／過遠未來時間，以及比目前畫面更舊的data.json。重疊請求以資料時間判定，不以回傳順序覆蓋。退回較舊快照時保留原資料時間與較新畫面，過期資料仍不計分；tests/test_frontend.cjs驗證備份標示與反序回傳。

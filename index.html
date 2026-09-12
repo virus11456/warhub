@@ -2491,9 +2491,15 @@ setInterval(htmlWpiRender, 10 * 60 * 1000);
 // GitHub Actions 約每 2 小時更新；前端輪詢只讀取快照。
 // 統一資料載入：優先打即時 API（/api/data，從 GitHub 讀最新，永遠不會因
 // 部署凍結而卡在舊快照），失敗才退回同站部署快照（較舊，保底用）。
+const SNAPSHOT_ORIGINS = new WeakMap();
 async function wLoad(file){
   let r = await fetch('/api/data?f=' + file, { cache: 'no-store', signal: AbortSignal.timeout(10000) }).catch(function(){return null;});
-  if (!r || !r.ok) r = await fetch('data/' + file + '?t=' + Date.now(), { cache: 'no-store', signal: AbortSignal.timeout(10000) }).catch(function(){return null;});
+  let origin = 'live';
+  if (!r || !r.ok) {
+    origin = 'backup';
+    r = await fetch('data/' + file + '?t=' + Date.now(), { cache: 'no-store', signal: AbortSignal.timeout(10000) }).catch(function(){return null;});
+  }
+  if(r && r.ok) SNAPSHOT_ORIGINS.set(r,origin);
   return r;
 }
 
@@ -2504,6 +2510,19 @@ async function fetchRealPizzaData() {
     let res = await wLoad('data.json');
     if (!res || !res.ok) throw new Error('HTTP ' + (res ? res.status : 'no-response'));
     const json = await res.json();
+    const incomingTime = Date.parse(json.updated_at);
+    if(!Number.isFinite(incomingTime) || incomingTime > Date.now()+60000) throw new Error('invalid snapshot timestamp');
+    if(DATA_UPDATED_AT && incomingTime < Date.parse(DATA_UPDATED_AT)) {
+      const expired=Date.now()-Date.parse(DATA_UPDATED_AT)>=6*3600000;
+      const status=document.getElementById('last-update-ts');
+      if(status)status.textContent=(expired?'⚠ 保留資料已過期：':'已保留較新的資料：')+observedTime()+'；本次回傳較舊，未覆蓋';
+      const live=document.querySelector('.live-lbl');
+      if(live)live.textContent=expired?'資料已過期':'保留較新資料';
+      if(expired && OBSERVED_DATA?.regions)renderRegions(OBSERVED_DATA.regions.map(r=>({...r,score:null,level:'INSUFFICIENT_DATA',coverage:0,factors:{}})));
+      htmlWpiRender();
+      return;
+    }
+    const backupSnapshot=SNAPSHOT_ORIGINS.get(res)==='backup';
     DATA_UPDATED_AT = json.updated_at;
     OBSERVED_DATA = json;
     MARKET_TRANSLATIONS = new Map((json.polymarket||[]).filter(m=>m.question_zh).map(m=>[m.question,m.question_zh]));
@@ -2515,7 +2534,7 @@ async function fetchRealPizzaData() {
     const badge=document.getElementById('alert-badge');
     if(badge)badge.textContent=BACKEND_SCORE?.combined_score != null ? '觀察指數 '+BACKEND_SCORE.alert_level : '資料不足';
     const live=document.querySelector('.live-lbl');
-    if(live)live.textContent=age >= 0 && age < 6*3600000 ? '定期資料快照' : '資料已過期';
+    if(live)live.textContent=age >= 0 && age < 6*3600000 ? (backupSnapshot?'備份資料快照':'定期資料快照') : '資料已過期';
     if(json.score?.model_version !== 'wpi-4.0') {
       json.polymarket=[]; json.pizza_index=null; json.defcon_level=null;
       const list=document.getElementById('poly-list-container');if(list)list.textContent='舊版盤口尚未核驗，等待新版資料。';
@@ -2657,7 +2676,7 @@ async function fetchRealPizzaData() {
     const tsEl = document.getElementById('last-update-ts');
     if (tsEl && json.updated_at) {
       const dt = new Date(json.updated_at);
-      tsEl.textContent = (Date.now()-dt.getTime() > 6*3600000 ? '⚠ 資料已過期：' : '後端資料時間：') + dt.toLocaleString('zh-TW');
+      tsEl.textContent = (Date.now()-dt.getTime() >= 6*3600000 ? '⚠ 資料已過期：' : backupSnapshot ? '備份快照資料時間：' : '後端資料時間：') + dt.toLocaleString('zh-TW');
     }
 
     console.log('[WARHUBS] data refreshed @', json.updated_at,
