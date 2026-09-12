@@ -1110,7 +1110,7 @@ async def fetch_pla_sorties(session: aiohttp.ClientSession) -> dict:
 # ─────────────────────────────────────────────────────────────
 from trade_availability import should_query as trade_should_query, setup as setup_trade_availability
 
-COMTRADE_URL = "https://comtradeapi.un.org/public/v1/preview/C/M/HS"
+from comtrade_client import weights as comtrade_weights, setup as setup_comtrade
 FOOD_EXPORTERS = [("76","巴西"),("842","美國"),("32","阿根廷"),
                   ("36","澳洲"),("124","加拿大"),("804","烏克蘭"),("251","法國")]
 FOOD_CMDS = [("1201","大豆"),("1001","小麥"),("1005","玉米")]
@@ -1127,27 +1127,9 @@ async def _comtrade_month(session, reporter: str, period: int):
     params = {"reporterCode": reporter, "flowCode": "X", "partnerCode": "156",
               "cmdCode": "1201,1001,1005", "period": str(period),
               "partner2Code": "0", "motCode": "0"}
-    for attempt, bk in ((1, 8), (2, 15), (3, 0)):
-        try:
-            async with session.get(COMTRADE_URL, params=params,
-                    headers={"User-Agent": USER_AGENT},
-                    timeout=aiohttp.ClientTimeout(total=30)) as r:
-                if r.status == 429:
-                    if bk: await asyncio.sleep(bk); continue
-                    return None
-                r.raise_for_status()
-                txt = await r.text()
-            data = json.loads(txt)
-            out = {}
-            for row in (data.get("data") or []):
-                cmd = str(row.get("cmdCode"))
-                if row.get("netWgt") is not None:
-                    out[cmd] = out.get(cmd, 0) + row["netWgt"]
-            return out
-        except Exception:
-            if bk: await asyncio.sleep(bk)
-            else: return None
-    return None
+    values = await comtrade_weights(session, params)
+    return values
+
 
 async def fetch_food_imports(session: aiohttp.ClientSession) -> dict:
     """
@@ -1234,27 +1216,9 @@ async def _comtrade_china_import(session, period: int):
     params = {"reporterCode": "156", "flowCode": "M", "partnerCode": "0",
               "cmdCode": "1201,1001,1005", "period": str(period),
               "partner2Code": "0", "motCode": "0"}
-    for attempt, bk in ((1, 8), (2, 15), (3, 0)):
-        try:
-            async with session.get(COMTRADE_URL, params=params,
-                    headers={"User-Agent": USER_AGENT},
-                    timeout=aiohttp.ClientTimeout(total=30)) as r:
-                if r.status == 429:
-                    if bk: await asyncio.sleep(bk); continue
-                    return None
-                r.raise_for_status()
-                txt = await r.text()
-            data = json.loads(txt)
-            out = {}
-            for row in (data.get("data") or []):
-                cmd = str(row.get("cmdCode"))
-                if row.get("netWgt") is not None:
-                    out[cmd] = out.get(cmd, 0) + row["netWgt"]
-            return out
-        except Exception:
-            if bk: await asyncio.sleep(bk)
-            else: return None
-    return None
+    values = await comtrade_weights(session, params)
+    return values
+
 
 async def _food_mirror_total(session, month: int):
     """主要出口國該月對中出口三主糧合計 {cmd: netWgt kg}, ok=成功國數, us=美國(842)部分。"""
@@ -1367,24 +1331,9 @@ async def _comtrade_one(session, reporter: str, cmd: str, period: int):
         return None
     params = {"reporterCode": reporter, "flowCode": "X", "partnerCode": "156",
               "cmdCode": cmd, "period": str(period), "partner2Code": "0", "motCode": "0"}
-    for attempt, bk in ((1, 8), (2, 15), (3, 0)):
-        try:
-            async with session.get(COMTRADE_URL, params=params,
-                    headers={"User-Agent": USER_AGENT},
-                    timeout=aiohttp.ClientTimeout(total=30)) as r:
-                if r.status == 429:
-                    if bk: await asyncio.sleep(bk); continue
-                    return None
-                r.raise_for_status()
-                txt = await r.text()
-            data = json.loads(txt)
-            rows = data.get("data") or []
-            weights = [row["netWgt"] for row in rows if row.get("netWgt") is not None]
-            return sum(weights) if weights else None
-        except Exception:
-            if bk: await asyncio.sleep(bk)
-            else: return None
-    return None
+    values = await comtrade_weights(session, params)
+    return values.get(cmd) if values is not None else None
+
 
 async def fetch_strategic_imports(session: aiohttp.ClientSession) -> dict:
     """中國戰略物資（橡膠/鎳/鉻/鐵礦）鏡像進口量＋年增率＋異常旗標。每日更新一次。"""
@@ -1478,27 +1427,9 @@ async def _comtrade_china_strat(session, period: int):
         return None
     params = {"reporterCode": "156", "flowCode": "M", "partnerCode": "0",
               "cmdCode": cmds, "period": str(period), "partner2Code": "0", "motCode": "0"}
-    for attempt, bk in ((1, 8), (2, 15), (3, 0)):
-        try:
-            async with session.get(COMTRADE_URL, params=params,
-                    headers={"User-Agent": USER_AGENT},
-                    timeout=aiohttp.ClientTimeout(total=30)) as r:
-                if r.status == 429:
-                    if bk: await asyncio.sleep(bk); continue
-                    return None
-                r.raise_for_status()
-                txt = await r.text()
-            data = json.loads(txt)
-            out = {}
-            for row in (data.get("data") or []):
-                c = str(row.get("cmdCode"))
-                if row.get("netWgt") is not None:
-                    out[c] = out.get(c, 0) + row["netWgt"]
-            return out
-        except Exception:
-            if bk: await asyncio.sleep(bk)
-            else: return None
-    return None
+    values = await comtrade_weights(session, params)
+    return values
+
 
 async def fetch_strategic_history(session: aiohttp.ClientSession) -> list:
     """近 3 年逐月戰略物資進口（萬噸）。≤2024-12 中國直報（批次、便宜），≥2025 鏡像。逐步回填。"""
@@ -2226,6 +2157,7 @@ async def main():
         finally:
             collection["duration_seconds"][name] = round(time.monotonic() - started, 3)
     async with aiohttp.ClientSession() as session:
+        trade_api = setup_comtrade(session, previous.get("trade_api"))
         trade_catalog = setup_trade_availability(session, previous.get("trade_availability"))
         pizzint_task  = asyncio.create_task(measured("pizzint", fetch_pizzint(session)))
         poly_task     = asyncio.create_task(measured("polymarket", fetch_polymarket(session)))
@@ -2341,6 +2273,7 @@ async def main():
         "updated_at":    datetime.now(timezone.utc).isoformat(),
         "collection":    collection,
         "trade_availability": trade_catalog.cache,
+        "trade_api": trade_api.report(),
         "translation_cache": update_cache(previous, news, polymarket),
         "score":         score,
         "pizza":         pizza_shops,

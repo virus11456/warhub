@@ -17,7 +17,7 @@ description: "Maintain WARHUB UN Comtrade food and strategic-material imports, m
 
 ## Comtrade 資料與覆蓋
 
-專案目前用 UN Comtrade public preview (`https://comtradeapi.un.org/public/v1/preview/C/M/HS`)，不是 WTO API。鏡像是選定出口國 `flowCode=X, partnerCode=156` 的對中出口；中國直報是 `reporterCode=156, flowCode=M, partnerCode=0`。兩者涵蓋範圍不同，不能直接拼成同口徑同比或稱為中國完整進口量。
+專案透過 `scripts/comtrade_client.py` 共用傳輸層；設定 COMTRADE_API_KEY 時使用已驗證的 `data/v1/get/C/M/HS`，未設定才用 public/v1/preview/C/M/HS，不是 WTO API。金鑰只放 Ocp-Apim-Subscription-Key header，不能寫入 URL／報告。鏡像是選定出口國 `flowCode=X, partnerCode=156` 的對中出口；中國直報是 `reporterCode=156, flowCode=M, partnerCode=0`。兩者涵蓋範圍不同，不能直接拼成同口徑同比或稱為中國完整進口量。
 
 商品 HS code 與出口國以 `FOOD_CMDS`、`FOOD_EXPORTERS`、`STRAT_MATERIALS` 為準。核對 period、flow、partner、商品、重量單位及總項／分項是否重複；netWgt 為 kg，除以 1e7 才是萬噸。不得拿貿易金額當重量。
 
@@ -41,12 +41,20 @@ auto 的慢來源 6 小時只代表檢查資格；有效 Comtrade 當期資料�
 
 糧食歷史回查若新結果僅涵蓋舊回報國的子集合，保留原商品值、覆蓋與美國分量；不得將部分新值與舊總量相加。驗證tests/test_trade_quality.py。
 
-官方資料可用性API（getDa）依官方文件需要訂閱key；現有public preview不具同等語意。COMTRADE_API_KEY尚未驗證前，不宣稱已接入，也不能把空資料說成官方尚未公布。月份公布沒有固定期限。來源：https://uncomtrade.org/docs/data-availability/ 。
+官方另提供免金鑰與認證資料目錄；目錄記錄不等於商品重量完整。月份公布沒有固定期限。來源：https://uncomtrade.org/docs/data-availability/ 。
 
 ## 可用性預覽節流
 
 已整合 `scripts/trade_availability.py` 的免金鑰 `public/v1/getDA/C/M/HS`，按reporterCode與period查月度HS資料集，正式main共用session狀態與鎖，避免重複。每輪最多4次額外metadata請求、每次5秒；成功可用快取24小時，未列出／未知6小時；最多512筆保存在data.json.trade_availability，沿用時不刷新checked_at。碰到拒絕、限流、格式錯誤或逾時停止本輪metadata。
 
-只有格式及查詢範圍驗證通過、count=0的明確空結果才略過該國該月商品查詢；名稱為not_listed，不宣稱官方未公布或零貿易。查詢錯誤、expired cache、預算耗尽均沿用原商品查詢流程，不能把未知變成未公布。正面資料集記錄也不能當作商品重量完整或追蹤國全數齊備。尚未使用COMTRADE_API_KEY；有key後須另驗證授權端點。
+只有格式及查詢範圍驗證通過、count=0的明確空結果才略過該國該月商品查詢；名稱為not_listed，不宣稱官方未公布或零貿易。查詢錯誤、expired cache、預算耗尽均沿用原商品查詢流程，不能把未知變成未公布。正面資料集記錄也不能當作商品重量完整或追蹤國全數齊備。有金鑰時只沿用有效目錄快取，不再追加公共目錄請求，改由認證商品查詢確認資料，減少跨端點流量。
 
 驗證tests/test_trade_availability.py：空結果、錯誤、錯誤國別／月份、預算、快取過期與同session去重。此module沿用現有收集排程，不觸發額外部署或通知。
+
+## 認證商品傳輸與正式驗證
+
+四個 `_comtrade_*` 入口共用 session 的鎖與至少3秒請求間隔；每輪最多80次商品查詢、180秒傳輸時間窗（單請求最多30秒）。遇401／403／429停止本輪，保存cooldown_until到data.json.trade_api；429使用Retry-After秒數（60秒至24小時），缺少／無法解析時1小時。錯誤不改走無金鑰端點繞過限制，也不將缺值轉零。保留既有當期快取與漸進回填排程。
+
+trade_api只保存模式、狀態、請求／成功次數、冷卻期限；沒有金鑰。驗證回應國別、月份、商品、貿易方向、夥伴、運輸與海關總項；同商品重複總項、錯誤範圍、截斷或無效重量拒用。netWgt缺值保持缺值，有效0保留。
+
+`.github/workflows/update-data.yml` 注入COMTRADE_API_KEY。手動 Probe upstream sources 選comtrade（預設）只執行 `scripts/probe_comtrade.py`，透過正式 `_comtrade_one` 查澳洲202607對中國鐵礦砂一筆，無資料寫入、無通知；all才是舊全來源探測。驗證 `tests/test_comtrade_client.py` 的scope、零／缺值、認證header、節流、跨輪冷卻與預算。

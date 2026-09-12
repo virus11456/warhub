@@ -1,6 +1,12 @@
 name: Probe upstream sources
 on:
   workflow_dispatch:
+    inputs:
+      source:
+        description: 'comtrade：只查一筆，使用正式爬蟲；all：原有完整來源探測'
+        type: choice
+        options: [comtrade, all]
+        default: comtrade
 permissions:
   contents: read
 jobs:
@@ -15,7 +21,14 @@ jobs:
           cache: pip
           cache-dependency-path: scripts/requirements.txt
       - run: pip install -r scripts/requirements.txt
+      - name: Verify production Comtrade collector
+        if: inputs.source == 'comtrade'
+        env:
+          COMTRADE_API_KEY: ${{ secrets.COMTRADE_API_KEY }}
+          WARHUB_NO_NOTIFY: '1'
+        run: python scripts/probe_comtrade.py
       - name: Probe without writes or notifications
+        if: inputs.source == 'all' 
         env:
           USDA_FAS_API_KEY: ${{ secrets.USDA_FAS_API_KEY }}
           BESTTIME_API_KEY: ${{ secrets.BESTTIME_API_KEY }}
@@ -23,6 +36,7 @@ jobs:
           WARHUB_NO_NOTIFY: '1'
         run: python scripts/probe_sources.py
       - uses: actions/upload-artifact@v4
+        if: inputs.source == 'all'
         with:
           name: source-probe
           path: probe-report.json
