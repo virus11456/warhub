@@ -1110,6 +1110,7 @@ async def fetch_pla_sorties(session: aiohttp.ClientSession) -> dict:
 # ─────────────────────────────────────────────────────────────
 from trade_availability import should_query as trade_should_query, setup as setup_trade_availability
 
+from trade_quality import preserve_current_coverage
 from comtrade_client import weights as comtrade_weights, setup as setup_comtrade
 FOOD_EXPORTERS = [("76","巴西"),("842","美國"),("32","阿根廷"),
                   ("36","澳洲"),("124","加拿大"),("804","烏克蘭"),("251","法國")]
@@ -1187,7 +1188,7 @@ async def fetch_food_imports(session: aiohttp.ClientSession) -> dict:
                       "prev_wan_ton":round(b,1) if b is not None else None, "yoy_pct":yoy,
                       "incomplete":incomplete, "reporter_codes":sorted(ok1), "reporter_codes_prev":sorted(ok2)})
     log.info(f"food: ref={L} soy={items[0]['wan_ton']}萬噸 yoy={items[0]['yoy_pct']} breadth={breadth}")
-    return {
+    result = {
         "schema_version": 2, "updated_at": now.isoformat(),
         "ref_month": f"{L//100}-{L%100:02d}",
         "prev_year_month": f"{L12//100}-{L12%100:02d}",
@@ -1196,6 +1197,8 @@ async def fetch_food_imports(session: aiohttp.ClientSession) -> dict:
         "breadth_up": breadth,
         "note": "出口國鏡像合計（涵蓋範圍有限，缺值不表示中國停止公布）· 月資料約 3–4 月落差 · 結構性背景指標",
     }
+
+    return preserve_current_coverage(prev, result)
 
 
 # ─────────────────────────────────────────────────────────────
@@ -1404,13 +1407,15 @@ async def fetch_strategic_imports(session: aiohttp.ClientSession) -> dict:
     if not items:
         return {**prev, "stale": True} if prev else {}
     log.info(f"strat: ref={L} materials={len(items)}")
-    return {
+    result = {
         "schema_version": 2, "updated_at": now.isoformat(),
         "ref_month": f"{L // 100}-{L % 100:02d}",
         "prev_year_month": f"{L12 // 100}-{L12 % 100:02d}",
         "items": items,
         "note": "出口國鏡像合計（涵蓋範圍有限，缺值不表示中國停止公布）· 月資料約 3–4 月落差 · 單月僅供參考、看趨勢 · 抓不到經俄/伊等不通報管道",
     }
+
+    return preserve_current_coverage(prev, result)
 
 
 # 戰略物資「月度」歷史（近 3 年逐月，供前端畫趨勢、觀察變動）
