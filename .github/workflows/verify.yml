@@ -35,3 +35,18 @@ jobs:
           Path('/tmp/warhub-inline.js').write_text('\n'.join(parts))
           PY
           node --check /tmp/warhub-inline.js
+
+      - name: Diagnose translation once
+        run: |
+          python - <<'PY'
+          import asyncio, aiohttp
+          async def main():
+              async with aiohttp.ClientSession() as s:
+                  async with s.get("https://translate.googleapis.com/translate_a/single", params={"client":"gtx","sl":"auto","tl":"zh-TW","dt":"t","q":"Military activity report"},timeout=aiohttp.ClientTimeout(total=15)) as r:
+                      print("TRANSLATION_DIAGNOSTIC_HTTP",r.status)
+                      print("TRANSLATION_DIAGNOSTIC_TYPE",r.headers.get("content-type"))
+                      if r.status == 200:
+                          d=await r.json(content_type=None)
+                          print("TRANSLATION_DIAGNOSTIC_RESULT",repr(d[0])[:500])
+          asyncio.run(main())
+          PY
