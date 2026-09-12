@@ -34,3 +34,11 @@ auto 的慢來源 6 小時只代表檢查資格；有效 Comtrade 當期資料�
 使用官方 commodities、countries、datareleasedates 取得中國代碼、商品及可用年度，按商品的 marketing year 查詢，不用日曆年硬套。`scripts/usda.py` 將當年度與次年度淨銷售分開；可能有負數取消訂單，不能直接截成零。出口銷售／承諾量不等於已運抵進口量，也不代表中國全球總量。
 
 驗證 `tests/test_trade_revalidation.py`、`tests/test_integrity.py` 及相關 DOM 歷史圖表案例。用代表性回應核對單位、部分回報、同一國去重、年度切換、歷史聯集；來源尚未回報就明確說資料待補，不承諾回填期限。
+
+## 完整度與同比展示
+
+`scripts/trade_quality.py` 從既有快照與歷史產生 current_complete、comparison_status、latest_complete。完整以每商品確切追蹤國集合判定，不只比國數；歷史必須 schema_version=2、src=mirror、coverage完全一致且數值有限非負。中國直報不得充作鏡像的最近完整月份。當期收齊與同比可比較分開：去年缺資料／零基期／stale不顯示同比，不以四捨五入後重量重算百分比。latest_complete可為零，但必須有完整回報。
+
+糧食歷史回查若新結果僅涵蓋舊回報國的子集合，保留原商品值、覆蓋與美國分量；不得將部分新值與舊總量相加。驗證tests/test_trade_quality.py。
+
+官方資料可用性API（getDa）依官方文件需要訂閱key；現有public preview不具同等語意。COMTRADE_API_KEY尚未驗證前，不宣稱已接入，也不能把空資料說成官方尚未公布。月份公布沒有固定期限。來源：https://uncomtrade.org/docs/data-availability/ 。

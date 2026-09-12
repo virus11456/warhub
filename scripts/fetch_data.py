@@ -1300,7 +1300,8 @@ async def fetch_food_history(session: aiohttp.ClientSession) -> list:
                     rec["us_soy"]   = round(us["1201"] / 1e7, 1) if us.get("1201") is not None else None
                     rec["us_wheat"] = round(us["1001"] / 1e7, 1) if us.get("1001") is not None else None
                     rec["us_corn"]  = round(us["1005"] / 1e7, 1) if us.get("1005") is not None else None
-                store[key(ym)] = rec
+                from trade_quality import preserve_food_coverage
+                store[key(ym)] = preserve_food_coverage(store.get(key(ym), {}), rec)
         for ym in sorted(missing_china, reverse=True)[:HIST_CHINA_BUDGET]:
             r = await _comtrade_china_import(session, ym)
             await asyncio.sleep(3)
@@ -2372,6 +2373,8 @@ async def main():
 
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
+    from trade_quality import enrich
+    enrich(output)
     from data_quality import source_health
     output["source_health"] = source_health(output)
 

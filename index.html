@@ -3041,6 +3041,16 @@ function newsAgo(ts){
   const hh=m/60; if(hh<24) return Math.floor(hh)+' 時前';
   return Math.floor(hh/24)+' 天前';
 }
+function tradeCoverageNote(it, month){
+  var complete=it.latest_complete;
+  var count=Array.isArray(it.reporter_codes)?new Set(it.reporter_codes).size:0;
+  var expected=Array.isArray(it.expected_reporter_codes)?it.expected_reporter_codes.length:0;
+  var status=it.current_complete?'追蹤國已收齊':'部分資料／待核對';
+  var text='本期 '+escapeHtml(month||'未定')+'：'+status+(expected?'（'+count+'/'+expected+' 國）':'')+'。';
+  if(it.comparison_status!=='comparable') text+=' 同比暫不比較：'+(it.current_complete?'去年同期、基期數值或新鮮度不符。':'當期回報不完整。');
+  text+=' 最新完整月份（追蹤國範圍）：'+(complete?escapeHtml(complete.month)+' · '+Number(complete.wan_ton).toLocaleString('zh-TW',{maximumFractionDigits:1})+' 萬噸':'尚無已核實紀錄')+'。';
+  return '<div class="strat-note">'+text+' 完整僅指追蹤國，不代表中國全部進口；缺值不等於零，未確認是否尚未公布。</div>';
+}
 function renderFood(json){
   var el=document.getElementById('food-grid'); if(!el) return;
   var f=json.food || {items:[]};
@@ -3048,13 +3058,13 @@ function renderFood(json){
     el.innerHTML='<div style="padding:1rem;text-align:center;font-family:\'Share Tech Mono\',monospace;font-size:.7rem;color:var(--text-dim)">暫無資料（每日更新一次）</div>';
   } else {
   el.innerHTML=f.items.map(function(it){
-    var y=it.yoy_pct;
+    var y=it.comparison_status==='comparable'&&!f.stale?it.yoy_pct:null;
     var col=(y==null)?'var(--text-dim)':(y>=15?'#ff4d5e':(y>0?'#f5a623':(y<0?'#35e08a':'var(--text-dim)')));
     var arr=(y==null)?'':(y>0?'▲':(y<0?'▼':''));
     var w=it.wan_ton==null?'--':it.wan_ton>=100?Math.round(it.wan_ton).toLocaleString():it.wan_ton;
     return '<div class="food-row"><div class="food-name">'+escapeHtml(it.name)+'</div>'
       +'<div class="food-val">'+w+'<span class="food-unit">萬噸</span></div>'
-      +'<div class="food-yoy" style="color:'+col+'">'+(y==null?'—':arr+Math.abs(y)+'% 年增')+'</div></div>';
+      +'<div class="food-yoy" style="color:'+col+'">'+(y==null?'—':arr+Math.abs(y)+'% 年增')+'</div></div>'+tradeCoverageNote(it,f.ref_month);
   }).join('');
   }
   // 🇺🇸→🇨🇳 USDA 每週銷售（有 key 才有）
@@ -3351,7 +3361,7 @@ function renderStrat(json){
     return;
   }
   el.innerHTML=s.items.map(function(it){
-    var y=it.yoy_pct;
+    var y=it.comparison_status==='comparable'&&!s.stale?it.yoy_pct:null;
     var partial=!!it.incomplete || it.anomaly==='partial';
     var col=partial?'var(--text-dim)':((y==null)?'var(--text-dim)':(y>0?'#ff4d5e':(y<0?'#35e08a':'var(--text-dim)')));
     var arr=(y==null)?'':(y>0?'▲':(y<0?'▼':''));
@@ -3369,7 +3379,8 @@ function renderStrat(json){
       else if(it.anomaly==='low') note='<div class="strat-note lo">⚑ 異常低判讀：'+'進口減少的原因待查，不能直接推定動用儲備。'+'</div>';
       else note='<div class="strat-note">▲高→'+'進口增加的原因待查，不能直接推定軍備擴張。'+'　▼低→'+'進口減少的原因待查，不能直接推定動用儲備。'+'</div>';
     }
-    if(reference) note+='<div class="strat-note">最近歷史參考：'+escapeHtml(reference.ym)+' · '+reference[it.cmd].toLocaleString('zh-TW',{maximumFractionDigits:1})+' 萬噸（出口國回推；'+(reference.schema_version===2?'部分覆蓋':'舊歷史未逐月核驗')+'，不是當月值）</div>';
+    note=tradeCoverageNote(it,s.ref_month);
+    if(reference && !it.latest_complete) note+='<div class="strat-note">最近歷史參考：'+escapeHtml(reference.ym)+' · '+reference[it.cmd].toLocaleString('zh-TW',{maximumFractionDigits:1})+' 萬噸（出口國回推；'+(reference.schema_version===2?'部分覆蓋':'舊歷史未逐月核驗')+'，不是當月值）</div>';
     return '<div class="strat-item"><div class="strat-row"><div class="strat-name">'+escapeHtml(it.name)
       +'<small>'+escapeHtml(it.use||'')+'</small></div>'
       +'<div class="strat-val">'+w+(it.wan_ton==null?'':'<span class="u">萬噸</span>')+'</div>'
