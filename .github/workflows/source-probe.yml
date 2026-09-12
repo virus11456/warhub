@@ -52,7 +52,9 @@ jobs:
           retention-days: 30
       - name: Verify one GDELT event batch
         if: inputs.source == 'gdelt_events'
-        run: python scripts/probe_gdelt_events.py --output /tmp/warhub-gdelt-events
+        run: |
+          python scripts/probe_gdelt_events.py --output /tmp/warhub-gdelt-events
+          python scripts/gdelt_event_index.py --source /tmp/warhub-gdelt-events --database /tmp/warhub-gdelt-events/event-index.sqlite
       - name: Preserve GDELT batch and report
         if: always() && inputs.source == 'gdelt_events'
         uses: actions/upload-artifact@v4
