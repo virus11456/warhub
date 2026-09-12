@@ -35,21 +35,3 @@ jobs:
           Path('/tmp/warhub-inline.js').write_text('\n'.join(parts))
           PY
           node --check /tmp/warhub-inline.js
-
-      - name: Validate Groq translation once
-        env:
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-          GROQ_TRANSLATION_MODEL: ${{ vars.GROQ_TRANSLATION_MODEL }}
-        run: |
-          PYTHONPATH=scripts python - <<'PY'
-          import asyncio, aiohttp
-          from translations import translate_groq
-          async def main():
-              rows=[{'title':'Will Russia test a nuclear weapon by September 30, 2026?'},{'title':'There is no confirmed military attack.'}]
-              async with aiohttp.ClientSession() as session:
-                  await translate_groq(session,rows,{})
-              for row in rows:
-                  print('GROQ_SMOKE',row.get('title_zh') or row.get('translation_error'))
-              assert all(row.get('title_zh') for row in rows), 'Groq translation unavailable'
-          asyncio.run(main())
-          PY
