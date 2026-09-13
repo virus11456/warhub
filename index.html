@@ -1489,7 +1489,7 @@
       <div style="grid-column:1/-1;text-align:center;padding:1.2rem;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 計算地區風險中…</div>
     </div>
     <div style="margin-top:.7rem;font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim)">
-      計分：市場 35% · 新聞 25% · NOTAM 15%；火點及廣域軍機數僅展示，暫不計分；有效權重不足 60% 不出分數 ｜ ↑↓ = 與資料時間約 24 小時前相比（容許 ±4 小時）
+      計分：市場 35% · 新聞 25% · NOTAM 15%；火點及廣域軍機數僅展示，暫不計分；有效權重不足 60% 不出分數 ｜ ↑↓ = 與資料時間約 24 小時前相比（同計分因子、容許 ±4 小時；缺比較資料不顯示箭頭）
     </div>
 
     <!-- 7 天風險趨勢圖 -->
@@ -2702,10 +2702,17 @@ function trendArrow(cur, regionKey) {
   const validScore = value => typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= 100;
   if (!Array.isArray(WW_HISTORY) || !validScore(cur) || !Number.isFinite(snapshot) ||
       snapshot > Date.now() || Date.now() - snapshot >= 6 * 3600000) return '';
+  const keys = regionKey ? ['poly','gdelt','notam'] : ['p','a','g','z','f','s','w'];
+  const factors = regionKey ? OBSERVED_DATA?.regions?.find(r => r.key === regionKey)?.factors : BACKEND_SCORE?.factors;
+  const basis = keys.filter(k => typeof factors?.[k] === 'number' && Number.isFinite(factors[k])).sort();
+  if (!basis.length) return '';
   const target = snapshot - 24 * 3600000;
   let best = null, bestDiff = Infinity;
   for (const h of WW_HISTORY) {
     if (!h || h.model_version !== 'wpi-4.0') continue;
+    const previousBasis = regionKey ? h.score_basis?.regions?.[regionKey] : h.score_basis?.combined;
+    if (!Array.isArray(previousBasis) || previousBasis.length !== basis.length ||
+        [...previousBasis].sort().some((k, i) => k !== basis[i])) continue;
     const ts = Date.parse(h.ts);
     const value = regionKey ? h.regions?.[regionKey] : h.combined;
     if (!Number.isFinite(ts) || ts >= snapshot || !validScore(value)) continue;
