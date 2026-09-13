@@ -20,12 +20,21 @@ PLA_FILE = DATA_DIR / "pla_adiz.json"
 
 
 def _remote(path_rel: str):
+    """Required tracked histories must be readable; failure is never an empty history."""
     try:
         raw = subprocess.check_output(["git", "show", f"origin/main:{path_rel}"],
                                       stderr=subprocess.DEVNULL)
-        return json.loads(raw)
-    except Exception:
-        return None
+        value = json.loads(raw)
+    except (OSError, subprocess.SubprocessError, ValueError) as exc:
+        raise RuntimeError(f"Cannot read required remote history: {path_rel}") from exc
+    if path_rel == "data/history.json":
+        valid = isinstance(value, list)
+    else:
+        field = "months" if path_rel in ("data/food_history.json", "data/strat_history.json") else "days"
+        valid = isinstance(value, dict) and isinstance(value.get(field), dict)
+    if not valid:
+        raise ValueError(f"Invalid required remote history structure: {path_rel}")
+    return value
 
 
 def _load(p: Path):

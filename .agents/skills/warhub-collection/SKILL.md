@@ -55,3 +55,5 @@ Comtrade另由scripts/source_archive.py保存逐次驗證後來源欄位，kind=
 每日 metrics_daily 紀錄另存 recorded_at（UTC歸檔時間，不代表各來源觀測時間），台北日期鍵由同一時間換算，避免跨午夜錯位。merge_metrics_daily 同日採較新的完整紀錄；已知時間不被無時間舊紀錄覆蓋，兩筆皆舊格式時維持本輪優先。無時區、未來、與台北日期不符的 recorded_at 不進入顯示歷史；舊紀錄不補造時間。保留730天窗口；tests/test_daily_metrics_merge.py 驗證時序、零值及跨日邊界。
 
 歷史合併程式若回傳失敗，update-data workflow 必須停止提交，不以 echo 或 continue-on-error 略過。提交步驟後以 always() 上傳本輪 /tmp/warhub-new-archive/ 為 analysis-snapshots artifact（30天），成功時亦保留；此為已完成壓縮封存的額外恢復途徑，不保證收集或壓縮前失敗仍有封存。來源 artifact 保持獨立。tests/test_publication_guard.py 用隔離的命令替身執行實際提交腳本，驗證 guard 失敗不會 git add/commit/push，正常流程仍可提交。
+
+遠端五份歷史是既有必需檔案：_remote 讀取 Git 失敗、JSON 損壞或頂層格式錯誤時必須拋出例外，不能回傳 None 假裝無歷史。history.json 須為陣列；共機／每日指標須有 days 物件；兩份月歷史須有 months 物件，合法空集合仍接受。tests/test_remote_history_read.py 驗證讀取與格式錯誤可停止合併，避免繞過提交保護。
