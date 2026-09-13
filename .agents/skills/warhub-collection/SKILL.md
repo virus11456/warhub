@@ -61,3 +61,5 @@ Comtrade另由scripts/source_archive.py保存逐次驗證後來源欄位，kind=
 WPI v4.0 的人工權重公式與歷史維持原樣，calculate_wpi 標記 experimental=true；首頁四類入口分開看實際活動、新聞關注、市場反應、經濟物流背景，舊 WPI／披薩／酒吧放在預設收合實驗區。alerts.run_notifications 對 experimental=true 或缺旗標的舊快照停用 WPI 升級與披薩異常警報（環境開關也不覆蓋此限制），保留更新摘要及獨立熱異常觀測。摘要標示實驗，不顯示 DEFCON。不得宣稱人流證實加班、獨立驗證或已回測；不改抓取頻率、不刪歷史。tests/test_alert_delivery.py 以 mock 驗證停止警報且摘要／熱異常仍有效，前端測試驗證實驗區收合與四類入口。
 
 使用者部署預算（2026-09-13）：WARHUB 每日最多20次，包含預覽與正式部署；先在本機完成一批修改與測試，再集中提交。同一PR推送仍可能觸發預覽，不能當成免費次數。這是操作限制，尚無自動硬性計數器；部署前需核對既有紀錄，不宣稱已自動強制執行。Vercel免費額度另由同owner下所有專案共用，已達平台限制時保留本機待上線批次，不反覆重試。
+
+台海洞察的 news.input_status 僅描述本輪 tw_news 可用樣本：available／partial／stale／unavailable，不代表完整新聞覆蓋。空或無效輸入為 unavailable；既有7天樣本及原 ts 保留，sample_24h 為已保存且發稿在24小時內的筆數，0只表示保存窗口中沒有符合樣本。前端缺少統計顯示缺資料，舊快照可使用既有 source_health.tw_news 狀態，缺旗標不推定正常。顯示最近保存新聞的發稿時間、公務船與共艦分列；市場比較須有20–28小時前的 comparison_at、有效報價及未到期題目，並列出兩次快照時間，缺比較不補零。新增欄位只隨正常排程產生，不重算或覆寫歷史；tests/test_taiwan_insights.py 與 tests/test_frontend.cjs 離線驗證失敗沿用、缺值、有效零、過期題目與原時間保存。

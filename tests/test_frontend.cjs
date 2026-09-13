@@ -53,7 +53,7 @@ if(mode==='valid'){
 
   assert.equal(w._mdVal({fin:{risk_off_cluster:0,risk_off_observed:6}},'cluster'),0);
   assert.equal(w._mdVal({fin:{risk_off_cluster:2,risk_off_observed:5}},'cluster'),null);
-  const insight={version:1,as_of:new Date().toISOString(),activity:{status:'within_baseline',baseline_days:20,median:10,latest:{date:'2026-09-13',aircraft:0,ships:5,period_end:new Date().toISOString(),source_url:'https://air.mnd.gov.tw/TW/News/News_Detail.aspx?CID=213&ID=1'}},news:{sample_24h:2,publishers_24h:1},markets:[{slug:'test',question:'English title',question_zh:'台海市場中文問題',yes_percent:10,delta_pp:3,comparison_hours:24,end_date:'2030-01-01T00:00:00Z'}],timeline:[{at:new Date().toISOString(),title:'測試新聞',time_label:'新聞發稿時間',url:'javascript:alert(1)'}]};
+  const insight={version:1,as_of:new Date().toISOString(),activity:{status:'within_baseline',baseline_days:20,median:10,latest:{date:'2026-09-13',aircraft:0,ships:5,period_end:new Date().toISOString(),source_url:'https://air.mnd.gov.tw/TW/News/News_Detail.aspx?CID=213&ID=1'}},news:{sample_24h:2,publishers_24h:1},markets:[{slug:'test',question:'English title',question_zh:'台海市場中文問題',yes_percent:10,delta_pp:3,comparison_hours:24,comparison_at:new Date(Date.now()-24*3600000).toISOString(),end_date:'2030-01-01T00:00:00Z'}],timeline:[{at:new Date().toISOString(),title:'測試新聞',time_label:'新聞發稿時間',url:'javascript:alert(1)'}]};
   w.renderTaiwanInsight({taiwan_insight:insight});
   assert.ok(d.querySelector('#taiwan-insight-body').textContent.includes('共機 0 架次'));
   assert.ok(d.querySelector('#taiwan-insight-body').textContent.includes('+3 個百分點'));
@@ -62,6 +62,47 @@ if(mode==='valid'){
   assert.ok(d.querySelector('#taiwan-insight-body .ti-market-section .ti-markets'));
   assert.ok(d.querySelector('#taiwan-insight-body').textContent.includes('2030'));
 
+  // Missing fields must not invent zero, dates, or a comparable market change.
+  const ti=()=>d.querySelector('#taiwan-insight-body').textContent;
+  w.renderTaiwanInsight({taiwan_insight:{...insight,news:{},activity:{...insight.activity,median:null,latest:{...insight.activity.latest,ships:null,government_ships:0}}}});
+  assert.ok(ti().includes('共艦 缺資料 艘、公務船 0 艘'));
+  assert.ok(ti().includes('中位數 缺資料'));
+  assert.ok(ti().includes('樣本：缺資料 則、缺資料 個'));
+  assert.ok(ti().includes('時間缺資料'));
+  assert.ok(!ti().includes('1970'));
+  const savedAt=new Date(Date.now()-2*3600000).toISOString();
+  w.renderTaiwanInsight({taiwan_insight:{...insight,news:{input_status:'stale',sample_24h:0,publishers_24h:0,latest_at:savedAt}}});
+  assert.ok(ti().includes('沿用舊樣本'));
+  assert.ok(ti().includes('樣本：0 則、0 個'));
+  assert.ok(ti().includes('發稿時間'));
+  w.renderTaiwanInsight({source_health:{tw_news:{status:'unavailable'}},taiwan_insight:{...insight,news:{sample_24h:2,publishers_24h:1}}});
+  assert.ok(ti().includes('未取得有效樣本，不代表沒有新聞'));
+  assert.ok(ti().includes('樣本：2 則、1 個'));
+  for(const value of [null,undefined,-1,'0',NaN]){
+    w.renderTaiwanInsight({taiwan_insight:{...insight,news:{sample_24h:value,publishers_24h:value}}});
+    assert.ok(ti().includes('樣本：缺資料 則、缺資料 個'));
+  }
+  const market=insight.markets[0];
+  for(const [extra,message] of [
+    [{yes_percent:null},'報價缺資料'],
+    [{yes_percent:'0'},'報價缺資料'],
+    [{yes_percent:101},'報價缺資料'],
+    [{end_date:null},'截止時間缺資料'],
+    [{end_date:new Date(Date.now()-1000).toISOString()},'題目已到期'],
+    [{comparison_at:null},'缺少可核對時間'],
+    [{comparison_at:new Date(Date.now()-30*3600000).toISOString()},'缺少可核對時間'],
+    [{delta_pp:NaN},'缺少可核對時間']
+  ]){
+    w.renderTaiwanInsight({taiwan_insight:{...insight,markets:[{...market,...extra}]}});
+    assert.ok(ti().includes(message));
+    assert.ok(!ti().includes('+3 個百分點'));
+  }
+  w.renderTaiwanInsight({taiwan_insight:{...insight,markets:[{...market,yes_percent:0,delta_pp:0}]}});
+  assert.ok(ti().includes('YES 報價 0%'));
+  assert.ok(ti().includes('0 個百分點'));
+  assert.ok(ti().includes('比較基準時間'));
+  assert.ok(ti().includes('報價快照時間'));
+  w.renderTaiwanInsight({taiwan_insight:insight});
   assert.equal(d.querySelector('#taiwan-insight-timeline a'),null);
   w.renderTaiwanInsight({taiwan_insight:{...insight,as_of:new Date(Date.now()-7*3600000).toISOString()}});
   assert.ok(d.querySelector('#taiwan-insight-body').textContent.includes('過期'));

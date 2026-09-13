@@ -3495,14 +3495,26 @@ function renderTaiwanInsight(json) {
   const at=Date.parse(v.as_of), age=Date.now()-at;
   if(!Number.isFinite(at)||age<0||age>=6*3600000){el.textContent='洞察快照已過期或時間無效，暫停判讀；請參考下方官方日報的原始日期。';return;}
   const a=v.activity||{}, latest=a.latest, n=v.news||{};
-  const fmt=ts=>new Date(ts).toLocaleString('zh-TW',{timeZone:'Asia/Taipei',year:'numeric',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  const fmt=ts=>typeof ts==='string' && Number.isFinite(Date.parse(ts)) ? new Date(ts).toLocaleString('zh-TW',{timeZone:'Asia/Taipei',year:'numeric',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '時間缺資料';
+  const count=value=>Number.isInteger(value)&&value>=0 ? String(value) : '缺資料';
   const link=(url,text)=>{try{const u=new URL(url);if(u.protocol!=='https:'||u.username)return escapeHtml(text);return `<a href="${escapeHtml(u.href)}" target="_blank" rel="noopener">${escapeHtml(text)}</a>`;}catch{return escapeHtml(text);}};
   const label={missing:'缺少官方日報',stale:'日報較舊，暫不判讀',baseline_pending:'基準資料累積中',elevated:'共機高於此前紀錄第 90 百分位',within_baseline:'共機未超過此前紀錄第 90 百分位'};
   let activity=`<strong>實際活動｜${escapeHtml(label[a.status]||'資料不足')}</strong>`;
-  if(latest) activity+=`<div>${link(latest.source_url,latest.date+' 官方日報')}：共機 ${escapeHtml(latest.aircraft)} 架次、共艦 ${escapeHtml(latest.ships??'缺資料')} 艘。統計截止 ${escapeHtml(fmt(latest.period_end))}；非目前即時數量。</div>`;
-  if(a.baseline_days)activity+=`<div>此前 28 天已收錄 ${escapeHtml(a.baseline_days)} 日；共機中位數 ${escapeHtml(a.median)} 架次。至少 14 日才比較，不代表作戰意圖。</div>`;
-  const news=`<strong>新聞關注｜已收錄樣本</strong><div>近 24 小時 ${escapeHtml(n.sample_24h??0)} 則、${escapeHtml(n.publishers_24h??0)} 個發布來源名稱。這是有限樣本，不代表完整新聞量，也不能判定熱度升降。</div>`;
-  const markets=(v.markets||[]).map(m=>`<div class="ti-market">${link('https://polymarket.com/market/'+encodeURIComponent(m.slug),chineseTitle(m.question_zh,m.question))}<div>Yes 報價 ${escapeHtml(m.yes_percent)}% · ${m.delta_pp==null?'同題比較資料累積中':`較約 ${escapeHtml(m.comparison_hours)} 小時前 ${m.delta_pp>=0?'+':''}${escapeHtml(m.delta_pp)} 個百分點`}</div><small>到期時間（台北）${escapeHtml(fmt(m.end_date))}；不同截止日不直接比較。</small></div>`).join('')||'<div>目前沒有有效的台海市場題目。</div>';
+  if(latest) activity+=`<div>${link(latest.source_url,(latest.date||'日期缺資料')+' 官方日報')}：共機 ${count(latest.aircraft)} 架次、共艦 ${count(latest.ships)} 艘、公務船 ${count(latest.government_ships)} 艘。統計截止 ${escapeHtml(fmt(latest.period_end))}；非目前即時數量，共艦與公務船分列。</div>`;
+  if(latest)activity+=`<div>此前 28 天已收錄 ${count(a.baseline_days)} 日；共機中位數 ${Number.isFinite(a.median)&&a.median>=0?escapeHtml(a.median):'缺資料'} 架次。至少 14 日才比較，不代表作戰意圖。</div>`;
+  const newsStatus={available:'本輪已取得可用樣本',partial:'本輪樣本部分可用或含沿用資料',stale:'本輪沿用舊樣本，未確認新資料',unavailable:'本輪未取得有效樣本，不代表沒有新聞'};
+  const inputStatus=n.input_status||(json.source_health||{}).tw_news?.status;
+  const news=`<strong>新聞關注｜已收錄樣本</strong><div>${escapeHtml(newsStatus[inputStatus]||'本輪取得狀態未記錄')}。</div><div>已保存的近 24 小時樣本：${count(n.sample_24h)} 則、${count(n.publishers_24h)} 個發布來源名稱。這是有限樣本，不代表完整新聞量，也不能判定熱度升降。</div><div>最近已保存新聞的發稿時間（台北）：${escapeHtml(fmt(n.latest_at))}；不是事件發生時間。</div>`;
+  const markets=(Array.isArray(v.markets)?v.markets:[]).filter(m=>m&&typeof m==='object').map(m=>{
+    const price=Number.isFinite(m.yes_percent)&&m.yes_percent>=0&&m.yes_percent<=100 ? `${m.yes_percent}%` : '缺資料';
+    const end=typeof m.end_date==='string'?Date.parse(m.end_date):NaN;
+    const expired=Number.isFinite(end)&&end<=Date.now();
+    const comparisonAt=typeof m.comparison_at==='string'?Date.parse(m.comparison_at):NaN;
+    const hours=(at-comparisonAt)/3600000;
+    const comparable=price!=='缺資料'&&!expired&&Number.isFinite(end)&&Number.isFinite(m.delta_pp)&&Math.abs(m.delta_pp)<=100&&Number.isFinite(comparisonAt)&&hours>=20&&hours<=28;
+    const comparison=expired?'題目已到期，暫停比較':!Number.isFinite(end)?'截止時間缺資料，暫停比較':price==='缺資料'?'報價缺資料，暫停比較':comparable?`較約 ${hours.toFixed(1)} 小時前 ${m.delta_pp>0?'+':''}${m.delta_pp} 個百分點`:'同題比較資料累積中或缺少可核對時間';
+    return `<div class="ti-market">${link('https://polymarket.com/market/'+encodeURIComponent(m.slug),chineseTitle(m.question_zh,m.question))}<div>YES 報價 ${price} · ${comparison}</div><div class="ti-note">${expired?'歷史快照報價':'報價快照時間'}（台北）${escapeHtml(fmt(v.as_of))}${comparable?`<br>比較基準時間（台北）${escapeHtml(fmt(m.comparison_at))}`:''}</div><small>到期時間（台北）${escapeHtml(fmt(m.end_date))}；不同截止日不直接比較。</small></div>`;
+  }).join('')||'<div>目前沒有有效的台海市場題目。</div>';
   el.innerHTML=`<div class="ti-grid"><section class="ti-panel">${activity}</section><section class="ti-panel">${news}</section><section class="ti-panel ti-market-section"><strong>市場反應｜逐題比較</strong><div class="ti-markets">${markets}</div></section></div><p class="ti-note">洞察資料時間 ${escapeHtml(fmt(v.as_of))}（台北）。這些觀測時間與定義不同；目前不自動判定互相證實或即將升級。</p>`;
   timeline.innerHTML=(v.timeline||[]).map(r=>`<div style="padding:.55rem 0;border-bottom:1px solid var(--border)"><small>${escapeHtml(r.time_label)} · ${escapeHtml(fmt(r.at))}（台北）</small><br>${link(r.url,chineseTitle(r.title,r.title))}</div>`).join('')||'近 7 天尚無可用紀錄。';
 }
