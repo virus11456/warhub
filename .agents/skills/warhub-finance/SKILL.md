@@ -18,3 +18,5 @@ description: "Maintain WARHUB Yahoo Finance quotes and FRED credit-spread collec
 相關驗證用 `tests/test_integrity.py` 與 `tests/test_frontend.cjs`；若改收盤基準，補能區分盤中／收盤及不足 30 筆的 mock 案例。外部驗證只查有疑問的標的，不為技能建立而全面抓取或觸發通知。
 
 離線日期／缺值／錯誤日誌驗證：tests/test_fred_quality.py。
+
+避險群聚使用 scoring.risk_off_cluster：金／油／VIX 上偏離、瑞郎及10年殖利率下偏離，門檻含5%；國防股任一達標即可確認亮訊號，但未達標須四檔均有效才能確認否。六類都可判讀才存0–6總數，否則為None；另存 risk_off_observed 及逐類 risk_off_signals。前端不將缺完整性欄位的舊總數當成已核實值，原始歷史仍保存。tests/test_risk_off_cluster.py 覆蓋完全缺值、部分缺值、有效零、方向及國防股不完整。

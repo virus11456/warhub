@@ -3471,7 +3471,7 @@ var MD_KEYS=[
 ];
 var MD_UNIT={gold:'',oil:'',vix:'',ust10:'%',em_oas:'%',hy_oas:'%',oil_premium:'$/bbl'};
 var MD_DESC={
-  cluster:'同時往避險方向明顯偏離 30 日均值（>5%）的指標數（金↑/油↑/VIX↑/瑞郎強/國防股↑/殖利率↓）。單一指標沒意義，數字越高代表越多指標同時亮 → 市場在同步定價風險。',
+  cluster:'往避險方向偏離 30 日均值至少 5% 的六類指標數（金↑/油↑/VIX↑/瑞郎強/國防股↑/殖利率↓）。六類皆可判讀才顯示；缺資料或舊紀錄無完整性資訊時不計數。各市場觀測時間可能不同，不能視為同步反應或戰爭成因證據。',
   gold:'避險金屬，戰爭/系統性風險升溫時走揚。',oil:'布倫特原油，供給中斷預期時跳漲。',
   vix:'股市恐慌指數，風險趨避時飆升。',ust10:'美 10 年公債殖利率，資金逃向安全資產時驟降。',
   em_oas:'新興市場公司債利差（FRED），全球信用壓力升高時擴大。',
@@ -3479,7 +3479,7 @@ var MD_DESC={
 };
 function _mdVal(rec,key){
   var f=rec.fin||{};
-  return key==='cluster' ? f.risk_off_cluster : f[key];
+  return key==='cluster' ? (f.risk_off_observed===6 && typeof f.risk_off_cluster==='number' && Number.isFinite(f.risk_off_cluster) && f.risk_off_cluster>=0 && f.risk_off_cluster<=6 ? f.risk_off_cluster : null) : f[key];
 }
 function renderMetricsHist(){
   var wrap=document.getElementById('md-wrap'); if(!wrap||!MD_JSON) return;

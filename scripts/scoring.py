@@ -67,3 +67,19 @@ def calculate_wpi(pizza_index, markets, aviation=None, firms=None, gdelt=None, w
             'pizza_score': factors['z'], 'polymarket_score': factors['p'],
             'factors': {k: round(v,2) if number(v) else None for k,v in factors.items()},
             'coverage': coverage, 'is_probability': False}
+
+
+def risk_off_cluster(finance):
+    """Six observed price-deviation signals; missing inputs never mean inactive."""
+    def signal(symbol, direction=1):
+        value = (finance.get(symbol) or {}).get('dev')
+        return value * direction >= 5 if number(value) else None
+    signals = {key: signal(symbol, direction) for key, symbol, direction in (
+        ('gold', 'GC=F', 1), ('oil', 'BZ=F', 1), ('vix', '^VIX', 1),
+        ('chf', 'USDCHF=X', -1), ('treasury', '^TNX', -1))}
+    defense = [signal(symbol) for symbol in ('LMT', 'RTX', 'NOC', 'GD')]
+    signals['defense'] = True if any(value is True for value in defense) else (
+        False if all(value is False for value in defense) else None)
+    observed = sum(value is not None for value in signals.values())
+    return {'risk_off_cluster': sum(value is True for value in signals.values()) if observed == 6 else None,
+            'risk_off_observed': observed, 'risk_off_signals': signals}
