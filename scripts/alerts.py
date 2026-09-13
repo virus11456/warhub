@@ -2,7 +2,7 @@
 WARHUBS - 推播通知系統
 透過 Telegram Bot（與 Discord Webhook）推送：
   1) 資料更新後觀測回報（DIGEST_EVERY_HOURS 為去重時段，非獨立定時器）
-  2) 即時異常警報（等級升高／五角大廈披薩爆量／監測區熱異常像元激增）
+  2) 監測區熱異常像元激增；實驗 WPI 與披薩不觸發戰情警報
 由 fetch_data.py 在每次資料更新後呼叫。跨 run 的狀態（上次回報時段、
 上次異常旗標）存在 data.json 的 "_notify" 欄位，由呼叫端讀出上一份傳入、
 再把新狀態寫回，因為 GitHub Actions 每次都是全新 process。
@@ -92,7 +92,7 @@ def _fmt_pizza_shops(shops):
 
 def build_digest(data: dict) -> str:
     score = data.get("score", {})
-    emoji = LEVEL_EMOJI.get(score.get("alert_level"), "⚠️")
+    emoji = "🧪" if score.get("experimental", True) else LEVEL_EMOJI.get(score.get("alert_level"), "⚠️")
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     firms = data.get("firms", {})
     hs = firms.get("conflict_total")
@@ -100,9 +100,9 @@ def build_digest(data: dict) -> str:
     return (
         f"🛰️ *WARHUBS 更新觀測回報*\n"
         f"{now}\n\n"
-        f"{emoji} *WPI 觀察指數：{_fmt_score(score.get('combined_score'))} / 100*　等級：*{score.get('alert_level','?')}*\n\n"
+        f"{emoji} *WPI 實驗指數：{_fmt_score(score.get('combined_score'))} / 100*（不作戰情警戒）\n\n"
         f"🗺️ 地區風險：\n{_fmt_regions(data.get('regions'))}\n\n"
-        f"🍕 五角大廈披薩指數：{_fmt_score(score.get('pizza_score'))}　·　DEFCON {data.get('defcon_level','—')}\n"
+        f"🍕 人流實驗觀察：{_fmt_score(score.get('pizza_score'))}\n"
         f"{_fmt_pizza_shops(data.get('pizza'))}\n"
         f"{_fmt_aviation(data.get('aviation'))}\n"
         f"🔥 監測區熱異常像元：{hs} 處（NASA FIRMS 24h）\n\n"
@@ -138,7 +138,7 @@ def build_pizza_alert(data: dict, shops: list) -> str:
         f"🍕 *WARHUBS 異常：五角大廈披薩爆量*\n"
         f"{now}\n\n"
         f"Pentagon 周邊披薩店下班後仍爆滿（EXTREME）：{names}\n"
-        f"最高達平時 *{pct}%*　·　DEFCON {data.get('defcon_level','—')}\n\n"
+        f"最高達平時 *{pct}%*\n\n"
         f"（人流異常並非軍事行動證據）\n"
         f"資料覆盖率：{(data.get('score',{}).get('coverage',0)*100):.0f}% · 未校準為開戰機率\n"
         f"🔗 {SITE}"
@@ -267,11 +267,11 @@ async def run_notifications(data: dict, prev_notify: dict | None = None,
         msgs.append(build_digest(data))
 
     # 2) 即時異常（邊緣觸發：條件「新成立」才推，避免洗版）
-    if ALERT_ESCALATION and new_level in LEVEL_ORDER and prev_level in LEVEL_ORDER \
+    if score.get("experimental") is False and ALERT_ESCALATION and new_level in LEVEL_ORDER and prev_level in LEVEL_ORDER \
             and LEVEL_ORDER.index(new_level) > LEVEL_ORDER.index(prev_level):
         alert_msgs.append(build_escalation(data, prev_level))
 
-    if ALERT_PIZZA and has_extreme and not prev_notify.get("pizza_extreme"):
+    if score.get("experimental") is False and ALERT_PIZZA and has_extreme and not prev_notify.get("pizza_extreme"):
         alert_msgs.append(build_pizza_alert(data, extreme_shops))
 
     prev_hs = prev_notify.get("hotspots", 0) or 0

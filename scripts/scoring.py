@@ -66,7 +66,7 @@ def calculate_wpi(pizza_index, markets, aviation=None, firms=None, gdelt=None, w
     return {'model_version': MODEL_VERSION, 'combined_score': score, 'alert_level': level,
             'pizza_score': factors['z'], 'polymarket_score': factors['p'],
             'factors': {k: round(v,2) if number(v) else None for k,v in factors.items()},
-            'coverage': coverage, 'is_probability': False}
+            'coverage': coverage, 'is_probability': False, 'experimental': True}
 
 
 def risk_off_cluster(finance):

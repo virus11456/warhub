@@ -21,6 +21,19 @@ const {JSDOM,VirtualConsole}=require('jsdom');const fs=require('fs');const asser
   assert.ok(!d.querySelector('#ticker').textContent.includes('綜合威脅指數'));
  }
 assert.equal(d.querySelector('#source-health'),null);
+const experimental=d.querySelector('#experimental-observations');
+assert.ok(experimental && !experimental.open);
+assert.equal(experimental.parentElement.className,'container');
+for(const selector of ['#pizza-card','.hero-strip','.wpi-section']) {
+  assert.equal(d.querySelectorAll(selector).length,1);
+  assert.ok(experimental.contains(d.querySelector(selector)));
+}
+assert.equal(d.querySelector('#observation-overview').querySelectorAll('h3').length,4);
+for(const a of d.querySelectorAll('#observation-overview a')) assert.ok(d.querySelector(a.getAttribute('href')));
+assert.ok(!d.querySelector('#ticker').textContent.includes('披薩指數'));
+assert.ok(!d.querySelector('#ticker').textContent.includes('戰爭壓力指數'));
+assert.ok(!d.querySelector('#ticker').textContent.includes('WPI'));
+
 if(mode==='valid'){assert.ok(d.querySelector('#html-wpi-a-desc').textContent.includes('170 架'));assert.ok(d.querySelector('#html-wpi-a-desc').textContent.includes('異常分數 0'));assert.ok(d.querySelector('#html-wpi-f-desc').textContent.includes('11,785 筆'));assert.ok(d.querySelector('#html-wpi-f-desc').textContent.includes('暫不計分'));assert.ok(d.querySelector('#poly-list-container').textContent.includes('美國會在12月31日前打擊古巴嗎？'));assert.ok(d.querySelector('#news-list').textContent.includes('新聞繁體中文標題'));assert.ok(!d.querySelector('#news-list').textContent.includes('English original'));assert.ok(d.querySelector('#strat-grid').textContent.includes('最近歷史參考：2026-06'));assert.ok(d.querySelector('#sh-svg').textContent.includes('缺報'));assert.ok(!d.querySelector('#sh-svg').innerHTML.includes('999'));}
 if(mode==='valid'){
   const w=dom.window;

@@ -57,3 +57,5 @@ Comtrade另由scripts/source_archive.py保存逐次驗證後來源欄位，kind=
 歷史合併程式若回傳失敗，update-data workflow 必須停止提交，不以 echo 或 continue-on-error 略過。提交步驟後以 always() 上傳本輪 /tmp/warhub-new-archive/ 為 analysis-snapshots artifact（30天），成功時亦保留；此為已完成壓縮封存的額外恢復途徑，不保證收集或壓縮前失敗仍有封存。來源 artifact 保持獨立。tests/test_publication_guard.py 用隔離的命令替身執行實際提交腳本，驗證 guard 失敗不會 git add/commit/push，正常流程仍可提交。
 
 遠端五份歷史是既有必需檔案：_remote 讀取 Git 失敗、JSON 損壞或頂層格式錯誤時必須拋出例外，不能回傳 None 假裝無歷史。history.json 須為陣列；共機／每日指標須有 days 物件；兩份月歷史須有 months 物件，合法空集合仍接受。tests/test_remote_history_read.py 驗證讀取與格式錯誤可停止合併，避免繞過提交保護。
+
+WPI v4.0 的人工權重公式與歷史維持原樣，calculate_wpi 標記 experimental=true；首頁四類入口分開看實際活動、新聞關注、市場反應、經濟物流背景，舊 WPI／披薩／酒吧放在預設收合實驗區。alerts.run_notifications 對 experimental=true 或缺旗標的舊快照停用 WPI 升級與披薩異常警報（環境開關也不覆蓋此限制），保留更新摘要及獨立熱異常觀測。摘要標示實驗，不顯示 DEFCON。不得宣稱人流證實加班、獨立驗證或已回測；不改抓取頻率、不刪歷史。tests/test_alert_delivery.py 以 mock 驗證停止警報且摘要／熱異常仍有效，前端測試驗證實驗區收合與四類入口。
