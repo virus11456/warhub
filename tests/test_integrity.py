@@ -93,7 +93,7 @@ class Integrity(unittest.TestCase):
     def test_seismic_archive_and_chf(self):
         with tempfile.TemporaryDirectory() as td, patch.object(f,'METRICS_DAILY_FILE',Path(td)/'daily.json'), patch.object(f,'DATA_FILE',Path(td)/'none.json'):
             s=f.update_daily_metrics(sc.calculate_wpi(None,[]),None,None,{},None,None,{'total_72h':3},[],{'USDCHF=X':{'dev':-6}})
-            r=next(iter(s.values()));self.assertEqual(r['seismic'],3);self.assertEqual(r['fin']['risk_off_cluster'],1)
+            r=next(iter(s.values()));self.assertEqual(r['seismic'],3);self.assertIsNone(r['fin']['risk_off_cluster']);self.assertTrue(r['fin']['risk_off_signals']['chf']);self.assertEqual(r['fin']['risk_off_observed'],1)
 
 class Sources(unittest.IsolatedAsyncioTestCase):
     async def test_besttime_http_failure_not_closed(self):

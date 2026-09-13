@@ -23,7 +23,7 @@ import logging
 import os
 import re
 from translations import cached_titles as translation_cache, update_cache, request_state, translate_groq
-from scoring import MODEL_VERSION, WEIGHTS, number, market_risk, market_average, aggregate, calculate_wpi
+from scoring import MODEL_VERSION, WEIGHTS, number, risk_off_cluster, market_risk, market_average, aggregate, calculate_wpi
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -2082,7 +2082,6 @@ def update_daily_metrics(score: dict, pizza_index, defcon_level, firms: dict,
     # 經濟避險指標（僅存價格，供長期趨勢；油價戰爭溢價＝布油現價−30日均）
     f = finance or {}
     def _px(sym): return (f.get(sym) or {}).get("price")
-    def _dev(sym): return (f.get(sym) or {}).get("dev")   # 相對 30MA 偏離%
     oil = _px("BZ=F"); oil_ma = (f.get("BZ=F") or {}).get("ma30")
     fin_rec = {
         "gold":   _px("GC=F"),
@@ -2099,17 +2098,8 @@ def update_daily_metrics(score: dict, pizza_index, defcon_level, firms: dict,
     fin_rec["em_oas"] = fr.get("em_oas")
     fin_rec["hy_oas"] = fr.get("hy_oas")
     fin_rec["fred_observation_dates"] = {k: v.get("observation_date") for k, v in (fr.get("observations") or {}).items()}
-    # 「避險群聚」訊號：同時往避險方向明顯偏離 30MA 的指標數（單一指標沒意義、群聚才有）
-    THRESH = 5.0   # 偏離 30MA 逾 5% 才算明顯
-    cluster = 0
-    if (_dev("GC=F") or 0) >= THRESH:  cluster += 1   # 金 ↑
-    if (_dev("BZ=F") or 0) >= THRESH:  cluster += 1   # 油 ↑
-    if (_dev("^VIX") or 0) >= THRESH:  cluster += 1   # VIX ↑
-    if (_dev("USDCHF=X") or 0) <= -THRESH: cluster += 1  # USDCHF 下跌 = 瑞郎相對美元升值
-    for stk in ("LMT", "RTX", "NOC", "GD"):
-        if (_dev(stk) or 0) >= THRESH: cluster += 1; break   # 國防股整體 ↑（四檔任一達標算一票）
-    if (_dev("^TNX") or 0) <= -THRESH: cluster += 1   # 殖利率 ↓（資金逃向安全資產）
-    fin_rec["risk_off_cluster"] = cluster              # 0–6，越高代表避險訊號越群聚
+    # Only a complete six-signal observation supports a comparable 0–6 count.
+    fin_rec.update(risk_off_cluster(f))
     rec["fin"] = fin_rec
     store[tp] = rec  # 當日最後一次執行覆蓋
     # 保留約 2 年

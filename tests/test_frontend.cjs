@@ -29,6 +29,9 @@ if(mode==='valid'){
   // Use the snapshot clock; skip missing/malformed values but retain real zero.
   const snapshot=new Date(Date.now()-5*3600000).toISOString();
   w.eval(`DATA_UPDATED_AT = ${JSON.stringify(snapshot)}`);
+  assert.equal(w._mdVal({fin:{risk_off_cluster:0}},'cluster'),null);
+  assert.equal(w._mdVal({fin:{risk_off_cluster:0,risk_off_observed:6}},'cluster'),0);
+  assert.equal(w._mdVal({fin:{risk_off_cluster:2,risk_off_observed:5}},'cluster'),null);
   const originalRegions=w.eval('OBSERVED_DATA.regions');
   w.eval("OBSERVED_DATA.regions = [{key:'taiwan',factors:{poly:20,gdelt:0}}]");
   const basis={combined:['p','a','z','s','w'],regions:{taiwan:['poly','gdelt']}};
