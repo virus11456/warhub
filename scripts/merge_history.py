@@ -113,6 +113,44 @@ def merge_months(rel: str, path: Path):
     path.write_text(json.dumps({"months": months}, ensure_ascii=False), encoding="utf-8")
 
 
+def merge_score_history(now=None):
+    """Union observation times across push retries without fabricating factor metadata."""
+    from datetime import timedelta
+    path = DATA_DIR / "history.json"
+    remote = _remote("data/history.json")
+    local = _load(path)
+    if remote is None and local is None:
+        return
+    now = now or datetime.now(timezone.utc)
+    cutoff = now - timedelta(days=31)
+    rows = {}
+    # Local wins a same-time/model collision, except matching older-schema rows
+    # must not strip known basis metadata. Conflicting scores remain whole rows.
+    for source in (remote, local):
+        for row in source if isinstance(source, list) else []:
+            if not isinstance(row, dict):
+                continue
+            try:
+                observed = datetime.fromisoformat(row["ts"].replace("Z", "+00:00"))
+                if observed.tzinfo is None or not cutoff <= observed <= now:
+                    continue
+                model = row.get("model_version")
+                if model is not None and not isinstance(model, str):
+                    continue
+            except (KeyError, TypeError, ValueError, AttributeError):
+                continue
+            key = (observed, model)
+            saved = rows.get(key)
+            if (saved and isinstance(saved.get("score_basis"), dict)
+                    and not isinstance(row.get("score_basis"), dict)
+                    and {k: v for k, v in saved.items() if k not in ("ts", "score_basis")}
+                        == {k: v for k, v in row.items() if k not in ("ts", "score_basis")}):
+                row = saved
+            rows[key] = row
+    result = [row for _, row in sorted(rows.items(), key=lambda item: (item[0][0], item[0][1] or ""))]
+    path.write_text(json.dumps(result, ensure_ascii=False), encoding="utf-8")
+
+
 def merge_metrics_daily():
     """每日指標長期封存：遠端有而本地無的日期補上（本地為準，只補缺），保留 ~2 年。"""
     from datetime import timedelta
@@ -134,4 +172,5 @@ if __name__ == "__main__":
     merge_months("data/food_history.json", DATA_DIR / "food_history.json")
     merge_months("data/strat_history.json", DATA_DIR / "strat_history.json")
     merge_metrics_daily()
+    merge_score_history()
     print("history merge guard applied")
