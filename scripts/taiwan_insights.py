@@ -92,11 +92,22 @@ def build(snapshot, previous=None):
             activity.update(status='elevated' if latest['aircraft'] > p90 else 'within_baseline',
                             p90=p90, difference=latest['aircraft'] - statistics.median(prior))
 
+    def valid_news(row):
+        if not isinstance(row, dict) or not isinstance(row.get('title'), str) or not row['title'].strip():
+            return False
+        at = timestamp(row.get('ts'))
+        return bool(at and cutoff <= at <= now and isinstance(row.get('url'), str) and safe_url(row['url']))
+
+    current_news = snapshot.get('tw_news')
+    current_news = current_news if isinstance(current_news, list) else []
+    usable_news = [row for row in current_news if valid_news(row)]
+    fresh_news = [row for row in usable_news if not row.get('stale')]
+    # Describes this input batch, not completeness of the news universe or a new event.
+    input_status = ('unavailable' if not usable_news else 'stale' if not fresh_news
+                    else 'available' if len(fresh_news) == len(current_news) else 'partial')
     news = {}
-    for row in [*(previous.get('news_observations') or []), *(snapshot.get('tw_news') or [])]:
-        at = timestamp(row.get('ts')) if isinstance(row, dict) else None
-        url = safe_url(row.get('url')) if isinstance(row, dict) else None
-        if not at or not cutoff <= at <= now or not url or not row.get('title'):
+    for row in [*(previous.get('news_observations') or []), *current_news]:
+        if not valid_news(row):
             continue
         key = re.sub(r'\s+', '', row['title']).casefold()
         if key not in news:
@@ -109,6 +120,7 @@ def build(snapshot, previous=None):
                      'url': r['url'], 'time_label': '新聞發稿時間'} for r in news)
     timeline.sort(key=lambda r: timestamp(r['at']), reverse=True)
     return {'version': 1, 'as_of': now.isoformat(), 'activity': activity, 'markets': market_views,
-            'news': {'sample_24h': len(recent), 'publishers_24h': len({r['domain'] for r in recent if r.get('domain')}),
+            'news': {'input_status': input_status,
+                     'sample_24h': len(recent), 'publishers_24h': len({r['domain'] for r in recent if r.get('domain')}),
                      'latest_at': news[0]['ts'] if news else None},
             'timeline': timeline[:20], 'market_observations': observations, 'news_observations': news}

@@ -64,5 +64,42 @@ class TaiwanInsightsTests(unittest.TestCase):
         self.assertEqual(len(first['market_observations']),100)
         self.assertEqual(build(self.snapshot(),first)['market_observations'],first['market_observations'])
 
+    def test_news_input_failure_preserves_saved_samples_and_original_time(self):
+        row = {'title': '已保存新聞', 'title_zh': None, 'url': 'https://example.com/news', 'domain': '來源',
+               'ts': (self.now-timedelta(hours=2)).isoformat()}
+        previous = {'news_observations': [row]}
+        original = copy.deepcopy(previous)
+        for batch, status in [([], 'unavailable'), ([{**row, 'stale': True}], 'stale'),
+                              ([row], 'available'), ([row, None], 'partial')]:
+            with self.subTest(status=status):
+                result = build(self.snapshot(tw_news=batch), previous)
+                self.assertEqual(result['news']['input_status'], status)
+                self.assertEqual(result['news']['sample_24h'], 1)
+                self.assertEqual(result['news']['latest_at'], row['ts'])
+                self.assertEqual(result['news_observations'], [row])
+                self.assertEqual(previous, original)
+
+    def test_zero_saved_news_is_distinct_from_missing_current_input(self):
+        old = {'title': '較早新聞', 'url': 'https://example.com/old', 'domain': '來源',
+               'ts': (self.now-timedelta(hours=25)).isoformat()}
+        result = build(self.snapshot(tw_news=[old]))
+        self.assertEqual(result['news']['input_status'], 'available')
+        self.assertEqual(result['news']['sample_24h'], 0)
+        self.assertEqual(result['news']['publishers_24h'], 0)
+        self.assertEqual(result['news']['latest_at'], old['ts'])
+        missing = build(self.snapshot(), result)
+        self.assertEqual(missing['news']['input_status'], 'unavailable')
+        self.assertEqual(missing['news_observations'], result['news_observations'])
+
+    def test_invalid_news_batch_does_not_claim_available(self):
+        for rows in [None, {}, [None, {'title': 123}],
+                     [{'title': '未來新聞', 'url': 'https://example.com/future',
+                       'ts': (self.now+timedelta(hours=1)).isoformat()}]]:
+            with self.subTest(rows=rows):
+                result = build(self.snapshot(tw_news=rows))
+                self.assertEqual(result['news']['input_status'], 'unavailable')
+                self.assertEqual(result['news']['sample_24h'], 0)
+                self.assertIsNone(result['news']['latest_at'])
+
 if __name__ == '__main__':
     unittest.main()
