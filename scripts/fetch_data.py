@@ -2058,9 +2058,11 @@ def update_daily_metrics(score: dict, pizza_index, defcon_level, firms: dict,
         except Exception:
             store = {}
 
-    tp = (datetime.now(timezone.utc) + timedelta(hours=8)).date().isoformat()
+    recorded_at = datetime.now(timezone.utc)
+    tp = (recorded_at + timedelta(hours=8)).date().isoformat()
     s = {} if (aviation or {}).get("error") else ((aviation or {}).get("summary") or {})
     rec = {
+        "recorded_at": recorded_at.isoformat(),
         "model_version": MODEL_VERSION,
         "combined": score.get("combined_score"),
         "poly":     score.get("polymarket_score"),

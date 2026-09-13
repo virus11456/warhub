@@ -151,20 +151,40 @@ def merge_score_history(now=None):
     path.write_text(json.dumps(result, ensure_ascii=False), encoding="utf-8")
 
 
-def merge_metrics_daily():
-    """每日指標長期封存：遠端有而本地無的日期補上（本地為準，只補缺），保留 ~2 年。"""
-    from datetime import timedelta
+def merge_metrics_daily(now=None):
+    """Keep the newest whole daily record, with legacy rows retained as undated."""
+    from datetime import date, timedelta
     path = DATA_DIR / "metrics_daily.json"
     remote = _remote("data/metrics_daily.json")
     local = _load(path)
     if remote is None and local is None:
         return
-    days = dict((remote or {}).get("days") or {})
-    for k, v in ((local or {}).get("days") or {}).items():
-        days[k] = v  # 本地（這次執行）為準
-    cutoff = (datetime.now(timezone.utc) + timedelta(hours=8) - timedelta(days=730)).date().isoformat()
-    days = {d: v for d, v in days.items() if d >= cutoff}
-    path.write_text(json.dumps({"days": days}, ensure_ascii=False), encoding="utf-8")
+    now = now or datetime.now(timezone.utc)
+    today = (now + timedelta(hours=8)).date()
+    cutoff = today - timedelta(days=730)
+    days, stamps = {}, {}
+    for source in (remote, local):
+        records = source.get("days") if isinstance(source, dict) else None
+        for key, row in (records if isinstance(records, dict) else {}).items():
+            if not isinstance(row, dict):
+                continue
+            try:
+                day = date.fromisoformat(key)
+                if day.isoformat() != key or not cutoff <= day <= today:
+                    continue
+                stamp = None
+                if "recorded_at" in row:
+                    stamp = datetime.fromisoformat(row["recorded_at"].replace("Z", "+00:00"))
+                    if (stamp.tzinfo is None or stamp > now or
+                            stamp.astimezone(timezone(timedelta(hours=8))).date() != day):
+                        continue
+            except (TypeError, ValueError, AttributeError):
+                continue
+            previous = stamps.get(key)
+            if previous is not None and (stamp is None or stamp < previous):
+                continue
+            days[key], stamps[key] = row, stamp
+    path.write_text(json.dumps({"days": dict(sorted(days.items()))}, ensure_ascii=False), encoding="utf-8")
 
 
 if __name__ == "__main__":

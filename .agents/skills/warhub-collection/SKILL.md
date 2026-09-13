@@ -51,3 +51,5 @@ Comtrade另由scripts/source_archive.py保存逐次驗證後來源欄位，kind=
 歷史 history.json 每輪新增 score_basis（combined 與各 regions 的有效計分因子鍵）；有效零值算有效因子，觀測用的火點／廣域軍機數不算地區計分因子。前端升降箭頭只比較同模型、同因子集合，且接近快照時間前24小時的有效分數。舊紀錄沒有 score_basis 時保留原紀錄，不回填推測基礎、不顯示其升降箭頭；新欄位隨自然排程累積，無需強制收集。tests/test_history_basis.py 與前端測試驗證保存及比較。
 
 `scripts/merge_history.py:merge_score_history` 在提交重試時聯集遠端與本輪 `history.json`，按實際時間及模型去重、排序，保留最近31天。拒絕無時區、無效或未來時間；同時間／模型以本輪完整紀錄為準，僅其他內容完全一致時保留含 score_basis 的遠端完整紀錄；內容不同不挪用其基礎。原始本輪仍由 archive_snapshot 先行封存。tests/test_score_history_merge.py 驗證聯集、重試冪等、期限及 metadata 保護。
+
+每日 metrics_daily 紀錄另存 recorded_at（UTC歸檔時間，不代表各來源觀測時間），台北日期鍵由同一時間換算，避免跨午夜錯位。merge_metrics_daily 同日採較新的完整紀錄；已知時間不被無時間舊紀錄覆蓋，兩筆皆舊格式時維持本輪優先。無時區、未來、與台北日期不符的 recorded_at 不進入顯示歷史；舊紀錄不補造時間。保留730天窗口；tests/test_daily_metrics_merge.py 驗證時序、零值及跨日邊界。
