@@ -23,7 +23,7 @@ import logging
 import os
 import re
 from translations import cached_titles as translation_cache, update_cache, request_state, translate_groq
-from scoring import MODEL_VERSION, market_risk, market_average, aggregate, calculate_wpi
+from scoring import MODEL_VERSION, WEIGHTS, number, market_risk, market_average, aggregate, calculate_wpi
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -1946,6 +1946,12 @@ def update_history(score: dict, pizza_index, regions: list[dict], wiki_score=Non
         "pizza": pizza_index,
         "wiki": wiki_score,
         "regions": {r["key"]: r["score"] for r in regions},
+        # Preserve the exact contributing factor set; absent metadata stays unknown.
+        "score_basis": {
+            "combined": sorted(k for k in WEIGHTS if number((score.get("factors") or {}).get(k))),
+            "regions": {r["key"]: sorted(k for k in ("poly", "gdelt", "notam")
+                        if number((r.get("factors") or {}).get(k))) for r in regions},
+        },
     }
     # 記錄軍機各機型架數（供 AVI 卡片 24h/7d/30d 歷史變化；短鍵省空間）
     s = {} if (aviation or {}).get("error") else ((aviation or {}).get("summary") or {})

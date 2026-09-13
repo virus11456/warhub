@@ -47,3 +47,5 @@ Comtrade另由scripts/source_archive.py保存逐次驗證後來源欄位，kind=
 前端快照讀取會標記即時或備份來源；拒絕無效／過遠未來時間，以及比目前畫面更舊的data.json。重疊請求以資料時間判定，不以回傳順序覆蓋。退回較舊快照時保留原資料時間與較新畫面，過期資料仍不計分；tests/test_frontend.cjs驗證備份標示與反序回傳。
 
 獨立備援入口 scripts/backup_scheduler.py 與 ops/backup-scheduler/：此程式需另行部署至 Linux/systemd，合併不等於啟用。30 分鐘檢查、快照超過130分鐘且無未完成 workflow 才補觸發；保留GitHub110分鐘守門與並行鎖。先寫120分鐘冷卻再POST，逾時不得立即重送；API接受不等於資料成功。預設dry-run，--apply才觸發auto/quiet=true，不推播、不強制全抓。獨立GitHub憑證只需本repo Contents read及Actions write，Actions write仍可管理workflow，新增存取須由操作者授權；不得挪用其他專案憑證。部署前依README確認終端連線、憑證、unit驗證、dry-run及自然timer驗證；tests/test_backup_scheduler.py覆蓋新鮮度、忙碌、冷卻、模糊失敗與損壞狀態。GitHub手動quiet輸入對應WARHUB_NO_NOTIFY=1；一般排程行為維持既有設定。
+
+歷史 history.json 每輪新增 score_basis（combined 與各 regions 的有效計分因子鍵）；有效零值算有效因子，觀測用的火點／廣域軍機數不算地區計分因子。前端升降箭頭只比較同模型、同因子集合，且接近快照時間前24小時的有效分數。舊紀錄沒有 score_basis 時保留原紀錄，不回填推測基礎、不顯示其升降箭頭；新欄位隨自然排程累積，無需強制收集。tests/test_history_basis.py 與前端測試驗證保存及比較。
