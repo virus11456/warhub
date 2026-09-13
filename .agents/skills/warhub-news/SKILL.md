@@ -46,3 +46,5 @@ Google 舊流程保留給未指定 provider 的本機相容用途，已有 GitHu
 ## 只補譯現有標題
 
 `Translate saved titles`（`.github/workflows/translate-titles.yml`）僅手動觸發於 main，與收集 workflow 共用 `update-data` concurrency；使用 `scripts/refresh_translations.py` 讀現有快照並補譯。它不抓來源、不算分、不發通知、不改 `updated_at` 或原觀測時間。全部標題有效才原子寫回 data.json，失敗不寫入；一般 push 遇到遠端更新即失敗，不強制覆蓋。這個手動修復提交可由 Git 歷史追溯，不新增一份偽裝成新觀測的收集封存。不要為驗證 key 而執行整套爬蟲。驗證 `tests/test_refresh_translations.py`。
+
+台海交叉洞察由 scripts/taiwan_insights.py::build 以既有快照推導，主流程写入 data.json.taiwan_insight 並隨分析快照封存。官方共機最新日對照此前28日，至少14個有效日；第90百分位以上僅稱活動偏高，非作戰意圖。最新日報超過48小時不作當前判讀。RSS以相同標題去重保留7天最多120則，僅稱已收錄樣本，不估完整新聞量或獨立證據數。市場保留7天最多100輪、每輪8題，逐題識別 id/question/end_date 比較約24小時（±4h），截止日不同不混比；前端只展示前3題，同題歷史不足留空。時間軸最多20筆區分統計截止與新聞發稿，均不冒充事件發生時間。資料不額外抓取、不通知；前端快照6小時過期停止判讀。舊快照無此欄位顯示等待正常排程。tests/test_taiwan_insights.py 與 test_frontend.cjs 驗證零值、基準、同題比較、保存、過期與安全連結。

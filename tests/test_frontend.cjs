@@ -32,6 +32,17 @@ if(mode==='valid'){
   assert.equal(w._mdVal({fin:{risk_off_cluster:0}},'cluster'),null);
   assert.equal(w._mdVal({fin:{risk_off_cluster:0,risk_off_observed:6}},'cluster'),0);
   assert.equal(w._mdVal({fin:{risk_off_cluster:2,risk_off_observed:5}},'cluster'),null);
+  const insight={version:1,as_of:new Date().toISOString(),activity:{status:'within_baseline',baseline_days:20,median:10,latest:{date:'2026-09-13',aircraft:0,ships:5,period_end:new Date().toISOString(),source_url:'https://air.mnd.gov.tw/TW/News/News_Detail.aspx?CID=213&ID=1'}},news:{sample_24h:2,publishers_24h:1},markets:[{slug:'test',question:'English title',question_zh:'台海市場中文問題',yes_percent:10,delta_pp:3,comparison_hours:24,end_date:'2030-01-01T00:00:00Z'}],timeline:[{at:new Date().toISOString(),title:'測試新聞',time_label:'新聞發稿時間',url:'javascript:alert(1)'}]};
+  w.renderTaiwanInsight({taiwan_insight:insight});
+  assert.ok(d.querySelector('#taiwan-insight-body').textContent.includes('共機 0 架次'));
+  assert.ok(d.querySelector('#taiwan-insight-body').textContent.includes('+3 個百分點'));
+  assert.ok(d.querySelector('#taiwan-insight-body').textContent.includes('台海市場中文問題'));
+  assert.ok(d.querySelector('#taiwan-insight-body').textContent.includes('有限樣本'));
+  assert.equal(d.querySelector('#taiwan-insight-timeline a'),null);
+  w.renderTaiwanInsight({taiwan_insight:{...insight,as_of:new Date(Date.now()-7*3600000).toISOString()}});
+  assert.ok(d.querySelector('#taiwan-insight-body').textContent.includes('過期'));
+  assert.equal(d.querySelector('#taiwan-insight-timeline').textContent,'');
+  w.renderTaiwanInsight({});assert.ok(d.querySelector('#taiwan-insight-body').textContent.includes('等待'));
   const originalRegions=w.eval('OBSERVED_DATA.regions');
   w.eval("OBSERVED_DATA.regions = [{key:'taiwan',factors:{poly:20,gdelt:0}}]");
   const basis={combined:['p','a','z','s','w'],regions:{taiwan:['poly','gdelt']}};

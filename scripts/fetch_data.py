@@ -2336,6 +2336,9 @@ async def main():
         },
     }
 
+    from taiwan_insights import build as build_taiwan_insights
+    output["taiwan_insight"] = build_taiwan_insights(output, previous.get("taiwan_insight"))
+
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
     from trade_quality import enrich

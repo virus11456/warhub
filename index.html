@@ -1776,6 +1776,13 @@
     </div>
   </div>
 
+  <div class="card" id="taiwan-insight-card" style="margin-bottom:1.5rem">
+    <div class="section-title">台海交叉洞察 · 活動、報導與市場</div>
+    <p style="color:var(--text-dim);font-size:.78rem">三類觀測分開判讀，不相加成開戰機率。新聞轉載不等於獨立證據。</p>
+    <div id="taiwan-insight-body" style="line-height:1.8">等待下一輪資料產生洞察。</div>
+    <details style="margin-top:1rem"><summary>近 7 天觀測時間軸（最近 20 筆）</summary><div id="taiwan-insight-timeline"></div></details>
+  </div>
+
   <!-- 🎖️ 台海軍事動態 -->
   <div class="card" id="twnews-card" style="margin-bottom:1.5rem">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-bottom:.4rem">
@@ -2518,6 +2525,7 @@ async function fetchRealPizzaData() {
       if(status)status.textContent=(expired?'⚠ 保留資料已過期：':'已保留較新的資料：')+observedTime()+'；本次回傳較舊，未覆蓋';
       const live=document.querySelector('.live-lbl');
       if(live)live.textContent=expired?'資料已過期':'保留較新資料';
+      if(expired && OBSERVED_DATA)renderTaiwanInsight(OBSERVED_DATA);
       if(expired && OBSERVED_DATA?.regions)renderRegions(OBSERVED_DATA.regions.map(r=>({...r,score:null,level:'INSUFFICIENT_DATA',coverage:0,factors:{}})));
       htmlWpiRender();
       return;
@@ -2634,6 +2642,7 @@ async function fetchRealPizzaData() {
     try { renderTwNews(json); }
     catch(err) { console.warn('[WARHUBS] renderTwNews error:', err.message); }
 
+    try { renderTaiwanInsight(json); } catch(err) { console.warn("Taiwan insight render error", err.message); }
     try { renderPla(json); }
     catch(err) { console.warn('[WARHUBS] renderPla error:', err.message); }
 
@@ -3442,6 +3451,27 @@ function renderStrat(json){
     upd.textContent='參考月 '+(s.ref_month||'—')+'（對比 '+(s.prev_year_month||'')+'）· 最後更新 '+ut+'（每日重查·月資料約月更）';
   }
 }
+function renderTaiwanInsight(json) {
+  const el=document.getElementById('taiwan-insight-body'), timeline=document.getElementById('taiwan-insight-timeline');
+  if(!el || !timeline) return;
+  const v=json.taiwan_insight;
+  timeline.innerHTML='';
+  if(!v || v.version!==1){el.textContent='等待下一輪正常排程累積洞察資料。';return;}
+  const at=Date.parse(v.as_of), age=Date.now()-at;
+  if(!Number.isFinite(at)||age<0||age>=6*3600000){el.textContent='洞察快照已過期或時間無效，暫停判讀；請參考下方官方日報的原始日期。';return;}
+  const a=v.activity||{}, latest=a.latest, n=v.news||{};
+  const fmt=ts=>new Date(ts).toLocaleString('zh-TW',{timeZone:'Asia/Taipei',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  const link=(url,text)=>{try{const u=new URL(url);if(u.protocol!=='https:'||u.username)return escapeHtml(text);return `<a href="${escapeHtml(u.href)}" target="_blank" rel="noopener">${escapeHtml(text)}</a>`;}catch{return escapeHtml(text);}};
+  const label={missing:'缺少官方日報',stale:'日報較舊，暫不判讀',baseline_pending:'基準資料累積中',elevated:'共機高於此前紀錄第 90 百分位',within_baseline:'共機未超過此前紀錄第 90 百分位'};
+  let activity=`<strong>實際活動｜${escapeHtml(label[a.status]||'資料不足')}</strong>`;
+  if(latest) activity+=`<div>${link(latest.source_url,latest.date+' 官方日報')}：共機 ${escapeHtml(latest.aircraft)} 架次、共艦 ${escapeHtml(latest.ships??'缺資料')} 艘。統計截止 ${escapeHtml(fmt(latest.period_end))}；非目前即時數量。</div>`;
+  if(a.baseline_days)activity+=`<div>此前 28 天已收錄 ${escapeHtml(a.baseline_days)} 日；共機中位數 ${escapeHtml(a.median)} 架次。至少 14 日才比較，不代表作戰意圖。</div>`;
+  const news=`<strong>新聞關注｜已收錄樣本</strong><div>近 24 小時 ${escapeHtml(n.sample_24h??0)} 則、${escapeHtml(n.publishers_24h??0)} 個發布來源名稱。這是有限樣本，不代表完整新聞量，也不能判定熱度升降。</div>`;
+  const markets=(v.markets||[]).map(m=>`<div style="margin-top:.65rem">${link('https://polymarket.com/market/'+encodeURIComponent(m.slug),chineseTitle(m.question_zh,m.question))}<br>Yes 報價 ${escapeHtml(m.yes_percent)}% · ${m.delta_pp==null?'同題比較資料累積中':`較約 ${escapeHtml(m.comparison_hours)} 小時前 ${m.delta_pp>=0?'+':''}${escapeHtml(m.delta_pp)} 個百分點`}<br><small>到期時間（台北）${escapeHtml(fmt(m.end_date))}；不同截止日不直接比較。</small></div>`).join('')||'<div>目前沒有有效的台海市場題目。</div>';
+  el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:1.2rem"><section>${activity}</section><section>${news}</section><section><strong>市場反應｜逐題比較</strong>${markets}</section></div><p style="color:var(--text-dim);margin-top:1rem">洞察資料時間 ${escapeHtml(fmt(v.as_of))}（台北）。這些觀測時間與定義不同；目前不自動判定互相證實或即將升級。</p>`;
+  timeline.innerHTML=(v.timeline||[]).map(r=>`<div style="padding:.55rem 0;border-bottom:1px solid var(--border)"><small>${escapeHtml(r.time_label)} · ${escapeHtml(fmt(r.at))}（台北）</small><br>${link(r.url,chineseTitle(r.title,r.title))}</div>`).join('')||'近 7 天尚無可用紀錄。';
+}
+
 // ── 🎖️ 台海軍事動態 ──
 function renderTwNews(json){
   var el=document.getElementById('twnews-list'); if(!el) return;
