@@ -131,7 +131,8 @@ jobs:
             rm -rf data && cp -r /tmp/newdata data
             # 防覆蓋守門員：把遠端已累積的歷史聯集回工作區，避免舊 checkout 的 run
             # 把較完整的累積歷史（如回填的共軍架次舊日期）蓋掉。
-            python scripts/merge_history.py || echo "merge guard skipped"
+            # A failed history guard must stop publication, not silently bypass preservation.
+            python scripts/merge_history.py
             mkdir -p archives
             cp -rn /tmp/warhub-new-archive/. archives/
             git add -A data/ archives/
@@ -142,3 +143,12 @@ jobs:
             sleep $(( (RANDOM % 4) + 2 ))
           done
           echo "push still failing after retries"; exit 1
+
+      - name: Preserve analysis snapshots even if submission fails
+        if: always() && steps.spacing.outputs.collect == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: analysis-snapshots
+          path: /tmp/warhub-new-archive/
+          if-no-files-found: ignore
+          retention-days: 30
