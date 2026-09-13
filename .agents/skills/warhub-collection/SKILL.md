@@ -59,3 +59,5 @@ Comtrade另由scripts/source_archive.py保存逐次驗證後來源欄位，kind=
 遠端五份歷史是既有必需檔案：_remote 讀取 Git 失敗、JSON 損壞或頂層格式錯誤時必須拋出例外，不能回傳 None 假裝無歷史。history.json 須為陣列；共機／每日指標須有 days 物件；兩份月歷史須有 months 物件，合法空集合仍接受。tests/test_remote_history_read.py 驗證讀取與格式錯誤可停止合併，避免繞過提交保護。
 
 WPI v4.0 的人工權重公式與歷史維持原樣，calculate_wpi 標記 experimental=true；首頁四類入口分開看實際活動、新聞關注、市場反應、經濟物流背景，舊 WPI／披薩／酒吧放在預設收合實驗區。alerts.run_notifications 對 experimental=true 或缺旗標的舊快照停用 WPI 升級與披薩異常警報（環境開關也不覆蓋此限制），保留更新摘要及獨立熱異常觀測。摘要標示實驗，不顯示 DEFCON。不得宣稱人流證實加班、獨立驗證或已回測；不改抓取頻率、不刪歷史。tests/test_alert_delivery.py 以 mock 驗證停止警報且摘要／熱異常仍有效，前端測試驗證實驗區收合與四類入口。
+
+使用者部署預算（2026-09-13）：WARHUB 每日最多20次，包含預覽與正式部署；先在本機完成一批修改與測試，再集中提交。同一PR推送仍可能觸發預覽，不能當成免費次數。這是操作限制，尚無自動硬性計數器；部署前需核對既有紀錄，不宣稱已自動強制執行。Vercel免費額度另由同owner下所有專案共用，已達平台限制時保留本機待上線批次，不反覆重試。

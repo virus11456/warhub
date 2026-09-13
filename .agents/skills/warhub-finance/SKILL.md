@@ -20,3 +20,5 @@ description: "Maintain WARHUB Yahoo Finance quotes and FRED credit-spread collec
 離線日期／缺值／錯誤日誌驗證：tests/test_fred_quality.py。
 
 避險群聚使用 scoring.risk_off_cluster：金／油／VIX 上偏離、瑞郎及10年殖利率下偏離，門檻含5%；國防股任一達標即可確認亮訊號，但未達標須四檔均有效才能確認否。六類都可判讀才存0–6總數，否則為None；另存 risk_off_observed 及逐類 risk_off_signals。前端不將缺完整性欄位的舊總數當成已核實值，原始歷史仍保存。tests/test_risk_off_cluster.py 覆蓋完全缺值、部分缺值、有效零、方向及國防股不完整。
+
+前端價格漲跌統一漲綠、跌紅、持平／缺值中性，更新時清除舊 up/down 樣式。群聚舊紀錄以獨立「舊版群聚（未核實）」入口保留查閱，不補造 risk_off_observed、不與新版混算。新版圖例明確顯示另存舊紀錄天數，切換無資料系列時更新圖例，避免被誤認為歷史遭刪除。
