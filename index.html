@@ -1489,7 +1489,7 @@
       <div style="grid-column:1/-1;text-align:center;padding:1.2rem;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 計算地區風險中…</div>
     </div>
     <div style="margin-top:.7rem;font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim)">
-      計分：市場 35% · 新聞 25% · NOTAM 15%；火點及廣域軍機數僅展示，暫不計分；有效權重不足 60% 不出分數 ｜ ↑↓ = 與 24 小時前相比
+      計分：市場 35% · 新聞 25% · NOTAM 15%；火點及廣域軍機數僅展示，暫不計分；有效權重不足 60% 不出分數 ｜ ↑↓ = 與資料時間約 24 小時前相比（容許 ±4 小時）
     </div>
 
     <!-- 7 天風險趨勢圖 -->
@@ -2698,20 +2698,28 @@ let WW_HISTORY = [];
 
 // 與 ~24 小時前比較，回傳趨勢箭頭 HTML（''=資料不足）
 function trendArrow(cur, regionKey) {
-  if (!Array.isArray(WW_HISTORY) || WW_HISTORY.length < 2 || cur == null) return '';
-  const target = Date.now() - 24 * 3600 * 1000;
+  const snapshot = Date.parse(DATA_UPDATED_AT);
+  const validScore = value => typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= 100;
+  if (!Array.isArray(WW_HISTORY) || !validScore(cur) || !Number.isFinite(snapshot) ||
+      snapshot > Date.now() || Date.now() - snapshot >= 6 * 3600000) return '';
+  const target = snapshot - 24 * 3600000;
   let best = null, bestDiff = Infinity;
   for (const h of WW_HISTORY) {
-    const diff = Math.abs(Date.parse(h.ts) - target);
+    if (!h || h.model_version !== 'wpi-4.0') continue;
+    const ts = Date.parse(h.ts);
+    const value = regionKey ? h.regions?.[regionKey] : h.combined;
+    if (!Number.isFinite(ts) || ts >= snapshot || !validScore(value)) continue;
+    const diff = Math.abs(ts - target);
     if (diff < bestDiff) { bestDiff = diff; best = h; }
   }
-  if (!best || bestDiff > 8 * 3600 * 1000) return '';
-  const prev = regionKey ? best.regions?.[regionKey] : best.combined;
-  if (prev == null) return '';
+  if (!best || bestDiff > 4 * 3600000) return '';
+  const prev = regionKey ? best.regions[regionKey] : best.combined;
+  const hours = ((snapshot - Date.parse(best.ts)) / 3600000).toFixed(1);
+  const title = `與資料時間約 ${hours} 小時前比較：${prev} 分`;
   const d = cur - prev;
-  if (d >= 3)  return `<span style="color:var(--accent2)" title="24h 前 ${prev}">▲+${d.toFixed(0)}</span>`;
-  if (d <= -3) return `<span style="color:var(--accent)" title="24h 前 ${prev}">▼${d.toFixed(0)}</span>`;
-  return `<span style="color:var(--text-dim)" title="24h 前 ${prev}">→</span>`;
+  if (d >= 3)  return `<span style="color:var(--accent2)" title="${title}">▲+${d.toFixed(0)}</span>`;
+  if (d <= -3) return `<span style="color:var(--accent)" title="${title}">▼${d.toFixed(0)}</span>`;
+  return `<span style="color:var(--text-dim)" title="${title}">→</span>`;
 }
 
 // ─── 7 天風險趨勢圖（SVG 折線）───────────────────────────────

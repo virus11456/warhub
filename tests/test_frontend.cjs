@@ -26,6 +26,23 @@ if(mode==='valid'){
   const w=dom.window;
   assert.ok(d.querySelector('.live-lbl').textContent.includes('備份'));
   const accepted=w.eval('DATA_UPDATED_AT');
+  // Use the snapshot clock; skip missing/malformed values but retain real zero.
+  const snapshot=new Date(Date.now()-5*3600000).toISOString();
+  w.eval(`DATA_UPDATED_AT = ${JSON.stringify(snapshot)}`);
+  const row=(hours,value,model='wpi-4.0')=>({ts:new Date(Date.parse(snapshot)-hours*3600000).toISOString(),model_version:model,combined:value,regions:{taiwan:value}});
+  const history=rows=>w.eval(`WW_HISTORY = ${JSON.stringify(rows)}`);
+  history([row(24,10),row(19,90)]);
+  assert.ok(w.trendArrow(20,'taiwan').includes('▲+10'));
+  assert.ok(w.trendArrow(20,'taiwan').includes('24.0 小時'));
+  history([row(24,null),row(23,0),row(24,90,'legacy'),row(24,'80')]);
+  assert.ok(w.trendArrow(20,'taiwan').includes('▲+20'));
+  assert.equal(w.trendArrow('20','taiwan'),'');
+  history([row(29,10),row(-1,10)]);assert.equal(w.trendArrow(20,'taiwan'),'');
+  history([row(24,20)]);assert.ok(w.trendArrow(20).includes('→'));
+  w.eval(`DATA_UPDATED_AT = ${JSON.stringify(new Date(Date.now()-7*3600000).toISOString())}`);
+  assert.equal(w.trendArrow(20),'');
+  w.eval(`DATA_UPDATED_AT = ${JSON.stringify(accepted)}; WW_HISTORY = []`);
+
   const older={...data,updated_at:new Date(Date.parse(accepted)-3600000).toISOString(),score:{...data.score,combined_score:99}};
   w.fetch=async(url)=>({ok:true,json:async()=>String(url).includes('data.json')?older:[]});
   await w.fetchRealPizzaData();
