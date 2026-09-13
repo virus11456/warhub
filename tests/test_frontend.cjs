@@ -21,6 +21,19 @@ const {JSDOM,VirtualConsole}=require('jsdom');const fs=require('fs');const asser
   assert.ok(!d.querySelector('#ticker').textContent.includes('綜合威脅指數'));
  }
 assert.equal(d.querySelector('#source-health'),null);
+const experimental=d.querySelector('#experimental-observations');
+assert.ok(experimental && !experimental.open);
+assert.equal(experimental.parentElement.className,'container');
+for(const selector of ['#pizza-card','.hero-strip','.wpi-section']) {
+  assert.equal(d.querySelectorAll(selector).length,1);
+  assert.ok(experimental.contains(d.querySelector(selector)));
+}
+assert.equal(d.querySelector('#observation-overview').querySelectorAll('h3').length,4);
+for(const a of d.querySelectorAll('#observation-overview a')) assert.ok(d.querySelector(a.getAttribute('href')));
+assert.ok(!d.querySelector('#ticker').textContent.includes('披薩指數'));
+assert.ok(!d.querySelector('#ticker').textContent.includes('戰爭壓力指數'));
+assert.ok(!d.querySelector('#ticker').textContent.includes('WPI'));
+
 if(mode==='valid'){assert.ok(d.querySelector('#html-wpi-a-desc').textContent.includes('170 架'));assert.ok(d.querySelector('#html-wpi-a-desc').textContent.includes('異常分數 0'));assert.ok(d.querySelector('#html-wpi-f-desc').textContent.includes('11,785 筆'));assert.ok(d.querySelector('#html-wpi-f-desc').textContent.includes('暫不計分'));assert.ok(d.querySelector('#poly-list-container').textContent.includes('美國會在12月31日前打擊古巴嗎？'));assert.ok(d.querySelector('#news-list').textContent.includes('新聞繁體中文標題'));assert.ok(!d.querySelector('#news-list').textContent.includes('English original'));assert.ok(d.querySelector('#strat-grid').textContent.includes('最近歷史參考：2026-06'));assert.ok(d.querySelector('#sh-svg').textContent.includes('缺報'));assert.ok(!d.querySelector('#sh-svg').innerHTML.includes('999'));}
 if(mode==='valid'){
   const w=dom.window;
@@ -30,6 +43,14 @@ if(mode==='valid'){
   const snapshot=new Date(Date.now()-5*3600000).toISOString();
   w.eval(`DATA_UPDATED_AT = ${JSON.stringify(snapshot)}`);
   assert.equal(w._mdVal({fin:{risk_off_cluster:0}},'cluster'),null);
+  assert.equal(w._mdVal({fin:{risk_off_cluster:0}},'cluster_legacy'),0);
+  assert.equal(w._mdVal({fin:{risk_off_cluster:2,risk_off_observed:6}},'cluster_legacy'),null);
+  w.renderFinanceSnapshot({'GC=F':{chg:1},'BZ=F':{chg:-1},LMT:{chg:1},RTX:{chg:-1},NOC:{chg:0}});
+  for(const id of ['html-fin-gc-chg','html-stk-lmt-c'])assert.ok(d.getElementById(id).classList.contains('up'));
+  for(const id of ['html-fin-bz-chg','html-stk-rtx-c'])assert.ok(d.getElementById(id).classList.contains('down'));
+  assert.ok(!d.getElementById('html-stk-noc-c').classList.contains('up'));
+  w.renderFinanceSnapshot({});assert.ok(!d.getElementById('html-fin-gc-chg').classList.contains('up'));
+
   assert.equal(w._mdVal({fin:{risk_off_cluster:0,risk_off_observed:6}},'cluster'),0);
   assert.equal(w._mdVal({fin:{risk_off_cluster:2,risk_off_observed:5}},'cluster'),null);
   const insight={version:1,as_of:new Date().toISOString(),activity:{status:'within_baseline',baseline_days:20,median:10,latest:{date:'2026-09-13',aircraft:0,ships:5,period_end:new Date().toISOString(),source_url:'https://air.mnd.gov.tw/TW/News/News_Detail.aspx?CID=213&ID=1'}},news:{sample_24h:2,publishers_24h:1},markets:[{slug:'test',question:'English title',question_zh:'台海市場中文問題',yes_percent:10,delta_pp:3,comparison_hours:24,end_date:'2030-01-01T00:00:00Z'}],timeline:[{at:new Date().toISOString(),title:'測試新聞',time_label:'新聞發稿時間',url:'javascript:alert(1)'}]};
@@ -38,6 +59,9 @@ if(mode==='valid'){
   assert.ok(d.querySelector('#taiwan-insight-body').textContent.includes('+3 個百分點'));
   assert.ok(d.querySelector('#taiwan-insight-body').textContent.includes('台海市場中文問題'));
   assert.ok(d.querySelector('#taiwan-insight-body').textContent.includes('有限樣本'));
+  assert.ok(d.querySelector('#taiwan-insight-body .ti-market-section .ti-markets'));
+  assert.ok(d.querySelector('#taiwan-insight-body').textContent.includes('2030'));
+
   assert.equal(d.querySelector('#taiwan-insight-timeline a'),null);
   w.renderTaiwanInsight({taiwan_insight:{...insight,as_of:new Date(Date.now()-7*3600000).toISOString()}});
   assert.ok(d.querySelector('#taiwan-insight-body').textContent.includes('過期'));

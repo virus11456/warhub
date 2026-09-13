@@ -19,3 +19,5 @@ BestTime 目前僅美東 `America/New_York` 16:00–24:00 查詢，時區含夏�
 Google Maps Popular Times／BestTime 是店家人流訊號，無法直接證實外送訂單、軍方加班或軍事行動；酒吧冷清與披薩忙碌可能有共同原因，不能宣稱已驗證交叉預警能力。
 
 離線測試在 `tests/test_integrity.py`。需覆蓋不存在店家、缺即時值、有效零、結構錯誤及無 baseline。線上檢查可能耗用 BestTime credit，先用既有快照定位，只在需要時做有限請求。勿以測試本 skill 為由觸發 Telegram。
+
+WPI v4.0 的人工權重公式與歷史維持原樣，calculate_wpi 標記 experimental=true；首頁四類入口分開看實際活動、新聞關注、市場反應、經濟物流背景，舊 WPI／披薩／酒吧放在預設收合實驗區。alerts.run_notifications 對 experimental=true 或缺旗標的舊快照停用 WPI 升級與披薩異常警報（環境開關也不覆蓋此限制），保留更新摘要及獨立熱異常觀測。摘要標示實驗，不顯示 DEFCON。不得宣稱人流證實加班、獨立驗證或已回測；不改抓取頻率、不刪歷史。tests/test_alert_delivery.py 以 mock 驗證停止警報且摘要／熱異常仍有效，前端測試驗證實驗區收合與四類入口。

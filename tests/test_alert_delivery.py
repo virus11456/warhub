@@ -32,6 +32,32 @@ class DeliveryTests(unittest.IsolatedAsyncioTestCase):
         self.addCleanup(self.env.stop)
         self.data = {'score': {'alert_level': 'LOW'}, 'firms': {}}
 
+    async def test_experimental_and_legacy_scores_never_trigger_wpi_or_pizza_alarm(self):
+        for flag in (True, None):
+            data = {'score': {'alert_level': 'CRITICAL', 'combined_score': 99},
+                    'pizza': [{'spike_magnitude': 'EXTREME', 'percentage_of_usual': 999}],
+                    'firms': {}}
+            if flag is not None:
+                data['score']['experimental'] = flag
+            sender = AsyncMock(return_value={'test': True})
+            with patch.object(alerts, '_send_all', sender), patch.multiple(
+                    alerts, ALERT_ESCALATION=True, ALERT_PIZZA=True):
+                await alerts.run_notifications(data, {}, 'LOW')
+            self.assertEqual(sender.call_args_list[0].args[0], [])
+            digest = sender.call_args_list[1].args[0]
+            self.assertEqual(len(digest), 1)
+            self.assertIn('WPI 實驗指數', digest[0])
+            self.assertNotIn('DEFCON', digest[0])
+
+    async def test_experiment_policy_preserves_independent_hotspot_observation_alert(self):
+        data = {'score': {'experimental': True, 'alert_level': 'LOW'},
+                'firms': {'conflict_total': 1000}}
+        sender = AsyncMock(return_value={'test': True})
+        with patch.object(alerts, '_send_all', sender), patch.multiple(
+                alerts, ALERT_HOTSPOT=True, HOTSPOT_SURGE_MIN=100, HOTSPOT_SURGE_RATIO=2):
+            await alerts.run_notifications(data, {'hotspot_counter_version': 2, 'hotspots': 100})
+        self.assertEqual(len(sender.call_args_list[0].args[0]), 1)
+
     async def test_plain_text_preserves_dynamic_characters(self):
         session = Session()
         text = 'INSUFFICIENT_DATA [news](url) *headline <tag> &'

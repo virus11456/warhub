@@ -1172,7 +1172,7 @@
 
     /* WPI 右欄的「各地區風險」迷你列與頂部 hero、下方看板重複 → 手機隱藏 */
     .wpi-mini-regions { display: none; }
-    /* 多重驗證警戒改雙欄，較不佔高 */
+    /* 未驗證組合假說改雙欄，較不佔高 */
     .wpi-alerts { display: block; }
     .wpi-al-sub { display: none; }
     .wpi-al-item { padding: .45rem .55rem; }
@@ -1278,6 +1278,29 @@
 #clock .clk:first-child{ margin-left:0; }
 #clock .clk b{ color:var(--text); }
 #clock .clk i{ color:var(--text-dim); font-style:normal; font-size:.9em; margin-left:.15rem; }
+
+  /* Taiwan observations: two short summaries, then full-width market cards. */
+  #taiwan-insight-card { font-family: 'Noto Sans TC', sans-serif; }
+  #taiwan-insight-card .ti-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; }
+  #taiwan-insight-card .ti-panel { min-width:0; padding:1rem; background:rgba(255,255,255,.025); border:1px solid var(--border); font-size:.82rem; line-height:1.85; }
+  #taiwan-insight-card .ti-panel strong { display:block; color:var(--accent); font-size:.85rem; margin-bottom:.55rem; }
+  #taiwan-insight-card .ti-panel > div + div { margin-top:.55rem; }
+  #taiwan-insight-card .ti-market-section { grid-column:1/-1; }
+  #taiwan-insight-card .ti-markets { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; }
+  #taiwan-insight-card .ti-market { min-width:0; border-top:1px solid var(--border); padding-top:.7rem; }
+  #taiwan-insight-card .ti-market > div { margin-top:.4rem; }
+  #taiwan-insight-card a, #taiwan-insight-card a:visited { color:var(--accent); text-decoration:underline; text-underline-offset:3px; overflow-wrap:anywhere; }
+  #taiwan-insight-card a:hover { color:var(--text); }
+  #taiwan-insight-card a:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+  #taiwan-insight-card small, #taiwan-insight-card .ti-note { color:var(--text-dim); font-size:.75rem; line-height:1.8; }
+  #taiwan-insight-card .ti-note { margin:1rem 0; }
+  #taiwan-insight-card summary { cursor:pointer; font-size:.8rem; }
+  #taiwan-insight-timeline { font-size:.8rem; line-height:1.8; overflow-wrap:anywhere; }
+  @media(max-width:800px) {
+    #taiwan-insight-card .ti-grid, #taiwan-insight-card .ti-markets { grid-template-columns:minmax(0,1fr); }
+    #taiwan-insight-card .ti-panel { padding:.8rem; }
+  }
+
 </style>
 </head>
 <body class="theme-8bit">
@@ -1311,156 +1334,24 @@
 </div>
 
 <div class="container">
+  <section id="observation-overview" style="margin:1.5rem 0;padding:1.2rem;border:1px solid var(--accent)">
+    <h2 style="font-size:1rem;color:var(--accent)">分項觀察｜先看事實，再比較反應</h2>
+    <p style="color:var(--text-dim);line-height:1.8">四類資料的時間與意義不同，分開比較，不合成整體戰爭警戒分數。各區保留觀測日期、缺資料與比較限制。</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:1rem;line-height:1.8">
+      <section><h3 style="font-size:.9rem">實際活動</h3><p>以官方日報看共機、共艦及此前基準；通報數量不代表作戰意圖。</p><a href="#taiwan-insight-card">查看台海交叉洞察 →</a></section>
+      <section><h3 style="font-size:.9rem">新聞關注</h3><p>新聞樣本與瀏覽量反映關注；重複報導不能當成獨立證據。</p><a href="#news-card">查看新聞與原文 →</a></section>
+      <section><h3 style="font-size:.9rem">市場反應</h3><p>預測市場逐題核對事件與到期日；金融價格同時受到其他因素影響。</p><a href="#poly-card">查看市場題目 →</a> · <a href="#md-wrap">金融趨勢 →</a></section>
+      <section><h3 style="font-size:.9rem">經濟與物流背景</h3><p>貿易資料按月且可能缺報，僅供背景比較；尚未接入航運流量資料。</p><a href="#strat-card">查看物資與回報完整度 →</a></section>
+    </div>
+  </section>
+
 
   <!-- ══════════ 置頂：免費訂閱 Telegram CTA ══════════ -->
   <a href="https://t.me/warhubss" target="_blank" rel="noopener" class="tg-cta tg-cta-top">
     <span class="tg-cta-ic">✈️</span>
-    <span class="tg-cta-txt"><b>免費訂閱 Telegram 即時戰情通知</b><small>威脅升級・五角大廈披薩爆量・衝突火點激增，第一時間推播到你手機（免費）</small></span>
+    <span class="tg-cta-txt"><b>免費訂閱 Telegram 即時戰情通知</b><small>資料更新摘要・監測區熱異常觀測，推送到你手機（免費）</small></span>
     <span class="tg-cta-go">加入頻道 →</span>
   </a>
-
-  <!-- ══════════ 戰情摘要（指揮中心）══════════ -->
-  <div class="hero-strip">
-    <div class="hero-wpi">
-      <div class="hero-wpi-num" id="hero-wpi-num">--</div>
-      <div class="hero-wpi-meta">
-        <div class="hero-wpi-title">戰爭壓力指數 WAR PRESSURE INDEX</div>
-        <div class="hero-wpi-level" id="hero-wpi-level">計算中…</div>
-      </div>
-    </div>
-    <div class="hero-regions" id="hero-regions">
-      <span style="color:var(--text-dim);font-size:.75rem">⏳ 載入地區風險…</span>
-    </div>
-    <div class="hero-alert" id="hero-alert">⏳ 載入警報狀態…</div>
-  </div>
-
-  <!-- ══════════ PIZZINT 整合卡片 ══════════ -->
-  <div class="card pizza-bar-card" id="pizza-card" style="margin-bottom:1.5rem">
-
-    <!-- 警報橫幅 -->
-    <div id="pizza-war-alert" style="display:none;position:relative;overflow:hidden;margin:-1.2rem -1.2rem 1.2rem;padding:1.2rem 1.5rem;background:linear-gradient(135deg,rgba(255,77,94,.15),rgba(255,68,0,.1));border-bottom:1px solid rgba(255,77,94,.4)">
-      <div style="position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,77,94,.1),transparent);animation:scan 3s linear infinite"></div>
-      <div class="alert-hdr" style="display:flex;align-items:center;gap:.7rem;margin-bottom:.7rem;flex-wrap:wrap">
-        <div style="font-family:'Orbitron',monospace;font-size:.7rem;font-weight:700;color:var(--accent2);letter-spacing:3px">⚠ 戰爭警報 WAR ALERT</div>
-        <div class="alert-hdr-sub" style="font-family:'Orbitron',monospace;font-size:.7rem;letter-spacing:2px;color:var(--accent2)">PIZZINT ANOMALY DETECTED</div>
-        <div style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)" id="alert-timestamp">--:--:-- UTC</div>
-      </div>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:.82rem;color:var(--accent2);line-height:1.6;margin-bottom:.8rem" id="alert-main-text">
-        <svg class="px-ic"><use href="#ic-pizza"/></svg> PizzINT 人流異常 — 尚無已驗證的軍事行動預測能力，需交叉查證
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.8rem">
-        <div style="background:rgba(255,77,94,.1);border:1px solid rgba(255,77,94,.3);padding:.6rem;border-radius:4px">
-          <div style="font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim);margin-bottom:.3rem">觸發店家</div>
-          <div style="font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:700;color:var(--accent2)" id="triggered-shops">--</div>
-        </div>
-        <div style="background:rgba(255,77,94,.1);border:1px solid rgba(255,77,94,.3);padding:.6rem;border-radius:4px">
-          <div style="font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim);margin-bottom:.3rem">異常等級</div>
-          <div style="font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:700;color:var(--accent3)" id="alert-magnitude">--</div>
-        </div>
-      </div>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim);line-height:1.8" id="alert-bullets">
-        <div>▶ 等待 pizzint.watch spike 事件…</div>
-      </div>
-      <div style="margin-top:.8rem;padding:.5rem .8rem;background:rgba(0,0,0,.3);font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim)">
-        ⚠ 偽陽性風險：財年截止、演習、重大體育賽事皆可能觸發。請交叉驗證右方地區風險看板與 GDELT 新聞強度。資料來源：pizzint.watch
-      </div>
-    </div>
-
-    <!-- 頭部：標題 + DEFCON 量尺 -->
-    <div class="pbi-header">
-      <div class="pbi-title-row">
-        <div>
-          <div class="section-title" style="margin:0 0 .2rem"><svg class="px-ic"><use href="#ic-pizza"/></svg> 五角大廈披薩指數 Pentagon Pizza Index (PizzINT)</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim)">KGB 代號 PIZZINT · Google Maps Popular Times · 每小時更新 · Pentagon / 白宮 / CIA HQ 3英里</div>
-        </div>
-        <div style="text-align:right;flex-shrink:0">
-          <div style="font-family:'Orbitron',monospace;font-size:.62rem;color:var(--text-dim);letter-spacing:2px">披薩戰備等級 PIZZA DEFCON</div>
-          <div class="pizza-level-num" id="pizza-level-num" style="font-size:1.6rem;line-height:1">--</div>
-          <div class="pizza-level-label" id="pizza-level-label">--</div>
-        </div>
-      </div>
-
-      <!-- DEFCON 量尺 -->
-      <div style="margin:.6rem 0 .8rem">
-        <div style="display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim);margin-bottom:.4rem">
-          <span>異常指數</span>
-          <span id="pizza-gauge-pct" style="font-weight:700">--%</span>
-        </div>
-        <div style="height:10px;background:var(--bg3);border:1px solid var(--border);position:relative;border-radius:2px">
-          <div id="pizza-gauge-fill" style="height:100%;width:0%;background:linear-gradient(90deg,#004400,var(--accent3));border-radius:2px;transition:width .8s ease;position:relative">
-            <div style="position:absolute;right:0;top:0;bottom:0;width:4px;background:white;opacity:.9;border-radius:0 2px 2px 0"></div>
-          </div>
-          <div style="position:absolute;left:40%;top:0;bottom:0;width:1px;background:rgba(245,166,35,.5)"></div>
-          <div style="position:absolute;left:70%;top:0;bottom:0;width:1px;background:rgba(255,77,94,.5)"></div>
-        </div>
-        <div class="pizza-zones" style="position:relative;height:20px;font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim);margin-top:.2rem">
-          <span style="position:absolute;left:0">5 正常</span>
-          <span style="position:absolute;left:38%">4 偏高</span>
-          <span style="position:absolute;left:68%">3 警戒</span>
-          <span style="position:absolute;right:0">1 危機</span>
-        </div>
-      </div>
-
-      <!-- 說明 -->
-      <div style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim);line-height:1.6;margin-bottom:.6rem">
-        冷戰時 KGB 監視五角大廈深夜外送作為早期預警。<strong style="color:var(--accent4)">PizzINT</strong>：觀察 Pentagon 周邊餐廳人流變化，無法直接確認外送訂單、軍方加班或行動規劃。
-      </div>
-
-      <!-- 🍺 加班指數（PizzINT × 酒吧反向 交叉判讀）-->
-      <div style="margin:.2rem 0 .4rem;padding:.7rem .8rem;background:rgba(0,207,232,.04);border:1px solid var(--border);border-left:3px solid var(--accent4)">
-        <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.5rem">
-          <span style="font-family:'Orbitron',monospace;font-size:.68rem;letter-spacing:2px;color:var(--accent4)">🍺 五角大廈加班指數</span>
-          <span style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim)">PizzINT × 酒吧反向 · 交叉確認</span>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.5rem">
-          <div style="background:var(--bg3);border:1px solid var(--border);padding:.5rem .6rem">
-            <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);margin-bottom:.2rem"><svg class="px-ic"><use href="#ic-pizza"/></svg> 披薩需求</div>
-            <div style="font-family:'Orbitron',monospace;font-size:.95rem;font-weight:700;color:var(--accent3)" id="overtime-pizza">--</div>
-          </div>
-          <div style="background:var(--bg3);border:1px solid var(--border);padding:.5rem .6rem">
-            <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);margin-bottom:.2rem">🍺 酒吧人流（反向）</div>
-            <div style="font-family:'Orbitron',monospace;font-size:.72rem;font-weight:700;color:var(--text-dim)" id="overtime-bar">待接資料源</div>
-          </div>
-        </div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim);line-height:1.6" id="overtime-note">
-          判讀邏輯：披薩<strong style="color:var(--accent3)">爆單</strong> ＋ 酒吧下班後<strong style="color:var(--accent4)">異常冷清</strong>（幕僚沒去喝酒）＝ 五角大廈留守加班策劃。兩訊號仍可能受共同因素影響，降低偽陽性的效果尚未回測。
-        </div>
-        <div id="overtime-footnote" style="margin-top:.45rem;font-family:'Share Tech Mono',monospace;font-size:.6rem;color:rgba(255,255,255,.28)">
-          🍺 酒吧即時人流由 BestTime 提供，僅美東傍晚下班時段（16–24 時）查詢。非該時段或未營業時顯示待接/無資料。
-        </div>
-      </div>
-    </div>
-
-    <!-- 披薩店監控（全寬） -->
-    <div>
-      <div class="section-title" style="font-size:.68rem"><svg class="px-ic"><use href="#ic-pizza"/></svg> 披薩店監控</div>
-      <div class="pizza-tracker-grid" id="pizza-shops-grid">
-        <div style="grid-column:1/-1;text-align:center;padding:.8rem;font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim)">載入中…</div>
-      </div>
-    </div>
-
-    <!-- 分隔線 -->
-    <div style="margin:.8rem 0;border-top:1px solid var(--border)"></div>
-
-    <!-- 歷史事件橫向捲動 chips -->
-    <div class="section-title" style="font-size:.68rem;margin-bottom:.4rem">🕐 歷史 PizzINT 事件</div>
-    <div class="ph-scroll">
-      <div class="ph-chip"><div class="ph-chip-year">1983</div><div class="ph-chip-event">格瑞那達入侵前夕</div><div class="ph-chip-tag"><svg class="px-ic"><use href="#ic-pizza"/></svg> 激增</div></div>
-      <div class="ph-chip"><div class="ph-chip-year">1990</div><div class="ph-chip-event">CIA 單夜訂 21 個披薩</div><div class="ph-chip-tag"><svg class="px-ic"><use href="#ic-pizza"/></svg>×21</div></div>
-      <div class="ph-chip"><div class="ph-chip-year">1991</div><div class="ph-chip-event">沙漠風暴 101 筆外送</div><div class="ph-chip-tag"><svg class="px-ic"><use href="#ic-pizza"/></svg>×101</div></div>
-      <div class="ph-chip"><div class="ph-chip-year">2003</div><div class="ph-chip-event">伊拉克戰爭前</div><div class="ph-chip-tag"><svg class="px-ic"><use href="#ic-pizza"/></svg> 確認</div></div>
-      <div class="ph-chip"><div class="ph-chip-year">2011</div><div class="ph-chip-event">擊斃賓拉登當夜</div><div class="ph-chip-tag"><svg class="px-ic"><use href="#ic-pizza"/></svg><svg class="px-ic"><use href="#ic-pizza"/></svg><svg class="px-ic"><use href="#ic-pizza"/></svg></div></div>
-      <div class="ph-chip"><div class="ph-chip-year">2024-04-13</div><div class="ph-chip-event">伊朗無人機攻以</div><div class="ph-chip-tag"><svg class="px-ic"><use href="#ic-pizza"/></svg> 峰值</div></div>
-      <div class="ph-chip"><div class="ph-chip-year">2025-06-12</div><div class="ph-chip-event">以色列炸伊朗前 1h</div><div class="ph-chip-tag"><svg class="px-ic"><use href="#ic-pizza"/></svg> 確認</div></div>
-      <div class="ph-chip"><div class="ph-chip-year">2025-06-22</div><div class="ph-chip-event">川普宣布打擊伊朗</div><div class="ph-chip-tag"><svg class="px-ic"><use href="#ic-pizza"/></svg> 確認</div></div>
-      <div class="ph-chip"><div class="ph-chip-year">2026-01-02</div><div class="ph-chip-event">美軍馬杜羅行動前夜</div><div class="ph-chip-tag"><svg class="px-ic"><use href="#ic-pizza"/></svg> 確認</div></div>
-    </div>
-
-    <div style="margin-top:.6rem;text-align:right">
-      <a href="https://www.pizzint.watch" target="_blank" rel="noopener" style="font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--accent4)">→ pizzint.watch ↗</a>
-    </div>
-
-  </div><!-- /.pizza-bar-card -->
 
   <!-- ══════════ 地區戰爭風險評估看板 ══════════ -->
   <div class="card" style="border-top:2px solid var(--accent2);margin-bottom:1.5rem">
@@ -1568,115 +1459,6 @@
   @media(max-width:800px) { .wpi-body{ grid-template-columns:1fr; } .wpi-gauge-wrap{order:-1;} }
   </style>
 
-  <div class="wpi-section">
-    <div class="wpi-topbar">
-      <div>
-        <div class="wpi-title">戰爭壓力指數 WAR PRESSURE INDEX <span class="wpi-ver">v4.0</span></div>
-        <div class="wpi-subtitle">加權多源 OSINT 綜合指數 · 同一後端快照供網站、歷史與通知使用</div>
-      </div>
-      <div class="wpi-badge medium" id="html-wpi-badge">⚠ <span id="html-wpi-badge-text">ELEVATED</span></div>
-    </div>
-
-    <div class="wpi-body">
-      <!-- 左：四子指標 -->
-      <div class="wpi-factors">
-        <div class="wpi-factor">
-          <div class="wpi-f-hdr"><span class="wpi-f-icon">📊</span><span class="wpi-f-name">Polymarket <em>P</em></span><span class="wpi-f-wt">×28%</span></div>
-          <div class="wpi-f-bar-wrap"><div class="wpi-f-bar"><div class="wpi-f-fill" id="html-wpi-p-fill" style="width:0%"></div></div><div class="wpi-f-val" id="html-wpi-p-val">--</div></div>
-          <div class="wpi-f-desc" id="html-wpi-p-desc">合格事件盤口的方向調整指數</div>
-        </div>
-        <div class="wpi-factor">
-          <div class="wpi-f-hdr"><span class="wpi-f-icon">✈️</span><span class="wpi-f-name">Aviation <em>A</em></span><span class="wpi-f-wt">×18%</span></div>
-          <div class="wpi-f-bar-wrap"><div class="wpi-f-bar"><div class="wpi-f-fill" id="html-wpi-a-fill" style="width:0%"></div></div><div class="wpi-f-val" id="html-wpi-a-val">--</div></div>
-          <div class="wpi-f-desc" id="html-wpi-a-desc">軍機異常活動頻率</div>
-        </div>
-        <div class="wpi-factor">
-          <div class="wpi-f-hdr"><span class="wpi-f-icon">📰</span><span class="wpi-f-name">GDELT <em>G</em></span><span class="wpi-f-wt">×10%</span></div>
-          <div class="wpi-f-bar-wrap"><div class="wpi-f-bar"><div class="wpi-f-fill" id="html-wpi-g-fill" style="width:0%"></div></div><div class="wpi-f-val" id="html-wpi-g-val">--</div></div>
-          <div class="wpi-f-desc" id="html-wpi-g-desc">全球新聞衝突報導強度</div>
-        </div>
-        <div class="wpi-factor">
-          <div class="wpi-f-hdr"><span class="wpi-f-icon"><svg class="px-ic"><use href="#ic-pizza"/></svg></span><span class="wpi-f-name">PizzINT <em>Z</em></span><span class="wpi-f-wt">×14%</span></div>
-          <div class="wpi-f-bar-wrap"><div class="wpi-f-bar"><div class="wpi-f-fill" id="html-wpi-z-fill" style="width:0%"></div></div><div class="wpi-f-val" id="html-wpi-z-val">--</div></div>
-          <div class="wpi-f-desc" id="html-wpi-z-desc">Pentagon Pizza 指數</div>
-        </div>
-        <div class="wpi-factor">
-          <div class="wpi-f-hdr"><span class="wpi-f-icon">🔥</span><span class="wpi-f-name">FIRMS <em>F</em></span><span class="wpi-f-wt">×10%</span></div>
-          <div class="wpi-f-bar-wrap"><div class="wpi-f-bar"><div class="wpi-f-fill" id="html-wpi-f-fill" style="width:0%"></div></div><div class="wpi-f-val" id="html-wpi-f-val">--</div></div>
-          <div class="wpi-f-desc" id="html-wpi-f-desc">衛星火點異常指數</div>
-        </div>
-        <div class="wpi-factor">
-          <div class="wpi-f-hdr"><span class="wpi-f-icon">📖</span><span class="wpi-f-name">Wiki 焦慮 <em>W</em></span><span class="wpi-f-wt">×8%</span></div>
-          <div class="wpi-f-bar-wrap"><div class="wpi-f-bar"><div class="wpi-f-fill" id="html-wpi-w-fill" style="width:0%"></div></div><div class="wpi-f-val" id="html-wpi-w-val">--</div></div>
-          <div class="wpi-f-desc" id="html-wpi-w-desc">戰爭條目瀏覽量 vs 30日基準</div>
-        </div>
-        <div class="wpi-factor">
-          <div class="wpi-f-hdr"><span class="wpi-f-icon">💰</span><span class="wpi-f-name">Sentiment <em>S</em></span><span class="wpi-f-wt">×12%</span></div>
-          <div class="wpi-f-bar-wrap"><div class="wpi-f-bar"><div class="wpi-f-fill" id="html-wpi-s-fill" style="width:0%"></div></div><div class="wpi-f-val" id="html-wpi-s-val">--</div></div>
-          <div class="wpi-f-desc" id="html-wpi-s-desc">VIX · 黃金 · 油價避險情緒</div>
-        </div>
-      </div>
-
-      <!-- 中：錶盤 -->
-      <div class="wpi-gauge-wrap">
-        <svg class="wpi-arc" viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
-          <!-- 像素分段錶盤：方塊由 renderWpiGauge() 動態產生 -->
-          <g id="html-wpi-segs"></g>
-          <line id="html-wpi-needle" x1="110" y1="110" x2="110" y2="30"
-            stroke="#ffffff" stroke-width="4" stroke-linecap="butt"
-            style="transform-origin:110px 110px;transform:rotate(-90deg);transition:transform 1.2s cubic-bezier(.5,1.4,.5,1)"/>
-          <rect x="104" y="104" width="12" height="12" fill="#ffffff" opacity=".92"/>
-        </svg>
-        <div class="wpi-center">
-          <div class="wpi-num" id="html-wpi-num">0</div>
-          <div class="wpi-num-lbl">/ 100</div>
-          <div class="wpi-level" id="html-wpi-level">COMPUTING...</div>
-        </div>
-        <div class="wpi-scale">
-          <span style="color:var(--accent)">0<br><small>LOW</small></span>
-          <span style="color:var(--accent3)">50<br><small>MED</small></span>
-          <span style="color:var(--accent2)">100<br><small>MAX</small></span>
-        </div>
-        <div class="wpi-formula">WPI = 有效因子加權總和 ÷ 有效權重總和；覆蓋至少 60% 且至少 3 個有效因子才出分</div>
-      </div>
-
-      <!-- 右：三級警戒 + 地區熱度 -->
-      <div class="wpi-alerts">
-        <div class="wpi-al-title">多重驗證警戒</div>
-        <div class="wpi-al-item" id="html-wpi-al-low">
-          <div class="wpi-al-dot low"></div>
-          <div><div class="wpi-al-name">低度警戒</div><div class="wpi-al-cond">僅 Polymarket 波動</div><div class="wpi-al-sub">單一市場變動不足以判斷情勢</div></div>
-          <div class="wpi-al-status" id="html-wpi-al-low-st">—</div>
-        </div>
-        <div class="wpi-al-item" id="html-wpi-al-med">
-          <div class="wpi-al-dot med"></div>
-          <div><div class="wpi-al-name">中度警戒</div><div class="wpi-al-cond">市場波動 + 披薩指數上升</div><div class="wpi-al-sub">內部人員可能已開始加班</div></div>
-          <div class="wpi-al-status" id="html-wpi-al-med-st">—</div>
-        </div>
-        <div class="wpi-al-item" id="html-wpi-al-high">
-          <div class="wpi-al-dot high"></div>
-          <div><div class="wpi-al-name">高度警戒</div><div class="wpi-al-cond">以上皆有 + 大量加油機</div><div class="wpi-al-sub">多源訊號同時變動，需查證原因</div></div>
-          <div class="wpi-al-status" id="html-wpi-al-high-st">—</div>
-        </div>
-        <div class="wpi-mini-regions">
-          <div class="wpi-al-title" style="margin-top:1rem">各地區風險（即時計算）</div>
-          <div id="region-mini-list" style="display:flex;flex-direction:column;gap:.3rem">
-            <div style="font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim)">⏳ 載入地區風險資料…</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="wpi-footer">
-      <span id="html-wpi-updated">⟳ 計算中…</span>
-      <span>·</span>
-      <span>Polymarket 28% · Aviation 18% · GDELT 10% · PizzINT 14% · FIRMS 10% · Sentiment 12% · Wiki焦慮 8%</span>
-      <span>·</span>
-      <span style="color:rgba(255,255,255,.25)">僅供參考，非投資建議</span>
-    </div>
-  </div>
-
-
   <!-- ══════════ 即時戰情快訊（GDELT 早期預警）══════════ -->
   <div class="card news-card" id="news-card" style="margin-bottom:1.5rem">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-bottom:.4rem">
@@ -1695,7 +1477,7 @@
   </div>
 
   <!-- ══════════ POLYMARKET 獨立卡片 ══════════ -->
-  <div class="card poly-card" style="margin-bottom:1.5rem">
+  <div id="poly-card" class="card poly-card" style="margin-bottom:1.5rem">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;flex-wrap:wrap;gap:.5rem">
       <div class="section-title" style="margin:0">📊 Polymarket 戰爭預測市場</div>
       <div style="font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim);display:flex;gap:.8rem;align-items:center">
@@ -1939,8 +1721,8 @@
 .fin-ticker { font-family:'Orbitron',monospace; font-size:.62rem; color:var(--text-dim); letter-spacing:2px; margin-bottom:.2rem; }
 .fin-price  { font-family:'Orbitron',monospace; font-size:1.05rem; font-weight:700; line-height:1; }
 .fin-change { font-family:'Share Tech Mono',monospace; font-size:.68rem; margin-top:.2rem; }
-.fin-change.up   { color:var(--accent2); }
-.fin-change.down { color:var(--accent); }
+.fin-change.up   { color:#35e08a; }
+.fin-change.down { color:#ff626f; }
 .fin-ma     { font-family:'Share Tech Mono',monospace; font-size:.6rem; color:var(--text-dim); margin-top:.15rem; }
 .fin-premium { margin-top:.7rem; padding:.55rem .65rem; background:rgba(245,166,35,.05); border:1px solid rgba(245,166,35,.2); font-family:'Share Tech Mono',monospace; font-size:.68rem; color:var(--text-dim); line-height:1.6; }
 .fin-stocks  { display:flex; flex-direction:column; gap:.3rem; margin-top:.7rem; }
@@ -1949,8 +1731,8 @@
 .fin-name { color:var(--text-dim); font-size:.62rem; }
 .fin-px   { text-align:right; }
 .fin-chg  { text-align:right; font-size:.66rem; }
-.fin-chg.up   { color:var(--accent2); }
-.fin-chg.down { color:var(--accent); }
+.fin-chg.up   { color:#35e08a; }
+.fin-chg.down { color:#ff626f; }
 /* RWD */
 @media(max-width:800px)  { .osint-adv-grid { grid-template-columns:1fr; } }
 </style>
@@ -2093,6 +1875,259 @@
     <div class="fh-legend" id="md-legend" style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);margin-top:.4rem;line-height:1.5"></div>
   </section>
 
+  <details id="experimental-observations" style="margin:1.5rem 0;border:1px solid var(--border);padding:1rem">
+    <summary style="cursor:pointer;color:var(--text)">實驗觀察｜WPI、披薩與酒吧（展開查看）</summary>
+    <p style="color:var(--text-dim);line-height:1.8">以下模型未經預測能力回測，不用來觸發戰情警報。保留原有公式、數值及歷史供研究；人流不等於訂單，也不能證實軍方加班或行動。</p>
+  <!-- ══════════ 戰情摘要（指揮中心）══════════ -->
+  <div class="hero-strip">
+    <div class="hero-wpi">
+      <div class="hero-wpi-num" id="hero-wpi-num">--</div>
+      <div class="hero-wpi-meta">
+        <div class="hero-wpi-title">WPI 實驗指數</div>
+        <div class="hero-wpi-level" id="hero-wpi-level">計算中…</div>
+      </div>
+    </div>
+    <div class="hero-regions" id="hero-regions">
+      <span style="color:var(--text-dim);font-size:.75rem">⏳ 載入地區風險…</span>
+    </div>
+    <div class="hero-alert" id="hero-alert">⏳ 載入警報狀態…</div>
+  </div>
+
+  <div class="card pizza-bar-card" id="pizza-card" style="margin-bottom:1.5rem">
+
+    <!-- 警報橫幅 -->
+    <div id="pizza-war-alert" style="display:none;position:relative;overflow:hidden;margin:-1.2rem -1.2rem 1.2rem;padding:1.2rem 1.5rem;background:linear-gradient(135deg,rgba(255,77,94,.15),rgba(255,68,0,.1));border-bottom:1px solid rgba(255,77,94,.4)">
+      <div style="position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,77,94,.1),transparent);animation:scan 3s linear infinite"></div>
+      <div class="alert-hdr" style="display:flex;align-items:center;gap:.7rem;margin-bottom:.7rem;flex-wrap:wrap">
+        <div style="font-family:'Orbitron',monospace;font-size:.7rem;font-weight:700;color:var(--accent2);letter-spacing:3px">人流異常｜實驗觀察</div>
+        <div class="alert-hdr-sub" style="font-family:'Orbitron',monospace;font-size:.7rem;letter-spacing:2px;color:var(--accent2)">PIZZINT ANOMALY DETECTED</div>
+        <div style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)" id="alert-timestamp">--:--:-- UTC</div>
+      </div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.82rem;color:var(--accent2);line-height:1.6;margin-bottom:.8rem" id="alert-main-text">
+        <svg class="px-ic"><use href="#ic-pizza"/></svg> PizzINT 人流異常 — 尚無已驗證的軍事行動預測能力，需交叉查證
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.8rem">
+        <div style="background:rgba(255,77,94,.1);border:1px solid rgba(255,77,94,.3);padding:.6rem;border-radius:4px">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim);margin-bottom:.3rem">觸發店家</div>
+          <div style="font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:700;color:var(--accent2)" id="triggered-shops">--</div>
+        </div>
+        <div style="background:rgba(255,77,94,.1);border:1px solid rgba(255,77,94,.3);padding:.6rem;border-radius:4px">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim);margin-bottom:.3rem">異常等級</div>
+          <div style="font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:700;color:var(--accent3)" id="alert-magnitude">--</div>
+        </div>
+      </div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim);line-height:1.8" id="alert-bullets">
+        <div>▶ 等待 pizzint.watch spike 事件…</div>
+      </div>
+      <div style="margin-top:.8rem;padding:.5rem .8rem;background:rgba(0,0,0,.3);font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim)">
+        ⚠ 偽陽性風險：財年截止、演習、重大體育賽事皆可能觸發。請交叉驗證右方地區風險看板與 GDELT 新聞強度。資料來源：pizzint.watch
+      </div>
+    </div>
+
+    <!-- 頭部：標題 + DEFCON 量尺 -->
+    <div class="pbi-header">
+      <div class="pbi-title-row">
+        <div>
+          <div class="section-title" style="margin:0 0 .2rem"><svg class="px-ic"><use href="#ic-pizza"/></svg> 五角大廈披薩指數 Pentagon Pizza Index (PizzINT)</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim)">KGB 代號 PIZZINT · Google Maps Popular Times · 每小時更新 · Pentagon / 白宮 / CIA HQ 3英里</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-family:'Orbitron',monospace;font-size:.62rem;color:var(--text-dim);letter-spacing:2px">披薩戰備等級 PIZZA DEFCON</div>
+          <div class="pizza-level-num" id="pizza-level-num" style="font-size:1.6rem;line-height:1">--</div>
+          <div class="pizza-level-label" id="pizza-level-label">--</div>
+        </div>
+      </div>
+
+      <!-- DEFCON 量尺 -->
+      <div style="margin:.6rem 0 .8rem">
+        <div style="display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim);margin-bottom:.4rem">
+          <span>異常指數</span>
+          <span id="pizza-gauge-pct" style="font-weight:700">--%</span>
+        </div>
+        <div style="height:10px;background:var(--bg3);border:1px solid var(--border);position:relative;border-radius:2px">
+          <div id="pizza-gauge-fill" style="height:100%;width:0%;background:linear-gradient(90deg,#004400,var(--accent3));border-radius:2px;transition:width .8s ease;position:relative">
+            <div style="position:absolute;right:0;top:0;bottom:0;width:4px;background:white;opacity:.9;border-radius:0 2px 2px 0"></div>
+          </div>
+          <div style="position:absolute;left:40%;top:0;bottom:0;width:1px;background:rgba(245,166,35,.5)"></div>
+          <div style="position:absolute;left:70%;top:0;bottom:0;width:1px;background:rgba(255,77,94,.5)"></div>
+        </div>
+        <div class="pizza-zones" style="position:relative;height:20px;font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim);margin-top:.2rem">
+          <span style="position:absolute;left:0">5 正常</span>
+          <span style="position:absolute;left:38%">4 偏高</span>
+          <span style="position:absolute;left:68%">3 警戒</span>
+          <span style="position:absolute;right:0">1 危機</span>
+        </div>
+      </div>
+
+      <!-- 說明 -->
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim);line-height:1.6;margin-bottom:.6rem">
+        冷戰時 KGB 監視五角大廈深夜外送作為早期預警。<strong style="color:var(--accent4)">PizzINT</strong>：觀察 Pentagon 周邊餐廳人流變化，無法直接確認外送訂單、軍方加班或行動規劃。
+      </div>
+
+      <!-- 🍺 加班指數（PizzINT × 酒吧反向 交叉判讀）-->
+      <div style="margin:.2rem 0 .4rem;padding:.7rem .8rem;background:rgba(0,207,232,.04);border:1px solid var(--border);border-left:3px solid var(--accent4)">
+        <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.5rem">
+          <span style="font-family:'Orbitron',monospace;font-size:.68rem;letter-spacing:2px;color:var(--accent4)">🍺 周邊人流實驗指數</span>
+          <span style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim)">PizzINT × 酒吧人流 · 未驗證假說</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.5rem">
+          <div style="background:var(--bg3);border:1px solid var(--border);padding:.5rem .6rem">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);margin-bottom:.2rem"><svg class="px-ic"><use href="#ic-pizza"/></svg> 披薩需求</div>
+            <div style="font-family:'Orbitron',monospace;font-size:.95rem;font-weight:700;color:var(--accent3)" id="overtime-pizza">--</div>
+          </div>
+          <div style="background:var(--bg3);border:1px solid var(--border);padding:.5rem .6rem">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);margin-bottom:.2rem">🍺 酒吧人流（反向）</div>
+            <div style="font-family:'Orbitron',monospace;font-size:.72rem;font-weight:700;color:var(--text-dim)" id="overtime-bar">待接資料源</div>
+          </div>
+        </div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim);line-height:1.6" id="overtime-note">
+          判讀邏輯：披薩<strong style="color:var(--accent3)">爆單</strong> ＋ 酒吧下班後<strong style="color:var(--accent4)">異常冷清</strong>，僅是兩項人流觀測同時變動，不能證實軍方加班或行動。兩訊號仍可能受共同因素影響，降低偽陽性的效果尚未回測。
+        </div>
+        <div id="overtime-footnote" style="margin-top:.45rem;font-family:'Share Tech Mono',monospace;font-size:.6rem;color:rgba(255,255,255,.28)">
+          🍺 酒吧即時人流由 BestTime 提供，僅美東傍晚下班時段（16–24 時）查詢。非該時段或未營業時顯示待接/無資料。
+        </div>
+      </div>
+    </div>
+
+    <!-- 披薩店監控（全寬） -->
+    <div>
+      <div class="section-title" style="font-size:.68rem"><svg class="px-ic"><use href="#ic-pizza"/></svg> 披薩店監控</div>
+      <div class="pizza-tracker-grid" id="pizza-shops-grid">
+        <div style="grid-column:1/-1;text-align:center;padding:.8rem;font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim)">載入中…</div>
+      </div>
+    </div>
+
+    <!-- 分隔線 -->
+    <div style="margin:.8rem 0;border-top:1px solid var(--border)"></div>
+
+    <!-- 歷史事件橫向捲動 chips -->
+    <div class="section-title" style="font-size:.68rem;margin-bottom:.4rem">🕐 歷史 PizzINT 事件</div>
+    <div class="ph-scroll">
+      <div class="ph-chip"><div class="ph-chip-year">1983</div><div class="ph-chip-event">格瑞那達入侵前夕</div><div class="ph-chip-tag"><svg class="px-ic"><use href="#ic-pizza"/></svg> 激增</div></div>
+      <div class="ph-chip"><div class="ph-chip-year">1990</div><div class="ph-chip-event">CIA 單夜訂 21 個披薩</div><div class="ph-chip-tag"><svg class="px-ic"><use href="#ic-pizza"/></svg>×21</div></div>
+      <div class="ph-chip"><div class="ph-chip-year">1991</div><div class="ph-chip-event">沙漠風暴 101 筆外送</div><div class="ph-chip-tag"><svg class="px-ic"><use href="#ic-pizza"/></svg>×101</div></div>
+      <div class="ph-chip"><div class="ph-chip-year">2003</div><div class="ph-chip-event">伊拉克戰爭前</div><div class="ph-chip-tag"><svg class="px-ic"><use href="#ic-pizza"/></svg> 確認</div></div>
+      <div class="ph-chip"><div class="ph-chip-year">2011</div><div class="ph-chip-event">擊斃賓拉登當夜</div><div class="ph-chip-tag"><svg class="px-ic"><use href="#ic-pizza"/></svg><svg class="px-ic"><use href="#ic-pizza"/></svg><svg class="px-ic"><use href="#ic-pizza"/></svg></div></div>
+      <div class="ph-chip"><div class="ph-chip-year">2024-04-13</div><div class="ph-chip-event">伊朗無人機攻以</div><div class="ph-chip-tag"><svg class="px-ic"><use href="#ic-pizza"/></svg> 峰值</div></div>
+      <div class="ph-chip"><div class="ph-chip-year">2025-06-12</div><div class="ph-chip-event">以色列炸伊朗前 1h</div><div class="ph-chip-tag"><svg class="px-ic"><use href="#ic-pizza"/></svg> 確認</div></div>
+      <div class="ph-chip"><div class="ph-chip-year">2025-06-22</div><div class="ph-chip-event">川普宣布打擊伊朗</div><div class="ph-chip-tag"><svg class="px-ic"><use href="#ic-pizza"/></svg> 確認</div></div>
+      <div class="ph-chip"><div class="ph-chip-year">2026-01-02</div><div class="ph-chip-event">美軍馬杜羅行動前夜</div><div class="ph-chip-tag"><svg class="px-ic"><use href="#ic-pizza"/></svg> 確認</div></div>
+    </div>
+<div style="margin-top:.6rem;text-align:right">
+      <a href="https://www.pizzint.watch" target="_blank" rel="noopener" style="font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--accent4)">→ pizzint.watch ↗</a>
+    </div>
+  </div><!-- /.pizza-bar-card -->
+  <div class="wpi-section">
+    <div class="wpi-topbar">
+      <div>
+        <div class="wpi-title">WPI 實驗指數 <span class="wpi-ver">v4.0</span></div>
+        <div class="wpi-subtitle">人工權重實驗模型 · 保留歷史比較，停止用於戰情警報</div>
+      </div>
+      <div class="wpi-badge medium" id="html-wpi-badge">⚠ <span id="html-wpi-badge-text">ELEVATED</span></div>
+    </div>
+
+    <div class="wpi-body">
+      <!-- 左：四子指標 -->
+      <div class="wpi-factors">
+        <div class="wpi-factor">
+          <div class="wpi-f-hdr"><span class="wpi-f-icon">📊</span><span class="wpi-f-name">Polymarket <em>P</em></span><span class="wpi-f-wt">×28%</span></div>
+          <div class="wpi-f-bar-wrap"><div class="wpi-f-bar"><div class="wpi-f-fill" id="html-wpi-p-fill" style="width:0%"></div></div><div class="wpi-f-val" id="html-wpi-p-val">--</div></div>
+          <div class="wpi-f-desc" id="html-wpi-p-desc">合格事件盤口的方向調整指數</div>
+        </div>
+        <div class="wpi-factor">
+          <div class="wpi-f-hdr"><span class="wpi-f-icon">✈️</span><span class="wpi-f-name">Aviation <em>A</em></span><span class="wpi-f-wt">×18%</span></div>
+          <div class="wpi-f-bar-wrap"><div class="wpi-f-bar"><div class="wpi-f-fill" id="html-wpi-a-fill" style="width:0%"></div></div><div class="wpi-f-val" id="html-wpi-a-val">--</div></div>
+          <div class="wpi-f-desc" id="html-wpi-a-desc">軍機異常活動頻率</div>
+        </div>
+        <div class="wpi-factor">
+          <div class="wpi-f-hdr"><span class="wpi-f-icon">📰</span><span class="wpi-f-name">GDELT <em>G</em></span><span class="wpi-f-wt">×10%</span></div>
+          <div class="wpi-f-bar-wrap"><div class="wpi-f-bar"><div class="wpi-f-fill" id="html-wpi-g-fill" style="width:0%"></div></div><div class="wpi-f-val" id="html-wpi-g-val">--</div></div>
+          <div class="wpi-f-desc" id="html-wpi-g-desc">全球新聞衝突報導強度</div>
+        </div>
+        <div class="wpi-factor">
+          <div class="wpi-f-hdr"><span class="wpi-f-icon"><svg class="px-ic"><use href="#ic-pizza"/></svg></span><span class="wpi-f-name">PizzINT <em>Z</em></span><span class="wpi-f-wt">×14%</span></div>
+          <div class="wpi-f-bar-wrap"><div class="wpi-f-bar"><div class="wpi-f-fill" id="html-wpi-z-fill" style="width:0%"></div></div><div class="wpi-f-val" id="html-wpi-z-val">--</div></div>
+          <div class="wpi-f-desc" id="html-wpi-z-desc">Pentagon Pizza 指數</div>
+        </div>
+        <div class="wpi-factor">
+          <div class="wpi-f-hdr"><span class="wpi-f-icon">🔥</span><span class="wpi-f-name">FIRMS <em>F</em></span><span class="wpi-f-wt">×10%</span></div>
+          <div class="wpi-f-bar-wrap"><div class="wpi-f-bar"><div class="wpi-f-fill" id="html-wpi-f-fill" style="width:0%"></div></div><div class="wpi-f-val" id="html-wpi-f-val">--</div></div>
+          <div class="wpi-f-desc" id="html-wpi-f-desc">衛星火點異常指數</div>
+        </div>
+        <div class="wpi-factor">
+          <div class="wpi-f-hdr"><span class="wpi-f-icon">📖</span><span class="wpi-f-name">Wiki 焦慮 <em>W</em></span><span class="wpi-f-wt">×8%</span></div>
+          <div class="wpi-f-bar-wrap"><div class="wpi-f-bar"><div class="wpi-f-fill" id="html-wpi-w-fill" style="width:0%"></div></div><div class="wpi-f-val" id="html-wpi-w-val">--</div></div>
+          <div class="wpi-f-desc" id="html-wpi-w-desc">戰爭條目瀏覽量 vs 30日基準</div>
+        </div>
+        <div class="wpi-factor">
+          <div class="wpi-f-hdr"><span class="wpi-f-icon">💰</span><span class="wpi-f-name">Sentiment <em>S</em></span><span class="wpi-f-wt">×12%</span></div>
+          <div class="wpi-f-bar-wrap"><div class="wpi-f-bar"><div class="wpi-f-fill" id="html-wpi-s-fill" style="width:0%"></div></div><div class="wpi-f-val" id="html-wpi-s-val">--</div></div>
+          <div class="wpi-f-desc" id="html-wpi-s-desc">VIX · 黃金 · 油價避險情緒</div>
+        </div>
+      </div>
+
+      <!-- 中：錶盤 -->
+      <div class="wpi-gauge-wrap">
+        <svg class="wpi-arc" viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+          <!-- 像素分段錶盤：方塊由 renderWpiGauge() 動態產生 -->
+          <g id="html-wpi-segs"></g>
+          <line id="html-wpi-needle" x1="110" y1="110" x2="110" y2="30"
+            stroke="#ffffff" stroke-width="4" stroke-linecap="butt"
+            style="transform-origin:110px 110px;transform:rotate(-90deg);transition:transform 1.2s cubic-bezier(.5,1.4,.5,1)"/>
+          <rect x="104" y="104" width="12" height="12" fill="#ffffff" opacity=".92"/>
+        </svg>
+        <div class="wpi-center">
+          <div class="wpi-num" id="html-wpi-num">0</div>
+          <div class="wpi-num-lbl">/ 100</div>
+          <div class="wpi-level" id="html-wpi-level">COMPUTING...</div>
+        </div>
+        <div class="wpi-scale">
+          <span style="color:var(--accent)">0<br><small>LOW</small></span>
+          <span style="color:var(--accent3)">50<br><small>MED</small></span>
+          <span style="color:var(--accent2)">100<br><small>MAX</small></span>
+        </div>
+        <div class="wpi-formula">WPI = 有效因子加權總和 ÷ 有效權重總和；覆蓋至少 60% 且至少 3 個有效因子才出分</div>
+      </div>
+
+      <!-- 右：三級警戒 + 地區熱度 -->
+      <div class="wpi-alerts">
+        <div class="wpi-al-title">未驗證組合假說</div>
+        <div class="wpi-al-item" id="html-wpi-al-low">
+          <div class="wpi-al-dot low"></div>
+          <div><div class="wpi-al-name">組合一</div><div class="wpi-al-cond">僅 Polymarket 波動</div><div class="wpi-al-sub">單一市場變動不足以判斷情勢</div></div>
+          <div class="wpi-al-status" id="html-wpi-al-low-st">—</div>
+        </div>
+        <div class="wpi-al-item" id="html-wpi-al-med">
+          <div class="wpi-al-dot med"></div>
+          <div><div class="wpi-al-name">組合二</div><div class="wpi-al-cond">市場波動 + 披薩指數上升</div><div class="wpi-al-sub">不能推論軍方加班</div></div>
+          <div class="wpi-al-status" id="html-wpi-al-med-st">—</div>
+        </div>
+        <div class="wpi-al-item" id="html-wpi-al-high">
+          <div class="wpi-al-dot high"></div>
+          <div><div class="wpi-al-name">組合三</div><div class="wpi-al-cond">以上皆有 + 大量加油機</div><div class="wpi-al-sub">多源訊號同時變動，需查證原因</div></div>
+          <div class="wpi-al-status" id="html-wpi-al-high-st">—</div>
+        </div>
+        <div class="wpi-mini-regions">
+          <div class="wpi-al-title" style="margin-top:1rem">各地區風險（即時計算）</div>
+          <div id="region-mini-list" style="display:flex;flex-direction:column;gap:.3rem">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim)">⏳ 載入地區風險資料…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wpi-footer">
+      <span id="html-wpi-updated">⟳ 計算中…</span>
+      <span>·</span>
+      <span>Polymarket 28% · Aviation 18% · GDELT 10% · PizzINT 14% · FIRMS 10% · Sentiment 12% · Wiki焦慮 8%</span>
+      <span>·</span>
+      <span style="color:rgba(255,255,255,.25)">僅供參考，非投資建議</span>
+    </div>
+  </div>
+
+
+
+  </details>
   <footer>
     WARHUBS // 戰爭預測情報中心 &nbsp;|&nbsp; 資料來源：Polymarket · pizzint.watch · adsb.fi · NASA FIRMS / EONET · GDELT · USGS · Wikipedia &nbsp;|&nbsp; 僅供資訊參考，不構成任何建議 &nbsp;|&nbsp; <span id="last-update-ts" style="color:var(--text-dim)">⏳ 等待後端資料…</span>
   </footer>
@@ -2155,7 +2190,7 @@ const PIZZA_SHOPS_DATA = [
 // 異常閾值設定
 const THRESHOLD = {
   ELEVATED:  40,   // busyness > 40 → 偏高
-  HIGH:      60,   // busyness > 60 → 高度警戒
+  HIGH:      60,   // busyness > 60 → 組合三
   ANOMALY:   70,   // busyness > 70 → 異常（觸發戰爭警報）
 };
 
@@ -2173,7 +2208,7 @@ function evaluatePizzaStatus(shops) {
   if (anomalyShops.length >= ANOMALY_SHOPS_REQUIRED) {
     level = 'ANOMALY'; levelZh = '⚠ 戰爭預警'; gaugeColor = '#ff2200';
   } else if (anomalyShops.length === 1 || highShops.length >= 2) {
-    level = 'HIGH'; levelZh = '⚠ 高度警戒'; gaugeColor = '#ff8800';
+    level = 'HIGH'; levelZh = '⚠ 組合三'; gaugeColor = '#ff8800';
   } else if (avg >= THRESHOLD.ELEVATED) {
     level = 'ELEVATED'; levelZh = '▲ 偏高'; gaugeColor = 'var(--accent3)';
   } else {
@@ -2290,7 +2325,7 @@ function renderWarAlert(status, shops) {
     const topDev  = Math.round(((topShop.busyness - topShop.baseline) / topShop.baseline) * 100);
     if (bullets) bullets.innerHTML = `
       <div style="color:var(--accent2);">▶ ${topShop.name} 繁忙度較基準高出 <strong>+${topDev}%</strong></div>
-      <div style="color:var(--accent3);">▶ ${anomCount} 家店同時出現深夜異常高峰，交叉確認可信度提升</div>
+      <div style="color:var(--accent3);">▶ ${anomCount} 家店同時出現深夜異常高峰，原因待查，不能推論軍事活動</div>
       <div style="color:var(--text-dim);">▶ 建議同步觀察：右方地區風險看板與 GDELT 新聞強度</div>`;
 
     // 更新 header 警戒狀態
@@ -2314,7 +2349,7 @@ function renderWarAlert(status, shops) {
     if (badgeEl) {
       badgeEl.style.borderColor = 'var(--accent3)';
       badgeEl.style.color = 'var(--accent3)';
-      badgeEl.textContent = '威脅 高度警戒';
+      badgeEl.textContent = '威脅 組合三';
     }
 
   } else {
@@ -2540,7 +2575,7 @@ async function fetchRealPizzaData() {
       json.regions=(json.regions||[]).map(r=>({...r,score:null,level:'INSUFFICIENT_DATA',coverage:0,factors:{}}));
     }
     const badge=document.getElementById('alert-badge');
-    if(badge)badge.textContent=BACKEND_SCORE?.combined_score != null ? '觀察指數 '+BACKEND_SCORE.alert_level : '資料不足';
+    if(badge)badge.textContent='分項觀察';
     const live=document.querySelector('.live-lbl');
     if(live)live.textContent=age >= 0 && age < 6*3600000 ? (backupSnapshot?'備份資料快照':'定期資料快照') : '資料已過期';
     if(json.score?.model_version !== 'wpi-4.0') {
@@ -3460,15 +3495,15 @@ function renderTaiwanInsight(json) {
   const at=Date.parse(v.as_of), age=Date.now()-at;
   if(!Number.isFinite(at)||age<0||age>=6*3600000){el.textContent='洞察快照已過期或時間無效，暫停判讀；請參考下方官方日報的原始日期。';return;}
   const a=v.activity||{}, latest=a.latest, n=v.news||{};
-  const fmt=ts=>new Date(ts).toLocaleString('zh-TW',{timeZone:'Asia/Taipei',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  const fmt=ts=>new Date(ts).toLocaleString('zh-TW',{timeZone:'Asia/Taipei',year:'numeric',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
   const link=(url,text)=>{try{const u=new URL(url);if(u.protocol!=='https:'||u.username)return escapeHtml(text);return `<a href="${escapeHtml(u.href)}" target="_blank" rel="noopener">${escapeHtml(text)}</a>`;}catch{return escapeHtml(text);}};
   const label={missing:'缺少官方日報',stale:'日報較舊，暫不判讀',baseline_pending:'基準資料累積中',elevated:'共機高於此前紀錄第 90 百分位',within_baseline:'共機未超過此前紀錄第 90 百分位'};
   let activity=`<strong>實際活動｜${escapeHtml(label[a.status]||'資料不足')}</strong>`;
   if(latest) activity+=`<div>${link(latest.source_url,latest.date+' 官方日報')}：共機 ${escapeHtml(latest.aircraft)} 架次、共艦 ${escapeHtml(latest.ships??'缺資料')} 艘。統計截止 ${escapeHtml(fmt(latest.period_end))}；非目前即時數量。</div>`;
   if(a.baseline_days)activity+=`<div>此前 28 天已收錄 ${escapeHtml(a.baseline_days)} 日；共機中位數 ${escapeHtml(a.median)} 架次。至少 14 日才比較，不代表作戰意圖。</div>`;
   const news=`<strong>新聞關注｜已收錄樣本</strong><div>近 24 小時 ${escapeHtml(n.sample_24h??0)} 則、${escapeHtml(n.publishers_24h??0)} 個發布來源名稱。這是有限樣本，不代表完整新聞量，也不能判定熱度升降。</div>`;
-  const markets=(v.markets||[]).map(m=>`<div style="margin-top:.65rem">${link('https://polymarket.com/market/'+encodeURIComponent(m.slug),chineseTitle(m.question_zh,m.question))}<br>Yes 報價 ${escapeHtml(m.yes_percent)}% · ${m.delta_pp==null?'同題比較資料累積中':`較約 ${escapeHtml(m.comparison_hours)} 小時前 ${m.delta_pp>=0?'+':''}${escapeHtml(m.delta_pp)} 個百分點`}<br><small>到期時間（台北）${escapeHtml(fmt(m.end_date))}；不同截止日不直接比較。</small></div>`).join('')||'<div>目前沒有有效的台海市場題目。</div>';
-  el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:1.2rem"><section>${activity}</section><section>${news}</section><section><strong>市場反應｜逐題比較</strong>${markets}</section></div><p style="color:var(--text-dim);margin-top:1rem">洞察資料時間 ${escapeHtml(fmt(v.as_of))}（台北）。這些觀測時間與定義不同；目前不自動判定互相證實或即將升級。</p>`;
+  const markets=(v.markets||[]).map(m=>`<div class="ti-market">${link('https://polymarket.com/market/'+encodeURIComponent(m.slug),chineseTitle(m.question_zh,m.question))}<div>Yes 報價 ${escapeHtml(m.yes_percent)}% · ${m.delta_pp==null?'同題比較資料累積中':`較約 ${escapeHtml(m.comparison_hours)} 小時前 ${m.delta_pp>=0?'+':''}${escapeHtml(m.delta_pp)} 個百分點`}</div><small>到期時間（台北）${escapeHtml(fmt(m.end_date))}；不同截止日不直接比較。</small></div>`).join('')||'<div>目前沒有有效的台海市場題目。</div>';
+  el.innerHTML=`<div class="ti-grid"><section class="ti-panel">${activity}</section><section class="ti-panel">${news}</section><section class="ti-panel ti-market-section"><strong>市場反應｜逐題比較</strong><div class="ti-markets">${markets}</div></section></div><p class="ti-note">洞察資料時間 ${escapeHtml(fmt(v.as_of))}（台北）。這些觀測時間與定義不同；目前不自動判定互相證實或即將升級。</p>`;
   timeline.innerHTML=(v.timeline||[]).map(r=>`<div style="padding:.55rem 0;border-bottom:1px solid var(--border)"><small>${escapeHtml(r.time_label)} · ${escapeHtml(fmt(r.at))}（台北）</small><br>${link(r.url,chineseTitle(r.title,r.title))}</div>`).join('')||'近 7 天尚無可用紀錄。';
 }
 
@@ -3496,19 +3531,21 @@ function renderTwNews(json){
 var MD_JSON=null;
 var MD_STATE={key:'cluster'};
 var MD_KEYS=[
-  ['cluster','🔴 避險群聚'],['gold','黃金'],['oil','布倫特油'],['vix','VIX'],
+  ['cluster','避險群聚'],['cluster_legacy','舊版群聚（未核實）'],['gold','黃金'],['oil','布倫特油'],['vix','VIX'],
   ['ust10','美10Y殖利率'],['em_oas','EM信用利差'],['hy_oas','高收益利差'],['oil_premium','油價相對均線差額']
 ];
 var MD_UNIT={gold:'',oil:'',vix:'',ust10:'%',em_oas:'%',hy_oas:'%',oil_premium:'$/bbl'};
 var MD_DESC={
+  cluster_legacy:'原始保存的舊版群聚數，缺少六類訊號完整性紀錄，可能把缺資料當未觸發。僅供查閱舊紀錄，不與新版直接比較，也不補造完整性。',
   cluster:'往避險方向偏離 30 日均值至少 5% 的六類指標數（金↑/油↑/VIX↑/瑞郎強/國防股↑/殖利率↓）。六類皆可判讀才顯示；缺資料或舊紀錄無完整性資訊時不計數。各市場觀測時間可能不同，不能視為同步反應或戰爭成因證據。',
   gold:'避險金屬，戰爭/系統性風險升溫時走揚。',oil:'布倫特原油，供給中斷預期時跳漲。',
   vix:'股市恐慌指數，風險趨避時飆升。',ust10:'美 10 年公債殖利率，資金逃向安全資產時驟降。',
   em_oas:'新興市場公司債利差（FRED），全球信用壓力升高時擴大。',
-  hy_oas:'美國高收益債利差（FRED），信用市場壓力指標。',oil_premium:'布油現價高於 30 日均價的幅度，>$8 常代表市場已預期軍事行動。'
+  hy_oas:'美國高收益債利差（FRED），信用市場壓力指標。',oil_premium:'布倫特價格與30交易日均價的差額；同時受供需、季節與其他因素影響，不能據此推論軍事行動。'
 };
 function _mdVal(rec,key){
   var f=rec.fin||{};
+  if(key==='cluster_legacy')return f.risk_off_observed==null && Number.isFinite(f.risk_off_cluster) && f.risk_off_cluster>=0 && f.risk_off_cluster<=6 ? f.risk_off_cluster : null;
   return key==='cluster' ? (f.risk_off_observed===6 && typeof f.risk_off_cluster==='number' && Number.isFinite(f.risk_off_cluster) && f.risk_off_cluster>=0 && f.risk_off_cluster<=6 ? f.risk_off_cluster : null) : f[key];
 }
 function renderMetricsHist(){
@@ -3526,13 +3563,17 @@ function renderMetricsHist(){
 }
 function drawMetricsHist(){
   var svg=document.getElementById('md-svg'); if(!svg||!MD_JSON) return;
-  var key=MD_STATE.key, isCluster=(key==='cluster');
+  var key=MD_STATE.key, isCluster=(key==='cluster'||key==='cluster_legacy');
   document.querySelectorAll('#md-cmd .fh-tab').forEach(function(b){b.classList.toggle('on', b.dataset.k===key);});
   var days=MD_JSON.days||{};
   var dates=Object.keys(days).sort();
   var pts=[];
   dates.forEach(function(d){ var v=_mdVal(days[d],key); if(v!=null && !isNaN(v)) pts.push({d:d,v:+v}); });
   var W=720,H=220,padL=44,padR=14,padT=14,padB=26, p=[];
+  var legacyCount=dates.filter(d=>_mdVal(days[d],'cluster_legacy')!=null).length;
+  var explanation=key==='cluster' ? '　新版只顯示六類訊號完整的日期；另存 '+legacyCount+' 天舊版數值，可切換「舊版群聚（未核實）」查閱。黃金等價格歷史未刪除。' : '';
+  var legend=document.getElementById('md-legend');
+  if(legend)legend.textContent=_mdLabel(key)+' · '+(MD_DESC[key]||'')+explanation;
   if(pts.length<1){
     p.push('<text x="'+(W/2)+'" y="'+(H/2)+'" text-anchor="middle" class="fh-svg-axis">尚無資料，累積中…</text>');
     svg.innerHTML=p.join(''); return;
@@ -3574,7 +3615,7 @@ function drawMetricsHist(){
   }
   svg.innerHTML=p.concat(hit).join('');
   var leg=document.getElementById('md-legend');
-  if(leg) leg.innerHTML='<b style="color:var(--accent)">'+_mdLabel(key)+'</b>　'+(MD_DESC[key]||'')+'　·　資料點：'+n+' 天';
+  if(leg) leg.innerHTML='<b style="color:var(--accent)">'+_mdLabel(key)+'</b>　'+(MD_DESC[key]||'')+'　·　資料點：'+n+' 天'+explanation;
 }
 function _mdLabel(key){ for(var i=0;i<MD_KEYS.length;i++) if(MD_KEYS[i][0]===key) return MD_KEYS[i][1].replace('🔴 ',''); return key; }
 
@@ -3657,9 +3698,6 @@ function renderTicker(json) {
   if (!el) return;
   const items = [];
 
-  if (json.pizza_index != null) {
-    items.push(`<svg class="px-ic"><use href="#ic-pizza"/></svg> 五角大廈披薩指數 <span class="hi">${json.pizza_index}</span>${json.defcon_level ? ` · PIZZA DEFCON <span class="hi">${json.defcon_level}</span>` : ''}`);
-  }
   [...(json.polymarket || [])]
     .filter(m => m.yes_price != null && m.question)
     .sort((a, b) => (b.volume || 0) - (a.volume || 0))
@@ -3673,9 +3711,6 @@ function renderTicker(json) {
   const av = json.aviation?.summary;
   if (av?.total) {
     items.push(`✈️ 全球軍機追蹤 <span class="hi">${av.total}</span> 架 · 加油機 ${av.tankers} · 運輸機 ${av.transport}`);
-  }
-  if (BACKEND_SCORE?.combined_score != null) {
-    items.push(`🎯 戰爭壓力指數 <span class="hi">${BACKEND_SCORE.combined_score}</span> / 100 · ${BACKEND_SCORE.alert_level}（非機率）`);
   }
   if (Array.isArray(json.regions) && json.regions.some(r=>Number.isFinite(r.score))) {
     const r = [...json.regions].filter(r=>Number.isFinite(r.score)).sort((a,b)=>b.score-a.score)[0];
@@ -3905,6 +3940,7 @@ function renderFinanceSnapshot(finance) {
     const change=document.getElementById('html-fin-'+id+'-chg');
     const ma=document.getElementById('html-fin-'+id+'-ma');
     if(price)price.textContent=Number.isFinite(q.price) ? q.price.toLocaleString('en',{maximumFractionDigits:ticker==='USDCHF=X'?4:2}) : '--';
+    if(change){change.classList.toggle('up',Number.isFinite(q.chg)&&q.chg>0);change.classList.toggle('down',Number.isFinite(q.chg)&&q.chg<0);}
     if(change)change.textContent=Number.isFinite(q.chg) ? `${q.chg>=0?'+':''}${q.chg}%（較前收）` : '--';
     if(ma)ma.textContent=Number.isFinite(q.dev) ? `30交易日均線偏離 ${q.dev}%` : '均線資料不足';
   }
@@ -3912,6 +3948,7 @@ function renderFinanceSnapshot(finance) {
     const q=finance[t]||{}; const id=t.toLowerCase();
     const p=document.getElementById('html-stk-'+id), c=document.getElementById('html-stk-'+id+'-c');
     if(p)p.textContent=Number.isFinite(q.price)?q.price.toFixed(2):'--';
+    if(c){c.classList.toggle('up',Number.isFinite(q.chg)&&q.chg>0);c.classList.toggle('down',Number.isFinite(q.chg)&&q.chg<0);}
     if(c)c.textContent=Number.isFinite(q.chg)?`${q.chg}%`:'--';
   }
   const oil=finance['BZ=F']; const prem=document.getElementById('fin-war-premium');
