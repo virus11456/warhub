@@ -2737,9 +2737,13 @@ function renderTrendChart(regions) {
   const legendEl = document.getElementById('trend-legend');
   if (!chartEl) return;
 
+  const end = Math.min(Date.parse(DATA_UPDATED_AT), Date.now());
+  const valid = v => typeof v === 'number' && Number.isFinite(v) && v >= 0 && v <= 100;
   const hist = (Array.isArray(WW_HISTORY) ? WW_HISTORY : [])
-    .filter(h => h.ts && h.combined != null)
+    .filter(h => h && h.model_version === 'wpi-4.0' && Number.isFinite(Date.parse(h.ts)) &&
+      Date.parse(h.ts) <= end && Date.parse(h.ts) >= end - 7 * 86400000)
     .sort((a, b) => Date.parse(a.ts) - Date.parse(b.ts));
+  if (legendEl) legendEl.textContent = '';
   if (hist.length < 4) {
     chartEl.textContent = `⏳ 歷史資料累積中（目前 ${hist.length} 筆，需至少 4 筆；資料約每 2 小時累積）…`;
     return;
@@ -2748,8 +2752,8 @@ function renderTrendChart(regions) {
   // 序列：綜合指數 + 目前分數最高的 3 個地區
   const topRegions = (regions || []).slice(0, 3);
   const series = [
-    { label: '綜合指數', get: h => h.combined },
-    ...topRegions.map(r => ({ label: `${r.flag}${r.name}`, get: h => h.regions?.[r.key] })),
+    { label: '綜合指數', get: h => h.combined, basis: h => h.score_basis?.combined },
+    ...topRegions.map(r => ({ label: `${r.flag}${r.name}`, get: h => h.regions?.[r.key], basis: h => h.score_basis?.regions?.[r.key] })),
   ];
 
   const W = 720, H = 150, PAD_L = 26, PAD_R = 8, PAD_T = 8, PAD_B = 18;
@@ -2770,12 +2774,23 @@ function renderTrendChart(regions) {
   ).join('');
 
   const lines = series.map((s, i) => {
-    const pts = hist
-      .map(h => ({ ts: h.ts, v: s.get(h) }))
-      .filter(p => p.v != null)
-      .map(p => `${x(p.ts).toFixed(1)},${y(p.v).toFixed(1)}`);
-    if (pts.length < 2) return '';
-    return `<polyline points="${pts.join(' ')}" fill="none" stroke="${TREND_COLORS[i]}" stroke-width="${i === 0 ? 2 : 1.3}" opacity="${i === 0 ? 1 : .8}"/>`;
+    const segments = [];
+    let segment = [], previous = null;
+    const flush = () => { if (segment.length) segments.push(segment); segment = []; };
+    for (const h of hist) {
+      const v = s.get(h), ts = Date.parse(h.ts), rawBasis = s.basis(h);
+      const basis = Array.isArray(rawBasis) && rawBasis.length && rawBasis.every(k => typeof k === 'string')
+        ? JSON.stringify([...rawBasis].sort()) : null;
+      if (!valid(v)) { flush(); previous = null; continue; }
+      if (!previous || !basis || basis !== previous.basis || ts - previous.ts > 6 * 3600000 || ts <= previous.ts) flush();
+      segment.push({ts:h.ts,v});
+      previous = {ts,basis};
+    }
+    flush();
+    return segments.map(points => {
+      if (points.length === 1) return `<circle cx="${x(points[0].ts).toFixed(1)}" cy="${y(points[0].v).toFixed(1)}" r="2" fill="${TREND_COLORS[i]}"/>`;
+      return `<polyline points="${points.map(p => `${x(p.ts).toFixed(1)},${y(p.v).toFixed(1)}`).join(' ')}" fill="none" stroke="${TREND_COLORS[i]}" stroke-width="${i === 0 ? 2 : 1.3}" opacity="${i === 0 ? 1 : .8}"/>`;
+    }).join('');
   }).join('');
 
   // 每個時間點一條透明感應帶：滑鼠移過去顯示該時刻綜合指數與各地區分數
@@ -2783,7 +2798,7 @@ function renderTrendChart(regions) {
   const bandW = (W - PAD_L - PAD_R) / Math.max(1, hist.length);
   const hitBands = hist.map(h => {
     const cx = x(h.ts);
-    const rows = series.map((s,i) => { const v = s.get(h); return v==null ? '' : `<br><span style="color:${TREND_COLORS[i]}">■</span> ${escapeHtml(s.label)} ${Math.round(v)}`; }).join('');
+    const rows = series.map((s,i) => { const v = s.get(h); return !valid(v) ? `<br>${escapeHtml(s.label)}：缺資料` : `<br><span style="color:${TREND_COLORS[i]}">■</span> ${escapeHtml(s.label)} ${Math.round(v)}`; }).join('');
     const tip = `<b>${escapeHtml(fmtTs(h.ts))}</b>${rows}`;
     return `<rect x="${(cx-bandW/2).toFixed(1)}" y="${PAD_T}" width="${bandW.toFixed(1)}" height="${(H-PAD_T-PAD_B).toFixed(1)}" fill="transparent" data-tip="${tip.replace(/"/g,'&quot;')}"/>`;
   }).join('');
@@ -2792,7 +2807,7 @@ function renderTrendChart(regions) {
   if (legendEl) {
     legendEl.innerHTML = series.map((s, i) =>
       `<span><i style="display:inline-block;width:14px;height:2px;background:${TREND_COLORS[i]};vertical-align:middle;margin-right:4px"></i>${escapeHtml(s.label)}</span>`
-    ).join('');
+    ).join('') + '<span>缺資料、間隔超過 6 小時或計分基礎不同時不連線；孤立觀測以點呈現。</span>';
   }
 }
 

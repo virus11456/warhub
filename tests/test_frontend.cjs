@@ -51,6 +51,28 @@ if(mode==='valid'){
   assert.equal(w.trendArrow(20),'');
   w.eval(`DATA_UPDATED_AT = ${JSON.stringify(accepted)}; WW_HISTORY = []; OBSERVED_DATA.regions = ${JSON.stringify(originalRegions)}`);
 
+  // Missing combined scores must not erase valid regional observations or bridge gaps.
+  const chartRow=(hours,value,regional=value,keys=['p','a','z'])=>({
+    ts:new Date(Date.parse(accepted)-hours*3600000).toISOString(),model_version:'wpi-4.0',
+    combined:value,regions:{taiwan:regional},score_basis:{combined:keys,regions:{taiwan:['poly','gdelt']}}});
+  const chartRegions=[{key:'taiwan',flag:'',name:'台海'}];
+  history([chartRow(10,0),chartRow(8,10),chartRow(6,null,30),chartRow(4,20),chartRow(2,30),chartRow(200,99)]);
+  w.renderTrendChart(chartRegions);
+  let chart=d.querySelector('#trend-chart');
+  assert.equal(chart.querySelectorAll('rect[data-tip]').length,5);
+  assert.equal(chart.querySelectorAll('polyline').length,3); // two combined segments + continuous region
+  assert.ok(chart.innerHTML.includes('缺資料'));
+  assert.ok(chart.querySelector('polyline').getAttribute('points').includes(',132.0')); // true zero
+  history([chartRow(16,10),chartRow(14,20),chartRow(4,30),chartRow(2,40)]);
+  w.renderTrendChart([]);assert.equal(chart.querySelectorAll('polyline').length,2);
+  history([chartRow(8,10),chartRow(6,20),chartRow(4,30,30,['p','g','z']),chartRow(2,40,40,['p','g','z'])]);
+  w.renderTrendChart([]);assert.equal(chart.querySelectorAll('polyline').length,2);
+  history([8,6,4,2].map(h=>({...chartRow(h,20),score_basis:null})));
+  w.renderTrendChart([]);assert.equal(chart.querySelectorAll('polyline').length,0);
+  assert.equal(chart.querySelectorAll('circle').length,4);
+  history([]);w.renderTrendChart([]);
+  assert.equal(chart.querySelector('svg'),null);assert.equal(d.querySelector('#trend-legend').textContent,'');
+
   const older={...data,updated_at:new Date(Date.parse(accepted)-3600000).toISOString(),score:{...data.score,combined_score:99}};
   w.fetch=async(url)=>({ok:true,json:async()=>String(url).includes('data.json')?older:[]});
   await w.fetchRealPizzaData();
