@@ -10,13 +10,21 @@ jobs:
   translate:
     if: github.ref == 'refs/heads/codex/bilingual-insights'
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
       - run: pip install -r scripts/requirements.txt
+      - name: Respect cooldown before starting
+        run: |
+          python - <<'PY'
+          from datetime import datetime, timezone
+          import time
+          until=datetime(2026,9,14,19,48,tzinfo=timezone.utc).timestamp()
+          time.sleep(max(0, until-time.time()))
+          PY
       - name: Prepare public UI and guide translations only
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
@@ -29,6 +37,9 @@ jobs:
           git config user.name 'warhub-bot'
           git config user.email 'localhost20000@gmail.com'
           git add locales/en.json
+          for file in locales/rejected.json locales/translation-state.json; do
+            if [ -f "$file" ]; then git add "$file"; fi
+          done
           if git diff --staged --quiet; then exit 0; fi
           git commit -m 'Prepare English UI and guide catalogue'
           git push origin HEAD:refs/heads/codex/bilingual-insights

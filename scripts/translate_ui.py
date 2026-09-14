@@ -7,6 +7,7 @@ import asyncio
 import json
 import os
 import re
+import time
 from pathlib import Path
 import aiohttp
 
@@ -36,21 +37,26 @@ async def main():
         raise SystemExit('Missing configured translation credential')
     model = os.environ.get('GROQ_TRANSLATION_MODEL') or 'openai/gpt-oss-20b'
     source = json.loads(Path('locales/source.json').read_text())
+    state_path = Path('locales/translation-state.json')
+    state = json.loads(state_path.read_text()) if state_path.exists() else {}
+    if time.time() < state.get('retry_at', 0):
+        raise SystemExit('Saved provider cooldown is still active; no request sent')
     target = Path('locales/en.json')
     catalog = json.loads(target.read_text()) if target.exists() else {}
     pending = [s for s in source if s not in catalog]
+    rejected_path = Path('locales/rejected.json')
     rejected = []
     async with aiohttp.ClientSession() as session:
-        for request in range(100):
+        for request in range(120):
             if not pending:
                 break
             batch, chars = [], 0
-            while pending and len(batch) < 50 and chars + len(pending[0]) <= 2200:
+            while pending and len(batch) < 50 and chars + len(pending[0]) <= 1400:
                 value = pending.pop(0)
                 batch.append(value)
                 chars += len(value)
             prepared = [masked(s) for s in batch]
-            payload = {'model': model, 'temperature': 0, 'max_completion_tokens': 10000,
+            payload = {'model': model, 'temperature': 0, 'max_completion_tokens': 4500,
                 'response_format': {'type': 'json_object'},
                 'messages': [
                     {'role': 'system', 'content':
@@ -70,7 +76,15 @@ async def main():
                     headers={'Authorization': 'Bearer ' + key}, json=payload,
                     timeout=aiohttp.ClientTimeout(total=90)) as response:
                 if response.status != 200:
+                    retry = response.headers.get('retry-after', '')
+                    seconds = float(retry) if re.fullmatch(r'\d+(?:\.\d+)?', retry) else 3600
+                    state_path.write_text(json.dumps({'status': response.status, 'retry_at': time.time()+max(60,seconds)}))
                     raise SystemExit(f'Translation stopped at HTTP {response.status}; no retry')
+                remaining = response.headers.get('x-ratelimit-remaining-tokens', '')
+                reset = response.headers.get('x-ratelimit-reset-tokens', '')
+                parts = re.findall(r'(\d+(?:\.\d+)?)(ms|h|m|s)', reset)
+                reset_seconds = sum(float(n)*{'ms':.001,'s':1,'m':60,'h':3600}[unit] for n,unit in parts)
+                wait_seconds = max(20, reset_seconds+3) if not remaining.isdigit() or int(remaining)<7800 else 20
                 result = await response.json()
             choice = result['choices'][0]
             if choice.get('finish_reason') != 'stop':
@@ -93,12 +107,12 @@ async def main():
                 except ValueError:
                     # These are public UI strings, never request headers/bodies.
                     rejected.append({'source': source_text, 'candidate': options})
-            Path('locales/rejected.json').write_text(json.dumps(rejected, ensure_ascii=False, indent=2)+'\n')
+            rejected_path.write_text(json.dumps(rejected, ensure_ascii=False, indent=2)+'\n')
             catalog.update(completed)
             target.write_text(json.dumps(catalog, ensure_ascii=False, indent=2, sort_keys=True)+'\n')
             print(f'Completed {len(catalog)}/{len(source)} UI strings; batch {request+1}', flush=True)
             if pending:
-                await asyncio.sleep(6)
+                await asyncio.sleep(wait_seconds)
     if pending:
         raise SystemExit('Per-run request budget reached; completed entries retained')
     if rejected:
