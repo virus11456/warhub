@@ -1685,6 +1685,13 @@ async def fetch_notams(session: aiohttp.ClientSession) -> dict:
     except Exception:
         pass
 
+    token = os.environ.get("NOTAC_API_KEY", "").strip()
+    if token:
+        from notac_client import collect_regions
+        return await collect_regions(session, token, dict(source_region_order(REGION_FIRS)), prev,
+                                     NOTAM_DANGER_RE, NOTAM_CLOSURE_RE,
+                                     os.environ.get("WARHUB_SOURCE_ARCHIVE_DIR"))
+
     from gdelt_quality import cooldown_active, cooldown_deadline
     if cooldown_active(prev):
         return {key: {**row, "stale": True} for key, row in prev.items()}

@@ -1,0 +1,28 @@
+name: Verify NOTAC access
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: notac-check
+  cancel-in-progress: false
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r scripts/requirements.txt
+      - name: Check one FIR without notifications or production writes
+        env:
+          NOTAC_API_KEY: ${{ secrets.NOTAC_API_KEY }}
+        run: python scripts/check_notac.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: notac-access-check
+          path: notac-check.json
+          retention-days: 30

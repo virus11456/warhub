@@ -22,9 +22,12 @@ def source_health(data):
             elif v.get('stale'):
                 status, note = 'stale', '沿用舊資料，未納入即時評分'
             if key in ('gdelt','notams'):
-                fresh = [r for r in v.values() if not r.get('stale')]
+                fresh = [r for r in v.values() if isinstance(r,dict) and not r.get('stale') and not r.get('partial') and r.get('available') is not False]
                 status = 'available' if len(fresh)==5 else ('partial' if fresh else 'stale')
                 note = f'{len(fresh)}/5 地區取得新資料；舊值不計分'
+                if key == 'notams' and any(r.get('provider') == 'NOTAC' for r in v.values() if isinstance(r,dict)):
+                    label = 'NOTAC / FAA NOTAM'
+                    note += '；僅查詢範圍，部分頁面不計分'
             if key == 'nuclear_seismic':
                 n = sum(s.get('count') is not None for s in v.get('sites',[]))
                 status = 'available' if n==5 else 'partial' if n else 'unavailable'
