@@ -8,6 +8,9 @@ WARHUBS - 推播通知系統
 再把新狀態寫回，因為 GitHub Actions 每次都是全新 process。
 """
 
+import asyncio
+import math
+import time
 import hashlib
 import aiohttp
 import os
@@ -158,16 +161,58 @@ def build_hotspot_alert(data: dict, now_cnt: int, prev_cnt: int) -> str:
 
 
 # ─── 發送 ──────────────────────────────────────────────────
-async def send_telegram(session, text, chat_id):
+class TelegramPacer:
+    """Shared by alerts and digest; 429 cooldown survives the next scheduled run."""
+    def __init__(self, retry_at=None):
+        self.retry_at = (retry_at if isinstance(retry_at, (int, float))
+                         and not isinstance(retry_at, bool) and math.isfinite(retry_at)
+                         and retry_at > 0 else 0)
+        self.next_send = 0
+        self.blocked = False
+
+    async def acquire(self):
+        if self.blocked or time.time() < self.retry_at:
+            print("ℹ️ Telegram 限流等待中，本輪略過")
+            return False
+        # Serialize all destinations conservatively, including group chats.
+        delay = self.next_send - time.monotonic()
+        if delay > 0:
+            await asyncio.sleep(delay)
+        self.next_send = time.monotonic() + 3.1
+        return True
+
+    def defer(self, body):
+        params = body.get("parameters") if isinstance(body, dict) else None
+        seconds = params.get("retry_after") if isinstance(params, dict) else None
+        # A malformed 429 must also stop this batch; never retry immediately.
+        if type(seconds) is not int or seconds <= 0:
+            seconds = 60
+        self.retry_at = max(self.retry_at, time.time() + seconds)
+        self.blocked = True
+        print("ℹ️ Telegram 已限流，保存等待期限供正常排程使用")
+
+
+async def send_telegram(session, text, chat_id, pacer=None):
     if not (TELEGRAM_BOT_TOKEN and chat_id):
+        return False
+    pacer = pacer or TelegramPacer()
+    if not await pacer.acquire():
         return False
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     # Plain text: source titles and INSUFFICIENT_DATA must never become markup.
     payload = {"chat_id": chat_id, "text": text,
                "disable_web_page_preview": True}
     async with session.post(url, json=payload) as resp:
-        body = await resp.json()
-        ok = resp.status == 200 and body.get("ok") is True
+        try:
+            body = await resp.json()
+        except (ValueError, aiohttp.ClientError, TimeoutError):
+            if resp.status == 429:
+                pacer.defer(None)
+            return False
+        if resp.status == 429 or (isinstance(body, dict) and body.get("error_code") == 429):
+            pacer.defer(body)
+            return False
+        ok = resp.status == 200 and isinstance(body, dict) and body.get("ok") is True
         print("✅ Telegram 推播成功" if ok else f"❌ Telegram 推播失敗 HTTP {resp.status}")
         return ok
 
@@ -193,10 +238,11 @@ def _target_key(kind, target):
     return hashlib.sha256(f"{kind}:{target}".encode()).hexdigest()
 
 
-async def _send_all(messages, level="NORMAL", tg_chats=None, completed=None):
+async def _send_all(messages, level="NORMAL", tg_chats=None, completed=None, pacer=None):
     """Return acknowledged results per destination; skip previously acknowledged targets."""
     if not messages:
         return {}
+    pacer = pacer or TelegramPacer()
     completed = completed or {}
     chats = list(dict.fromkeys(c for c in (
         tg_chats if tg_chats is not None else [TELEGRAM_CHAT_ID]) if c))
@@ -214,7 +260,7 @@ async def _send_all(messages, level="NORMAL", tg_chats=None, completed=None):
             results[key] = True
             for msg in messages:
                 try:
-                    ok = (await send_telegram(session, msg, target) if kind == "telegram"
+                    ok = (await send_telegram(session, msg, target, pacer=pacer) if kind == "telegram"
                           else await send_discord(session, msg, level))
                 except Exception as exc:
                     # Exception strings may contain bot tokens or webhook URLs.
@@ -229,9 +275,10 @@ async def run_notifications(data: dict, prev_notify: dict | None = None,
                             prev_level: str = "NORMAL", force_test: bool = False):
     """
     回傳新的 _notify 狀態（供呼叫端寫回 data.json）。
-    force_test=True 時無視所有條件，直接送一則測試 digest 驗證連線。
+    force_test=True 時略過事件條件，但仍遵守 Telegram 限流。
     """
     prev_notify = prev_notify or {}
+    pacer = TelegramPacer(prev_notify.get("telegram_retry_at"))
     score = data.get("score", {})
     new_level = score.get("alert_level", "NORMAL")
 
@@ -256,7 +303,8 @@ async def run_notifications(data: dict, prev_notify: dict | None = None,
     if force_test:
         result = await _send_all(["🔔 *WARHUBS 推播測試*\nTelegram／Discord 連線正常，"
                          "之後定時回報與異常警報都會送到這裡。\n\n" + build_digest(data)],
-                        new_level, tg_chats=both)
+                        new_level, tg_chats=both, pacer=pacer)
+        new_notify["telegram_retry_at"] = pacer.retry_at
         new_notify["delivery"] = {"test": result}
         return new_notify
 
@@ -280,10 +328,10 @@ async def run_notifications(data: dict, prev_notify: dict | None = None,
         alert_msgs.append(build_hotspot_alert(data, hs_cnt, prev_hs))
 
     # 異常警報：個人＋公開頻道都推；定時摘要：依頻道 scope
-    alerts = await _send_all(alert_msgs, new_level, tg_chats=both)
+    alerts = await _send_all(alert_msgs, new_level, tg_chats=both, pacer=pacer)
     receipts = (prev_notify.get("digest_receipts", {})
                 if prev_notify.get("digest_attempt_bucket") == bucket else {})
-    digest = await _send_all(msgs, new_level, tg_chats=digest_targets, completed=receipts)
+    digest = await _send_all(msgs, new_level, tg_chats=digest_targets, completed=receipts, pacer=pacer)
     if msgs:
         new_notify["digest_receipts"] = {k: True for k, ok in digest.items() if ok}
         new_notify["digest_attempt_bucket"] = bucket
@@ -292,6 +340,7 @@ async def run_notifications(data: dict, prev_notify: dict | None = None,
     else:
         new_notify["digest_receipts"] = receipts
         new_notify["digest_attempt_bucket"] = bucket
+    new_notify["telegram_retry_at"] = pacer.retry_at
     new_notify["delivery_version"] = 1
     new_notify["delivery"] = {"checked_at": now.isoformat(), "alerts": alerts, "digest": digest}
     return new_notify
