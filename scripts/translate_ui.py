@@ -39,6 +39,7 @@ async def main():
     target = Path('locales/en.json')
     catalog = json.loads(target.read_text()) if target.exists() else {}
     pending = [s for s in source if s not in catalog]
+    rejected = []
     async with aiohttp.ClientSession() as session:
         for request in range(100):
             if not pending:
@@ -77,7 +78,15 @@ async def main():
             rows = json.loads(choice['message']['content'])['translations']
             if len(rows) != len(batch) or sorted(r['id'] for r in rows) != list(range(len(batch))):
                 raise SystemExit('Invalid translation mapping; stopping')
-            completed = {batch[r['id']]: restore(r['text'], prepared[r['id']][1]) for r in rows}
+            completed = {}
+            for row in rows:
+                ident = row['id']
+                try:
+                    completed[batch[ident]] = restore(row['text'], prepared[ident][1])
+                except ValueError:
+                    # These are public UI strings, never request headers/bodies.
+                    rejected.append({'source': batch[ident], 'candidate': row['text']})
+            Path('locales/rejected.json').write_text(json.dumps(rejected, ensure_ascii=False, indent=2)+'\n')
             catalog.update(completed)
             target.write_text(json.dumps(catalog, ensure_ascii=False, indent=2, sort_keys=True)+'\n')
             print(f'Completed {len(catalog)}/{len(source)} UI strings; batch {request+1}', flush=True)
@@ -85,6 +94,9 @@ async def main():
                 await asyncio.sleep(6)
     if pending:
         raise SystemExit('Per-run request budget reached; completed entries retained')
+    if rejected:
+        print(json.dumps({'review_required': rejected}, ensure_ascii=False))
+        raise SystemExit('Some UI entries require review; accepted entries retained')
 
 
 if __name__ == '__main__':
