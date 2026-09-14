@@ -39,10 +39,13 @@ async def main():
     source = json.loads(Path('locales/source.json').read_text())
     state_path = Path('locales/translation-state.json')
     state = json.loads(state_path.read_text()) if state_path.exists() else {}
-    if time.time() < state.get('retry_at', 0):
+    if state.get('status') in (401, 402, 403, 429) and time.time() < state.get('retry_at', 0):
         raise SystemExit('Saved provider cooldown is still active; no request sent')
     target = Path('locales/en.json')
     catalog = json.loads(target.read_text()) if target.exists() else {}
+    overrides = Path('locales/overrides.json')
+    if overrides.exists():
+        catalog.update(json.loads(overrides.read_text()))
     pending = [s for s in source if s not in catalog]
     rejected_path = Path('locales/rejected.json')
     rejected = []
@@ -57,7 +60,11 @@ async def main():
                 chars += len(value)
             prepared = [masked(s) for s in batch]
             payload = {'model': model, 'temperature': 0, 'max_completion_tokens': 4500,
-                'response_format': {'type': 'json_object'},
+                'response_format': {'type': 'json_schema', 'json_schema': {
+                    'name': 'english_ui', 'strict': True,
+                    'schema': {'type': 'object', 'additionalProperties': False,
+                               'properties': {str(i): {'type': 'string'} for i in range(len(batch))},
+                               'required': [str(i) for i in range(len(batch))]}}},
                 'messages': [
                     {'role': 'system', 'content':
                      'Translate the supplied public website UI/guide text into clear, faithful English. '
@@ -66,7 +73,7 @@ async def main():
                      'Use Taipei, Taiwan, PLA aircraft, official daily report, observed, partial, stale, missing data, '
                      'and experimental consistently. WPI is an experimental observation index, not war probability. '
                      'Keep each [[N0]] numeric placeholder EXACTLY once; do not add numbers. '
-                     'Return JSON {"translations":[{"id":0,"text":"English text"}]} with every input id exactly once. '
+                     'Return a JSON object mapping every input id (as a string key) to its English text. '
                      'Use English/transliterated proper names; no Chinese characters in the output.'},
                     {'role': 'user', 'content': json.dumps([
                         {'id': i, 'text': pair[0]} for i, pair in enumerate(prepared)], ensure_ascii=False)}]}
@@ -78,7 +85,15 @@ async def main():
                 if response.status != 200:
                     retry = response.headers.get('retry-after', '')
                     seconds = float(retry) if re.fullmatch(r'\d+(?:\.\d+)?', retry) else 3600
-                    state_path.write_text(json.dumps({'status': response.status, 'retry_at': time.time()+max(60,seconds)}))
+                    try:
+                        code = (await response.json()).get('error', {}).get('code')
+                    except Exception:
+                        code = None
+                    allowed_codes = {'json_validate_failed','context_length_exceeded','model_not_found',
+                                     'invalid_request_error','rate_limit_exceeded','model_request_failed'}
+                    state_path.write_text(json.dumps({'status': response.status,
+                        'code': code if code in allowed_codes else 'unknown',
+                        'retry_at': time.time()+max(60,seconds)}))
                     raise SystemExit(f'Translation stopped at HTTP {response.status}; no retry')
                 remaining = response.headers.get('x-ratelimit-remaining-tokens', '')
                 reset = response.headers.get('x-ratelimit-reset-tokens', '')
@@ -89,9 +104,10 @@ async def main():
             choice = result['choices'][0]
             if choice.get('finish_reason') != 'stop':
                 raise SystemExit('Incomplete translation response; stopping')
-            rows = json.loads(choice['message']['content'])['translations']
-            if not isinstance(rows, list):
+            decoded = json.loads(choice['message']['content'])
+            if not isinstance(decoded, dict):
                 raise SystemExit('Invalid translation response; stopping')
+            rows = [{'id': int(key), 'text': value} for key,value in decoded.items() if key.isdigit()]
             completed = {}
             by_id = {}
             for row in rows:
