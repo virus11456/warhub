@@ -62,3 +62,5 @@ tests/test_gdelt_sampling.py驗證6h限制、錯誤保留舊資料、archive還�
 fetch_notams遇401／403／429沿用cooldown_active／cooldown_deadline，預設6小時，Retry-After秒數限制1至24小時，保存到地區cooldown_until。冷卻期間零請求、原觀測時間不變且stale；無歷史值只記缺資料，不填零。成功恢復的地區用新觀測取代冷卻標記。測試test_notam_backoff.py覆蓋首次拒絕、跨輪重用及到期恢復。此機制只减少無效請求，不代表資料恢復。
 
 FAA官方NMS頁與FAQ目前指引透過7-AWA-NAIMES@faa.gov申請NMS-API存取及文件：https://www.faa.gov/about/initiatives/notam 、https://www.faa.gov/about/initiatives/notam/faqs 。現有NOTAM Search網頁端點不是已授權的新API；未取得介面文件及存取前不能猜測URL或宣稱已遷移。申請或寄信需依使用者授權，skill不授予外部訊息權限。
+
+Telegram摘要使用「目前可見軍機（ADS-B覆蓋不完整）」，逐項顯示分類數；缺欄位不補0，有效0保留，部分資料明示。航空／FIRMS的來源或source_health過期與錯誤優先顯示狀態，不把舊值當目前數量；FIRMS熱異常明示不等於戰火。tests/test_alert_content.py純離線覆蓋partial、stale、error、零值及缺資料，不增加來源請求或測試推播。
