@@ -118,3 +118,82 @@ class DeliveryTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(tg.await_count, 2)
         self.assertEqual(dc.await_count, 2)
         self.assertEqual(second['bucket'], second['digest_attempt_bucket'])
+
+    async def test_spacing_shared_between_alert_and_digest_destinations(self):
+        session = Session()
+        ticks = [100.0]
+        async def advance(delay):
+            ticks[0] += delay
+        data = {'score': {'experimental': True}, 'firms': {'conflict_total': 1000}}
+        with patch.object(alerts.aiohttp, 'ClientSession') as factory, \
+             patch.object(alerts.time, 'monotonic', side_effect=lambda: ticks[0]), \
+             patch.object(alerts.asyncio, 'sleep', AsyncMock(side_effect=advance)) as sleep:
+            factory.return_value.__aenter__.return_value = session
+            result = await alerts.run_notifications(data, {'hotspot_counter_version': 2, 'hotspots': 10})
+        self.assertEqual(len(session.calls), 4)
+        self.assertEqual(sleep.await_count, 3)
+        for call in sleep.await_args_list:
+            self.assertAlmostEqual(call.args[0], 3.1)
+        self.assertTrue(all(result['delivery']['digest'].values()))
+
+    async def test_429_persists_across_runs_and_does_not_block_discord(self):
+        session = Session(429, {'ok': False, 'parameters': {'retry_after': 7200}})
+        with patch.object(alerts.aiohttp, 'ClientSession') as factory, \
+             patch.object(alerts.time, 'time', return_value=1000), \
+             patch.object(alerts, 'DISCORD_WEBHOOK', 'fake-webhook'), \
+             patch.object(alerts, 'send_discord', AsyncMock(return_value=True)) as discord:
+            factory.return_value.__aenter__.return_value = session
+            first = await alerts.run_notifications(self.data)
+            second = await alerts.run_notifications(self.data, first)
+            self.assertEqual(discord.await_count, 1)
+        self.assertEqual(len(session.calls), 1)
+        self.assertEqual(first['telegram_retry_at'], 8200)
+        self.assertEqual(second['telegram_retry_at'], 8200)
+        self.assertIsNone(second['bucket'])
+        self.assertEqual(len(second['digest_receipts']), 1)
+        with patch.object(alerts.aiohttp, 'ClientSession') as factory, \
+             patch.object(alerts.time, 'time', return_value=8201), \
+             patch.object(alerts.asyncio, 'sleep', AsyncMock()):
+            recovered = Session()
+            factory.return_value.__aenter__.return_value = recovered
+            third = await alerts.run_notifications(self.data, second)
+        self.assertEqual(len(recovered.calls), 2)
+        self.assertEqual(third['bucket'], third['digest_attempt_bucket'])
+
+    async def test_malformed_429_stops_batch_without_immediate_retry(self):
+        bodies = [None, [], {'parameters': None}, {'parameters': {'retry_after': 0}},
+                  {'parameters': {'retry_after': True}}, {'parameters': {'retry_after': '10'}}]
+        for body in bodies:
+            session = Session(429, body)
+            pacer = alerts.TelegramPacer()
+            with patch.object(alerts.time, 'time', return_value=1000):
+                self.assertFalse(await alerts.send_telegram(session, 'a', 'private', pacer))
+                self.assertFalse(await alerts.send_telegram(session, 'b', 'channel', pacer))
+            self.assertEqual(len(session.calls), 1)
+            self.assertEqual(pacer.retry_at, 1060)
+
+    async def test_non_json_429_and_api_error_code_keep_cooldown(self):
+        for status, response in [(429, ValueError('bad json')), (429, TimeoutError()), (200, {'error_code': 429, 'parameters': {'retry_after': 120}})]:
+            session = Session(status)
+            session.response.json = (AsyncMock(side_effect=response) if isinstance(response, Exception)
+                                     else AsyncMock(return_value=response))
+            pacer = alerts.TelegramPacer()
+            with patch.object(alerts.time, 'time', return_value=1000):
+                self.assertFalse(await alerts.send_telegram(session, 'a', 'private', pacer))
+            self.assertTrue(pacer.blocked)
+            self.assertGreater(pacer.retry_at, 1000)
+
+    async def test_manual_test_cannot_bypass_saved_cooldown(self):
+        session = Session()
+        with patch.object(alerts.aiohttp, 'ClientSession') as factory, \
+             patch.object(alerts.time, 'time', return_value=1000):
+            factory.return_value.__aenter__.return_value = session
+            result = await alerts.run_notifications(self.data, {'telegram_retry_at': 9000}, force_test=True)
+        self.assertEqual(session.calls, [])
+        self.assertEqual(result['telegram_retry_at'], 9000)
+        self.assertTrue(all(not ok for ok in result['delivery']['test'].values()))
+
+    async def test_invalid_saved_cooldown_does_not_crash_or_delay(self):
+        for value in (None, 'invalid', {}, True, float('nan'), float('inf'), -1):
+            pacer = alerts.TelegramPacer(value)
+            self.assertEqual(pacer.retry_at, 0)
