@@ -48,14 +48,14 @@ jobs:
         run: python3 scripts/collection_guard.py
 
       - uses: actions/setup-python@v5
-        if: steps.spacing.outputs.collect == 'true'
+        if: steps.spacing.outputs.collect == 'true' || github.event_name == 'schedule'
         with:
           python-version: '3.11'
           cache: pip
           cache-dependency-path: scripts/requirements.txt
 
       - name: Install deps
-        if: steps.spacing.outputs.collect == 'true'
+        if: steps.spacing.outputs.collect == 'true' || github.event_name == 'schedule'
         run: pip install -r scripts/requirements.txt
 
       - name: Fetch data
@@ -150,5 +150,46 @@ jobs:
         with:
           name: analysis-snapshots
           path: /tmp/warhub-new-archive/
+          if-no-files-found: ignore
+          retention-days: 30
+
+
+      - name: Notify fresh saved snapshot when collection is skipped
+        if: steps.spacing.outputs.collect == 'false' && github.event_name == 'schedule' && !inputs.quiet
+        env:
+          WARHUB_NO_NOTIFY: ${{ inputs.quiet && '1' || '0' }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_CHANNEL_ID: ${{ vars.TELEGRAM_CHANNEL_ID }}
+          TELEGRAM_CHANNEL_SCOPE: ${{ vars.TELEGRAM_CHANNEL_SCOPE }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DIGEST_EVERY_HOURS: ${{ vars.DIGEST_EVERY_HOURS }}
+        run: python scripts/notify_snapshot.py prepare --state /tmp/warhub-notify-state.json
+
+      - name: Commit notification receipts only
+        if: steps.spacing.outputs.collect == 'false' && github.event_name == 'schedule' && !inputs.quiet
+        run: |
+          if [ ! -f /tmp/warhub-notify-state.json ]; then exit 0; fi
+          git config user.name "warhub-bot"
+          git config user.email "localhost20000@gmail.com"
+          for i in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            # apply verifies observation content and previous receipts before writing _notify only.
+            python scripts/notify_snapshot.py apply --state /tmp/warhub-notify-state.json
+            git add data/data.json
+            if git diff --staged --quiet; then exit 0; fi
+            git commit -m "data: save notification receipts"
+            if git push origin HEAD:main; then exit 0; fi
+            sleep $(( (RANDOM % 4) + 2 ))
+          done
+          echo "notification receipt publication failed"; exit 1
+
+      - name: Preserve notification receipts even if submission fails
+        if: always() && steps.spacing.outputs.collect == 'false' && github.event_name == 'schedule'
+        uses: actions/upload-artifact@v4
+        with:
+          name: notification-receipts
+          path: /tmp/warhub-notify-state.json
           if-no-files-found: ignore
           retention-days: 30

@@ -1,4 +1,4 @@
-"""Skip closely spaced workflow runs before source requests and notifications."""
+"""Skip closely spaced source collection; scheduled saved-snapshot digests run separately."""
 import json
 import os
 from datetime import datetime, timezone

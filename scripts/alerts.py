@@ -102,7 +102,7 @@ def build_digest(data: dict) -> str:
     hs = "資料不足" if hs is None or firms.get("stale") else hs
     return (
         f"🛰️ *WARHUBS 更新觀測回報*\n"
-        f"{now}\n\n"
+        f"{now}\n資料時間：{data.get('updated_at') or '未提供'}\n\n"
         f"{emoji} *WPI 實驗指數：{_fmt_score(score.get('combined_score'))} / 100*（不作戰情警戒）\n\n"
         f"🗺️ 地區風險：\n{_fmt_regions(data.get('regions'))}\n\n"
         f"🍕 人流實驗觀察：{_fmt_score(score.get('pizza_score'))}\n"
@@ -272,7 +272,8 @@ async def _send_all(messages, level="NORMAL", tg_chats=None, completed=None, pac
 
 # ─── 主流程：定時回報 + 即時異常 ─────────────────────────────
 async def run_notifications(data: dict, prev_notify: dict | None = None,
-                            prev_level: str = "NORMAL", force_test: bool = False):
+                            prev_level: str = "NORMAL", force_test: bool = False,
+                            digest_only: bool = False):
     """
     回傳新的 _notify 狀態（供呼叫端寫回 data.json）。
     force_test=True 時略過事件條件，但仍遵守 Telegram 限流。
@@ -293,6 +294,15 @@ async def run_notifications(data: dict, prev_notify: dict | None = None,
 
     new_notify = {"bucket": prev_notify.get("bucket"), "level": new_level,
                   "pizza_extreme": has_extreme, "hotspots": hs_cnt, "hotspot_counter_version": 2}
+
+    new_notify["digest_snapshot_at"] = prev_notify.get("digest_snapshot_at")
+    if digest_only:
+        # A saved-snapshot digest must not consume or replay event edges.
+        for key in ("level", "pizza_extreme", "hotspots", "hotspot_counter_version"):
+            if key in prev_notify:
+                new_notify[key] = prev_notify[key]
+            else:
+                new_notify.pop(key, None)
 
     # 收件對象：個人 chat 永遠收；公開頻道依 scope 決定
     personal = [TELEGRAM_CHAT_ID]
@@ -315,15 +325,15 @@ async def run_notifications(data: dict, prev_notify: dict | None = None,
         msgs.append(build_digest(data))
 
     # 2) 即時異常（邊緣觸發：條件「新成立」才推，避免洗版）
-    if score.get("experimental") is False and ALERT_ESCALATION and new_level in LEVEL_ORDER and prev_level in LEVEL_ORDER \
+    if not digest_only and score.get("experimental") is False and ALERT_ESCALATION and new_level in LEVEL_ORDER and prev_level in LEVEL_ORDER \
             and LEVEL_ORDER.index(new_level) > LEVEL_ORDER.index(prev_level):
         alert_msgs.append(build_escalation(data, prev_level))
 
-    if score.get("experimental") is False and ALERT_PIZZA and has_extreme and not prev_notify.get("pizza_extreme"):
+    if not digest_only and score.get("experimental") is False and ALERT_PIZZA and has_extreme and not prev_notify.get("pizza_extreme"):
         alert_msgs.append(build_pizza_alert(data, extreme_shops))
 
     prev_hs = prev_notify.get("hotspots", 0) or 0
-    if ALERT_HOTSPOT and prev_notify.get("hotspot_counter_version") == 2 and hs_cnt is not None and hs_cnt >= HOTSPOT_SURGE_MIN and prev_hs > 0 \
+    if not digest_only and ALERT_HOTSPOT and prev_notify.get("hotspot_counter_version") == 2 and hs_cnt is not None and hs_cnt >= HOTSPOT_SURGE_MIN and prev_hs > 0 \
             and hs_cnt >= prev_hs * HOTSPOT_SURGE_RATIO:
         alert_msgs.append(build_hotspot_alert(data, hs_cnt, prev_hs))
 
@@ -337,6 +347,7 @@ async def run_notifications(data: dict, prev_notify: dict | None = None,
         new_notify["digest_attempt_bucket"] = bucket
         if digest and all(digest.values()):
             new_notify["bucket"] = bucket
+            new_notify["digest_snapshot_at"] = data.get("updated_at")
     else:
         new_notify["digest_receipts"] = receipts
         new_notify["digest_attempt_bucket"] = bucket
