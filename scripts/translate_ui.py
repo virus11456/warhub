@@ -76,16 +76,23 @@ async def main():
             if choice.get('finish_reason') != 'stop':
                 raise SystemExit('Incomplete translation response; stopping')
             rows = json.loads(choice['message']['content'])['translations']
-            if len(rows) != len(batch) or sorted(r['id'] for r in rows) != list(range(len(batch))):
-                raise SystemExit('Invalid translation mapping; stopping')
+            if not isinstance(rows, list):
+                raise SystemExit('Invalid translation response; stopping')
             completed = {}
+            by_id = {}
             for row in rows:
-                ident = row['id']
+                ident = row.get('id') if isinstance(row, dict) else None
+                if type(ident) is int and ident in range(len(batch)):
+                    by_id.setdefault(ident, []).append(row.get('text'))
+            for ident, source_text in enumerate(batch):
+                options = by_id.get(ident, [])
                 try:
-                    completed[batch[ident]] = restore(row['text'], prepared[ident][1])
+                    if len(options) != 1:
+                        raise ValueError('missing or duplicate mapping')
+                    completed[source_text] = restore(options[0], prepared[ident][1])
                 except ValueError:
                     # These are public UI strings, never request headers/bodies.
-                    rejected.append({'source': batch[ident], 'candidate': row['text']})
+                    rejected.append({'source': source_text, 'candidate': options})
             Path('locales/rejected.json').write_text(json.dumps(rejected, ensure_ascii=False, indent=2)+'\n')
             catalog.update(completed)
             target.write_text(json.dumps(catalog, ensure_ascii=False, indent=2, sort_keys=True)+'\n')
