@@ -15,35 +15,11 @@ from alerts import run_notifications
 from collection_guard import MIN_INTERVAL_SECONDS
 
 
-def timestamp(value):
-    try:
-        parsed = datetime.fromisoformat(value.replace('Z', '+00:00'))
-        return parsed if parsed.tzinfo is not None else None
-    except (AttributeError, ValueError, TypeError):
-        return None
+from notification_status import timestamp, snapshot_reason
 
 
 def eligible(snapshot, now):
-    if not isinstance(snapshot, dict):
-        return False
-    observed = timestamp(snapshot.get('updated_at'))
-    if observed is None or not 0 <= (now - observed).total_seconds() < MIN_INTERVAL_SECONDS:
-        return False
-    previous = snapshot.get('_notify') or {}
-    if not isinstance(previous, dict):
-        return False
-    delivered = timestamp(previous.get('digest_snapshot_at'))
-    # Legacy successful delivery provides a conservative no-replay boundary.
-    if delivered is None:
-        delivery = previous.get('delivery') or {}
-        if not isinstance(delivery, dict):
-            return False
-        results = delivery.get('digest') or {}
-        if not isinstance(results, dict):
-            return False
-        if results and all(value is True for value in results.values()):
-            delivered = timestamp(delivery.get('checked_at'))
-    return delivered is None or observed > delivered
+    return snapshot_reason(snapshot, now) == 'ready'
 
 
 def fingerprint(snapshot):
@@ -57,9 +33,10 @@ async def prepare(snapshot, now):
     event = os.environ.get('GITHUB_EVENT_NAME')
     enabled = event == 'schedule' or (event == 'workflow_dispatch'
                                     and os.environ.get('WARHUB_NOTIFY_ONLY') == 'true')
-    if not enabled or os.environ.get('WARHUB_NO_NOTIFY') == '1':
-        return None
-    if not eligible(snapshot, now):
+    reason = ('quiet' if os.environ.get('WARHUB_NO_NOTIFY') == '1' else
+              'event_not_enabled' if not enabled else snapshot_reason(snapshot, now))
+    print('Saved-snapshot decision: ' + reason)
+    if reason != 'ready':
         return None
     previous = snapshot.get('_notify') or {}
     observed_hash = fingerprint(snapshot)
@@ -98,7 +75,7 @@ def main():
         if pending is not None:
             state.write_text(json.dumps(pending, ensure_ascii=False, indent=2), encoding='utf-8')
         print('Saved-snapshot notification checked; receipt state saved.' if pending else
-              'Saved-snapshot notification skipped: quiet, non-scheduled, stale, or already delivered.')
+              'No new receipt state; see decision above (ready may still be deduplicated or unsuccessful).')
     else:
         pending = json.loads(state.read_text(encoding='utf-8'))
         updated = apply(snapshot, pending)
