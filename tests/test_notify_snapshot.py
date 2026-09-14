@@ -140,3 +140,20 @@ class ReceiptPublicationTests(unittest.TestCase):
         code, commands = self.submission(reject_apply=True)
         self.assertEqual(code, 42)
         self.assertFalse(any(c.startswith(('git add ', 'git commit ', 'git push ')) for c in commands))
+
+
+class ExplicitDigestTests(unittest.IsolatedAsyncioTestCase):
+    async def test_opt_in_dispatch_sends_normal_digest_but_quiet_wins(self):
+        now = datetime.now(timezone.utc)
+        snapshot = {'updated_at': now.isoformat()}
+        with patch.object(ns, 'run_notifications', AsyncMock(return_value={'ack': True})) as sender:
+            for event, flag, quiet, expected in [
+                ('workflow_dispatch', 'true', '0', True),
+                ('workflow_dispatch', 'false', '0', False),
+                ('workflow_dispatch', 'true', '1', False),
+                ('push', 'true', '0', False)]:
+                sender.reset_mock()
+                with patch.dict(os.environ, {'GITHUB_EVENT_NAME': event,
+                        'WARHUB_NOTIFY_ONLY': flag, 'WARHUB_NO_NOTIFY': quiet}):
+                    await ns.prepare(snapshot, now)
+                self.assertEqual(sender.await_count, int(expected))

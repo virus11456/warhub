@@ -48,3 +48,21 @@ class CollectionGuardTests(unittest.TestCase):
                 collected.append(minute)
                 snapshot = {'updated_at': now.isoformat()}
         self.assertEqual(collected, [180, 300])
+
+    def test_digest_only_never_collects_even_with_force_and_stale_data(self):
+        from collection_guard import workflow_plan
+        now = datetime(2026, 9, 14, tzinfo=timezone.utc)
+        for snapshot in ({}, {'updated_at': '2026-09-01T00:00:00Z'}):
+            for force in (False, True):
+                self.assertEqual(workflow_plan(snapshot, now, 'workflow_dispatch',
+                    notify_only=True, force=force), (False, 'explicit_digest_only', True))
+                self.assertEqual(workflow_plan(snapshot, now, 'workflow_dispatch',
+                    notify_only=True, quiet=True, force=force), (False, 'explicit_digest_only', False))
+
+    def test_manual_digest_flag_is_not_implicit_or_accepted_on_push(self):
+        from collection_guard import workflow_plan
+        now = datetime(2026, 9, 14, tzinfo=timezone.utc)
+        snapshot = {'updated_at': now.isoformat()}
+        self.assertFalse(workflow_plan(snapshot, now, 'workflow_dispatch')[2])
+        self.assertFalse(workflow_plan(snapshot, now, 'push', notify_only=True)[2])
+        self.assertTrue(workflow_plan(snapshot, now, 'schedule')[2])
