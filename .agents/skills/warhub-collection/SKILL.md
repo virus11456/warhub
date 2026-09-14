@@ -78,3 +78,5 @@ Telegram 發送由 scripts/alerts.py 的 TelegramPacer 在同一輪異常警報�
 通知診斷：`python3 scripts/notification_status.py --data data/data.json` 是純唯讀入口，僅使用標準函式庫與 collection_guard 常數，不載入發送器、不讀憑證、不連線或寫快照。update-data 最後以 always() 執行，輸出至日誌與 GITHUB_STEP_SUMMARY；即使快照缺少亦顯示無效，不把缺回條視為成功。摘要列原觀測時間、最後可核實全部成功時間、距成功分鐘、快照判斷、quiet、去重時段、Telegram 冷卻剩餘秒及目的地成功／失敗數，不暴露目的地識別值。這是目前檔案回條的摘要，不保證本輪發送或提交成功，提交錯誤仍查 notification-receipts artifact。prepare 另列單一 decision 原因（quiet／event_not_enabled／invalid_snapshot／invalid_observation_time／future_observation／stale_snapshot／invalid_receipts／already_delivered／ready），ready 仍須經既有時段與限流判斷。
 
 `_notify.digest_success_at` 保留最近一次全部摘要目的地確認成功的實際發送時間，後續略過或失敗不覆寫；舊狀態僅在非空 digest 全為 true 且 checked_at 合法非未來時承接，缺資料不回填推測時間。digest_snapshot_at 仍是原觀測時間，兩者不可混用。tests/test_notification_status.py 驗證區分狀態、零副作用、隱去目的地、成功時間保存及 CLI 缺快照診斷。此批不改排程頻率、不啟用未部署的獨立 Linux 備援；GitHub 恢復一次 schedule 執行不等於每小時穩定，需自然排程續查。
+
+NOTAC（2026-09-15）：既有fetch_notams可用NOTAC_API_KEY切換正式API，仍同輪抓取、110分鐘來源守門，無額外定時器。NOTAC來源metadata使用既有source archive流程保存，詳見warhub-osint；部分分頁或失敗保持舊觀測stale而不補零。Verify NOTAC access是明確手動的有限RCAA實測，不通知、不寫正式data。新增index領空公告觀察與同範圍前次比較，不合成新的戰爭機率。

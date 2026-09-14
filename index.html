@@ -1565,6 +1565,12 @@
     <details style="margin-top:1rem"><summary>近 7 天觀測時間軸（最近 20 筆）</summary><div id="taiwan-insight-timeline"></div></details>
   </div>
 
+  <section class="card" id="notac-card" style="margin-bottom:1.5rem">
+    <h2 class="section-title">領空公告觀察 · NOTAM</h2>
+    <p style="color:var(--text-dim);font-size:.8rem;line-height:1.8">公告可能涉及民航、工程、演習或其他限制，不等於軍事行動。與上方官方活動、新聞及市場分開核對，不合成開戰機率。</p>
+    <div id="notac-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:1rem;line-height:1.8">等待已核實的 NOTAC 資料。</div>
+  </section>
+
   <!-- 🎖️ 台海軍事動態 -->
   <div class="card" id="twnews-card" style="margin-bottom:1.5rem">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-bottom:.4rem">
@@ -2560,7 +2566,7 @@ async function fetchRealPizzaData() {
       if(status)status.textContent=(expired?'⚠ 保留資料已過期：':'已保留較新的資料：')+observedTime()+'；本次回傳較舊，未覆蓋';
       const live=document.querySelector('.live-lbl');
       if(live)live.textContent=expired?'資料已過期':'保留較新資料';
-      if(expired && OBSERVED_DATA)renderTaiwanInsight(OBSERVED_DATA);
+      if(expired && OBSERVED_DATA){renderTaiwanInsight(OBSERVED_DATA);renderNotacObservation(OBSERVED_DATA);}
       if(expired && OBSERVED_DATA?.regions)renderRegions(OBSERVED_DATA.regions.map(r=>({...r,score:null,level:'INSUFFICIENT_DATA',coverage:0,factors:{}})));
       htmlWpiRender();
       return;
@@ -2677,6 +2683,7 @@ async function fetchRealPizzaData() {
     try { renderTwNews(json); }
     catch(err) { console.warn('[WARHUBS] renderTwNews error:', err.message); }
 
+    try { renderNotacObservation(json); } catch(err) { console.warn("NOTAC render error", err.message); }
     try { renderTaiwanInsight(json); } catch(err) { console.warn("Taiwan insight render error", err.message); }
     try { renderPla(json); }
     catch(err) { console.warn('[WARHUBS] renderPla error:', err.message); }
@@ -3486,6 +3493,33 @@ function renderStrat(json){
     upd.textContent='參考月 '+(s.ref_month||'—')+'（對比 '+(s.prev_year_month||'')+'）· 最後更新 '+ut+'（每日重查·月資料約月更）';
   }
 }
+function renderNotacObservation(json) {
+  const el=document.getElementById('notac-body');if(!el)return;
+  const names={taiwan:'台北 FIR',ukraine:'基輔 FIR',mideast:'德黑蘭／特拉維夫 FIR',korea:'平壤 FIR',southsea:'馬尼拉 FIR'};
+  const fmt=t=>Number.isFinite(Date.parse(t))?new Date(t).toLocaleString('zh-TW',{timeZone:'Asia/Taipei',year:'numeric',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'時間缺資料';
+  const num=n=>Number.isInteger(n)&&n>=0?String(n):'缺資料';
+  el.innerHTML=Object.entries(names).map(([key,name])=>{
+    const r=(json.notams||{})[key]||{}, a=r.latest_attempt||r;
+    const age=Date.now()-Date.parse(r.observed_at);
+    const fresh=r.provider==='NOTAC'&&r.complete===true&&!r.stale&&Number.isFinite(age)&&age>=0&&age<6*3600000;
+    let text;
+    if(fresh){
+      text='有效公告 '+num(r.total)+' 筆；限制／危險關鍵字候選 '+num(r.danger)+' 筆。';
+      const c=r.comparison, gap=c?Date.parse(r.observed_at)-Date.parse(c.observed_at):NaN;
+      text+='<br>查詢時間：'+fmt(r.observed_at)+'（不是公告發布時間）';
+      text+=c&&Number.isInteger(c.total_change)&&gap>0&&gap<=6*3600000?'<br>較 '+fmt(c.observed_at)+' 同範圍完整查詢 '+(c.total_change>0?'+':'')+c.total_change+' 筆；數量變化不是情勢升級。':'<br>同範圍比較資料累積中。';
+    }else if(r.provider==='NOTAC'){
+      text='本輪未取得完整可用公告，暫停判讀。';
+      if(a.partial)text+='<br>已取得樣本 '+num(a.sample_count)+' 筆／來源回報 '+num(a.reported_count)+' 筆；分頁未收齊，不代表零公告。';
+      if(r.observed_at)text+='<br>保留舊觀測時間：'+fmt(r.observed_at);
+      if(r.attempted_at)text+='<br>最近嘗試：'+fmt(r.attempted_at);
+    }else{text='等待 NOTAC 查詢；舊 FAA 資料保留，不混算比較。';}
+    const firs=(r.firs||[]).filter(f=>typeof f==='string'&&/^[A-Z]{4}$/.test(f)).join(',');
+    const link=firs?'https://notac.aero/notams/?fir='+encodeURIComponent(firs):'https://notac.aero/notams/';
+    return '<article style="min-width:0;border:1px solid var(--border);padding:.8rem;font-size:.8rem"><strong>'+name+'</strong><div>'+text+'</div><a style="color:var(--accent)" href="'+link+'" target="_blank" rel="noopener">查看來源公告 →</a></article>';
+  }).join('');
+}
+
 function renderTaiwanInsight(json) {
   const el=document.getElementById('taiwan-insight-body'), timeline=document.getElementById('taiwan-insight-timeline');
   if(!el || !timeline) return;

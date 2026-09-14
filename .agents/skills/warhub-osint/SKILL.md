@@ -64,3 +64,19 @@ fetch_notams遇401／403／429沿用cooldown_active／cooldown_deadline，預設
 FAA官方NMS頁與FAQ目前指引透過7-AWA-NAIMES@faa.gov申請NMS-API存取及文件：https://www.faa.gov/about/initiatives/notam 、https://www.faa.gov/about/initiatives/notam/faqs 。現有NOTAM Search網頁端點不是已授權的新API；未取得介面文件及存取前不能猜測URL或宣稱已遷移。申請或寄信需依使用者授權，skill不授予外部訊息權限。
 
 Telegram摘要使用「目前可見軍機（ADS-B覆蓋不完整）」，逐項顯示分類數；缺欄位不補0，有效0保留，部分資料明示。航空／FIRMS的來源或source_health過期與錯誤優先顯示狀態，不把舊值當目前數量；FIRMS熱異常明示不等於戰火。tests/test_alert_content.py純離線覆蓋partial、stale、error、零值及缺資料，不增加來源請求或測試推播。
+
+## NOTAC 正式 API 接入
+
+2026-09-15 Denis 回信確認指定 FIR 覆蓋、可公開衍生摘要及可留存 API 副本。帳戶已註冊，使用者確認已存 GitHub Secret `NOTAC_API_KEY`。官方 authentication 文件的「尚無自助註冊」與目前帳號頁不一致，以已登入頁面為準；terms 頁尚未完整核對，不展示 NOTAC 自動產生的 readings／長文，公開介面僅展示自算統計與來源連結。
+
+入口仍為 fetch_data.py:fetch_notams；有 NOTAC_API_KEY 時使用 notac_client.collect_regions，沒有 key 保持 FAA 舊路徑。來源失敗不切回 FAA 假裝新觀測。五區沿用 REGION_FIRS（UKBV、OIIX/LLLL、RCAA、ZKKP、RPHI）；每區 GET /api/v1/notam/，fir列表、status=active、sort=newest，最多2頁，每頁2credits。每輪最多10請求／20credits，逐來源至少110分鐘（含失敗），約兩小時排程每31天最多7440credits；更密的110分鐘理論上限約8120，額外手動驗證另計。帳戶10,000月額度、UTC月初重置，Beta後可能縮減，不能保證永久免費。每次讀X-Credits-Remaining，低於20暫停至下月，不買超額。
+
+401/403停止後續區域並保存24h冷卻；402至下一UTC月初；429遵循Retry-After，不立即重試。分頁next必須同HTTPS主機、路徑與篩選，禁止redirect與key進URL；2MB上限、每頁20秒、每區42秒。缺count/next、頁面總數不符、重複ID、FIR不符、非active均不完整。完整合法空清單才total=0；其他total未知。最新部分結果放latest_attempt，保留旧observed_at/total/score並stale，舊值不計分。NOTAC查詢時間是取得當時有效公告清單的時間，不冒充公告發布時間；公告原effective_start/end等留在來源metadata。
+
+完整結果沿用既有關鍵字候選與人工score公式；僅同NOTAC來源、相同FIR、兩次完整且間隔不超過6h才算total_change，不比較FAA舊值。變化不是戰爭機率或軍事行動證據。index.html新增五區NOTAM觀察，顯示缺值、部分樣本、舊時間及比較累積；root過期時重繪，6h後停判讀。
+
+source metadata以notac/<取得時間>_<SHA256>.json.gz不可覆寫保存，沿用WARHUB_SOURCE_ARCHIVE_DIR与既有Git/artifact封存。只存ID、編號、FIR、Q-code、狀態與來源時間欄位，不存token、readings或完整原文；不能聲稱全部HTTP回應已封存。測試test_notac_client.py全用合成fixture與mock，驗證限額、部分資料、零值、來源退避、原時間保留和archive。
+
+手動Verify NOTAC access workflow執行scripts/check_notac.py：只讀RCAA最多2頁（最多4credits），無其他爬蟲、無通知、無正式data寫入，提供30天去除rows的摘要artifact。這是真實API呼叫，不能當離線測試；依本次串接驗證授權單次執行，失敗先看代碼不連續重跑。完整查詢或已核實的分頁預算停止可確認存取，但後者不表示資料齊全。
+
+官方文件：https://notac.aero/api/search-notams/ 、https://notac.aero/api/authentication/ 、https://notac.aero/api/credits/ 、https://notac.aero/api/rate-limits/ 。文件示例count與列數可能不一致，真實資料仍須檢查，不照示例放寬完整性。

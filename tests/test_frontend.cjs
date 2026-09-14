@@ -38,6 +38,14 @@ if(mode==='valid'){assert.ok(d.querySelector('#html-wpi-a-desc').textContent.inc
 if(mode==='valid'){
   const w=dom.window;
   assert.ok(d.querySelector('.live-lbl').textContent.includes('備份'));
+  w.renderNotacObservation({notams:{taiwan:{provider:'NOTAC',complete:true,total:0,danger:0,observed_at:new Date().toISOString(),firs:['RCAA']}}});
+  assert.ok(d.querySelector('#notac-body').textContent.includes('有效公告 0 筆'));
+  w.renderNotacObservation({notams:{taiwan:{provider:'NOTAC',stale:true,observed_at:'2020-01-01T00:00:00Z',latest_attempt:{partial:true,sample_count:20,reported_count:100}}}});
+  assert.ok(d.querySelector('#notac-body').textContent.includes('已取得樣本 20 筆'));
+  assert.ok(!d.querySelector('#notac-body').textContent.includes('有效公告 0 筆'));
+  assert.ok(d.querySelector('#notac-body').textContent.includes('2020'));
+  w.renderNotacObservation({notams:{taiwan:{provider:'NOTAC',complete:true,total:5,danger:1,observed_at:'2020-01-01T00:00:00Z'}}});
+  assert.ok(!d.querySelector('#notac-body').textContent.includes('有效公告 5 筆'));
   const accepted=w.eval('DATA_UPDATED_AT');
   // Use the snapshot clock; skip missing/malformed values but retain real zero.
   const snapshot=new Date(Date.now()-5*3600000).toISOString();
