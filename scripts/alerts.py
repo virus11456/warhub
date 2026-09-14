@@ -342,6 +342,10 @@ async def run_notifications(data: dict, prev_notify: dict | None = None,
                   "pizza_extreme": has_extreme, "hotspots": hs_cnt, "hotspot_counter_version": 2}
 
     new_notify["digest_snapshot_at"] = prev_notify.get("digest_snapshot_at")
+    # Retain a verified success independently of later checks or failed attempts.
+    from notification_status import last_success
+    new_notify["digest_success_at"] = last_success(prev_notify, now)
+
     if digest_only:
         # A saved-snapshot digest must not consume or replay event edges.
         for key in ("level", "pizza_extreme", "hotspots", "hotspot_counter_version"):
@@ -394,6 +398,7 @@ async def run_notifications(data: dict, prev_notify: dict | None = None,
         if digest and all(digest.values()):
             new_notify["bucket"] = bucket
             new_notify["digest_snapshot_at"] = data.get("updated_at")
+            new_notify["digest_success_at"] = now.isoformat()
     else:
         new_notify["digest_receipts"] = receipts
         new_notify["digest_attempt_bucket"] = bucket

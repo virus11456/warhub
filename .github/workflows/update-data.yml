@@ -200,3 +200,11 @@ jobs:
           path: /tmp/warhub-notify-state.json
           if-no-files-found: ignore
           retention-days: 30
+
+
+      - name: Explain notification status (read only)
+        if: always()
+        env:
+          WARHUB_NO_NOTIFY: ${{ inputs.quiet && '1' || '0' }}
+          DIGEST_EVERY_HOURS: ${{ vars.DIGEST_EVERY_HOURS }}
+        run: python3 scripts/notification_status.py --data data/data.json
