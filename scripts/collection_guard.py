@@ -24,6 +24,16 @@ def should_collect(snapshot, now, force=False):
     return True, 'refresh_due'
 
 
+def workflow_plan(snapshot, now, event, notify_only=False, quiet=False, force=False):
+    manual_digest = event == 'workflow_dispatch' and notify_only
+    if manual_digest:
+        collect, reason = False, 'explicit_digest_only'
+    else:
+        collect, reason = should_collect(snapshot, now, event == 'workflow_dispatch' and force)
+    notify_saved = not collect and not quiet and (event == 'schedule' or manual_digest)
+    return collect, reason, notify_saved
+
+
 if __name__ == '__main__':
     try:
         snapshot = json.loads(Path('data/data.json').read_text(encoding='utf-8'))
@@ -31,9 +41,12 @@ if __name__ == '__main__':
         snapshot = {}
     manual = os.getenv('GITHUB_EVENT_NAME') == 'workflow_dispatch'
     force = manual and (os.getenv('FORCE_REFRESH') == 'true' or os.getenv('TEST_PUSH') == 'true')
-    collect, reason = should_collect(snapshot, datetime.now(timezone.utc), force)
+    collect, reason, notify_saved = workflow_plan(
+        snapshot, datetime.now(timezone.utc), os.getenv('GITHUB_EVENT_NAME'),
+        notify_only=os.getenv('NOTIFY_ONLY') == 'true',
+        quiet=os.getenv('QUIET') == 'true', force=force)
     with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as stream:
-        stream.write(f'collect={str(collect).lower()}\n')
+        stream.write(f'collect={str(collect).lower()}\nnotify_saved={str(notify_saved).lower()}\n')
     summary = f'Collection {"due" if collect else "skipped"}: {reason}. Minimum spacing: 110 minutes.'
     print(summary)
     if os.getenv('GITHUB_STEP_SUMMARY'):

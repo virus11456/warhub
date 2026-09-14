@@ -18,6 +18,10 @@ on:
         description: '靜默資料更新（不發送任何通知；供備援與驗證）'
         type: boolean
         default: false
+      notify_only:
+        description: '只檢查並發送未通知的新鮮正常摘要；不抓資料，quiet仍優先'
+        type: boolean
+        default: false
       test_push:
         description: '傳一則測試推播到 Telegram/Discord（驗證連線）'
         type: boolean
@@ -45,17 +49,19 @@ jobs:
         env:
           FORCE_REFRESH: ${{ inputs.force_refresh }}
           TEST_PUSH: ${{ inputs.test_push }}
+          NOTIFY_ONLY: ${{ inputs.notify_only }}
+          QUIET: ${{ inputs.quiet }}
         run: python3 scripts/collection_guard.py
 
       - uses: actions/setup-python@v5
-        if: steps.spacing.outputs.collect == 'true' || github.event_name == 'schedule'
+        if: steps.spacing.outputs.collect == 'true' || steps.spacing.outputs.notify_saved == 'true'
         with:
           python-version: '3.11'
           cache: pip
           cache-dependency-path: scripts/requirements.txt
 
       - name: Install deps
-        if: steps.spacing.outputs.collect == 'true' || github.event_name == 'schedule'
+        if: steps.spacing.outputs.collect == 'true' || steps.spacing.outputs.notify_saved == 'true'
         run: pip install -r scripts/requirements.txt
 
       - name: Fetch data
@@ -155,8 +161,9 @@ jobs:
 
 
       - name: Notify fresh saved snapshot when collection is skipped
-        if: steps.spacing.outputs.collect == 'false' && github.event_name == 'schedule' && !inputs.quiet
+        if: steps.spacing.outputs.notify_saved == 'true'
         env:
+          WARHUB_NOTIFY_ONLY: ${{ inputs.notify_only }}
           WARHUB_NO_NOTIFY: ${{ inputs.quiet && '1' || '0' }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -167,7 +174,7 @@ jobs:
         run: python scripts/notify_snapshot.py prepare --state /tmp/warhub-notify-state.json
 
       - name: Commit notification receipts only
-        if: steps.spacing.outputs.collect == 'false' && github.event_name == 'schedule' && !inputs.quiet
+        if: steps.spacing.outputs.notify_saved == 'true'
         run: |
           if [ ! -f /tmp/warhub-notify-state.json ]; then exit 0; fi
           git config user.name "warhub-bot"
@@ -186,7 +193,7 @@ jobs:
           echo "notification receipt publication failed"; exit 1
 
       - name: Preserve notification receipts even if submission fails
-        if: always() && steps.spacing.outputs.collect == 'false' && github.event_name == 'schedule'
+        if: always() && steps.spacing.outputs.notify_saved == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: notification-receipts

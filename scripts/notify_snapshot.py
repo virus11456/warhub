@@ -54,7 +54,10 @@ def fingerprint(snapshot):
 
 
 async def prepare(snapshot, now):
-    if os.environ.get('GITHUB_EVENT_NAME') != 'schedule' or os.environ.get('WARHUB_NO_NOTIFY') == '1':
+    event = os.environ.get('GITHUB_EVENT_NAME')
+    enabled = event == 'schedule' or (event == 'workflow_dispatch'
+                                    and os.environ.get('WARHUB_NOTIFY_ONLY') == 'true')
+    if not enabled or os.environ.get('WARHUB_NO_NOTIFY') == '1':
         return None
     if not eligible(snapshot, now):
         return None
