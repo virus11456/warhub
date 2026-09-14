@@ -22,7 +22,7 @@ description: "Maintain WARHUB collector orchestration, source freshness, schedul
 
 ## 執行與資料規則
 
-先讀 `scripts/collection_policy.py`、`scripts/collection_guard.py` 與 `.github/workflows/update-data.yml`。目前 workflow 每小時第 23 分檢查，110 分鐘內已有快照即跳過（使用 runner 內建 python3，略過環境設定、安裝、來源請求、提交與通知）；正常每約兩小時實際收集一次，增加檢查機會不代表每小時抓資料。排程漏跑或延遲仍可能發生，不能當作獨立備援；`auto` 每輪快來源、6 小時檢查慢來源、24 小時檢查歷史。來源內部快取可能更久。排程設定不等於準時執行保證，以 Actions 實際時間判斷延遲。
+先讀 `scripts/collection_policy.py`、`scripts/collection_guard.py` 與 `.github/workflows/update-data.yml`。目前 workflow 每小時第 23 分檢查，110 分鐘內已有快照即跳過（使用 runner 內建 python3，略過來源請求及歷史提交；正常schedule另檢查新鮮快照摘要，安靜／手動略過則不通知）；正常每約兩小時實際收集一次，增加檢查機會不代表每小時抓資料。排程漏跑或延遲仍可能發生，不能當作獨立備援；`auto` 每輪快來源、6 小時檢查慢來源、24 小時檢查歷史。來源內部快取可能更久。排程設定不等於準時執行保證，以 Actions 實際時間判斷延遲。
 
 `python scripts/fetch_data.py` 會寫正式資料，直接執行預設 `full`，且不會自動經過 workflow 的間隔守門員，還可能發送正常通知。不得把這個命令當作離線驗證。依當次授權決定是否執行收集／通知，skill 本身不授予發送訊息權限。需要實際收集但不通知時使用 `WARHUB_NO_NOTIFY=1`；需要快來源才用 `WARHUB_COLLECTION_MODE=fast`，不要為了檢查而增加排程或反覆強制更新。
 
@@ -65,3 +65,8 @@ WPI v4.0 的人工權重公式與歷史維持原樣，calculate_wpi 標記 exper
 台海洞察的 news.input_status 僅描述本輪 tw_news 可用樣本：available／partial／stale／unavailable，不代表完整新聞覆蓋。空或無效輸入為 unavailable；既有7天樣本及原 ts 保留，sample_24h 為已保存且發稿在24小時內的筆數，0只表示保存窗口中沒有符合樣本。前端缺少統計顯示缺資料，舊快照可使用既有 source_health.tw_news 狀態，缺旗標不推定正常。顯示最近保存新聞的發稿時間、公務船與共艦分列；市場比較須有20–28小時前的 comparison_at、有效報價及未到期題目，並列出兩次快照時間，缺比較不補零。新增欄位只隨正常排程產生，不重算或覆寫歷史；tests/test_taiwan_insights.py 與 tests/test_frontend.cjs 離線驗證失敗沿用、缺值、有效零、過期題目與原時間保存。
 
 Telegram 發送由 scripts/alerts.py 的 TelegramPacer 在同一輪異常警報與摘要之間共用，所有目的地依序至少間隔3.1秒（保守涵蓋單一聊天室與群組頻率）。HTTP／API 429 讀取 parameters.retry_after，保存 UTC epoch 秒 telegram_retry_at 至 _notify，停止本輪後續 Telegram 發送；新程序在期限前仍略過，期限後由正常收集排程再判斷最新摘要與事件。缺少／無效 retry_after 或非 JSON 429 使用60秒冷卻，仍不立即重試。Discord 不受 Telegram 冷卻阻塞；只有確認成功的摘要目的地寫入 receipts，既有同時段去重保留。這不是歷史警報補送佇列，既有邊緣觸發事件不補送過期警報；不改 DIGEST_EVERY_HOURS、110分鐘收集守門或資料觀測時間。force_test 也不能繞過限流，實際測試訊息仍須當次明確授權。tests/test_alert_delivery.py 全用假的 session／時鐘驗證間隔、跨輪冷卻、成功回條、429格式錯誤與恢復，禁止以真推播驗證。規則依 Telegram 官方 https://core.telegram.org/bots/faq#my-bot-is-hitting-limits-how-do-i-avoid-this 與 https://core.telegram.org/bots/api#responseparameters；節流不保證免於反垃圾訊息停權。
+
+
+正常排程與收集間隔解耦（Telegram摘要）：update-data 在 collect=false 且 event=schedule、quiet未啟用時，呼叫 scripts/notify_snapshot.py prepare，只使用現有data.json，絕不呼叫爬蟲。updated_at須有時區、非未來且未滿110分鐘；同一快照全部摘要目的地成功後記digest_snapshot_at，舊格式以成功delivery.checked_at避免重播。沿用DIGEST_EVERY_HOURS去重與TelegramPacer；digest_only不補送舊警報、不消耗事件邊緣狀態，訊息列出原updated_at。部分／429失敗不標記快照送達。prepare會實際發正常通知，不能當離線測試。
+
+通知回條先寫/tmp/warhub-notify-state.json；publication每次從最新origin/main套用apply，只改_notify，校對所有觀測內容雜湊及前次通知狀態，相同已套用結果為冪等。資料或回條衝突須停止、不覆蓋新快照、不重送訊息，保留30天notification-receipts artifact供人工核對；送達後提交失敗仍可能造成未來重送，不能宣稱exactly-once。純回條data更新沿用Vercel略過建置規則。tests/test_notify_snapshot.py以mock驗證靜默／手動限制、新鮮度、快照去重、警報保留、原時間與有效零值，並執行實際publication shell命令替身測試提交重試不重抓／不重送。此路徑不改資料抓取排程、部署頻率或历史。
