@@ -51,12 +51,35 @@ SITE = "https://warhubs.com"
 
 
 # ─── 訊息組裝 ──────────────────────────────────────────────
+def _valid_number(value, maximum=None):
+    return (type(value) in (int, float) and math.isfinite(value) and value >= 0
+            and (maximum is None or value <= maximum))
+
+
 def _fmt_score(value):
-    return "資料不足" if value is None else f"{value:.1f}"
+    return f"{value:.1f}" if _valid_number(value, 100) else "資料不足"
+
+
+def _fmt_coverage(value):
+    return f"{value * 100:.0f}%" if _valid_number(value, 1) else "資料不足"
+
+
+def _source_problem(source, health=None):
+    health = health or {}
+    if source.get("error") or source.get("available") is False or health.get("status") == "unavailable":
+        return "資料不可用"
+    if source.get("stale") or health.get("status") == "stale":
+        return "資料過期（沿用舊觀測）"
+    return None
+
+
+def _fmt_count(value):
+    return str(int(value)) if _valid_number(value) and float(value).is_integer() else "缺資料"
+
 
 def _fmt_regions(regions):
     lines = []
-    for r in sorted(regions or [], key=lambda x: x.get("score") if x.get("score") is not None else -1, reverse=True)[:5]:
+    for r in sorted(regions or [], key=lambda x: x.get("score") if _valid_number(x.get("score"), 100) else -1, reverse=True)[:5]:
         e = LEVEL_EMOJI.get(r.get("level"), "⚪")
         lines.append(f"  {e} {r.get('name','?')}  {_fmt_score(r.get('score'))}  ({r.get('level','')})")
     return "\n".join(lines) or "  （無資料）"
@@ -68,49 +91,72 @@ def _fmt_news(news, n=3):
     return "\n".join(lines) or "  （無即時頭條）"
 
 
-def _fmt_aviation(aviation):
-    """全球軍機動態摘要（無人機優先，附加油機/預警機/偵察機）。"""
-    if not aviation or aviation.get("error"):
-        return "✈️ 全球軍機：資料不可用"
-    s = aviation.get("summary") or {}
-    return (f"✈️ 全球軍機：無人機 {s.get('uav',0)}・加油機 {s.get('tankers',0)}"
-            f"・預警機 {s.get('awacs',0)}・偵察機 {s.get('c4isr',0)}（共 {s.get('total',0)} 架）")
+def _fmt_aviation(aviation, health=None):
+    aviation = aviation or {}
+    prefix = "✈️ 目前可見軍機（ADS-B 覆蓋不完整）："
+    problem = _source_problem(aviation, health)
+    if problem:
+        return prefix + problem
+    summary = aviation.get("summary") or {}
+    counts = [_fmt_count(summary.get(k)) for k in ("uav", "tankers", "awacs", "c4isr", "total")]
+    partial = "；部分資料" if "缺資料" in counts or aviation.get("partial") or (health or {}).get("status") == "partial" else ""
+    return (prefix + f"無人機 {counts[0]}・加油機 {counts[1]}・預警機 {counts[2]}"
+            f"・偵察機 {counts[3]}（可見總數 {counts[4]} 架{partial}）")
 
 
-def _fmt_pizza_shops(shops):
-    """目前『超標』的披薩店（status=spike 爆量 / busy 偏忙），列出店名與忙碌度。"""
-    hot = [s for s in (shops or []) if s.get("status") in ("spike", "busy")]
+def _fmt_pizza_shops(shops, health=None):
+    shops = [shop for shop in (shops or []) if isinstance(shop, dict)]
+    problem = _source_problem({}, health)
+    if problem:
+        return "   店家人流：" + problem
+    if not shops:
+        return "   店家人流：資料不足，無法判定是否異常"
+    fresh = [shop for shop in shops if not _source_problem(shop)]
+    live = [shop for shop in fresh if shop.get("is_open") is True
+            and _valid_number(shop.get("busyness"), 100)
+            and shop.get("status") in ("quiet", "normal", "busy", "spike")]
+    closed = sum(shop.get("is_open") is False for shop in fresh)
+    missing = len(shops) - len(live) - closed
+    hot = [shop for shop in live if shop.get("status") in ("spike", "busy")]
+    summary = f"   有效即時人流 {len(live)}/{len(shops)} 家；已知未營業 {closed} 家；缺值或過期 {missing} 家"
     if not hot:
-        opn = sum(1 for s in (shops or []) if s.get("is_open"))
-        return f"   （目前無店家爆量／異常忙碌；{opn}/{len(shops or [])} 家營業中）"
-    hot.sort(key=lambda s: (s.get("busyness") or 0), reverse=True)
-    lines = []
-    for s in hot[:6]:
-        p = s.get("percentage_of_usual")
-        tag = "🔴爆量" if s.get("status") == "spike" else "🟠偏忙"
-        extra = f"（達平時 {round(p)}%）" if p is not None else ""
-        lines.append(f"   {tag} {s.get('name','?')}　忙碌度 {s.get('busyness',0)}%{extra}")
+        return summary + ("；有效樣本未見偏忙／爆量" if live else "；無即時人流可供判斷")
+    hot.sort(key=lambda shop: shop["busyness"], reverse=True)
+    lines = [summary]
+    for shop in hot[:6]:
+        pct = shop.get("percentage_of_usual")
+        tag = "🔴爆量" if shop.get("status") == "spike" else "🟠偏忙"
+        extra = f"（達平時 {round(pct)}%）" if _valid_number(pct) else "（缺平時比較值）"
+        lines.append(f"   {tag} {shop.get('name','?')}　忙碌度 {shop['busyness']:g}%{extra}")
     return "\n".join(lines)
+
+
+def _fmt_firms(firms, health=None):
+    firms = firms or {}
+    problem = _source_problem(firms, health)
+    count = _fmt_count(firms.get("conflict_total"))
+    value = problem or (count + " 處" if count != "缺資料" else "資料不足")
+    if not problem and (firms.get("partial") or (health or {}).get("status") == "partial"):
+        value += "（部分資料）"
+    return "🔥 監測區熱異常像元：" + value + "（NASA FIRMS 24h；不等於戰火）"
 
 
 def build_digest(data: dict) -> str:
     score = data.get("score", {})
     emoji = "🧪" if score.get("experimental", True) else LEVEL_EMOJI.get(score.get("alert_level"), "⚠️")
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-    firms = data.get("firms", {})
-    hs = firms.get("conflict_total")
-    hs = "資料不足" if hs is None or firms.get("stale") else hs
+    health = data.get("source_health") or {}
     return (
         f"🛰️ *WARHUBS 更新觀測回報*\n"
         f"{now}\n資料時間：{data.get('updated_at') or '未提供'}\n\n"
         f"{emoji} *WPI 實驗指數：{_fmt_score(score.get('combined_score'))} / 100*（不作戰情警戒）\n\n"
         f"🗺️ 地區風險：\n{_fmt_regions(data.get('regions'))}\n\n"
         f"🍕 人流實驗觀察：{_fmt_score(score.get('pizza_score'))}\n"
-        f"{_fmt_pizza_shops(data.get('pizza'))}\n"
-        f"{_fmt_aviation(data.get('aviation'))}\n"
-        f"🔥 監測區熱異常像元：{hs} 處（NASA FIRMS 24h）\n\n"
+        f"{_fmt_pizza_shops(data.get('pizza'), health.get('pizza'))}\n"
+        f"{_fmt_aviation(data.get('aviation'), health.get('aviation'))}\n"
+        f"{_fmt_firms(data.get('firms'), health.get('firms'))}\n\n"
         f"📡 最新戰情頭條：\n{_fmt_news(data.get('news'))}\n\n"
-        f"資料覆盖率：{(data.get('score',{}).get('coverage',0)*100):.0f}% · 未校準為開戰機率\n"
+        f"資料覆蓋率：{_fmt_coverage((data.get('score') or {}).get('coverage'))} · 未校準為開戰機率\n"
         f"🔗 {SITE}"
     ).strip()
 
@@ -127,7 +173,7 @@ def build_escalation(data: dict, old_level: str) -> str:
         f"🎯 WPI 觀察指數：*{_fmt_score(score.get('combined_score'))} / 100*\n\n"
         f"🗺️ 地區風險：\n{_fmt_regions(data.get('regions'))}\n\n"
         f"📡 最新頭條：\n{_fmt_news(data.get('news'))}\n\n"
-        f"資料覆盖率：{(data.get('score',{}).get('coverage',0)*100):.0f}% · 未校準為開戰機率\n"
+        f"資料覆蓋率：{_fmt_coverage((data.get('score') or {}).get('coverage'))} · 未校準為開戰機率\n"
         f"🔗 {SITE}"
     ).strip()
 
@@ -143,7 +189,7 @@ def build_pizza_alert(data: dict, shops: list) -> str:
         f"Pentagon 周邊披薩店下班後仍爆滿（EXTREME）：{names}\n"
         f"最高達平時 *{pct}%*\n\n"
         f"（人流異常並非軍事行動證據）\n"
-        f"資料覆盖率：{(data.get('score',{}).get('coverage',0)*100):.0f}% · 未校準為開戰機率\n"
+        f"資料覆蓋率：{_fmt_coverage((data.get('score') or {}).get('coverage'))} · 未校準為開戰機率\n"
         f"🔗 {SITE}"
     ).strip()
 
@@ -153,9 +199,9 @@ def build_hotspot_alert(data: dict, now_cnt: int, prev_cnt: int) -> str:
     return (
         f"🔥 *WARHUBS 異常：監測區熱異常像元激增*\n"
         f"{now}\n\n"
-        f"NASA FIRMS 監測區監測區熱異常像元：*{prev_cnt} → {now_cnt} 處*\n\n"
+        f"NASA FIRMS 監測區熱異常像元：*{prev_cnt} → {now_cnt} 處*\n\n"
         f"🗺️ 地區風險：\n{_fmt_regions(data.get('regions'))}\n\n"
-        f"資料覆盖率：{(data.get('score',{}).get('coverage',0)*100):.0f}% · 未校準為開戰機率\n"
+        f"資料覆蓋率：{_fmt_coverage((data.get('score') or {}).get('coverage'))} · 未校準為開戰機率\n"
         f"🔗 {SITE}"
     ).strip()
 
