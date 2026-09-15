@@ -38,6 +38,11 @@
   function english(text){
     const clean=normalize(text);
     if(!clean)return text;
+    const relative=/^(最新\s*)?(\d+)\s*(分|時|天)前$/.exec(clean);
+    if(relative){
+      const unit=({'分':'minute','時':'hour','天':'day'})[relative[3]];
+      return (relative[1]?'Latest: ':'')+relative[2]+' '+unit+(Number(relative[2])===1?'':'s')+' ago';
+    }
     if(titles.has(clean))return titles.get(clean);
     if(Object.hasOwn(catalog,clean))return catalog[clean];
     for(const [pattern,format] of numeric){

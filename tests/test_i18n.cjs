@@ -52,3 +52,10 @@ test('failed catalogue load keeps Chinese rather than claiming English mode',()=
  const dom=create({});dom.window.WarhubI18n.select('en');
  assert.equal(dom.window.document.documentElement.lang,'zh-TW');assert.equal(dom.window.document.querySelector('[data-language="en"]').disabled,true);dom.window.close();
 });
+test('relative ages preserve counts and use singular English only for one',()=>{
+ const dom=create(catalog),w=dom.window;w.WarhubI18n.select('en');
+ assert.equal(w.WarhubI18n.text('1 天前'),'1 day ago');
+ assert.equal(w.WarhubI18n.text('2 天前'),'2 days ago');
+ assert.equal(w.WarhubI18n.text('最新 1 時前'),'Latest: 1 hour ago');
+ w.WarhubI18n.select('zh-TW');assert.equal(w.WarhubI18n.text('1 天前'),'1 天前');w.close();
+});

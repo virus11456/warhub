@@ -37,6 +37,16 @@ assert.ok(!d.querySelector('#ticker').textContent.includes('WPI'));
 if(mode==='valid'){assert.ok(d.querySelector('#html-wpi-a-desc').textContent.includes('170 架'));assert.ok(d.querySelector('#html-wpi-a-desc').textContent.includes('異常分數 0'));assert.ok(d.querySelector('#html-wpi-f-desc').textContent.includes('11,785 筆'));assert.ok(d.querySelector('#html-wpi-f-desc').textContent.includes('暫不計分'));assert.ok(d.querySelector('#poly-list-container').textContent.includes('美國會在12月31日前打擊古巴嗎？'));assert.ok(d.querySelector('#news-list').textContent.includes('新聞繁體中文標題'));assert.ok(!d.querySelector('#news-list').textContent.includes('English original'));assert.ok(d.querySelector('#strat-grid').textContent.includes('最近歷史參考：2026-06'));assert.ok(d.querySelector('#sh-svg').textContent.includes('缺報'));assert.ok(!d.querySelector('#sh-svg').innerHTML.includes('999'));}
 if(mode==='valid'){
   const w=dom.window;
+  const sparse=Array.from({length:36},(_,i)=>({ym:`${2023+Math.floor(i/12)}-${String(i%12+1).padStart(2,'0')}`,schema_version:2,src:'mirror','4001':i===2?0:i===3?4:null}));
+  const preserved=JSON.stringify(sparse);
+  w.SH_STATE.range=36;w.renderStratHistory({strat_hist:sparse});
+  assert.equal(d.querySelectorAll('#sh-svg .fh-missing').length,34,'missing months remain distinct');
+  assert.equal(d.querySelectorAll('#sh-svg .fh-zero').length,1,'reported zero remains visible');
+  assert.ok(![...d.querySelectorAll('#sh-svg text')].some(x=>x.textContent.includes('缺報')),'no repeated axis labels');
+  assert.equal(d.querySelectorAll('#sh-svg [data-tip]').length,36,'each month remains inspectable');
+  assert.equal(JSON.stringify(sparse),preserved,'history is unchanged');
+  assert.equal(d.querySelector('#sh-legend details').open,false,'long explanation starts collapsed');
+  assert.ok(d.querySelector('#sh-legend').textContent.includes('缺報'));
   assert.ok(d.querySelector('.live-lbl').textContent.includes('備份'));
   w.renderNotacObservation({notams:{taiwan:{provider:'NOTAC',complete:true,total:0,danger:0,observed_at:new Date().toISOString(),firs:['RCAA']}}});
   assert.ok(d.querySelector('#notac-body').textContent.includes('有效公告 0 筆'));
