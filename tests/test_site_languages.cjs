@@ -46,6 +46,8 @@ function visibleStrings(d){
  assert.ok(d.querySelector('#poly-list-container').textContent.includes('14%'));
  assert.ok(d.querySelector('#cross-reading').textContent.includes('40'));
  assert.ok(d.querySelector('#cross-reading').textContent.includes('600'));
+ assert.ok(d.querySelector('#notac-body').textContent.includes('records'));
+ assert.ok(!/\bPen\b/.test(d.querySelector('#cross-reading').textContent));
  assert.ok(d.querySelector('#cross-reading').textContent.includes('0'));
  const missing=visibleStrings(d).filter(s=>/[\u3400-\u9fff]/.test(s));
  assert.deepEqual(missing,[],'dashboard untranslated UI text');
