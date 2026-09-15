@@ -22,7 +22,8 @@ const {JSDOM,VirtualConsole}=require('jsdom');const fs=require('fs');const asser
  }
 assert.equal(d.querySelector('#source-health'),null);
 const experimental=d.querySelector('#experimental-observations');
-assert.ok(experimental && !experimental.open);
+assert.ok(experimental && experimental.open);
+assert.equal(experimental.parentElement.firstElementChild,experimental);
 assert.equal(experimental.parentElement.className,'container');
 for(const selector of ['#pizza-card','.hero-strip','.wpi-section']) {
   assert.equal(d.querySelectorAll(selector).length,1);
@@ -229,6 +230,41 @@ if(mode==='valid'){
   assert.equal(card.querySelector('.poly-question').title,'Unknown future question?');
   assert.equal(card.querySelector('a').href,'https://polymarket.com/market/untranslated-test');
   assert.ok(card.textContent.includes('20%'));
+}
+if(mode==='valid'){
+ const sample={food_hist:[{ym:'2026-06',soy:10,wheat:20,corn:30,us_soy:2,us_wheat:3,us_corn:4},{ym:'2026-07',soy:11,wheat:21,corn:31,us_soy:2,us_wheat:3,us_corn:4}],usda:{schema_version:2,hist:{soy:[{w:'2026-08-01',market_year:2026,commit:10},{w:'2026-08-08',market_year:2026,commit:12}],wheat:[],corn:[]}}};
+ const original=JSON.stringify(sample);
+ dom.window.renderFoodHistory(sample);dom.window.renderUsdaHist(sample);dom.window.renderGrainExplorer(sample);
+ assert.equal(d.querySelector('#uh-wrap').hidden,true);
+ d.querySelector('#grain-view [data-view="commit"]').click();
+ assert.equal(d.querySelector('#food-hist-wrap').hidden,true);
+ assert.equal(d.querySelector('#uh-wrap').hidden,false);
+ assert.ok(d.querySelector('#uh-legend').textContent.includes('千噸'));
+ d.querySelector('#grain-cmd [data-cmd="wheat"]').click();
+ assert.ok(d.querySelector('#uh-svg').textContent.includes('資料累積中'));
+ d.querySelector('#grain-view [data-view="vol"]').click();
+ assert.equal(d.querySelector('#food-hist-wrap').hidden,false);
+ assert.equal(d.querySelector('#uh-wrap').hidden,true);
+ assert.equal(dom.window.FH_STATE.cmd,'wheat');
+ assert.equal(dom.window.UH_STATE.cmd,'wheat');
+ assert.equal(JSON.stringify(sample),original);
+}
+if(mode==='valid'){
+ const w=dom.window;
+ assert.equal(w.mdWindow(1,new Date('2024-03-31T04:00:00Z')).start,'2024-02-29');
+ const win=w.mdWindow(1), old=new Date(win.start+'T00:00:00Z');old.setUTCDate(old.getUTCDate()-1);
+ const future=new Date(win.end+'T00:00:00Z');future.setUTCDate(future.getUTCDate()+1);
+ const ds={};ds[old.toISOString().slice(0,10)]={fin:{oil_premium:123}};
+ ds[win.start]={fin:{oil_premium:0}};ds[win.end]={fin:{oil_premium:-5}};
+ ds[future.toISOString().slice(0,10)]={fin:{oil_premium:1000}};
+ w.MD_JSON={days:ds};w.MD_STATE={key:'oil_premium',months:1};const saved=JSON.stringify(ds);w.renderMetricsHist();
+ assert.equal(d.querySelectorAll('#md-svg circle').length,2);
+ assert.ok(d.querySelector('#md-period').textContent.includes(win.start));
+ d.querySelector('#md-range [data-months="3"]').click();
+ assert.equal(w.MD_STATE.key,'oil_premium');assert.equal(d.querySelectorAll('#md-svg circle').length,3);
+ d.querySelector('#md-range [data-months="12"]').click();
+ assert.equal(w.MD_STATE.months,12);assert.equal(d.querySelectorAll('#md-svg circle').length,3);
+ assert.equal(JSON.stringify(ds),saved);
 }
 assert.equal(result.wpi,mode==='valid'?'42':'--');dom.window.close();
 }})().catch(e=>{console.error(e);process.exit(1)});
