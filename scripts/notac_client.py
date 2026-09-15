@@ -181,6 +181,28 @@ async def collect_regions(session, token, regions, previous, danger_re, closure_
         except TimeoutError:
             result = {'provider': 'NOTAC', 'firs': firs, 'fetched_at': now.isoformat(),
                       'complete': False, 'reason': 'source_timeout', 'sample_count': None}
+        # Counts describe validated returned rows only, even when paging stops.
+        # Zero candidates in a sample never means zero across the whole FIR.
+        rows = result.get('rows')
+        if isinstance(rows, list) and (rows or result.get('complete')):
+            result['sample_danger'] = sum(bool(danger_re.search(r['text'])) for r in rows)
+            result['sample_closure'] = sum(bool(closure_re.search(r['text'])) for r in rows)
+            result['sample_order'] = 'newest'
+            timing = {'current': 0, 'future': 0, 'ended': 0, 'unknown': 0}
+            for row in rows:
+                start, end = parsed_time(row.get('effective_start')), parsed_time(row.get('effective_end'))
+                if start and end and end <= start:
+                    kind = 'unknown'
+                elif end and end <= now:
+                    kind = 'ended'
+                elif start and start > now:
+                    kind = 'future'
+                elif start and end and start <= now < end:
+                    kind = 'current'
+                else:
+                    kind = 'unknown'
+                timing[kind] += 1
+            result['sample_timing'] = timing
         if archive_dir:
             save_observation(archive_dir, result)
         summary = {k: v for k, v in result.items() if k != 'rows'}
@@ -200,6 +222,7 @@ async def collect_regions(session, token, regions, previous, danger_re, closure_
         else:
             # Old observations stay intact; a partial new attempt lives separately.
             summary = {**old, 'provider': 'NOTAC', 'firs': list(firs), 'stale': True,
+                       'observed_provider': old.get('observed_provider', old.get('provider', 'FAA')) if old.get('observed_at') else None,
                        'attempted_at': now.isoformat(), 'reason': result.get('reason'), 'latest_attempt': summary}
         until = parsed_time(result.get('cooldown_until'))
         remaining = result.get('credits_remaining')

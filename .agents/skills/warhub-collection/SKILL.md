@@ -80,3 +80,5 @@ Telegram 發送由 scripts/alerts.py 的 TelegramPacer 在同一輪異常警報�
 `_notify.digest_success_at` 保留最近一次全部摘要目的地確認成功的實際發送時間，後續略過或失敗不覆寫；舊狀態僅在非空 digest 全為 true 且 checked_at 合法非未來時承接，缺資料不回填推測時間。digest_snapshot_at 仍是原觀測時間，兩者不可混用。tests/test_notification_status.py 驗證區分狀態、零副作用、隱去目的地、成功時間保存及 CLI 缺快照診斷。此批不改排程頻率、不啟用未部署的獨立 Linux 備援；GitHub 恢復一次 schedule 執行不等於每小時穩定，需自然排程續查。
 
 NOTAC（2026-09-15）：既有fetch_notams可用NOTAC_API_KEY切換正式API，仍同輪抓取、110分鐘來源守門，無額外定時器。NOTAC來源metadata使用既有source archive流程保存，詳見warhub-osint；部分分頁或失敗保持舊觀測stale而不補零。Verify NOTAC access是明確手動的有限RCAA實測，不通知、不寫正式data。新增index領空公告觀察與同範圍前次比較，不合成新的戰爭機率。
+
+雙語：固定網站文字與指南以離線catalogue提供；來源新聞在原收集session附加title_english與english_translation_cache，詳見warhub-news。中英文切換不能觸發來源請求、重算／改寫歷史或更新觀測時間。NOTAC樣本起訖時段及跨資料閱讀排序見warhub-osint；完整性、6h前端時效與每來源原時間仍分開核對，不能因API驗證成功就宣稱正式資料已齊全。

@@ -112,11 +112,14 @@ def build(snapshot, previous=None):
         key = re.sub(r'\s+', '', row['title']).casefold()
         if key not in news:
             news[key] = {k: row.get(k) for k in ('title', 'title_zh', 'url', 'domain', 'ts')}
+            news[key].update({k: row[k] for k in ('title_en', 'title_english') if k in row})
     news = sorted(news.values(), key=lambda r: timestamp(r['ts']), reverse=True)[:120]
     recent = [r for r in news if timestamp(r['ts']) >= now - timedelta(hours=24)]
     timeline = [{'kind': 'official', 'at': r['period_end'], 'title': f"官方日報：共機 {r['aircraft']} 架次",
+                 'title_english': f"Official daily report: {r['aircraft']} PLA aircraft sorties",
                  'url': r['source_url'], 'time_label': '統計截止時間'} for r in days if timestamp(r['period_end']) >= cutoff]
     timeline.extend({'kind': 'news', 'at': r['ts'], 'title': r.get('title_zh') or r['title'],
+                     'title_english': r.get('title_english') or r.get('title_en'),
                      'url': r['url'], 'time_label': '新聞發稿時間'} for r in news)
     timeline.sort(key=lambda r: timestamp(r['at']), reverse=True)
     return {'version': 1, 'as_of': now.isoformat(), 'activity': activity, 'markets': market_views,

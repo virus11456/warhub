@@ -5,6 +5,16 @@ description: "Maintain WARHUB Google News RSS collectors, Traditional Chinese ti
 
 # WARHUB 中文新聞與共機
 
+## 中英文顯示（2026-09-15）
+
+首頁與 guides 使用 i18n.js、i18n.css 及 locales/en.js，每次新開頁面預設繁中；不讀瀏覽器語言或保存上次選擇。只改文字節點、標籤與 Canvas 文字，不改連結、價格、漲跌 class 或觀測時間；切換不呼叫爬蟲／翻譯服務。新聞及市場以同一筆資料的中英文題目對照，不能用字詞拼湊新聞譯文。英文原標題優先沿用；中文原新聞由既有 Groq helper 的 target=en 分支增加 title_english，title/title_zh/title_en（既有原文欄位）與 ts 均保留。失敗顯示英文未取得提示，不能把提示當作已翻譯。
+
+english_titles 每輪在既有 session 中處理 news、tw_news，沿用相同 Groq 錯誤停止與請求限制；不啟用 Google 備援、不增加來源抓取頻率。english_translation_cache 按完全相同原文保存至多512筆，不改新聞觀測歷史。台海時間軸的新觀測可帶 title_english；舊紀錄不補造欄位或時間，前端可使用已存同原文快取。Translate saved titles 的 refresh_translations 也可補已存英文標題，須全組成功才原子寫入，仍不改 updated_at、價格、分數或通知回條。
+
+固定介面／指南字串由 scripts/extract_ui_catalog.cjs 用 jsdom + acorn 離線解析，產生 locales/source.json；scripts/build_ui_assets.py 只接受齊全英文 catalogue，可合併人工覆核的 locales/overrides.json，產生靜態 en.js。UI 更動後重跑抽取／建置並檢查來源差異，勿手改 en.js。scripts/translate_ui.py 是明確一次性的公開介面譯文準備工具，使用既有 Groq Secret，不是定時收集或部署測試；最多120批、每批50項／1400字，保留合法數字占位符，個別不合格譯文留待覆核，不降低驗證。遵循回應 reset headers，429停止並保存 retry_at，不切換模型／端點規避限制。帳戶配額共用，不能擠掉正常新聞翻譯或升級付費。
+
+驗證 test_translations.py、test_refresh_translations.py、test_ui_assets.py、test_i18n.cjs、test_site_languages.cjs；後者涵蓋21個指南頁與首頁的繁中預設、英文文字、更新後語言、原文還原、連結及數值。真實桌面／手機瀏覽器仍需驗收。指南中文正文及原權威連結保留；英文是翻譯版本，不新增未核實的醫療或避難建議。
+
 從 repository root 讀 `scripts/fetch_data.py` 的 `fetch_gnews`、`fetch_tw_military_news`、`fetch_pla_sorties`、`_translate_titles`、`_translate_market_questions`，以及 `scripts/pla_counts.py`。總流程與執行界線見 [抓取與封存](../warhub-collection/SKILL.md)。
 
 | 入口 | 來源與輸出 |
@@ -50,3 +60,5 @@ Google 舊流程保留給未指定 provider 的本機相容用途，已有 GitHu
 台海交叉洞察由 scripts/taiwan_insights.py::build 以既有快照推導，主流程写入 data.json.taiwan_insight 並隨分析快照封存。官方共機最新日對照此前28日，至少14個有效日；第90百分位以上僅稱活動偏高，非作戰意圖。最新日報超過48小時不作當前判讀。RSS以相同標題去重保留7天最多120則，僅稱已收錄樣本，不估完整新聞量或獨立證據數。市場保留7天最多100輪、每輪8題，逐題識別 id/question/end_date 比較約24小時（±4h），截止日不同不混比；前端只展示前3題，同題歷史不足留空。時間軸最多20筆區分統計截止與新聞發稿，均不冒充事件發生時間。資料不額外抓取、不通知；前端快照6小時過期停止判讀。舊快照無此欄位顯示等待正常排程。tests/test_taiwan_insights.py 與 test_frontend.cjs 驗證零值、基準、同題比較、保存、過期與安全連結。
 
 台海洞察的 news.input_status 僅描述本輪 tw_news 可用樣本：available／partial／stale／unavailable，不代表完整新聞覆蓋。空或無效輸入為 unavailable；既有7天樣本及原 ts 保留，sample_24h 為已保存且發稿在24小時內的筆數，0只表示保存窗口中沒有符合樣本。前端缺少統計顯示缺資料，舊快照可使用既有 source_health.tw_news 狀態，缺旗標不推定正常。顯示最近保存新聞的發稿時間、公務船與共艦分列；市場比較須有20–28小時前的 comparison_at、有效報價及未到期題目，並列出兩次快照時間，缺比較不補零。新增欄位只隨正常排程產生，不重算或覆寫歷史；tests/test_taiwan_insights.py 與 tests/test_frontend.cjs 離線驗證失敗沿用、缺值、有效零、過期題目與原時間保存。
+
+固定字串抽取須遍歷 AST 物件屬性的 value（例如狀態 label 字典），不可一律略過 value。原有 emoji 轉 SVG 會移除文字中的圖示，i18n 同時建立去圖示的完整標籤對照，避免拆字混譯。每次新增 UI 後以 test_site_languages 驗證真實 renderer 動態文字；4032 是本次包含人工覆核與別名的靜態字串數，不是未來覆蓋保證。資源 URL 版本需與發布批次一致；本機驗收若看到舊樣式，核對實際 link href，不把舊畫面當新驗收。

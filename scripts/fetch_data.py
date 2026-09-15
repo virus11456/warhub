@@ -22,7 +22,7 @@ import json
 import logging
 import os
 import re
-from translations import cached_titles as translation_cache, update_cache, request_state, translate_groq
+from translations import cached_titles as translation_cache, update_cache, request_state, translate_groq, english_titles
 from scoring import MODEL_VERSION, WEIGHTS, number, risk_off_cluster, market_risk, market_average, aggregate, calculate_wpi
 from datetime import datetime, timezone
 from pathlib import Path
@@ -2240,6 +2240,8 @@ async def main():
             log.warning(f"fred skipped: {e}")
             fred = {}
 
+        english_cache = await english_titles(session, [*news, *tw_news], previous)
+
     pizza_shops  = transform_pizza_shops(pizzint_data)
     pizza_index  = (pizzint_data.get("defcon_details") or {}).get("smoothed_index")
     if pizza_index is None:
@@ -2302,6 +2304,7 @@ async def main():
         # Preserve the independent six-hour sampler state across full snapshot rebuilds.
         "gdelt_events_sampling": previous.get("gdelt_events_sampling", {}),
         "translation_cache": update_cache(previous, news, polymarket),
+        "english_translation_cache": english_cache,
         "score":         score,
         "pizza":         pizza_shops,
         "pizza_index":   pizza_index,

@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 import aiohttp
 import fetch_data as collector
-from translations import update_cache
+from translations import update_cache, english_titles
 
 
 async def refresh_file(session, path):
@@ -32,6 +32,10 @@ async def refresh_file(session, path):
     if any(not r.get('title_zh') for r in news) or any(not r.get('question_zh') for r in markets):
         raise ValueError('Some translations are unavailable; saved snapshot was not modified')
     result['translation_cache'] = update_cache(original, news, markets)
+    bilingual_rows = [*news, *(result.get('tw_news') or [])]
+    result['english_translation_cache'] = await english_titles(session, bilingual_rows, original)
+    if any(not row.get('title_english') for row in bilingual_rows):
+        raise ValueError('Some English titles are unavailable; saved snapshot was not modified')
     content = json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False) + '\n'
     temporary = path.with_suffix('.translation-tmp')
     temporary.write_text(content, encoding='utf-8')
