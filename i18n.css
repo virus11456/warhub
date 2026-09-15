@@ -11,3 +11,38 @@ header .hdr-left{flex-wrap:wrap}
 header .header-status{flex-wrap:wrap;max-width:100%;gap:.6rem}
 #observation-overview a,#observation-overview a:visited{color:#8de9ef}
 @media(max-width:800px){header .header-inner{min-height:48px;padding:.5rem 0}header .hdr-left{gap:.5rem}.language-switch{order:2}}
+/* Keep the arcade frame; prose and controls need a stable reading size. */
+body .container :is(.news-item,.poly-question,.poly-meta,.strat-note,.fh-legend,.fh-tab,.food-row,.strat-name,.ti-panel,.signal-desc){font-family:Arial,'Noto Sans TC',sans-serif!important;font-size:14px!important;line-height:1.65!important;letter-spacing:normal}
+body .container :is(.strat-note,.fh-legend,.poly-meta){color:#a9bdcb}
+body .container .fh-tab{min-height:36px;padding:.3rem .7rem}
+body .container .fh-chart{max-width:900px;margin-inline:auto}
+body .container .fh-chart svg{min-width:720px}
+body .container .fh-svg-axis{font-family:Arial,'Noto Sans TC',sans-serif!important;font-size:13px}
+.reading-details{margin-top:.45rem}
+.reading-details>summary{cursor:pointer;color:#a9dce5;line-height:1.6;padding:.25rem 0}
+.reading-details>summary:hover{color:#8de9ef}
+.reading-details>summary:focus-visible{outline:2px solid #8de9ef;outline-offset:3px}
+.reading-details>p{margin:.5rem 0;max-width:75ch}
+body .container :is(.card,.card [style*="font-family"],.card small,.news-src,.news-time,.food-unit,.strat-val .u){font-family:Arial,'Noto Sans TC',sans-serif!important}
+body .container :is(.card small,.news-src,.news-time,.food-unit,.strat-val .u){font-size:12px!important;line-height:1.6}
+body .container .card [style*="font-size:.6"]{font-size:12px!important;line-height:1.6!important}
+#observation-overview{padding:1rem!important}
+#observation-overview h2{margin-bottom:.8rem}
+#observation-overview h3{color:#8de9ef;margin-bottom:.35rem}
+#observation-overview>div>section{padding:.65rem;border-left:3px solid #37506a;background:#0a1622}
+#strat-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem;margin-top:1rem}
+#strat-grid .strat-item{padding:.8rem;border:1px solid #37506a;min-width:0}
+@media(max-width:800px){#strat-grid{grid-template-columns:1fr}}
+.chart-scroll-hint{display:none;color:#a9bdcb;font:12px/1.6 Arial,'Noto Sans TC',sans-serif}
+@media(max-width:800px){.chart-scroll-hint{display:block}}
+#chart-tip{font:14px/1.6 Arial,'Noto Sans TC',sans-serif!important;white-space:normal!important;overflow-wrap:anywhere}
+body .container .section-title{font-size:14px!important;line-height:1.5!important;letter-spacing:.04em;color:#b7d5df}
+body .container .section-title::before{flex-shrink:0;white-space:nowrap}
+body .container .section-title svg{flex-shrink:0}
+.fh-chart{scrollbar-color:#536f82 #0a1622;scrollbar-width:thin}
+body .container :is(.news-topic,.strat-flag,.pla-legend,.pla-legend a,.tg-cta-txt small,.tg-cta-go){font-size:12px!important;font-family:Arial,'Noto Sans TC',sans-serif!important;line-height:1.6}
+@media(max-width:600px){body .container .news-item{display:grid;grid-template-columns:auto 1fr;gap:.3rem .6rem;padding:.7rem 0}body .container .news-title{grid-column:1/-1}body .container .news-topic{max-width:none}body .container .news-time{text-align:right}}
+body .container :is(.osint-updated,.avi-box-lbl,.avi-tr .row,.avi-item){font-family:Arial,'Noto Sans TC',sans-serif!important;font-size:12px!important;line-height:1.6;letter-spacing:normal}
+body .container .osint-adv-hdr{font-size:14px;letter-spacing:.03em;flex-wrap:wrap;gap:.5rem}
+body .container .avi-tr .row{white-space:normal;flex-wrap:wrap}
+@media(max-width:600px){body .container .fh-chart{overscroll-behavior-x:contain}body .container .fh-tab{min-height:42px}body .container .news-title{font-size:14px!important}}

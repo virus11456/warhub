@@ -1222,7 +1222,8 @@
   body.theme-8bit .clock-face { font-size:1.4rem !important; }
 
   /* 移除圓角/模糊/光暈，改硬邊像素風 */
-  body.theme-8bit * { border-radius:0 !important; text-shadow:none !important; font-family:'Cubic 11','Press Start 2P',monospace !important; }
+  body.theme-8bit * { border-radius:0 !important; text-shadow:none !important; }
+  body.theme-8bit :is(.logo,.section-title,.card-title,.threat-badge,.risk-pill,.wpi-badge,#theme-toggle) { font-family:'Cubic 11','Share Tech Mono',monospace; }
   body.theme-8bit header { backdrop-filter:none !important; border-bottom:3px solid var(--accent) !important; }
 
   /* 卡片：粗邊 + 硬陰影（像素立體感）、平塗背景 */
@@ -1303,9 +1304,9 @@
   }
 
 </style>
-<link rel="stylesheet" href="/i18n.css?v=20260915b">
-<script src="/locales/en.js?v=20260915b" defer></script>
-<script src="/i18n.js?v=20260915b" defer></script>
+<link rel="stylesheet" href="/i18n.css?v=20260916a">
+<script src="/locales/en.js?v=20260916a" defer></script>
+<script src="/i18n.js?v=20260916a" defer></script>
 <script src="/cross-context.js"></script>
 </head>
 <body class="theme-8bit">
@@ -1342,13 +1343,13 @@
 <div class="container">
   <section id="observation-overview" style="margin:1.5rem 0;padding:1.2rem;border:1px solid var(--accent)">
     <h2 style="font-size:1rem;color:var(--accent)">分項觀察｜先看事實，再比較反應</h2>
-    <p style="color:var(--text-dim);line-height:1.8">四類資料的時間與意義不同，分開比較，不合成整體戰爭警戒分數。各區保留觀測日期、缺資料與比較限制。</p>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:1rem;line-height:1.8">
-      <section><h3 style="font-size:.9rem">實際活動</h3><p>以官方日報看共機、共艦及此前基準；通報數量不代表作戰意圖。</p><a href="#taiwan-insight-card">查看台海交叉洞察 →</a></section>
-      <section><h3 style="font-size:.9rem">新聞關注</h3><p>新聞樣本與瀏覽量反映關注；重複報導不能當成獨立證據。</p><a href="#news-card">查看新聞與原文 →</a></section>
-      <section><h3 style="font-size:.9rem">市場反應</h3><p>預測市場逐題核對事件與到期日；金融價格同時受到其他因素影響。</p><a href="#poly-card">查看市場題目 →</a> · <a href="#md-wrap">金融趨勢 →</a></section>
-      <section><h3 style="font-size:.9rem">經濟與物流背景</h3><p>貿易資料按月且可能缺報，僅供背景比較；尚未接入航運流量資料。</p><a href="#strat-card">查看物資與回報完整度 →</a></section>
+      <section><h3 style="font-size:.9rem">實際活動</h3><a href="#taiwan-insight-card">查看台海交叉洞察 →</a></section>
+      <section><h3 style="font-size:.9rem">新聞關注</h3><a href="#news-card">查看新聞與原文 →</a></section>
+      <section><h3 style="font-size:.9rem">市場反應</h3><a href="#poly-card">查看市場題目 →</a> · <a href="#md-wrap">金融趨勢 →</a></section>
+      <section><h3 style="font-size:.9rem">經濟與物流背景</h3><a href="#strat-card">查看物資與回報完整度 →</a></section>
     </div>
+    <details class="reading-details"><summary>資料範圍與限制</summary><p>以官方日報看共機、共艦及此前基準；通報數量不代表作戰意圖。</p><p>新聞樣本與瀏覽量反映關注；重複報導不能當成獨立證據。</p><p>預測市場逐題核對事件與到期日；金融價格同時受到其他因素影響。</p><p>貿易資料按月且可能缺報，僅供背景比較；尚未接入航運流量資料。</p></details>
   </section>
 
 
@@ -1468,15 +1469,15 @@
   <!-- ══════════ 即時戰情快訊（GDELT 早期預警）══════════ -->
   <div class="card news-card" id="news-card" style="margin-bottom:1.5rem">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-bottom:.4rem">
-      <div class="section-title" style="margin:0">📡 即時戰情快訊 · 早期預警</div>
+      <div class="section-title" style="margin:0">📡 最新新聞</div>
       <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);display:flex;gap:.8rem;align-items:center">
         <span style="color:var(--accent1)">約每 2 小時更新</span>
         <span id="news-updated">載入中…</span>
       </div>
     </div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim);margin-bottom:.5rem">
+    <details class="reading-details" style="margin-bottom:.5rem"><summary>來源與篩選方式</summary><p>
       Google News 全球監測 · 篩選白宮／中國／戰爭升級相關頭條，依時間排序；可切換中英文標題，譯文須對照原文 · 供事件追蹤與原文查核，未驗證其預測能力（點擊看原文）
-    </div>
+    </p></details>
     <div id="news-list">
       <div style="padding:1rem;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 連接 GDELT 新聞流…</div>
     </div>
@@ -1549,19 +1550,21 @@
       <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim)"><span id="strat-updated">軍工原料</span></div>
     </div>
     <div style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim);margin-bottom:.6rem">
-      軍工必需、中國高度依賴進口的原料（出口國回推）· <strong>增減原因未定，不能直接解讀為囤積或動用儲備</strong> · 石油因俄/沙不報 Comtrade 抓不到 · 近月常未收齊，標「<strong>資料待補</strong>」者為暫值、勿當異常
-    </div>
-    <div id="strat-grid">
-      <div style="padding:1rem;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 連接 UN Comtrade…</div>
+      月度進口背景 · <strong>資料待補不等於零；增減原因未定。</strong>
     </div>
     <div id="sh-wrap" class="fh-wrap" style="display:none">
       <div class="fh-controls">
         <div class="fh-tabs" id="sh-cmd"></div>
         <div class="fh-tabs" id="sh-range"></div>
       </div>
-      <div class="fh-chart"><svg id="sh-svg" viewBox="0 0 720 220" preserveAspectRatio="xMidYMid meet"></svg></div>
+      <div class="chart-scroll-hint">左右滑動查看月份；點選圖表查看數值。</div>
+      <div class="fh-chart" tabindex="0" aria-label="戰略物資逐月圖表"><svg id="sh-svg" viewBox="0 0 720 220" preserveAspectRatio="xMidYMid meet"></svg></div>
       <div class="fh-legend" id="sh-legend"></div>
     </div>
+    <div id="strat-grid">
+      <div style="padding:1rem;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 連接 UN Comtrade…</div>
+    </div>
+
   </div>
 
   <div class="card" id="taiwan-insight-card" style="margin-bottom:1.5rem">
@@ -3154,10 +3157,11 @@ function tradeCoverageNote(it, month){
   var count=Array.isArray(it.reporter_codes)?new Set(it.reporter_codes).size:0;
   var expected=Array.isArray(it.expected_reporter_codes)?it.expected_reporter_codes.length:0;
   var status=it.current_complete?'追蹤國已收齊':'部分資料／待核對';
-  var text='本期 '+escapeHtml(month||'未定')+'：'+status+(expected?'（'+count+'/'+expected+' 國）':'')+'。';
+  var summary=escapeHtml(month||'未定')+' · '+status+(expected?'（'+count+'/'+expected+' 國）':'');
+  var text='';
   if(it.comparison_status!=='comparable') text+=' 同比暫不比較：'+(it.current_complete?'去年同期、基期數值或新鮮度不符。':'當期回報不完整。');
   text+=' 最新完整月份（追蹤國範圍）：'+(complete?escapeHtml(complete.month)+' · '+Number(complete.wan_ton).toLocaleString('zh-TW',{maximumFractionDigits:1})+' 萬噸':'尚無已核實紀錄')+'。';
-  return '<div class="strat-note">'+text+' 完整僅指追蹤國，不代表中國全部進口；缺值不等於零，未確認是否尚未公布。</div>';
+  return '<details class="strat-note reading-details"><summary>'+summary+'</summary><p>'+text+' 完整僅指追蹤國，不代表中國全部進口；缺值不等於零，未確認是否尚未公布。</p></details>';
 }
 function renderFood(json){
   var el=document.getElementById('food-grid'); if(!el) return;
@@ -3435,12 +3439,14 @@ function drawStratHistory(){
   data.forEach(function(d,i){
     var cx=CX(i);
     if(d[key]==null || (d.schema_version!==2 && d[key]===0)) {
-      p.push('<text class="fh-svg-axis" x="'+cx+'" y="'+(y0-6)+'" text-anchor="middle">缺報</text>');
+      p.push('<path class="fh-missing" d="M'+(cx-2)+' '+(y0-8)+'l4 4m-4 0l4 -4" stroke="var(--text-dim)" fill="none"><title>'+escapeHtml(d.ym)+' · 缺報</title></path>');
+      shHit.push('<rect x="'+(cx-slot/2).toFixed(1)+'" y="'+padT+'" width="'+slot.toFixed(1)+'" height="'+(y0-padT).toFixed(1)+'" fill="transparent" data-tip="'+escapeHtml(d.ym)+' · 缺報"></rect>');
       return;
     }
     var v=d[key], by=Y(v), h=Math.max(0,y0-by);
     p.push('<rect class="'+(d.src==='mirror'?'fh-bar-m':'fh-bar-c')+'" x="'+(cx-bw/2).toFixed(1)
       +'" y="'+by.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+h.toFixed(1)+'"></rect>');
+    if(v===0) p.push('<circle class="fh-zero" cx="'+cx+'" cy="'+y0+'" r="2.5" fill="var(--accent)"/>');
     var tip='<b>'+d.ym+'</b><br>'+shNm+' '+fhFmt(v)+' 萬噸'+(d.src==='mirror'?'<br>（出口國回推）':'<br>（中國海關直報）');
     shHit.push('<rect x="'+(cx-slot/2).toFixed(1)+'" y="'+padT+'" width="'+slot.toFixed(1)+'" height="'+(y0-padT).toFixed(1)
       +'" fill="transparent" data-tip="'+tip+'"></rect>');
@@ -3455,8 +3461,8 @@ function drawStratHistory(){
   if(leg){
     var nm=({'4001':'天然橡膠','2604':'鎳礦砂','2610':'鉻礦砂','2601':'鐵礦砂'})[key];
     var f=data.length?data[0].ym:'', l=data.length?data[data.length-1].ym:'';
-    leg.innerHTML='中國每月<b>'+nm+'</b>進口量（萬噸，每月一根）· '+f+' → '+l
-      +'　舊歷史正分批重新核驗，未核驗月份暫不繪製；缺報不等於零。▮ 實心＝中國海關直報，▯ 淡色虛邊＝出口國回推（直報與鏡像涵蓋範圍不同，不宜直接比較增幅）· 看逐月趨勢';
+    leg.innerHTML='<div><b>'+nm+'</b> · 萬噸 · '+f+' → '+l+'</div><div>▮ 中國海關直報　▯ 出口國回推　× 缺報　● 有效零值</div>'
+      +'<details class="reading-details"><summary>資料範圍與限制</summary><p>舊歷史正分批重新核驗，未核驗月份暫不繪製；缺報不等於零。直報與鏡像涵蓋範圍不同，不宜直接比較增幅。</p></details>';
   }
 }
 // ── ⚙️ 戰略物資進口監測 ──
@@ -3488,7 +3494,7 @@ function renderStrat(json){
       else note='<div class="strat-note">▲高→'+'進口增加的原因待查，不能直接推定軍備擴張。'+'　▼低→'+'進口減少的原因待查，不能直接推定動用儲備。'+'</div>';
     }
     note=tradeCoverageNote(it,s.ref_month);
-    if(reference && !it.latest_complete) note+='<div class="strat-note">最近歷史參考：'+escapeHtml(reference.ym)+' · '+reference[it.cmd].toLocaleString('zh-TW',{maximumFractionDigits:1})+' 萬噸（出口國回推；'+(reference.schema_version===2?'部分覆蓋':'舊歷史未逐月核驗')+'，不是當月值）</div>';
+    if(reference && !it.latest_complete) note+='<div class="strat-note"><span>最近歷史參考：</span>'+escapeHtml(reference.ym)+' · '+reference[it.cmd].toLocaleString('zh-TW',{maximumFractionDigits:1})+' <span>萬噸</span> <span>（出口國回推；部分覆蓋，不是當月值）</span></div>';
     return '<div class="strat-item"><div class="strat-row"><div class="strat-name">'+escapeHtml(it.name)
       +'<small>'+escapeHtml(it.use||'')+'</small></div>'
       +'<div class="strat-val">'+w+(it.wan_ton==null?'':'<span class="u">萬噸</span>')+'</div>'
@@ -3561,7 +3567,7 @@ function renderTaiwanInsight(json) {
     const hours=(at-comparisonAt)/3600000;
     const comparable=price!=='缺資料'&&!expired&&Number.isFinite(end)&&Number.isFinite(m.delta_pp)&&Math.abs(m.delta_pp)<=100&&Number.isFinite(comparisonAt)&&hours>=20&&hours<=28;
     const comparison=expired?'題目已到期，暫停比較':!Number.isFinite(end)?'截止時間缺資料，暫停比較':price==='缺資料'?'報價缺資料，暫停比較':comparable?`較約 ${hours.toFixed(1)} 小時前 ${m.delta_pp>0?'+':''}${m.delta_pp} 個百分點`:'同題比較資料累積中或缺少可核對時間';
-    return `<div class="ti-market">${link('https://polymarket.com/market/'+encodeURIComponent(m.slug),chineseTitle(m.question_zh,m.question))}<div>YES 報價 ${price} · ${comparison}</div><div class="ti-note">${expired?'歷史快照報價':'報價快照時間'}（台北）${escapeHtml(fmt(v.as_of))}${comparable?`<br>比較基準時間（台北）${escapeHtml(fmt(m.comparison_at))}`:''}</div><small>到期時間（台北）${escapeHtml(fmt(m.end_date))}；不同截止日不直接比較。</small></div>`;
+    return `<div class="ti-market">${link('https://polymarket.com/market/'+encodeURIComponent(m.slug),chineseTitle(m.question_zh,m.question))}<div>YES 報價 ${price} · ${comparison}</div><div class="ti-note">${expired?'歷史快照報價':'報價快照時間'}（台北）${escapeHtml(fmt(v.as_of))}</div><details class="reading-details"><summary>時間與比較依據</summary>${comparable?`<div>比較基準時間（台北）${escapeHtml(fmt(m.comparison_at))}</div>`:''}<div>到期時間（台北）${escapeHtml(fmt(m.end_date))}；不同截止日不直接比較。</div></details></div>`;
   }).join('')||'<div>目前沒有有效的台海市場題目。</div>';
   el.innerHTML=`<div class="ti-grid"><section class="ti-panel">${activity}</section><section class="ti-panel">${news}</section><section class="ti-panel ti-market-section"><strong>市場反應｜逐題比較</strong><div class="ti-markets">${markets}</div></section></div><p class="ti-note">洞察資料時間 ${escapeHtml(fmt(v.as_of))}（台北）。這些觀測時間與定義不同；目前不自動判定互相證實或即將升級。</p>`;
   const context=window.WarhubCrossContext?.build(json);
@@ -4454,6 +4460,8 @@ async function fetchFirmsEvents() { /* no-op: 改由 fetchRealPizzaData 從 data
     if(!t) tip.classList.remove('on');
   }
   document.addEventListener('pointerover',show,{passive:true});
+  document.addEventListener('pointerdown',function(e){if(e.target.closest('[data-tip]'))show(e);else tip.classList.remove('on');},{passive:true});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')tip.classList.remove('on');});
   document.addEventListener('pointermove',move,{passive:true});
   document.addEventListener('pointerout',hide,{passive:true});
   document.addEventListener('scroll',function(){tip.classList.remove('on');},{passive:true});
