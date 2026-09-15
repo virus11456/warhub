@@ -86,3 +86,5 @@ source metadata以notac/<取得時間>_<SHA256>.json.gz不可覆寫保存，沿�
 樣本分析：collect_regions 新增 sample_danger/sample_closure，只計已驗證返回的 rows，不外推全FIR；sample_timing 依有時區的 effective_start/end 分 current/future/ended/unknown，缺起訖／矛盾時間保留unknown，API active不等於目前已生效。這些樣本欄位隨來源metadata封存；失敗仍保留旧 observed_at，另存 observed_provider 區分舊FAA數值。前端逐區顯示樣本及完整性，不把0個關鍵字候選當作0公告或已證實沒有軍事用途。測試 test_notac_client.py 覆蓋時段、部分樣本與來源保存。
 
 cross-context.js 是純前端衍生閱讀排序，使用既有台海洞察與 NOTAC 最新嘗試；同題20–28小時比較且未到期才按 abs(delta_pp) 找出目前已展示題目中最大變動，不平均／加總不同YES題目，不推論風險方向。並列公告樣本覆蓋與原查詢時間，時間超過6小時停止。不是新來源抓取、因果檢驗或戰爭機率模型；不寫資料、不改WPI、不通知。test_cross_context.cjs 離線驗證缺值、有效0、期限、部分資料、原資料不變。
+
+NOTAC 封存路徑 archives/notac/<ISO查詢時間（冒號換連字號）>_<SHA256>.json.gz 已納入 vercel-ignore-build.cjs 純資料跳過清單；與live data／其他archive同改時不部署。未部署的程式仍會觸發build，來源收集與保存頻率不變。test_deploy.mjs 以真實Git差異驗證。

@@ -40,6 +40,9 @@ test('deployment gate preserves code updates and fresh data without unnecessary 
     mkdirSync(join(cwd,'archives/gdelt-events'),{recursive:true});
     writeFileSync(join(cwd,`archives/gdelt-events/20260912141500_${'b'.repeat(64)}.json.gz`),'source fixture'); commit();
     assert.equal(gate(deployed),0,'GDELT source archives skip deployment');
+    mkdirSync(join(cwd,'archives/notac'),{recursive:true});
+    writeFileSync(join(cwd,`archives/notac/2026-09-15T01-29-15.858203+00-00_${'c'.repeat(64)}.json.gz`),'NOTAC source fixture'); commit();
+    assert.equal(gate(deployed),0,'NOTAC source archives skip deployment without suppressing later code');
     const archiveIgnored = spawnSync('git', ['-c', `core.excludesfile=${ignoreFile}`, 'check-ignore', '--no-index', archive], { cwd });
     assert.equal(archiveIgnored.status, 0, 'archives stay out of the public deployment');
     mkdirSync(join(cwd, '.agents/skills/warhub-news'), { recursive: true });
