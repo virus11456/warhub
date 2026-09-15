@@ -83,6 +83,13 @@
     const sourceTitle=linkTitles.get(node.parentElement.closest('a')?.href);
     let next=language==='en'?(saved.zh.includes('中文翻譯暫時無法取得')&&sourceTitle?sourceTitle:english(saved.zh)):saved.zh;
     if(language==='en'&&saved.zh.trim())next=saved.zh.match(/^\s*/)[0]+next.trim()+saved.zh.match(/\s*$/)[0];
+    if(language==='en'){
+      const inline=/^(A|B|STRONG|EM|I|SPAN|SMALL)$/;
+      const previous=node.previousSibling||(inline.test(node.parentElement.tagName)?node.parentElement.previousSibling:null);
+      const following=node.nextSibling||(inline.test(node.parentElement.tagName)?node.parentElement.nextSibling:null);
+      if(/^[A-Za-z0-9]/.test(next)&&/[A-Za-z0-9\u3400-\u9fff]$/.test(previous?.textContent||''))next=' '+next;
+      if(/[A-Za-z0-9]$/.test(next)&&/^[A-Za-z0-9\u3400-\u9fff]/.test(following?.textContent||''))next+=' ';
+    }
     if(language==='en'&&node.parentElement.closest('.news-src')&&hasZh(next))next='— Source (name in Chinese mode)';
     if(node.nodeValue!==next)node.nodeValue=next;
     saved.last=next;original.set(node,saved);

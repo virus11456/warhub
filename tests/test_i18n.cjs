@@ -42,6 +42,12 @@ test('unknown publisher names are explicit in English and preserved in Chinese',
  w.WarhubI18n.select('en');await tick();assert.equal(source.textContent,'— Source (name in Chinese mode)');
  w.WarhubI18n.select('zh-TW');await tick();assert.equal(source.textContent,'— 未建譯名媒體');dom.window.close();
 });
+test('inline emphasis keeps English words separated and restores Chinese',async()=>{
+ const dom=create({...catalog,'先':'First','確認安全':'check safety','再求救':'then call for help'}),w=dom.window,d=w.document;
+ const p=d.createElement('p');p.innerHTML='先<strong>確認安全</strong>再求救';d.body.appendChild(p);
+ w.WarhubI18n.select('en');await tick();assert.equal(p.textContent,'First check safety then call for help');
+ w.WarhubI18n.select('zh-TW');await tick();assert.equal(p.textContent,'先確認安全再求救');dom.window.close();
+});
 test('failed catalogue load keeps Chinese rather than claiming English mode',()=>{
  const dom=create({});dom.window.WarhubI18n.select('en');
  assert.equal(dom.window.document.documentElement.lang,'zh-TW');assert.equal(dom.window.document.querySelector('[data-language="en"]').disabled,true);dom.window.close();
