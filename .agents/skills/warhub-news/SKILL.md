@@ -62,3 +62,5 @@ Google 舊流程保留給未指定 provider 的本機相容用途，已有 GitHu
 台海洞察的 news.input_status 僅描述本輪 tw_news 可用樣本：available／partial／stale／unavailable，不代表完整新聞覆蓋。空或無效輸入為 unavailable；既有7天樣本及原 ts 保留，sample_24h 為已保存且發稿在24小時內的筆數，0只表示保存窗口中沒有符合樣本。前端缺少統計顯示缺資料，舊快照可使用既有 source_health.tw_news 狀態，缺旗標不推定正常。顯示最近保存新聞的發稿時間、公務船與共艦分列；市場比較須有20–28小時前的 comparison_at、有效報價及未到期題目，並列出兩次快照時間，缺比較不補零。新增欄位只隨正常排程產生，不重算或覆寫歷史；tests/test_taiwan_insights.py 與 tests/test_frontend.cjs 離線驗證失敗沿用、缺值、有效零、過期題目與原時間保存。
 
 固定字串抽取須遍歷 AST 物件屬性的 value（例如狀態 label 字典），不可一律略過 value。原有 emoji 轉 SVG 會移除文字中的圖示，i18n 同時建立去圖示的完整標籤對照，避免拆字混譯。每次新增 UI 後以 test_site_languages 驗證真實 renderer 動態文字；4032 是本次包含人工覆核與別名的靜態字串數，不是未來覆蓋保證。資源 URL 版本需與發布批次一致；本機驗收若看到舊樣式，核對實際 link href，不把舊畫面當新驗收。
+
+英文新聞驗收修正（2026-09-15）：scripts/reviewed_english.py 保存完全相同原標題的人工覆核譯文，優先於舊英文快取；不套用到相似標題、不改中文／原文／ts。valid_english 在快取及新回應都拒絕「機艦→aircraft carriers」（原文未提航母時）、陸委會機關誤譯、高市人名及沖繩政治變天誤譯。這是針對已發現錯誤的有限檢查，不能保證未來每篇語意都正確。失敗移除錯誤title_english並標unavailable；仍沿用同一服務的失敗停止規則。test_reviewed_english.py 驗證合計機艦不變成航母、真正航母不被誤拒，以及既有人工譯文。
