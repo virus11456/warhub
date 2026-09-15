@@ -1304,8 +1304,8 @@
   }
 
 </style>
-<link rel="stylesheet" href="/i18n.css?v=20260916a">
-<script src="/locales/en.js?v=20260916a" defer></script>
+<link rel="stylesheet" href="/i18n.css?v=20260915c">
+<script src="/locales/en.js?v=20260915c" defer></script>
 <script src="/i18n.js?v=20260916a" defer></script>
 <script src="/cross-context.js"></script>
 </head>
@@ -1576,8 +1576,8 @@
 
   <section class="card" id="notac-card" style="margin-bottom:1.5rem">
     <h2 class="section-title">領空公告觀察 · NOTAM</h2>
-    <p style="color:var(--text-dim);font-size:.8rem;line-height:1.8">公告可能涉及民航、工程、演習或其他限制，不等於軍事行動。與上方官方活動、新聞及市場分開核對，不合成開戰機率。</p>
-    <div id="notac-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:1rem;line-height:1.8">等待已核實的 NOTAC 資料。</div>
+    <p class="observation-caption">航空運作背景 · 公告不等於軍事行動</p>
+    <div id="notac-body">等待已核實的 NOTAC 資料。</div>
   </section>
 
   <!-- 🎖️ 台海軍事動態 -->
@@ -1590,10 +1590,8 @@
       共軍擾台・軍演・軍艦穿越台海・國防部戰報 · <strong>新聞訊號、非精確計數</strong>，供趨勢與異常觀察
     </div>
     <div id="pla-wrap" class="pla-wrap" style="display:none">
-      <div class="pla-hd">📈 官方每日共機架次 · 近 30 天已收錄日報<span id="pla-latest"></span></div>
-      <div id="pla-note" class="pla-legend"></div>
-      <div class="fh-chart"><svg id="pla-svg" viewBox="0 0 720 170" preserveAspectRatio="xMidYMid meet"></svg></div>
-      <div class="pla-legend" id="pla-legend"></div>
+      <div class="pla-summary"><div class="pla-hd">官方共機日報</div><div id="pla-latest"></div><div class="observation-caption">架次，非不同飛機數</div></div>
+      <div class="pla-chart-panel"><div class="pla-chart-heading">近 30 天已收錄日報</div><div class="fh-chart"><svg id="pla-svg" viewBox="0 0 720 170" preserveAspectRatio="xMidYMid meet"></svg></div><details class="reading-details"><summary>統計時間與圖例</summary><div id="pla-note" class="pla-legend"></div><div class="pla-legend" id="pla-legend"></div></details></div>
     </div>
     <div id="twnews-list">
       <div style="padding:1rem;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 連接台海新聞流…</div>
@@ -3536,7 +3534,21 @@ function renderNotacObservation(json) {
     }
     const firs=(r.firs||[]).filter(f=>typeof f==='string'&&/^[A-Z]{4}$/.test(f)).join(',');
     const link=firs?'https://notac.aero/notams/?fir='+encodeURIComponent(firs):'https://notac.aero/notams/';
-    return '<article style="min-width:0;border:1px solid var(--border);padding:.8rem;font-size:.8rem"><strong>'+name+'</strong><div>'+text+'</div><a style="color:var(--accent)" href="'+link+'" target="_blank" rel="noopener">查看來源公告 →</a></article>';
+    const partial=r.provider==='NOTAC'&&!fresh&&a.partial===true;
+    const sampleTime=a.fetched_at||r.attempted_at;
+    const sampleAge=Date.now()-Date.parse(sampleTime);
+    const status=fresh?'完整查詢':partial?(!Number.isFinite(sampleAge)||sampleAge<0?'部分樣本（時間未明）':sampleAge>=6*3600000?'部分樣本（已過期）':'部分樣本'):'暫無可用資料';
+    const value=fresh?num(r.total):partial?num(a.sample_count):'—';
+    const unit=fresh?'有效公告（API active）':partial?'樣本公告':'等待更新';
+    const time=fresh?r.observed_at:sampleTime;
+    const icon='<svg class="notac-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="10" opacity=".3"/><path d="m12 4 2 7 6 4v2l-7-2v4l2 1v1l-3-1-3 1v-1l2-1v-4l-7 2v-2l6-4z"/></svg>';
+    const stateIcon=fresh?'✓':partial?(sampleAge>=6*3600000?'◷':'◐'):'—';
+    return '<article class="notac-tile"><div class="notac-tile-head"><div class="notac-region">'+icon+'<strong>'+name+'</strong></div><span class="notac-status"><span aria-hidden="true">'+stateIcon+'</span> '+status+'</span></div>'
+      +'<div class="notac-count"><b>'+value+'</b><span>'+unit+'</span></div>'
+      +(partial?'<div class="notac-coverage">來源回報 '+num(a.reported_count)+' 筆 · 尚未收齊</div>':'')
+      +'<div class="notac-time">查詢時間：'+fmt(time)+'</div>'
+      +'<details class="reading-details"><summary>查詢詳情與限制</summary><div>'+text+'</div></details>'
+      +'<a class="notac-source" href="'+link+'" target="_blank" rel="noopener">查看來源公告 →</a></article>';
   }).join('');
 }
 
@@ -3731,7 +3743,8 @@ function renderPla(json){
   // baseline (median) dashed line
   if(base>0){ var by=Y(base);
     p.push('<line x1="'+padL+'" y1="'+by+'" x2="'+(W-padR)+'" y2="'+by+'" stroke="var(--accent3)" stroke-dasharray="4 3" stroke-width="1" opacity=".7"/>');
-    p.push('<text x="'+(padL+3)+'" y="'+(by-3)+'" text-anchor="start" class="fh-svg-axis" style="fill:var(--accent3)">中位 '+base+'</text>');
+    // Keep the median label outside the bars, where it cannot overlap observations.
+    p.push('<text x="'+(W-padR)+'" y="12" text-anchor="end" class="fh-svg-axis" style="fill:var(--accent3)">中位 '+base+'</text>');
   }
   // bars: red if elevated (>=1.5x median & >=25)
   var plaHit=[];
@@ -3742,6 +3755,7 @@ function renderPla(json){
     var tip='<b>'+d.date+'</b><br>共機 '+v+' 架次'+(d.ships!=null?('　共艦 '+d.ships+' 艘'):'')+(hi?'<br>⚠ 異常偏高（≥中位數1.5倍）':'');
     p.push('<rect x="'+(cx-bw/2).toFixed(1)+'" y="'+by.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+h.toFixed(1)
       +'" fill="'+(hi?'#ff4d5e':'var(--accent)')+'" opacity="'+(hi?'.95':'.7')+'"></rect>');
+    if(v===0)p.push('<circle class="pla-zero" cx="'+cx+'" cy="'+y0+'" r="2.5" fill="var(--accent)"/>');
     // 透明全高感應區，滑鼠移到整欄任一處都能看到當日數據
     plaHit.push('<rect x="'+(cx-slot/2).toFixed(1)+'" y="'+padT+'" width="'+slot.toFixed(1)+'" height="'+(y0-padT).toFixed(1)
       +'" fill="transparent" data-tip="'+tip+'"></rect>');
@@ -3753,7 +3767,7 @@ function renderPla(json){
   svg.innerHTML=p.join('');
   var lt=document.getElementById('pla-latest');
   if(lt && latest){ var el=(base>0 && latest.aircraft>=base*1.5 && latest.aircraft>=25);
-    lt.innerHTML='　最新 '+latest.date.slice(5)+'：<b style="color:'+(el?'#ff4d5e':'var(--accent)')+'">'+latest.aircraft+'</b> 架次'+(el?' <span style="color:#ff4d5e">⚠異常偏高</span>':''); }
+    lt.innerHTML='<div class="pla-date">'+escapeHtml(latest.date)+'</div><div class="pla-latest-value"><b style="color:'+(el?'#ff4d5e':'var(--accent)')+'">'+latest.aircraft+'</b><span>架次</span></div>'+(el?'<div class="pla-elevated">相對偏高</div>':''); }
   var lg=document.getElementById('pla-legend');
   if(lg){ lg.textContent='官方日報 · 缺日留空 · 紅柱僅為已收錄日報的相對高值，不代表戰爭機率。 '; var source=document.createElement('a'); if(/^https:\/\/air\.mnd\.gov\.tw\//.test(latest.source_url||'')){source.href=latest.source_url; source.target='_blank'; source.rel='noopener noreferrer'; source.textContent='查看最新官方日報'; lg.appendChild(source);} }
 }
