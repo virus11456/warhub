@@ -1,6 +1,6 @@
 ---
 name: warhub-osint
-description: "Maintain WARHUB ADS-B, FIRMS, EONET, GDELT, USGS, Wikipedia and FAA NOTAM collectors. Use for source outages, observation freshness and raw-count versus anomaly-score mismatches."
+description: "Maintain WARHUB ADS-B, FIRMS, EONET, GDELT, USGS, Wikipedia and NOTAC/FAA NOTAM collectors. Use for source outages, observation freshness and raw-count versus anomaly-score mismatches."
 ---
 
 # WARHUB 航空與公開情資
@@ -15,7 +15,7 @@ description: "Maintain WARHUB ADS-B, FIRMS, EONET, GDELT, USGS, Wikipedia and FA
 | `fetch_gdelt` | GDELT DOC API timelinevol；`gdelt` | 新聞報導強度，非新聞條數／衝突機率。逐地區記錄成功與 stale，其他 RSS 有新聞不能補此因子 |
 | `fetch_nuclear_seismic` | USGS FDSN event API；`nuclear_seismic` | 72h、試驗場周邊 150km 篩選；無地震須查詢成功才可成立，地震不等於核試 |
 | `fetch_wikipedia_anxiety` | Wikimedia Pageviews；`wikipedia` | 英文條目、每日資料截至前一日；最近兩天均量比更早樣本中位數，至少 10 點才有值。是關注度代理，非群眾焦慮實測 |
-| `fetch_notams` | FAA `notams.aim.faa.gov/notamSearch/search`；`notams` | 領空公告，查詢成功的空清單與 403／缺資料不同；不能用舊公告冒充新觀測 |
+| `fetch_notams` | NOTAC API（有 key）／FAA 舊路徑（無 key）；`notams` | 領空公告，查詢成功的空清單與 403／缺資料不同；不能用舊公告冒充新觀測 |
 
 這些來源在每輪快收集中檢查，但實際觀測頻率不同。先核對各來源的資料时间和健康狀態，不只看根層 `updated_at`。GDELT／FAA 遇到封鎖、限流、非預期 HTML，保留缺值或 stale；遵循 `SourceBackoff`、來源總預算及單次 timeout，停止該輪來源，不能無限改 URL 或增加請求。
 
@@ -71,7 +71,7 @@ Telegram摘要使用「目前可見軍機（ADS-B覆蓋不完整）」，逐項�
 
 入口仍為 fetch_data.py:fetch_notams；有 NOTAC_API_KEY 時使用 notac_client.collect_regions，沒有 key 保持 FAA 舊路徑。來源失敗不切回 FAA 假裝新觀測。五區沿用 REGION_FIRS（UKBV、OIIX/LLLL、RCAA、ZKKP、RPHI）；每區 GET /api/v1/notam/，fir列表、status=active、sort=newest，最多2頁，每頁2credits。每輪最多10請求／20credits，逐來源至少110分鐘（含失敗），約兩小時排程每31天最多7440credits；更密的110分鐘理論上限約8120，額外手動驗證另計。帳戶10,000月額度、UTC月初重置，Beta後可能縮減，不能保證永久免費。每次讀X-Credits-Remaining，低於20暫停至下月，不買超額。
 
-401/403停止後續區域並保存24h冷卻；402至下一UTC月初；429遵循Retry-After，不立即重試。分頁next必須同HTTPS主機、路徑與篩選，禁止redirect與key進URL；2MB上限、每頁20秒、每區42秒。缺count/next、頁面總數不符、重複ID、FIR不符、非active均不完整。完整合法空清單才total=0；其他total未知。最新部分結果放latest_attempt，保留旧observed_at/total/score並stale，舊值不計分。NOTAC查詢時間是取得當時有效公告清單的時間，不冒充公告發布時間；公告原effective_start/end等留在來源metadata。
+401/403停止後續區域並保存24h冷卻；402至下一UTC月初；429遵循Retry-After，不立即重試。分頁next必須同HTTPS主機、路徑與篩選，禁止redirect與key進URL；2MB上限、每頁20秒、每區42秒。缺count/next、頁面總數不符、重複ID、FIR不符、非active均不完整。完整合法空清單才total=0；其他total未知。最新部分結果放latest_attempt，保留旧observed_at/total/score並stale，舊值不計分。NOTAC查詢時間是取得 API active 狀態公告樣本的時間，active 不保證已進入生效期間，不冒充公告發布時間；公告原effective_start/end等留在來源metadata。
 
 完整結果沿用既有關鍵字候選與人工score公式；僅同NOTAC來源、相同FIR、兩次完整且間隔不超過6h才算total_change，不比較FAA舊值。變化不是戰爭機率或軍事行動證據。index.html新增五區NOTAM觀察，顯示缺值、部分樣本、舊時間及比較累積；root過期時重繪，6h後停判讀。
 
@@ -80,3 +80,9 @@ source metadata以notac/<取得時間>_<SHA256>.json.gz不可覆寫保存，沿�
 手動Verify NOTAC access workflow執行scripts/check_notac.py：只讀RCAA最多2頁（最多4credits），無其他爬蟲、無通知、無正式data寫入，提供30天去除rows的摘要artifact。這是真實API呼叫，不能當離線測試；依本次串接驗證授權單次執行，失敗先看代碼不連續重跑。完整查詢或已核實的分頁預算停止可確認存取，但後者不表示資料齊全。
 
 官方文件：https://notac.aero/api/search-notams/ 、https://notac.aero/api/authentication/ 、https://notac.aero/api/credits/ 、https://notac.aero/api/rate-limits/ 。文件示例count與列數可能不一致，真實資料仍須檢查，不照示例放寬完整性。
+
+2026-09-15 03:08（台北）單次 Verify NOTAC access 已實測金鑰可用：RCAA 來源回報600筆，依2頁上限只取40筆，使用4credits、剩9996；reason=page_budget_reached，complete=false。這只是取得當時回應，不是現在額度或正式快照；不能宣稱600筆已收齊。未發通知、未寫正式data，不以這份驗證摘要冒充正常排程觀測。
+
+樣本分析：collect_regions 新增 sample_danger/sample_closure，只計已驗證返回的 rows，不外推全FIR；sample_timing 依有時區的 effective_start/end 分 current/future/ended/unknown，缺起訖／矛盾時間保留unknown，API active不等於目前已生效。這些樣本欄位隨來源metadata封存；失敗仍保留旧 observed_at，另存 observed_provider 區分舊FAA數值。前端逐區顯示樣本及完整性，不把0個關鍵字候選當作0公告或已證實沒有軍事用途。測試 test_notac_client.py 覆蓋時段、部分樣本與來源保存。
+
+cross-context.js 是純前端衍生閱讀排序，使用既有台海洞察與 NOTAC 最新嘗試；同題20–28小時比較且未到期才按 abs(delta_pp) 找出目前已展示題目中最大變動，不平均／加總不同YES題目，不推論風險方向。並列公告樣本覆蓋與原查詢時間，時間超過6小時停止。不是新來源抓取、因果檢驗或戰爭機率模型；不寫資料、不改WPI、不通知。test_cross_context.cjs 離線驗證缺值、有效0、期限、部分資料、原資料不變。

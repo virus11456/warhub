@@ -1,45 +1,42 @@
 name: Translate saved titles
+
 on:
   workflow_dispatch:
+
 permissions:
   contents: write
+
 concurrency:
-  group: prepare-warhub-bilingual-ui
+  group: update-data
   cancel-in-progress: false
+
 jobs:
   translate:
-    if: github.ref == 'refs/heads/codex/bilingual-insights'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: pip
+          cache-dependency-path: scripts/requirements.txt
       - run: pip install -r scripts/requirements.txt
-      - name: Respect cooldown before starting
-        run: |
-          python - <<'PY'
-          from datetime import datetime, timezone
-          import time
-          until=datetime(2026,9,14,19,48,tzinfo=timezone.utc).timestamp()
-          time.sleep(max(0, until-time.time()))
-          PY
-      - name: Prepare public UI and guide translations only
+      - name: Translate existing snapshot
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GROQ_TRANSLATION_MODEL: ${{ vars.GROQ_TRANSLATION_MODEL }}
-        run: python scripts/translate_ui.py
-      - name: Preserve completed catalogue on this work branch
-        if: always()
+          WARHUB_NO_NOTIFY: '1'
+        run: python scripts/refresh_translations.py
+      - name: Save translated titles
         run: |
-          if [ ! -f locales/en.json ]; then exit 0; fi
           git config user.name 'warhub-bot'
           git config user.email 'localhost20000@gmail.com'
-          git add locales/en.json
-          for file in locales/rejected.json locales/translation-state.json; do
-            if [ -f "$file" ]; then git add "$file"; fi
-          done
+          git add data/data.json
           if git diff --staged --quiet; then exit 0; fi
-          git commit -m 'Prepare English UI and guide catalogue'
-          git push origin HEAD:refs/heads/codex/bilingual-insights
+          git commit -m 'data: translate saved titles with Groq'
+          # A concurrent external update rejects this push; never force or overwrite it.
+          git push origin HEAD:main

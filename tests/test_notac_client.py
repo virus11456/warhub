@@ -33,6 +33,39 @@ NEXT = n.BASE + '?fir=RCAA&status=active&sort=newest&page=2'
 
 
 class Tests(unittest.IsolatedAsyncioTestCase):
+    async def test_partial_candidates_describe_sample_only_and_archive_original_times(self):
+        import re
+        import tempfile
+        import gzip
+        now=datetime(2026,9,15,tzinfo=timezone.utc)
+        notice={**row(), 'text':'DANGER AREA', 'effective_start':'2026-09-14T00:00:00Z'}
+        payload={'provider':'NOTAC','firs':['RCAA'],'fetched_at':now.isoformat(),'rows':[notice],
+                 'complete':False,'partial':True,'sample_count':1,'reported_count':600,'reason':'page_budget_reached'}
+        previous={'taiwan':{'provider':'FAA','observed_at':'2020-01-01T00:00:00Z','total':7}}
+        with tempfile.TemporaryDirectory() as folder, patch.object(n,'collect_region',AsyncMock(return_value=payload)):
+            result=await n.collect_regions(Session(),'fixture',{'taiwan':['RCAA']},previous,re.compile('DANGER'),re.compile('CLOSED'),folder,now)
+            result=result['taiwan']
+            self.assertEqual(result['total'],7)
+            self.assertEqual(result['observed_provider'],'FAA')
+            self.assertTrue(result['stale'])
+            self.assertEqual(result['latest_attempt']['sample_danger'],1)
+            self.assertEqual(result['latest_attempt']['sample_closure'],0)
+            saved=json.loads(gzip.decompress(next(Path(folder).rglob('*.gz')).read_bytes()))
+            self.assertEqual(saved['rows'][0]['effective_start'],notice['effective_start'])
+            self.assertNotIn('text',saved['rows'][0])
+            self.assertEqual(result['latest_attempt']['sample_timing']['unknown'],1)
+
+    async def test_active_query_does_not_mean_all_notices_are_effective_now(self):
+        import re
+        now=datetime(2026,9,15,tzinfo=timezone.utc)
+        rows=[{**row('current'),'effective_start':'2026-09-14T00:00:00Z','effective_end':'2026-09-16T00:00:00Z'},
+              {**row('future'),'effective_start':'2026-09-16T00:00:00Z','effective_end':'2026-09-17T00:00:00Z'},
+              {**row('ended'),'effective_start':'2026-09-13T00:00:00Z','effective_end':'2026-09-14T00:00:00Z'},
+              {**row('unknown'),'effective_start':'2026-09-14T00:00:00','effective_end':None}]
+        r={'provider':'NOTAC','firs':['RCAA'],'fetched_at':now.isoformat(),'rows':rows,'complete':True,'total':4,'sample_count':4}
+        with patch.object(n,'collect_region',AsyncMock(return_value=r)):
+            out=await n.collect_regions(Session(),'fixture',{'taiwan':['RCAA']},{},re.compile('DANGER'),re.compile('CLOSED'),now=now)
+        self.assertEqual(out['taiwan']['sample_timing'],{'current':1,'future':1,'ended':1,'unknown':1})
     async def test_missing_key_no_request(self):
         s = Session()
         r = await n.collect_region(s, '', ['RCAA'])

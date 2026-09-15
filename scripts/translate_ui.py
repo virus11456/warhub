@@ -26,6 +26,8 @@ def restore(text, values):
     expected = [f'[[N{i}]]' for i in range(len(values))]
     if sorted(re.findall(r'\[\[N\d+\]\]', text)) != sorted(expected):
         raise ValueError('numeric placeholder mismatch')
+    if not text.strip() or re.search(r'\d', re.sub(r'\[\[N\d+\]\]', '', text)):
+        raise ValueError('empty translation or added numeric value')
     for i, value in enumerate(values):
         text = text.replace(f'[[N{i}]]', value)
     return text.strip()
@@ -92,7 +94,7 @@ async def main():
                     allowed_codes = {'json_validate_failed','context_length_exceeded','model_not_found',
                                      'invalid_request_error','rate_limit_exceeded','model_request_failed'}
                     state_path.write_text(json.dumps({'status': response.status,
-                        'code': code if code in allowed_codes else 'unknown',
+                        'code': code if isinstance(code, str) and code in allowed_codes else 'unknown',
                         'retry_at': time.time()+max(60,seconds)}))
                     raise SystemExit(f'Translation stopped at HTTP {response.status}; no retry')
                 remaining = response.headers.get('x-ratelimit-remaining-tokens', '')

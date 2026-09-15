@@ -22,7 +22,7 @@ function visit(n){
  if(!n||typeof n!=='object')return;
  if(n.type==='Literal'&&typeof n.value==='string')literal(n.value);
  if(n.type==='TemplateElement')literal(n.value.cooked||n.value.raw);
- for(const [k,v] of Object.entries(n))if(k!=='value'){
+ for(const v of Object.values(n)){
   if(Array.isArray(v))v.forEach(visit);else if(v&&typeof v==='object')visit(v);
  }
 }

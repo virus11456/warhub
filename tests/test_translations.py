@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'scripts'))
-from translations import cached_titles, update_cache, translate_groq, CACHE_LIMIT
+from translations import cached_titles, update_cache, translate_groq, english_titles, CACHE_LIMIT
 
 class Response:
     def __init__(self, status, rows): self.status, self.rows = status, rows
@@ -41,6 +41,27 @@ class GroqTests(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         self.env=patch.dict('os.environ',{'GROQ_API_KEY':'test-only-not-a-real-key','GROQ_TRANSLATION_MODEL':''})
         self.env.start();self.addCleanup(self.env.stop)
+    async def test_english_display_preserves_chinese_original_and_observation_time(self):
+        rows=[{'title':'共機5架次', 'title_zh':'共機5架次', 'ts':'2026-09-14T00:00:00Z'},
+              {'title':'中文新聞', 'title_en':'Original English title', 'ts':'unchanged'}]
+        s=Session(rows=[{'id':0,'text':'5 PLA aircraft sorties'}])
+        cache=await english_titles(s, rows, {})
+        self.assertEqual(rows[0]['title'],'共機5架次')
+        self.assertEqual(rows[0]['title_zh'],'共機5架次')
+        self.assertEqual(rows[0]['ts'],'2026-09-14T00:00:00Z')
+        self.assertEqual(rows[0]['title_english'],'5 PLA aircraft sorties')
+        self.assertEqual(rows[1]['title_english'],'Original English title')
+        self.assertEqual(len(s.calls),1)
+        retry=Session();copies=[{'title':'共機5架次'}]
+        await english_titles(retry,copies,{'english_translation_cache':cache})
+        self.assertEqual(retry.calls,[])
+        self.assertEqual(copies[0]['title_english'],'5 PLA aircraft sorties')
+
+    async def test_chinese_output_is_not_an_english_translation(self):
+        rows=[{'title':'原始中文'}]
+        await english_titles(Session(rows=[{'id':0,'text':'仍是中文'}]),rows,{})
+        self.assertNotIn('title_english',rows[0])
+        self.assertEqual(rows[0]['english_translation_status'],'unavailable')
     async def test_batch_id_mapping_dedup_and_original_preservation(self):
         items=[{'title':'First?'},{'title':'Second?'},{'title':'First?'}];s=Session()
         await translate_groq(s,items,{})
