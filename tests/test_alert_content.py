@@ -66,7 +66,7 @@ class ContentTests(unittest.TestCase):
         original = copy.deepcopy(data)
         text = alerts.build_digest(data)
         self.assertIn('2026-09-14T13:23:24Z', text)
-        self.assertIn('資料覆蓋率：資料不足', text)
+        self.assertIn('WPI 有效權重：資料不足', text)
         self.assertIn('資料過期', text)
         self.assertEqual(data, original)
 
@@ -79,3 +79,26 @@ class ContentTests(unittest.TestCase):
         self.assertIn('缺平時比較值', text)
         self.assertNotIn('missing', text)
         self.assertNotIn('平時 0%', text)
+
+    def test_region_observations_keep_partial_zero_and_stale_distinct(self):
+        data = {'regions': [{'key': 'taiwan', 'name': '台海', 'score': None,
+                             'level': 'INSUFFICIENT_DATA', 'factors': {'poly': 0}}],
+                'notams': {'taiwan': {'stale': True, 'total': 99, 'latest_attempt': {
+                    'partial': True, 'sample_count': 40, 'reported_count': 608}}},
+                'gdelt': {'taiwan': {'stale': True}}}
+        original = copy.deepcopy(data)
+        text = alerts.build_digest(data)
+        self.assertIn('市場有資料', text)
+        self.assertIn('公告部分樣本 40/608', text)
+        self.assertIn('新聞強度過期', text)
+        self.assertNotIn('INSUFFICIENT_DATA', text)
+        self.assertNotIn('99', text)
+        self.assertEqual(data, original)
+        data['notams']['taiwan'] = {'complete': True, 'available': True, 'total': 0}
+        self.assertIn('公告查詢 0 筆', alerts.build_digest(data))
+        data['notams']['taiwan']['stale'] = True
+        self.assertIn('公告過期', alerts.build_digest(data))
+        data['notams'] = {}
+        data['regions'][0]['factors'] = {}
+        self.assertIn('公告缺資料', alerts.build_digest(data))
+        self.assertIn('市場缺可用題目', alerts.build_digest(data))

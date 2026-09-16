@@ -77,12 +77,34 @@ def _fmt_count(value):
     return str(int(value)) if _valid_number(value) and float(value).is_integer() else "缺資料"
 
 
-def _fmt_regions(regions):
+def _fmt_regions(regions, data=None):
+    """Describe usable inputs without presenting missing scores as missing observations."""
+    data = data or {}
     lines = []
-    for r in sorted(regions or [], key=lambda x: x.get("score") if _valid_number(x.get("score"), 100) else -1, reverse=True)[:5]:
-        e = LEVEL_EMOJI.get(r.get("level"), "⚪")
-        lines.append(f"  {e} {r.get('name','?')}  {_fmt_score(r.get('score'))}  ({r.get('level','')})")
-    return "\n".join(lines) or "  （無資料）"
+    for r in (regions or [])[:5]:
+        key = r.get('key')
+        factors = r.get('factors') or {}
+        parts = []
+        parts.append('市場有資料' if _valid_number(factors.get('poly'), 100) else '市場缺可用題目')
+        nt = (data.get('notams') or {}).get(key) or {}
+        attempt = nt.get('latest_attempt') or nt
+        count = _fmt_count(attempt.get('sample_count'))
+        total = _fmt_count(attempt.get('reported_count'))
+        if attempt.get('partial') and count != '缺資料':
+            parts.append(f'公告部分樣本 {count}/{total}')
+        elif nt.get('stale'):
+            parts.append('公告過期')
+        elif nt.get('complete') is True and nt.get('available') is True:
+            parts.append(f"公告查詢 {_fmt_count(nt.get('total'))} 筆")
+        else:
+            parts.append('公告缺資料')
+        g = (data.get('gdelt') or {}).get(key) or {}
+        parts.append('新聞強度過期' if g.get('stale') else
+                     ('新聞強度有資料' if _valid_number(factors.get('gdelt'), 100) else '新聞強度缺資料'))
+        # Old model scores remain in saved history; these are observations, not risk levels.
+        lines.append(f"  • {r.get('name', '?')}：" + '；'.join(parts))
+    return '\n'.join(lines) or '  （尚無地區觀測）'
+
 
 def _fmt_news(news, n=3):
     lines = []
@@ -150,13 +172,13 @@ def build_digest(data: dict) -> str:
         f"🛰️ *WARHUBS 更新觀測回報*\n"
         f"{now}\n資料時間：{data.get('updated_at') or '未提供'}\n\n"
         f"{emoji} *WPI 實驗指數：{_fmt_score(score.get('combined_score'))} / 100*（不作戰情警戒）\n\n"
-        f"🗺️ 地區風險：\n{_fmt_regions(data.get('regions'))}\n\n"
-        f"🍕 人流實驗觀察：{_fmt_score(score.get('pizza_score'))}\n"
+        f"🗺️ 地區觀測（非風險評級）：\n{_fmt_regions(data.get('regions'), data)}\n\n"
+        f"🍕 人流實驗觀察：{_fmt_score(score.get('pizza_score')) if _valid_number(score.get('pizza_score'), 100) else '暫無有效即時指數'}\n"
         f"{_fmt_pizza_shops(data.get('pizza'), health.get('pizza'))}\n"
         f"{_fmt_aviation(data.get('aviation'), health.get('aviation'))}\n"
         f"{_fmt_firms(data.get('firms'), health.get('firms'))}\n\n"
         f"📡 最新戰情頭條：\n{_fmt_news(data.get('news'))}\n\n"
-        f"資料覆蓋率：{_fmt_coverage((data.get('score') or {}).get('coverage'))} · 未校準為開戰機率\n"
+        f"WPI 有效權重：{_fmt_coverage((data.get('score') or {}).get('coverage'))}（非全站資料完整率） · 未校準為開戰機率\n"
         f"🔗 {SITE}"
     ).strip()
 
@@ -171,9 +193,9 @@ def build_escalation(data: dict, old_level: str) -> str:
         f"{now}\n\n"
         f"⚠️ 等級 *{old_level} → {new_level}*\n"
         f"🎯 WPI 觀察指數：*{_fmt_score(score.get('combined_score'))} / 100*\n\n"
-        f"🗺️ 地區風險：\n{_fmt_regions(data.get('regions'))}\n\n"
+        f"🗺️ 地區觀測（非風險評級）：\n{_fmt_regions(data.get('regions'), data)}\n\n"
         f"📡 最新頭條：\n{_fmt_news(data.get('news'))}\n\n"
-        f"資料覆蓋率：{_fmt_coverage((data.get('score') or {}).get('coverage'))} · 未校準為開戰機率\n"
+        f"WPI 有效權重：{_fmt_coverage((data.get('score') or {}).get('coverage'))}（非全站資料完整率） · 未校準為開戰機率\n"
         f"🔗 {SITE}"
     ).strip()
 
@@ -189,7 +211,7 @@ def build_pizza_alert(data: dict, shops: list) -> str:
         f"Pentagon 周邊披薩店下班後仍爆滿（EXTREME）：{names}\n"
         f"最高達平時 *{pct}%*\n\n"
         f"（人流異常並非軍事行動證據）\n"
-        f"資料覆蓋率：{_fmt_coverage((data.get('score') or {}).get('coverage'))} · 未校準為開戰機率\n"
+        f"WPI 有效權重：{_fmt_coverage((data.get('score') or {}).get('coverage'))}（非全站資料完整率） · 未校準為開戰機率\n"
         f"🔗 {SITE}"
     ).strip()
 
@@ -200,8 +222,8 @@ def build_hotspot_alert(data: dict, now_cnt: int, prev_cnt: int) -> str:
         f"🔥 *WARHUBS 異常：監測區熱異常像元激增*\n"
         f"{now}\n\n"
         f"NASA FIRMS 監測區熱異常像元：*{prev_cnt} → {now_cnt} 處*\n\n"
-        f"🗺️ 地區風險：\n{_fmt_regions(data.get('regions'))}\n\n"
-        f"資料覆蓋率：{_fmt_coverage((data.get('score') or {}).get('coverage'))} · 未校準為開戰機率\n"
+        f"🗺️ 地區觀測（非風險評級）：\n{_fmt_regions(data.get('regions'), data)}\n\n"
+        f"WPI 有效權重：{_fmt_coverage((data.get('score') or {}).get('coverage'))}（非全站資料完整率） · 未校準為開戰機率\n"
         f"🔗 {SITE}"
     ).strip()
 
