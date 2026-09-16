@@ -92,8 +92,8 @@
 
   .logo span { color: var(--accent2); }
   .logo .logo-sub { color: var(--text-dim); }
-  /* 頭部有兩顆導覽按鈕，較窄時先收起副標避免換行擠壓 */
-  @media (max-width: 1120px) { .logo-sub { display: none; } }
+  /* 頭部導覽含避難指南、TG 與姊妹站，較窄時先收起副標避免換行擠壓 */
+  @media (max-width: 1280px) { .logo-sub { display: none; } }
 
   .header-status {
     display: flex;
@@ -122,6 +122,27 @@
   .nav-guides:hover { background: var(--accent); color: #04121a; box-shadow: var(--glow); }
   .nav-tg { color: #29abe2; border: 1px solid #29abe2; }
   .nav-tg:hover { background: #29abe2; color: #04121a; box-shadow: 0 0 12px rgba(41,171,226,.4); }
+  .network-links {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: .15rem .7rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: .4px;
+  }
+  .network-links a {
+    color: var(--text-dim);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .network-links a:hover { color: var(--accent); }
+  .network-links .simples-mark { opacity: .8; }
+  .hdr-left .network-links {
+    padding-left: .55rem;
+    margin-left: .1rem;
+    border-left: 1px solid var(--border);
+  }
 
   /* Telegram 訂閱 CTA */
   .tg-cta {
@@ -816,9 +837,16 @@
     font-size: 0.65rem;
     color: var(--text-dim);
     letter-spacing: 1px;
+  }
+  footer .footer-meta {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+  footer .network-links {
+    display: flex;
+    margin-top: .45rem;
+    letter-spacing: .4px;
   }
 
   /* ══════════════════════════════════════════════════════════
@@ -956,6 +984,7 @@
     .nav-guides .nav-tx, .nav-tg .nav-tx { display: none; }  /* 極小螢幕：導覽只留圖示 */
     .nav-guides, .nav-tg { font-size:.9rem; padding:3px 8px; }
     .hdr-left { gap: .5rem; }
+    .hdr-left .network-links { display: none; }  /* 姊妹站改由頁尾進入，避免擠壓時鐘 */
 
     /* Layout */
     .container     { padding: .6rem; }
@@ -1304,8 +1333,8 @@
   }
 
 </style>
-<link rel="stylesheet" href="/i18n.css?v=20260915d">
-<script src="/locales/en.js?v=20260915d" defer></script>
+<link rel="stylesheet" href="/i18n.css?v=20260916b">
+<script src="/locales/en.js?v=20260916b" defer></script>
 <script src="/i18n.js?v=20260916a" defer></script>
 <script src="/cross-context.js"></script>
 </head>
@@ -1322,6 +1351,10 @@
       <div class="logo">WAR<span>HUBS</span> <span class="logo-sub" style="font-size:0.7rem;color:var(--text-dim);font-weight:400;letter-spacing:2px">戰情觀測站</span></div>
       <a href="guides/" class="nav-guides"><span class="nav-ic">🛡️</span><span class="nav-tx">避難指南</span></a>
       <a href="https://t.me/warhubss" target="_blank" rel="noopener" class="nav-tg"><span class="nav-ic">📢</span><span class="nav-tx">TG 通知</span></a>
+      <nav class="network-links" aria-label="SIMPLES 工具網">
+        <a href="https://hypeboss.cc/" target="_blank" rel="noopener">Crypig 量化</a>
+        <a href="https://moneytools-eight.vercel.app/tw" target="_blank" rel="noopener">Moneytools</a>
+      </nav>
     </div>
     <div class="header-status">
       <span class="live-ind"><span class="live-dot"></span><span class="live-lbl">定期資料快照</span></span>
@@ -2161,7 +2194,12 @@
     </details>
   </section>
   <footer>
-    WARHUBS // 戰情觀測站 &nbsp;|&nbsp; 資料來源：Polymarket · pizzint.watch · adsb.fi · NASA FIRMS / EONET · GDELT · USGS · Wikipedia &nbsp;|&nbsp; <a href="#disclaimer">免責聲明</a> &nbsp;|&nbsp; <span id="last-update-ts" style="color:var(--text-dim)">⏳ 等待後端資料…</span>
+    <div class="footer-meta">WARHUBS // 戰情觀測站 &nbsp;|&nbsp; 資料來源：Polymarket · pizzint.watch · adsb.fi · NASA FIRMS / EONET · GDELT · USGS · Wikipedia &nbsp;|&nbsp; <a href="#disclaimer">免責聲明</a> &nbsp;|&nbsp; <span id="last-update-ts" style="color:var(--text-dim)">⏳ 等待後端資料…</span></div>
+    <nav class="network-links" aria-label="SIMPLES 工具網">
+      <a href="https://hypeboss.cc/" target="_blank" rel="noopener">Crypig 量化</a>
+      <a href="https://moneytools-eight.vercel.app/tw" target="_blank" rel="noopener">Moneytools</a>
+      <a href="https://simples.com.tw/" target="_blank" rel="noopener" class="simples-mark">SIMPLES 工具網</a>
+    </nav>
   </footer>
 
 </div><!-- /.container -->
