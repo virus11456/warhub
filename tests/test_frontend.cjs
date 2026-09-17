@@ -1,5 +1,12 @@
 process.chdir(require('path').resolve(__dirname,'..'));
 const {JSDOM,VirtualConsole}=require('jsdom');const fs=require('fs');const assert=require('assert');
+{
+ const cash=fs.readFileSync('guides/cash-finance.html','utf8');
+ const stocktoolsDeep=['https://www.stocktools.cc/tw/us-fee-calculator','https://www.stocktools.cc/tw/us-etf','https://www.stocktools.cc/tw/us-deposit'];
+ for(const href of stocktoolsDeep) assert.ok(cash.includes(`href="${href}"`), href+' missing from cash-finance');
+ assert.ok(cash.includes('href="https://stocktools.cc/"') && cash.includes('href="https://toolist.cc/"'));
+ assert.ok(!/firstrade|luxstay|moneytools/i.test(cash));
+}
 (async()=>{for(const mode of ['missing','legacy','new','valid']){
  const errors=[];const vc=new VirtualConsole();vc.on('jsdomError',e=>{if(!e.message.includes('Not implemented'))errors.push(e.message)});vc.on('warn',(...m)=>{if(String(m).includes('render error'))errors.push(m.join(' '))});
  const data=JSON.parse(fs.readFileSync('tests/fixtures/legacy-data.json'));
@@ -49,8 +56,17 @@ assert.ok(d.querySelector('footer a[href="https://simples.com.tw/"]'));
 assert.ok(d.querySelector('footer').textContent.includes('SIMPLES 工具網'));
 assert.ok(d.querySelector('footer').textContent.includes('Stocktools'));
 assert.ok(d.querySelector('footer').textContent.includes('Toolist'));
+const stocktoolsDeep=['https://www.stocktools.cc/tw/us-fee-calculator','https://www.stocktools.cc/tw/us-etf','https://www.stocktools.cc/tw/us-deposit'];
+for(const href of stocktoolsDeep){
+  const links=[...d.querySelectorAll(`a[href="${href}"]`)];
+  assert.ok(links.length>=2, href+' should appear in footer and finance tools');
+  assert.ok(links.every(a=>a.target==='_blank' && a.rel==='noopener'));
+  assert.ok(d.querySelector(`footer a[href="${href}"]`));
+  assert.ok(d.querySelector(`#related-tools-fin a[href="${href}"]`));
+}
+assert.ok(d.querySelector('footer .network-links[aria-label="相關工具"]'));
 assert.ok(!d.body.textContent.includes('Moneytools'));
-assert.ok(![...d.querySelectorAll('a')].some(a=>/moneytools/i.test(a.href)));
+assert.ok(![...d.querySelectorAll('a')].some(a=>/moneytools|firstrade|luxstay/i.test(a.href)));
 
 if(mode==='valid'){assert.ok(d.querySelector('#html-wpi-a-desc').textContent.includes('170 架'));assert.ok(d.querySelector('#html-wpi-a-desc').textContent.includes('異常分數 0'));assert.ok(d.querySelector('#html-wpi-f-desc').textContent.includes('11,785 筆'));assert.ok(d.querySelector('#html-wpi-f-desc').textContent.includes('暫不計分'));assert.ok(d.querySelector('#poly-list-container').textContent.includes('美國會在12月31日前打擊古巴嗎？'));assert.ok(d.querySelector('#news-list').textContent.includes('新聞繁體中文標題'));assert.ok(!d.querySelector('#news-list').textContent.includes('English original'));assert.ok(d.querySelector('#strat-grid').textContent.includes('最近歷史參考：2026-06'));assert.ok(d.querySelector('#sh-svg').textContent.includes('缺報'));assert.ok(!d.querySelector('#sh-svg').innerHTML.includes('999'));}
 if(mode==='valid'){
