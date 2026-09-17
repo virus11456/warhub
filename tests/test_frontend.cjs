@@ -34,16 +34,23 @@ for(const a of d.querySelectorAll('#observation-overview a')) assert.ok(d.queryS
 assert.ok(!d.querySelector('#ticker').textContent.includes('披薩指數'));
 assert.ok(!d.querySelector('#ticker').textContent.includes('戰爭壓力指數'));
 assert.ok(!d.querySelector('#ticker').textContent.includes('WPI'));
-const siblingHrefs=['https://hypeboss.cc/','https://moneytools-eight.vercel.app/tw','https://simples.com.tw/'];
+const siblingHrefs=['https://hypeboss.cc/','https://stocktools.cc/','https://toolist.cc/','https://simples.com.tw/'];
 for(const href of siblingHrefs){
   const links=[...d.querySelectorAll(`a[href="${href}"]`)];
   assert.ok(links.length>=1, href+' missing from dashboard');
   assert.ok(links.every(a=>a.target==='_blank' && a.rel==='noopener'));
 }
 assert.ok(d.querySelector('header a[href="https://hypeboss.cc/"]'));
-assert.ok(d.querySelector('header a[href="https://moneytools-eight.vercel.app/tw"]'));
+assert.ok(d.querySelector('header a[href="https://stocktools.cc/"]'));
+assert.ok(d.querySelector('header a[href="https://toolist.cc/"]'));
+assert.ok(d.querySelector('footer a[href="https://stocktools.cc/"]'));
+assert.ok(d.querySelector('footer a[href="https://toolist.cc/"]'));
 assert.ok(d.querySelector('footer a[href="https://simples.com.tw/"]'));
 assert.ok(d.querySelector('footer').textContent.includes('SIMPLES 工具網'));
+assert.ok(d.querySelector('footer').textContent.includes('Stocktools'));
+assert.ok(d.querySelector('footer').textContent.includes('Toolist'));
+assert.ok(!d.body.textContent.includes('Moneytools'));
+assert.ok(![...d.querySelectorAll('a')].some(a=>/moneytools/i.test(a.href)));
 
 if(mode==='valid'){assert.ok(d.querySelector('#html-wpi-a-desc').textContent.includes('170 架'));assert.ok(d.querySelector('#html-wpi-a-desc').textContent.includes('異常分數 0'));assert.ok(d.querySelector('#html-wpi-f-desc').textContent.includes('11,785 筆'));assert.ok(d.querySelector('#html-wpi-f-desc').textContent.includes('暫不計分'));assert.ok(d.querySelector('#poly-list-container').textContent.includes('美國會在12月31日前打擊古巴嗎？'));assert.ok(d.querySelector('#news-list').textContent.includes('新聞繁體中文標題'));assert.ok(!d.querySelector('#news-list').textContent.includes('English original'));assert.ok(d.querySelector('#strat-grid').textContent.includes('最近歷史參考：2026-06'));assert.ok(d.querySelector('#sh-svg').textContent.includes('缺報'));assert.ok(!d.querySelector('#sh-svg').innerHTML.includes('999'));}
 if(mode==='valid'){
