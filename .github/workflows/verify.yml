@@ -1,10 +1,10 @@
 name: Verify data integrity
 on:
   pull_request:
-    paths: ['scripts/**', 'tests/**', 'api/**', 'index.html', 'i18n.*', 'cross-context.js', 'locales/**', 'guides/**', 'vercel.json', 'vercel-ignore-build.cjs', '.vercelignore', '.github/workflows/**']
+    paths: ['scripts/**', 'tests/**', 'api/**', 'index.html', 'i18n.*', 'cross-context.js', 'locales/**', 'guides/**', 'robots.txt', 'sitemap.xml', 'vercel.json', 'vercel-ignore-build.cjs', '.vercelignore', '.github/workflows/**']
   push:
     branches: [main]
-    paths: ['scripts/**', 'tests/**', 'api/**', 'index.html', 'i18n.*', 'cross-context.js', 'locales/**', 'guides/**', 'vercel.json', 'vercel-ignore-build.cjs', '.vercelignore', '.github/workflows/**']
+    paths: ['scripts/**', 'tests/**', 'api/**', 'index.html', 'i18n.*', 'cross-context.js', 'locales/**', 'guides/**', 'robots.txt', 'sitemap.xml', 'vercel.json', 'vercel-ignore-build.cjs', '.vercelignore', '.github/workflows/**']
 concurrency:
   group: verify-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -23,7 +23,7 @@ jobs:
           node-version: '22'
       - run: pip install -r scripts/requirements.txt
       - run: python -m unittest discover -s tests -v
-      - run: node --test tests/test_api.mjs tests/test_deploy.mjs
+      - run: node --test tests/test_api.mjs tests/test_deploy.mjs tests/test_seo.mjs
       - run: npm install --no-save --ignore-scripts jsdom@30.0.1 acorn@8.15.0
       - run: node scripts/extract_ui_catalog.cjs
       - run: git diff --exit-code -- locales/source.json
