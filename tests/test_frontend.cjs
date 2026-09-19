@@ -2,7 +2,7 @@ process.chdir(require('path').resolve(__dirname,'..'));
 const {JSDOM,VirtualConsole}=require('jsdom');const fs=require('fs');const assert=require('assert');
 {
  const cash=fs.readFileSync('guides/cash-finance.html','utf8');
- const stocktoolsDeep=['https://www.stocktools.cc/tw/us-fee-calculator','https://www.stocktools.cc/tw/us-etf','https://www.stocktools.cc/tw/us-deposit','https://www.stocktools.cc/tw/us-open-account','https://www.stocktools.cc/tw/us-dividend','https://www.stocktools.cc/tw/us-first-buy','https://www.stocktools.cc/tw/us-premarket','https://www.stocktools.cc/tw/us-order-types','https://www.stocktools.cc/tw/us-adr','https://www.stocktools.cc/tw/us-fx'];
+ const stocktoolsDeep=['https://www.stocktools.cc/tw/us-fee-calculator','https://www.stocktools.cc/tw/us-etf','https://www.stocktools.cc/tw/us-deposit','https://www.stocktools.cc/tw/us-open-account','https://www.stocktools.cc/tw/us-dividend','https://www.stocktools.cc/tw/us-first-buy','https://www.stocktools.cc/tw/us-premarket','https://www.stocktools.cc/tw/us-order-types','https://www.stocktools.cc/tw/us-adr','https://www.stocktools.cc/tw/us-fx','https://www.stocktools.cc/tw/us-fractional'];
  for(const href of stocktoolsDeep) assert.ok(cash.includes(`href="${href}"`), href+' missing from cash-finance');
  assert.ok(cash.includes('href="https://stocktools.cc/"') && cash.includes('href="https://toolist.cc/"'));
  assert.ok(!/firstrade|luxstay|moneytools/i.test(cash));
@@ -56,7 +56,7 @@ assert.ok(d.querySelector('footer a[href="https://simples.com.tw/"]'));
 assert.ok(d.querySelector('footer').textContent.includes('SIMPLES 工具網'));
 assert.ok(d.querySelector('footer').textContent.includes('Stocktools'));
 assert.ok(d.querySelector('footer').textContent.includes('Toolist'));
-const stocktoolsDeep=['https://www.stocktools.cc/tw/us-fee-calculator','https://www.stocktools.cc/tw/us-etf','https://www.stocktools.cc/tw/us-deposit','https://www.stocktools.cc/tw/us-open-account','https://www.stocktools.cc/tw/us-dividend','https://www.stocktools.cc/tw/us-first-buy','https://www.stocktools.cc/tw/us-premarket','https://www.stocktools.cc/tw/us-order-types','https://www.stocktools.cc/tw/us-adr','https://www.stocktools.cc/tw/us-fx'];
+const stocktoolsDeep=['https://www.stocktools.cc/tw/us-fee-calculator','https://www.stocktools.cc/tw/us-etf','https://www.stocktools.cc/tw/us-deposit','https://www.stocktools.cc/tw/us-open-account','https://www.stocktools.cc/tw/us-dividend','https://www.stocktools.cc/tw/us-first-buy','https://www.stocktools.cc/tw/us-premarket','https://www.stocktools.cc/tw/us-order-types','https://www.stocktools.cc/tw/us-adr','https://www.stocktools.cc/tw/us-fx','https://www.stocktools.cc/tw/us-fractional'];
 for(const href of stocktoolsDeep){
   const links=[...d.querySelectorAll(`a[href="${href}"]`)];
   assert.ok(links.length>=2, href+' should appear in footer and finance tools');
