@@ -9,7 +9,6 @@ html[lang="en"] .header-inner{flex-wrap:wrap;gap:.5rem}
 header .header-inner{height:auto;min-height:64px;padding:.6rem 0;flex-wrap:wrap;gap:.6rem}
 header .hdr-left{flex-wrap:wrap}
 header .header-status{flex-wrap:wrap;max-width:100%;gap:.6rem}
-#observation-overview a,#observation-overview a:visited{color:#8de9ef}
 @media(max-width:800px){header .header-inner{min-height:48px;padding:.5rem 0}header .hdr-left{gap:.5rem}.language-switch{order:2}}
 /* Keep the arcade frame; prose and controls need a stable reading size. */
 body .container :is(.news-item,.poly-question,.poly-meta,.strat-note,.fh-legend,.fh-tab,.food-row,.strat-name,.ti-panel,.signal-desc){font-family:Arial,'Noto Sans TC',sans-serif!important;font-size:14px!important;line-height:1.65!important;letter-spacing:normal}
@@ -26,10 +25,6 @@ body .container .fh-svg-axis{font-family:Arial,'Noto Sans TC',sans-serif!importa
 body .container :is(.card,.card [style*="font-family"],.card small,.news-src,.news-time,.food-unit,.strat-val .u){font-family:Arial,'Noto Sans TC',sans-serif!important}
 body .container :is(.card small,.news-src,.news-time,.food-unit,.strat-val .u){font-size:12px!important;line-height:1.6}
 body .container .card [style*="font-size:.6"]{font-size:12px!important;line-height:1.6!important}
-#observation-overview{padding:1rem!important}
-#observation-overview h2{margin-bottom:.8rem}
-#observation-overview h3{color:#8de9ef;margin-bottom:.35rem}
-#observation-overview>div>section{padding:.65rem;border-left:3px solid #37506a;background:#0a1622}
 #strat-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem;margin-top:1rem}
 #strat-grid .strat-item{padding:.8rem;border:1px solid #37506a;min-width:0}
 @media(max-width:800px){#strat-grid{grid-template-columns:1fr}}
@@ -45,9 +40,6 @@ body .container :is(.news-topic,.strat-flag,.pla-legend,.pla-legend a,.tg-cta-tx
 body .container :is(.osint-updated,.avi-box-lbl,.avi-tr .row,.avi-item){font-family:Arial,'Noto Sans TC',sans-serif!important;font-size:12px!important;line-height:1.6;letter-spacing:normal}
 body .container .osint-adv-hdr{font-size:14px;letter-spacing:.03em;flex-wrap:wrap;gap:.5rem}
 body .container .avi-tr .row{white-space:normal;flex-wrap:wrap}
-#observation-overview a,#observation-overview a:visited{text-decoration:none;border-bottom:0;display:inline-flex;align-items:center;gap:.4rem;padding:.35rem 0;color:#d2f8fa}
-#observation-overview a:hover{color:#2ce8ff;text-decoration:none}
-#observation-overview a:focus-visible{outline:2px solid #2ce8ff;outline-offset:4px}
 .observation-caption{font:13px/1.6 Arial,'Noto Sans TC',sans-serif;color:#a9bdcb;margin:.4rem 0 .8rem}
 #notac-body{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem;align-items:stretch;grid-auto-rows:1fr}
 .notac-tile{min-width:0;border:1px solid #304252;padding:1rem;background:#101d28;font:14px/1.6 Arial,'Noto Sans TC',sans-serif}
@@ -74,16 +66,6 @@ body .container .pla-chart-panel .fh-chart svg{min-width:560px}
 /* Instrument-panel hierarchy: quiet frames, bright controls, compact summaries. */
 body.theme-8bit .container .card{border:1px solid #334357!important;border-radius:8px!important;box-shadow:0 4px 16px #0003!important;background:#0b1420!important}
 body.theme-8bit .container :is(.notac-tile,.pla-wrap){border-radius:6px!important}
-#observation-overview{border:1px solid #334357!important;background:#0b1420;border-radius:8px!important}
-#observation-overview>div>section{position:relative;border:1px solid #304252;border-radius:5px!important;padding:.85rem;background:#121f2e;transition:border-color .15s,background .15s}
-#observation-overview>div>section:hover{border-color:#68b8db;background:#172b3c}
-#observation-overview h3{font-size:13px!important;color:#93acbf;margin:0 0 .35rem}
-#observation-overview a{font-size:14px;font-weight:600;min-height:36px}
-#observation-overview>div>section:nth-child(2){border-top:2px solid #aa8de0}
-#observation-overview>div>section:nth-child(1){border-top:2px solid #62d3dc}
-#observation-overview>div>section:nth-child(3){border-top:2px solid #76cda0}
-#observation-overview>div>section:nth-child(4){border-top:2px solid #d6b273}
-@media(prefers-reduced-motion:reduce){#observation-overview>div>section{transition:none}}
 .notac-region{display:flex;align-items:center;gap:.65rem;min-width:0}
 .notac-icon{width:32px;height:32px;flex:none;color:#79ccd7}
 .notac-region strong{font-size:15px;color:#d7e8f2}

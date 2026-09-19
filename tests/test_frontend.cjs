@@ -36,8 +36,8 @@ for(const selector of ['#pizza-card','.hero-strip','.wpi-section']) {
   assert.equal(d.querySelectorAll(selector).length,1);
   assert.ok(experimental.contains(d.querySelector(selector)));
 }
-assert.equal(d.querySelector('#observation-overview').querySelectorAll('h3').length,4);
-for(const a of d.querySelectorAll('#observation-overview a')) assert.ok(d.querySelector(a.getAttribute('href')));
+assert.equal(d.querySelector('#observation-overview'),null);
+assert.ok(!d.body.textContent.includes('分項觀察'));
 assert.ok(!d.querySelector('#ticker').textContent.includes('披薩指數'));
 assert.ok(!d.querySelector('#ticker').textContent.includes('戰爭壓力指數'));
 assert.ok(!d.querySelector('#ticker').textContent.includes('WPI'));

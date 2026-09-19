@@ -1635,18 +1635,6 @@
 
   </details>
 
-  <section id="observation-overview" style="margin:1.5rem 0;padding:1.2rem;border:1px solid var(--accent)">
-    <h2 style="font-size:1rem;color:var(--accent)">分項觀察｜先看事實，再比較反應</h2>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:1rem;line-height:1.8">
-      <section><h3 style="font-size:.9rem">實際活動</h3><a href="#taiwan-insight-card">查看台海交叉洞察 →</a></section>
-      <section><h3 style="font-size:.9rem">新聞關注</h3><a href="#news-card">查看新聞與原文 →</a></section>
-      <section><h3 style="font-size:.9rem">市場反應</h3><a href="#poly-card">查看市場題目 →</a> · <a href="#md-wrap">金融趨勢 →</a></section>
-      <section><h3 style="font-size:.9rem">經濟與物流背景</h3><a href="#strat-card">查看物資與回報完整度 →</a></section>
-    </div>
-    <details class="reading-details"><summary>資料範圍與限制</summary><p>以官方日報看共機、共艦及此前基準；通報數量不代表作戰意圖。</p><p>新聞樣本與瀏覽量反映關注；重複報導不能當成獨立證據。</p><p>預測市場逐題核對事件與到期日；金融價格同時受到其他因素影響。</p><p>貿易資料按月且可能缺報，僅供背景比較；尚未接入航運流量資料。</p></details>
-  </section>
-
-
   <!-- ══════════ 置頂：免費訂閱 Telegram CTA ══════════ -->
   <a href="https://t.me/warhubss" target="_blank" rel="noopener" class="tg-cta tg-cta-top">
     <span class="tg-cta-ic">✈️</span>
@@ -2681,7 +2669,7 @@ async function fetchRealPizzaData() {
       json.regions=(json.regions||[]).map(r=>({...r,score:null,level:'INSUFFICIENT_DATA',coverage:0,factors:{}}));
     }
     const badge=document.getElementById('alert-badge');
-    if(badge)badge.textContent='分項觀察';
+    if(badge)badge.textContent=backupSnapshot?'備份資料快照':'定期資料快照';
     const live=document.querySelector('.live-lbl');
     if(live)live.textContent=age >= 0 && age < 6*3600000 ? (backupSnapshot?'備份資料快照':'定期資料快照') : '資料已過期';
     if(json.score?.model_version !== 'wpi-4.0') {
