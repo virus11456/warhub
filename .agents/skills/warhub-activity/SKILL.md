@@ -20,6 +20,6 @@ Google Maps Popular Times／BestTime 是店家人流訊號，無法直接證實�
 
 離線測試在 `tests/test_integrity.py`。需覆蓋不存在店家、缺即時值、有效零、結構錯誤及無 baseline。線上檢查可能耗用 BestTime credit，先用既有快照定位，只在需要時做有限請求。勿以測試本 skill 為由觸發 Telegram。
 
-WPI v4.0 的人工權重公式與歷史維持原樣，calculate_wpi 標記 experimental=true；首頁四類入口分開看實際活動、新聞關注、市場反應、經濟物流背景，舊 WPI／披薩／酒吧放在預設收合實驗區。alerts.run_notifications 對 experimental=true 或缺旗標的舊快照停用 WPI 升級與披薩異常警報（環境開關也不覆蓋此限制），保留更新摘要及獨立熱異常觀測。摘要標示實驗，不顯示 DEFCON。不得宣稱人流證實加班、獨立驗證或已回測；不改抓取頻率、不刪歷史。tests/test_alert_delivery.py 以 mock 驗證停止警報且摘要／熱異常仍有效，前端測試驗證實驗區收合與四類入口。
+WPI v4.0 的人工權重公式與歷史維持原樣，calculate_wpi 標記 experimental=true；舊 WPI／披薩／酒吧放在預設收合實驗區。alerts.run_notifications 對 experimental=true 或缺旗標的舊快照停用 WPI 升級與披薩異常警報（環境開關也不覆蓋此限制），保留更新摘要及獨立熱異常觀測。摘要標示實驗，不顯示 DEFCON。不得宣稱人流證實加班、獨立驗證或已回測；不改抓取頻率、不刪歷史。tests/test_alert_delivery.py 以 mock 驗證停止警報且摘要／熱異常仍有效，前端測試驗證實驗區收合。
 
 Telegram摘要由alerts._fmt_pizza_shops呈現：只有新鮮、is_open=true、有效0至100忙碌度與已知狀態的店家算即時樣本；明確未營業、缺值／過期分別計數。無即時樣本不能說沒有異常，部分样本的「未見偏忙／爆量」只限定有效樣本。已過期／失敗店家不出現在偏忙名單；缺percentage_of_usual不補0，標缺平時比較值。來源整體stale／unavailable優先顯示。tests/test_alert_content.py驗證有效零、缺值、打烊與過期；不改人流來源、通知政策或歷史。
