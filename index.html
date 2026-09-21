@@ -1645,7 +1645,7 @@
   <!-- ══════════ 地區戰爭風險評估看板 ══════════ -->
   <div class="card" style="border-top:2px solid var(--accent2);margin-bottom:1.5rem">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-bottom:.3rem">
-      <div class="section-title" style="margin:0">⚔️ 地區戰爭風險評估</div>
+      <div class="section-title" style="margin:0">🌐 地區觀測指數</div>
       <div style="font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim)" id="region-board-updated">依 Polymarket 盤口 + GDELT 新聞強度 + FIRMS 火點 + 軍機活動 即時計算</div>
     </div>
     <!-- 🌍 全球戰爭熱點發光點陣地球（Canvas · 可旋轉/縮放 · FIRMS 火點 × 監測地區風險）-->
@@ -1669,7 +1669,7 @@
       <div style="grid-column:1/-1;text-align:center;padding:1.2rem;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 計算地區風險中…</div>
     </div>
     <div style="margin-top:.7rem;font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim)">
-      計分：市場 35% · 新聞 25% · NOTAM 15%；火點及廣域軍機數僅展示，暫不計分；有效權重不足 60% 不出分數 ｜ ↑↓ = 與資料時間約 24 小時前相比（同計分因子、容許 ±4 小時；缺比較資料不顯示箭頭）
+      觀測分數依有效來源加權（市場 35、新聞 25、領空 15），缺值不補零。資料未達原模型門檻時顯示暫定分數；單一來源只代表該項觀察，不代表地區整體風險或開戰機率。暫定分數不寫入歷史、不顯示升降箭頭。
     </div>
 
     <!-- 7 天風險趨勢圖 -->
@@ -3002,13 +3002,31 @@ const REGION_LEVEL_STYLE = {
   WATCH:    { color:'var(--accent)', zh:'觀察中' },
 };
 
+// Presentation-only partial observation index; never writes scores or history.
+function regionalObservation(r) {
+  const valid = v => typeof v === 'number' && Number.isFinite(v) && v >= 0 && v <= 100;
+  const factors = r.factors || {};
+  const inputs = [['poly',35,'市場'],['gdelt',25,'新聞'],['notam',15,'領空']]
+    .filter(([key]) => valid(factors[key]));
+  const weight = inputs.reduce((sum, [,w]) => sum+w, 0);
+  const qualified = valid(r.score);
+  return {
+    score: qualified ? r.score : weight ? Math.round(inputs.reduce((sum,[key,w])=>sum+factors[key]*w,0)/weight*10)/10 : null,
+    provisional: !qualified && weight > 0,
+    count: inputs.length,
+    basis: inputs.map(([, ,label])=>label).join(' + '),
+    weight
+  };
+}
+
 function renderRegions(regions) {
   const board = document.getElementById('region-board');
   if (board) {
     board.innerHTML = regions.map(r => {
-      const st = REGION_LEVEL_STYLE[r.level] || REGION_LEVEL_STYLE.WATCH;
+      const observation = regionalObservation(r);
+      const st = observation.provisional ? {color:'var(--accent)',zh:'暫定觀測'} : REGION_LEVEL_STYLE[r.level] || REGION_LEVEL_STYLE.INSUFFICIENT_DATA;
       const f = r.factors || {};
-      const trend = trendArrow(r.score, r.key);
+      const trend = observation.provisional ? '' : trendArrow(r.score, r.key);
       const gdeltDelta = f.gdelt_delta != null
         ? `<span style="color:${f.gdelt_delta > 10 ? 'var(--accent2)' : f.gdelt_delta < -10 ? 'var(--accent)' : 'var(--text-dim)'}">${f.gdelt_delta > 0 ? '+' : ''}${f.gdelt_delta}%</span>`
         : '--';
@@ -3025,10 +3043,11 @@ function renderRegions(regions) {
       return `<div style="display:flex;flex-direction:column;min-width:0;overflow:hidden;background:var(--bg3);border:1px solid var(--border);border-left:3px solid ${st.color};padding:.9rem 1rem">
         <div style="display:flex;align-items:baseline;gap:.5rem;margin-bottom:.4rem">
           <span style="font-size:1rem">${r.flag} ${escapeHtml(r.name)}</span>
-          <span style="margin-left:auto;font-family:'Orbitron',monospace;font-size:1.5rem;font-weight:900;color:${st.color}">${(r.score == null ? '--' : Math.round(r.score))}</span>
+          <span style="margin-left:auto;font-family:'Orbitron',monospace;font-size:1.5rem;font-weight:900;color:${st.color}">${(observation.score == null ? '--' : Math.round(observation.score))}</span>
           <span style="font-family:'Share Tech Mono',monospace;font-size:.72rem">${trend}</span>
         </div>
-        <div style="font-family:'Orbitron',monospace;font-size:.7rem;letter-spacing:2px;color:${st.color};margin-bottom:.55rem">${r.level} · ${st.zh} · 覆蓋 ${Math.round((r.coverage || 0)*100)}%</div>
+        <div style="font-family:'Orbitron',monospace;font-size:.8rem;letter-spacing:normal;color:${st.color};margin-bottom:.55rem">${observation.score == null ? '尚無有效計分資料' : observation.provisional ? (observation.count === 1 ? '單一來源觀測' : '暫定觀測') : '多來源觀測'} · ${observation.count}/3 來源</div>
+        <div class="region-score-basis" style="font-size:.75rem;color:var(--text-dim);margin-bottom:.6rem">${observation.basis || '等待有效來源'}${observation.provisional ? ' · 資料有限，非整體風險' : ''}</div>
         <div style="display:flex;flex-direction:column;gap:.34rem;font-family:'Share Tech Mono',monospace">
           ${factorRow('市場盤口', f.poly)}
           ${factorRow('新聞強度', f.gdelt, gdeltDelta)}
@@ -3045,12 +3064,13 @@ function renderRegions(regions) {
   const mini = document.getElementById('region-mini-list');
   if (mini) {
     mini.innerHTML = regions.map(r => {
-      const st = REGION_LEVEL_STYLE[r.level] || REGION_LEVEL_STYLE.WATCH;
+      const observation = regionalObservation(r);
+      const st = observation.provisional ? {color:'var(--accent)',zh:'暫定觀測'} : REGION_LEVEL_STYLE[r.level] || REGION_LEVEL_STYLE.INSUFFICIENT_DATA;
       return `<div style="display:grid;grid-template-columns:82px 1fr 34px 30px;align-items:center;gap:.4rem;font-family:'Share Tech Mono',monospace;font-size:.68rem">
         <span>${r.flag} ${escapeHtml(r.name)}</span>
-        <div style="height:4px;background:rgba(255,255,255,.08)"><div style="width:${Math.min(100, r.score)}%;height:100%;background:${st.color}"></div></div>
-        <span style="color:${st.color};text-align:right">${(r.score == null ? '--' : Math.round(r.score))}</span>
-        <span style="font-size:.62rem">${trendArrow(r.score, r.key)}</span>
+        <div style="height:4px;background:rgba(255,255,255,.08)"><div style="width:${observation.score ?? 0}%;height:100%;background:${st.color}"></div></div>
+        <span style="color:${st.color};text-align:right">${(observation.score == null ? '--' : Math.round(observation.score))}</span>
+        <span style="font-size:.62rem">${observation.provisional ? '暫定' : trendArrow(r.score, r.key)}</span>
       </div>`;
     }).join('');
   }

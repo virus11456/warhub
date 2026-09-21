@@ -69,6 +69,37 @@ assert.ok(!d.body.textContent.includes('Moneytools'));
 assert.ok(![...d.querySelectorAll('a')].some(a=>/moneytools|firstrade|luxstay/i.test(a.href)));
 
 if(mode==='valid'){assert.ok(d.querySelector('#html-wpi-a-desc').textContent.includes('170 架'));assert.ok(d.querySelector('#html-wpi-a-desc').textContent.includes('異常分數 0'));assert.ok(d.querySelector('#html-wpi-f-desc').textContent.includes('11,785 筆'));assert.ok(d.querySelector('#html-wpi-f-desc').textContent.includes('暫不計分'));assert.ok(d.querySelector('#poly-list-container').textContent.includes('美國會在12月31日前打擊古巴嗎？'));assert.ok(d.querySelector('#news-list').textContent.includes('新聞繁體中文標題'));assert.ok(!d.querySelector('#news-list').textContent.includes('English original'));assert.ok(d.querySelector('#strat-grid').textContent.includes('最近歷史參考：2026-06'));assert.ok(d.querySelector('#sh-svg').textContent.includes('缺報'));assert.ok(!d.querySelector('#sh-svg').innerHTML.includes('999'));}
+
+if(mode==='valid'){
+ const w=dom.window;
+ const cases=[
+  {key:'ukraine',name:'俄烏',flag:'',score:null,level:'INSUFFICIENT_DATA',factors:{poly:69.6,notam:0}},
+  {key:'taiwan',name:'台海',flag:'',score:null,level:'INSUFFICIENT_DATA',factors:{poly:6.6}},
+  {key:'korea',name:'朝鮮',flag:'',score:null,level:'INSUFFICIENT_DATA',factors:{notam:0}},
+  {key:'empty',name:'缺值',flag:'',score:null,level:'INSUFFICIENT_DATA',factors:{poly:null,gdelt:NaN,notam:false,firms_hotspots:300,avi_count:20}}
+ ];
+ const original=JSON.stringify(cases);
+ assert.equal(w.regionalObservation(cases[0]).score,48.7);
+ assert.equal(w.regionalObservation(cases[1]).score,6.6);
+ assert.equal(w.regionalObservation(cases[2]).score,0);
+ assert.equal(w.regionalObservation(cases[3]).score,null);
+ assert.equal(w.regionalObservation({...cases[1],score:32}).score,32,'qualified historical model score is preserved');
+ assert.equal(w.regionalObservation({...cases[1],factors:{poly:Infinity,notam:-1,gdelt:101}}).score,null);
+ w.renderRegions(cases);
+ const board=d.querySelector('#region-board');
+ assert.ok(board.textContent.includes('單一來源觀測'));
+ assert.ok(board.textContent.includes('領空 · 資料有限，非整體風險'));
+ assert.ok(board.textContent.includes('尚無有效計分資料'));
+ assert.ok(!board.textContent.includes('INSUFFICIENT_DATA'));
+ assert.ok(!board.textContent.includes('CRITICAL'));
+ assert.ok(d.querySelector('#region-mini-list').textContent.includes('暫定'));
+ assert.equal(JSON.stringify(cases),original,'presentation must not rewrite snapshot or historical scores');
+ // Stale/legacy load path clears factors before rendering; no observation score survives.
+ w.renderRegions(cases.map(r=>({...r,score:null,factors:{}})));
+ assert.ok(!board.textContent.includes('單一來源觀測'));
+ assert.ok(!d.querySelector('#region-mini-list').textContent.includes('暫定'));
+}
+
 if(mode==='valid'){
   const w=dom.window;
   const sparse=Array.from({length:36},(_,i)=>({ym:`${2023+Math.floor(i/12)}-${String(i%12+1).padStart(2,'0')}`,schema_version:2,src:'mirror','4001':i===2?0:i===3?4:null}));
