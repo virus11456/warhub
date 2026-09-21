@@ -24,6 +24,7 @@ function visibleStrings(d){
  const errors=[],vc=new VirtualConsole();vc.on('jsdomError',e=>{if(!e.message.includes('Not implemented'))errors.push(e.message)});
  const data=JSON.parse(fs.readFileSync('tests/fixtures/legacy-data.json','utf8'));
  data.updated_at=new Date().toISOString();data.score={model_version:'wpi-4.0',combined_score:null,coverage:0,factors:{}};
+ data.regions=[{key:'taiwan',name:'台海',flag:'',score:null,level:'INSUFFICIENT_DATA',factors:{poly:6.6}},{key:'korea',name:'朝鮮半島',flag:'',score:null,level:'INSUFFICIENT_DATA',factors:{notam:0}}];
  data.polymarket=[{question:'Will the event happen by December 31?',question_zh:'事件會在12月31日前發生嗎？',yes_price:.14,volume:1000,slug:'test'}];
  data.news=[{title:'中文測試標題',title_zh:'中文測試標題',title_en:'Original test headline',url:'https://example.com/news',ts:data.updated_at}];
  data.taiwan_insight={version:1,as_of:data.updated_at,activity:{status:'within_baseline',baseline_days:20,median:10,latest:{date:data.updated_at.slice(0,10),aircraft:0,ships:5,government_ships:0,period_end:data.updated_at,source_url:'https://example.com/report'}},
@@ -49,6 +50,8 @@ function visibleStrings(d){
  assert.ok(d.querySelector('#notac-body').textContent.includes('records'));
  assert.ok(!/\bPen\b/.test(d.querySelector('#cross-reading').textContent));
  assert.ok(d.querySelector('#cross-reading').textContent.includes('0'));
+ assert.ok(d.querySelector('#region-board').textContent.includes('Single-source observation'));
+ assert.ok(d.querySelector('#region-board').textContent.includes('Limited data; not overall risk'));
  const missing=visibleStrings(d).filter(s=>/[\u3400-\u9fff]/.test(s));
  assert.deepEqual(missing,[],'dashboard untranslated UI text');
  data.news[0].title='更新中文標題';data.news[0].title_zh='更新中文標題';data.news[0].title_en='Updated English headline';

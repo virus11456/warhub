@@ -84,3 +84,5 @@ NOTAC（2026-09-15）：既有fetch_notams可用NOTAC_API_KEY切換正式API，�
 雙語：固定網站文字與指南以離線catalogue提供；來源新聞在原收集session附加title_english與english_translation_cache，詳見warhub-news。中英文切換不能觸發來源請求、重算／改寫歷史或更新觀測時間。NOTAC樣本起訖時段及跨資料閱讀排序見warhub-osint；完整性、6h前端時效與每來源原時間仍分開核對，不能因API驗證成功就宣稱正式資料已齊全。
 
 2026-09-16 Telegram 摘要改為地區觀測（非風險評級）：逐區列市場因子是否有效、NOTAM 完整查詢／部分樣本／過期／缺資料，以及 GDELT 新聞強度狀態，不再只輸出 INSUFFICIENT_DATA。部分樣本優先讀 latest_attempt，不拿舊 total 當本輪全量；完整有效零值保留。WPI coverage 改標「有效權重（非全站資料完整率）」。僅通知呈現變更，地區模型、門檻、歷史與來源額度不變；NOTAC 每輪最新兩頁不會跨輪自動补齊。tests/test_alert_content.py 驗證不改快照、零值、過期與部分資料，不發真實測試訊息。
+
+2026-09-21 地區卡片的 regionalObservation 為前端展示用暫定觀測分數：原 score 有效時保留，否則按有效 poly/gdelt/notam 的35/25/15權重重新正規化；只接受0至100的有限數字，有效零保留，布林／缺值／非有限／越界排除。單一來源及暫定分數需明示來源，不能標為整體風險、戰爭機率或安全。既有過期／舊模型讀取守門清除因子，火點與廣域軍機仍不計分。暫定分數不寫入快照、歷史或Telegram，不显示升降箭頭；原模型門檻與歷史保留。tests/test_frontend.cjs驗證缺值、有效零、無效輸入與快照不變；test_site_languages.cjs驗證双語呈現。
