@@ -16,3 +16,7 @@ description: "Maintain WARHUB Polymarket Gamma collection, market selection, eve
 `question_zh` 只對應相同 `question`。核對 by／before（期限前）、on（當日）、through（持續至）與 test／use 核武等差異；未知句型不得套模板改變事件。前端列表、地區卡、跑馬燈共用 `zhMarket`，保留原文 tooltip 與市場連結。
 
 可展示市場價格不代表已驗證預測準確率；不同期限／事件定義不能直接比較。核對 `tests/test_integrity.py` 的市場案例、`tests/test_news_translation.py` 及 `tests/test_frontend.cjs`。驗證缺譯時仍保留正確價格與原文入口，而非捏造中文事件。
+
+
+Kalshi共用篩選準備：scripts/market_selection.py::selected_market_risk抽出原fetch_polymarket的EXCLUDE_KEYWORDS前置排除，再原樣呼叫scoring.market_risk。Polymarket題目、價格、期限、停火方向與原篩選集合不变；WAR_KEYWORDS並不是現行fetch_polymarket的最終資格判斷。Kalshi離線select_markets使用同函式，無需跨平台配對才納入；同題價差配對另做審核。Kalshi仍須active有效雙邊報價，量單位contracts不等於Gamma美元volume。共用篩選已納入程式；Kalshi網路抓取與網站展示尚未啟用。tests/test_kalshi_market_data.py以原排除清單加market_risk比對兩平台選取結果，test_integrity.py驗證現有收集器。
+
