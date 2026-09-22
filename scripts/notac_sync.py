@@ -159,7 +159,8 @@ async def collect_delta(session, token, firs, old, budget, danger_re, closure_re
                 or (row.get('status') == 'upcoming' and not start)):
             continue
         rows.append(row)
-    result.update(rows=rows, sample_count=len(rows), partial=bool(rows) and not result['complete'])
+    result.update(rows=rows, sample_count=len(rows), partial=bool(rows) and not result['complete'],
+                  sample_observed_at=state.get('as_of'))
     if result['complete']:
         result['total'] = len(rows)
         result['reported_count'] = len(rows)

@@ -53,6 +53,7 @@ class Tests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(out['complete'])
         self.assertEqual(out['sync_state']['cursor'], 'p1')
         self.assertEqual(list(out['sync_state']['records']), ['a'])
+        self.assertEqual(out['sample_observed_at'], NOW.isoformat())
 
     async def test_unsafe_next_never_requested(self):
         p = page([row('a')], 'p1', True); p['next'] = p['next'].replace('notac.aero', 'evil.test')
