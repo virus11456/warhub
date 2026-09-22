@@ -99,3 +99,5 @@ Kalshi共用選題與离線adapter見 [warhub-kalshi](../warhub-kalshi/SKILL.md)
 Kalshi後續本機工作：refresh已實作跨輪冷卻及原時間保留、獨立雙語renderer已有mock驗證；公開API有限實測成功，但兩個軍事相關系列無開放市場。仍未掛入main/index，未變更排程或WPI，詳見warhub-kalshi最新進度。
 
 2026-09-22 Kalshi正式接線：fetch_kalshi加入正常收集，輸出獨立kalshi欄位及source_health；每輪最多3次公開讀請求、來源110分鐘間隔、429冷卻持久化。詳見warhub-kalshi。外交／制裁／軍事政策僅作地區分數旁參考，不改WPI／地區权重，無新增排程或通知；data.json既有不可覆寫封存自然涵蓋新欄位。
+
+2026-09-23 台海洞察呈現：先顯示共機活動相對既有基準的白話摘要，明示不代表全球戰爭機率或安全保證。官方比較方法、保存新聞樣本與交叉限制預設收合；有效零、來源時間、同題市場比較條件及全部資料仍保留。僅顯示層調整，不改公式、來源抓取、歷史或時間戳。

@@ -38,3 +38,5 @@ index載入kalshi-markets.js/css，位於現有市場區下方；地區卡片dat
 首次上線備援：research/kalshi-initial.json是2026-09-22實際API取得的美伊系列初始快照，保留原fetched_at及原標題／期限，7題中文人工核對。尚無正式kalshi欄位時前端只讀一次，明示initial_probe；6h過期不顯示現時中價，較晚回應不能蓋過已載入正式kalshi（即使正式結果為空／失敗）。正常collector只從此檔讀精確翻譯快取，不把其報價改時間或當新收集。此檔作歷史種子保留，不滾動更新。
 
 2026-09-22卡片整合：Kalshi卡片改加入poly-list-container同一網格，沿用poly-item／poly-bar／poly-percent；每張data-exchange及平台標籤，不另建Kalshi卡片區或平台篩選器。Polymarket重新渲染後refreshKalshiReferences重建Kalshi卡片，先移除舊Kalshi節點避免重複。交易量的美元與合約數維持區別；kalshi-market-container只留精簡來源狀態。此批為顯示，不增加系列、不改計分權重。
+
+2026-09-23：兩平台卡片在同一網格交錯排列，各平台內部順序維持；不混用美元／合約量作跨平台排名。防止Kalshi全部排在列表尾端而看似消失，重繪仍先清除舊Kalshi卡片。

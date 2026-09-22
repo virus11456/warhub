@@ -1,7 +1,7 @@
 const {JSDOM} = require('jsdom');
 const fs = require('node:fs');
 const assert = require('node:assert/strict');
-const dom = new JSDOM('<div id="poly-list-container"></div><div id="kalshi-market-container"></div>', {runScripts:'outside-only'});
+const dom = new JSDOM('<div id="poly-list-container"><a data-exchange="polymarket">P1</a><a data-exchange="polymarket">P2</a></div><div id="kalshi-market-container"></div>', {runScripts:'outside-only'});
 const w = dom.window;
 w.fetch=()=>Promise.reject(new Error('No network in tests'));
 w.eval(fs.readFileSync('kalshi-markets.js', 'utf8'));
@@ -12,6 +12,7 @@ const m = {question:'<img src=x onerror=alert(1)>',question_zh:'合成測試', d
 w.renderKalshiMarkets({...base,markets:[m]});
 assert.match(w.document.body.textContent,/YES 0.0%/);
 assert.equal(w.document.querySelector('img'),null);
+assert.deepEqual([...w.document.querySelectorAll('[data-exchange]')].map(e=>e.dataset.exchange),['polymarket','kalshi','polymarket']);
 w.renderKalshiMarkets({...base,status:'stale',markets:[m]});
 assert.doesNotMatch(w.document.body.textContent,/YES 0.0%/);
 w.WarhubI18n={language:'en'};
@@ -21,7 +22,7 @@ w.renderKalshiMarkets({...base,markets:[{...m,display_midpoint:null}]});
 assert.doesNotMatch(w.document.body.textContent,/YES 0.0%/);
 console.log('Kalshi UI: empty, zero, stale, missing, English and HTML injection checks passed');
 (async()=>{
- const d=new JSDOM('<div id="poly-list-container"></div><div id="kalshi-market-container"></div><div data-kalshi-region="mideast"></div>',{runScripts:'outside-only'});
+ const d=new JSDOM('<div id="poly-list-container"><a data-exchange="polymarket">P1</a><a data-exchange="polymarket">P2</a></div><div id="kalshi-market-container"></div><div data-kalshi-region="mideast"></div>',{runScripts:'outside-only'});
  let release;
  d.window.fetch=()=>new Promise(resolve=>{release=resolve});
  d.window.eval(fs.readFileSync('kalshi-markets.js','utf8'));

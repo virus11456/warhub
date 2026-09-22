@@ -31,3 +31,6 @@ research/pizza-reviews.json 保存版本化重大行動定義與逐事件審核�
 
 
 2026-09-22證據呈現修正：pizza-reviews新增screenings，保存逐窗口的初步查找、雙語摘要、來源與checked_at；inconclusive／complete_window=false不改正式reviews，不轉為reviewed_no或命中。本輪只核對到候選動武、反恐空襲、計畫暫緩，部分官方頁403且精確時點／範圍不足，不能宣稱6窗已核實。前端獨立讀screenings與現有觀測摘要，不刷新歷史時間，主畫面直接列每次訊號與證據；四格改為確認符合／完整核對未見／仍不確定／觀測中，缺率顯示尚不能估計，方法另收合。沿用既有8bit主题Cubic11與PressStart2P，不改觀測演算法。
+
+2026-09-23披薩48h呈現：統計常駐、事件與證據預設details收合，計算方法為獨立details。重繪分別保存兩者open，語言／門檻／資料更新不強制收合使用者已開啟的內容。只改UI，不改訊號自動累積或人工查核流程。
+私有GitHub原始封存連結不再出現在公開披薩回測UI；保留原觀測時間與公開證據連結，後端archive欄位與歷史檔不刪除。
