@@ -1,8 +1,4 @@
-"""Offline adapter preparation. Not connected to collection or public display.
-
-Actual API use, storage and redistribution await written data-use authorization.
-All tests use synthetic fixtures. No network or account access exists here.
-"""
+"""Pure Kalshi contract normalization and explicit topic selection."""
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 import hashlib
@@ -32,6 +28,15 @@ def timestamp(value):
         return None
 
 
+# Reviewed series scope, confirmed against the official series catalog.
+# Background topics are references, not inputs to WPI or regional risk weights.
+BACKGROUND_SERIES = {
+    'KXUSAIRANAGREEMENT': {'region': 'mideast', 'topic': 'diplomacy'},
+    'KXSANCTIONRUSSIA': {'region': 'ukraine', 'topic': 'sanctions'},
+    'KXGREENLANDMILITARYBILL': {'region': None, 'topic': 'military_policy'},
+}
+
+
 def normalize(market, fetched_at):
     fetched=timestamp(fetched_at)
     if fetched is None:
@@ -41,6 +46,13 @@ def normalize(market, fetched_at):
         raise ValueError('Invalid ticker')
     if market.get('market_type') != 'binary':
         raise ValueError('Only binary contracts are supported')
+    original=market.get('title')
+    if not isinstance(original, str) or not original.strip():
+        raise ValueError('Missing contract title')
+    # The option often contains the actual deadline. Never collapse these markets
+    # into identical questions or treat close_time as the semantic event deadline.
+    option=market.get('yes_sub_title')
+    question=original + (' | ' + option if isinstance(option,str) and option.strip() and option != original else '')
     end=timestamp(market.get('close_time'))
     bid,ask=(number(market.get(key),1) for key in ('yes_bid_dollars','yes_ask_dollars'))
     bid_size,ask_size=(number(market.get(key)) for key in ('yes_bid_size_fp','yes_ask_size_fp'))
@@ -50,8 +62,8 @@ def normalize(market, fetched_at):
     rules={k:market.get(k) for k in ('title','subtitle','yes_sub_title','no_sub_title','rules_primary','rules_secondary','close_time','expected_expiration_time','latest_expiration_time','can_close_early')}
     fingerprint=hashlib.sha256(json.dumps(rules,sort_keys=True,ensure_ascii=False).encode()).hexdigest()
     return {'provider':'kalshi','id':f'kalshi:{ticker}','ticker':ticker,
-            'event_ticker':market.get('event_ticker'),'question':market.get('title'),
-            'question_zh':None,'question_en':market.get('title'),
+            'event_ticker':market.get('event_ticker'),'question':question, 'title_original':original,
+            'question_zh':None,'question_en':question,
             'fetched_at':fetched.isoformat(),'source_updated_at':market.get('updated_time'),
             'quote_observed_at':None, # updated_time is not proven to be last quote time.
             'end_date':market.get('close_time'),'rules':rules,'rules_fingerprint':fingerprint,
@@ -82,7 +94,7 @@ def reviewed_pair(left, right, review):
 
 
 
-def select_markets(markets, fetched_at):
+def select_markets(markets, fetched_at, *, include_background=False):
     """Offline equivalent of Polymarket topic selection on normalized binary data.
 
     No cross-platform pairing is required. Kalshi quote validity remains separate
@@ -103,9 +115,17 @@ def select_markets(markets, fetched_at):
             continue
         candidate = {'question': item['question'],
                      'yes_price': item['display_midpoint'], 'end_date': item['end_date']}
-        if selected_market_risk(candidate) is None:
+        series=item['ticker'].split('-')[0]
+        background=BACKGROUND_SERIES.get(series) if include_background else None
+        if background:
+            item.update(background)
+            item['category']='geopolitical_background'
+        elif selected_market_risk(candidate) is None:
             continue
+        else:
+            item['category']='conflict_market'
+        item['series_ticker']=series
         seen.add(item['id'])
-        item['event_direction'] = 'deescalation' if PEACE.search(item['question']) else 'escalation'
+        item['event_direction'] = 'context_only' if background else ('deescalation' if PEACE.search(item['question']) else 'escalation')
         selected.append(item)
     return selected

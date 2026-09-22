@@ -134,7 +134,7 @@ class Pipeline(unittest.IsolatedAsyncioTestCase):
     async def test_full_pipeline_with_missing_sources(self):
         from contextlib import ExitStack
         from unittest.mock import AsyncMock
-        funcs=['pizzint','aviation','firms','gdelt','food_imports','usda_esr','nuclear_seismic','wikipedia_anxiety','notams','bars','strategic_imports','pla_sorties','finance','fred']
+        funcs=['kalshi','pizzint','aviation','firms','gdelt','food_imports','usda_esr','nuclear_seismic','wikipedia_anxiety','notams','bars','strategic_imports','pla_sorties','finance','fred']
         lists=['polymarket','eonet','gnews','food_history','strategic_history','tw_military_news']
         with tempfile.TemporaryDirectory() as td, ExitStack() as stack:
             stack.enter_context(patch.dict('os.environ',{'WARHUB_NO_NOTIFY':'1'}))
@@ -157,7 +157,7 @@ class Pipeline(unittest.IsolatedAsyncioTestCase):
         from contextlib import ExitStack
         from unittest.mock import AsyncMock
         import copy
-        funcs=['pizzint','aviation','firms','gdelt','nuclear_seismic','wikipedia_anxiety','notams','bars','pla_sorties','finance']
+        funcs=['kalshi','pizzint','aviation','firms','gdelt','nuclear_seismic','wikipedia_anxiety','notams','bars','pla_sorties','finance']
         lists=['polymarket','eonet','gnews','tw_military_news']
         previous={'food': {'schema_version':2, 'updated_at':'2026-09-01T00:00:00+00:00', 'items':[{'wan_ton':12}]},
                   'usda':None, 'strat':{}, 'fred':{}, 'food_hist':[{'month':'2026-07'}], 'strat_hist':[]}
@@ -184,3 +184,4 @@ class Pipeline(unittest.IsolatedAsyncioTestCase):
             self.assertIn('polymarket',data['collection']['duration_seconds'])
             self.assertNotIn('food_imports',data['collection']['duration_seconds'])
             self.assertNotIn('_notify',data)
+

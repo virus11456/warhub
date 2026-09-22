@@ -1,0 +1,15 @@
+#kalshi-market-container { border-top:1px solid var(--border); margin-top:1.2rem; padding-top:1rem; scroll-margin-top:5rem; }
+#kalshi-market-container h3 { font:600 1rem/1.5 sans-serif; color:var(--accent); margin:0 0 .5rem; }
+#kalshi-market-container .poly-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:.8rem; }
+#kalshi-market-container .poly-item { display:flex; flex-direction:column; gap:.55rem; min-width:0; padding:1rem; }
+#kalshi-market-container .poly-question { font:500 .9rem/1.6 sans-serif; overflow-wrap:anywhere; }
+#kalshi-market-container strong { font:600 1.35rem/1.4 sans-serif; color:var(--accent); }
+#kalshi-market-container p { margin:0; font:400 .8rem/1.6 sans-serif; overflow-wrap:anywhere; }
+#kalshi-market-container .kalshi-status { color:var(--text-dim); margin-bottom:.5rem; }
+#kalshi-market-container details { margin-top:auto; font:400 .8rem/1.7 sans-serif; }
+#kalshi-market-container summary { cursor:pointer; color:var(--accent); }
+#kalshi-market-container a,.kalshi-region-reference a { color:var(--accent); text-decoration:none; }
+.kalshi-region-reference:empty { display:none; }
+.kalshi-region-reference { margin:.4rem 0; font:400 .75rem/1.5 sans-serif; }
+.kalshi-region-reference small { display:block; color:var(--text-dim); }
+@media(max-width:650px) { #kalshi-market-container .poly-grid { grid-template-columns:minmax(0,1fr); } }

@@ -909,10 +909,12 @@ async def _translate_titles(session, items, tl="zh-TW", cached_titles=None):
     log.info("Chinese news titles: %s/%s", sum(bool(i.get("title_zh")) for i in items), len(items))
 
 
-async def _translate_market_questions(session, markets):
-    cached = {}
+async def _translate_market_questions(session, markets, cached=None):
+    provided_cache = cached is not None
+    cached = cached or {}
     try:
-        cached = translation_cache(json.loads(DATA_FILE.read_text(encoding="utf-8")), "polymarket")
+        if not provided_cache:
+            cached = translation_cache(json.loads(DATA_FILE.read_text(encoding="utf-8")), "polymarket")
     except (OSError, ValueError, TypeError):
         pass
     titles = [{"title":m.get("question", "")} for m in markets]
@@ -2142,6 +2144,33 @@ def calculate_score(pizza_index, polymarket, **sources):
     return calculate_wpi(pizza_index, polymarket, **sources)
 
 
+async def fetch_kalshi(session, previous=None):
+    """Three reviewed background series; no scoring, trading or notifications."""
+    from kalshi_client import refresh
+    from kalshi_market_data import BACKGROUND_SERIES
+    previous = previous if isinstance(previous, dict) else {}
+    # Seed exact translations only; never promote bootstrap quotes to a new time.
+    seed = {}
+    if not previous.get('markets'):
+        try:
+            seed = json.loads((Path(__file__).resolve().parents[1] / 'research' / 'kalshi-initial.json').read_text(encoding='utf-8'))
+        except (OSError, ValueError):
+            pass
+    result = await refresh(session, list(BACKGROUND_SERIES), previous,
+                           authorized=True, include_background=True)
+    if result.get('reused') or not result.get('markets'):
+        return result
+    cached = {m.get('question'): m['question_zh'] for m in (previous.get('markets') or seed.get('markets') or [])
+              if isinstance(m, dict) and m.get('question') and m.get('question_zh')}
+    # Only translate the bounded display set. Full selected records are preserved.
+    result['markets'].sort(key=lambda m: -(m.get('volume_24h_contracts') or 0))
+    try:
+        await _translate_market_questions(session, result['markets'][:12], cached=cached)
+    except Exception:
+        log.warning('Kalshi title translation unavailable; preserve original quotes')
+    return result
+
+
 async def main():
     import time
     from collection_policy import plan
@@ -2178,6 +2207,7 @@ async def main():
             pizzint_task, poly_task, aviation_task, firms_task, eonet_task,
             gdelt_task, news_task, seismic_task, wiki_task, notam_task, bars_task
         )
+        kalshi = await measured("kalshi", fetch_kalshi(session, previous.get("kalshi")))
         news_sampling = news["sampling"]
         news = news["headlines"]
         food = await food_task if food_task else previous.get("food")
@@ -2290,6 +2320,7 @@ async def main():
         "defcon_level":  defcon_level,
         "defcon_details": pizzint_data.get("defcon_details"),
         "polymarket":    polymarket,
+        "kalshi":        kalshi,
         "finance":       finance,
         "fred":          fred,
         "aviation":      aviation,
