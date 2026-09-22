@@ -29,3 +29,5 @@ Telegram摘要由alerts._fmt_pizza_shops呈現：只有新鮮、is_open=true、�
 research/pizza-reviews.json 保存版本化重大行動定義與逐事件審核；候選空襲不是命中。只有附來源、審核時間、完整落在48小時內的行動時間範圍才算確認；負例須明確完成整個窗口核對，沒有新聞不等於無行動。尚有成熟窗口待核實則整組比例維持null，不從少數已確認正例推算命中率。兩組與窗口可重疊，Wilson區間未校正相依；未建立對照期基準前不得宣稱預測能力。reviewed_fraction僅診斷，不當作整組率；baseline_rate/predictive_lift保持null。讀檔錯誤不當零，封存讀取失敗停顯比例。
 初次研究檔包含101份觀測（100封存加一份main快照）；原封存與歷史均不改寫。網站 pizza-backtest.js 使用靜態審核結果作初次顯示，之後採較新的快照摘要，不把舊研究時間說成即時。中英文切換不重新抓資料。tests/test_pizza_backtest.py、test_pizza_backtest.cjs及既有DOM suite驗證門檻、去重、缺值、48h邊界、審核、反序回覆與雙語；禁止執行fetch_data作測試。
 
+
+2026-09-22證據呈現修正：pizza-reviews新增screenings，保存逐窗口的初步查找、雙語摘要、來源與checked_at；inconclusive／complete_window=false不改正式reviews，不轉為reviewed_no或命中。本輪只核對到候選動武、反恐空襲、計畫暫緩，部分官方頁403且精確時點／範圍不足，不能宣稱6窗已核實。前端獨立讀screenings與現有觀測摘要，不刷新歷史時間，主畫面直接列每次訊號與證據；四格改為確認符合／完整核對未見／仍不確定／觀測中，缺率顯示尚不能估計，方法另收合。沿用既有8bit主题Cubic11與PressStart2P，不改觀測演算法。

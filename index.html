@@ -1776,7 +1776,7 @@
   <!-- ══════════ POLYMARKET 獨立卡片 ══════════ -->
   <div id="poly-card" class="card poly-card" style="margin-bottom:1.5rem">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;flex-wrap:wrap;gap:.5rem">
-      <div class="section-title" style="margin:0">📊 Polymarket 戰爭預測市場</div>
+      <div class="section-title" style="margin:0">📊 Polymarket / Kalshi</div>
       <div style="font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim);display:flex;gap:.8rem;align-items:center">
         <span style="color:var(--accent1)">約每 2 小時更新</span>
         <span id="poly-updated-time">上次更新：載入中…</span>
@@ -4022,6 +4022,7 @@ function renderPolymarketCards(markets) {
 
   if (!sorted.length) {
     container.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:1.4rem;font-family:\'Share Tech Mono\',monospace;font-size:.7rem;color:var(--text-dim)">目前無相關市場資料</div>';
+    window.refreshKalshiReferences?.();
     return;
   }
 
@@ -4038,8 +4039,9 @@ function renderPolymarketCards(markets) {
     const question = escapeHtml(zhMarket(m.question));
     const qEn      = escapeHtml(m.question);
 
-    return `<a href="${url}" target="_blank" rel="noopener" style="text-decoration:none;color:inherit">
+    return `<a data-exchange="polymarket" href="${url}" target="_blank" rel="noopener" style="text-decoration:none;color:inherit">
       <div class="poly-item ${severity}" style="cursor:pointer" onmouseover="this.style.borderLeftWidth='5px'" onmouseout="this.style.borderLeftWidth='3px'">
+        <span class="market-exchange">Polymarket</span>
         <div class="poly-question" title="${qEn}">${flag} ${question}</div>
         <div class="poly-bar-container">
           <span style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim);width:24px">YES</span>
@@ -4053,6 +4055,7 @@ function renderPolymarketCards(markets) {
       </div>
     </a>`;
   }).join('');
+  window.refreshKalshiReferences?.();
 }
 
 function formatVolume(v) {

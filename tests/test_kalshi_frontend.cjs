@@ -1,7 +1,7 @@
 const {JSDOM} = require('jsdom');
 const fs = require('node:fs');
 const assert = require('node:assert/strict');
-const dom = new JSDOM('<div id="kalshi-market-container"></div>', {runScripts:'outside-only'});
+const dom = new JSDOM('<div id="poly-list-container"></div><div id="kalshi-market-container"></div>', {runScripts:'outside-only'});
 const w = dom.window;
 w.fetch=()=>Promise.reject(new Error('No network in tests'));
 w.eval(fs.readFileSync('kalshi-markets.js', 'utf8'));
@@ -21,7 +21,7 @@ w.renderKalshiMarkets({...base,markets:[{...m,display_midpoint:null}]});
 assert.doesNotMatch(w.document.body.textContent,/YES 0.0%/);
 console.log('Kalshi UI: empty, zero, stale, missing, English and HTML injection checks passed');
 (async()=>{
- const d=new JSDOM('<div id="kalshi-market-container"></div><div data-kalshi-region="mideast"></div>',{runScripts:'outside-only'});
+ const d=new JSDOM('<div id="poly-list-container"></div><div id="kalshi-market-container"></div><div data-kalshi-region="mideast"></div>',{runScripts:'outside-only'});
  let release;
  d.window.fetch=()=>new Promise(resolve=>{release=resolve});
  d.window.eval(fs.readFileSync('kalshi-markets.js','utf8'));

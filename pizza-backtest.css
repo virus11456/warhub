@@ -5,3 +5,19 @@
 .pizza-study-main{display:grid;grid-template-columns:minmax(150px,1fr) 3fr;gap:1.2rem;margin:1rem 0}.pizza-study-rate{display:flex;flex-direction:column;justify-content:center}.pizza-study-rate>strong{font-size:2.6rem;line-height:1.1;color:#8ee6ed}.pizza-study-rate>span{font-size:.85rem;color:#b0c9d3;margin-top:.5rem}.pizza-study-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem}.pizza-study-stats>div{display:flex;flex-direction:column;background:#0c1d28;border-radius:8px;padding:.75rem}.pizza-study-stats strong{font-size:1.6rem;color:#c4f0f4}.pizza-study-stats span{font-size:.85rem;color:#b8ccd5}.pizza-study-cutoff{font-size:.8rem}
 .pizza-study details{border-top:1px solid #304853;margin-top:.8rem;padding-top:.7rem}.pizza-study summary{cursor:pointer;color:#96dce5}.pizza-study ol{list-style:none;padding:0;margin:.8rem 0}.pizza-study li{padding:.8rem 0;border-bottom:1px solid #29414e}.pizza-study li>div{display:flex;justify-content:space-between;gap:.6rem;flex-wrap:wrap}.pizza-study li b{font-weight:500;color:#c5d1df}.pizza-study small{font-size:.8rem;color:#a8bcc9}.pizza-study a{color:#86d6e5;text-decoration:none}.pizza-study a:hover{text-decoration:underline}
 @media(max-width:700px){.pizza-study{padding:.9rem}.pizza-study-main{grid-template-columns:1fr}.pizza-study-stats{grid-template-columns:repeat(2,1fr)}.pizza-study-tabs button{min-height:44px}.pizza-study-rate{flex-direction:row;align-items:center;gap:1rem;justify-content:flex-start}.pizza-study li{overflow-wrap:anywhere}}
+
+/* Match the existing optional 8-bit theme; leave body evidence text readable. */
+.pizza-study {border-radius:0;background:var(--bg3);padding:.8rem}
+.pizza-study button,.pizza-study-stats>div {border-radius:0}
+.pizza-study-main {grid-template-columns:1fr;margin:.6rem 0}
+.pizza-study-rate {flex-direction:row;align-items:center;gap:.8rem}
+.pizza-study-rate>strong {font-size:1.1rem}
+.pizza-study-rate>span {margin:0}
+.pizza-study-stats>div {border:1px solid var(--border);padding:.55rem}
+.pizza-study-evidence {list-style:none;padding:0;margin:.6rem 0}
+.pizza-study-evidence li {border-left:2px solid var(--accent);padding:.6rem .7rem;margin:.4rem 0;background:var(--bg)}
+.pizza-study-evidence li p {font-size:.8rem;margin:.3rem 0}
+body.theme-8bit .pizza-study :is(h3,button,strong,b,summary) {font-family:'Cubic 11','Press Start 2P',monospace!important;letter-spacing:0!important}
+body.theme-8bit .pizza-study-stats strong {font-family:'Press Start 2P','Cubic 11',monospace!important;font-size:1.1rem;line-height:1.5}
+
+.pizza-study-rate>strong {flex:0 0 auto;white-space:nowrap;font-size:1rem}
