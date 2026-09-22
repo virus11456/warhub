@@ -25,7 +25,7 @@
     };
     if (snapshot?.snapshot_kind === 'initial_probe') root.append(node('p', txt('首次實測快照 · 等待正常排程更新', 'Initial API snapshot · awaiting scheduled refresh'), 'kalshi-status'));
     const state = states[snapshot?.status] || ['等待首次收集', 'Awaiting first collection'];
-    root.append(node('p', txt(...state), 'kalshi-status'));
+    root.append(node('p', 'Kalshi · '+txt(...state), 'kalshi-status'));
     const fetched = Date.parse(snapshot?.fetched_at);
     const stale = snapshot?.status === 'stale' || !Number.isFinite(fetched) || Date.now()-fetched > 21600000 || fetched > Date.now()+300000;
     if (Number.isFinite(fetched)) root.append(node('p', txt('取得時間：', 'Retrieved: ') + new Date(fetched).toLocaleString(en() ? 'en-GB' : 'zh-TW'), 'kalshi-status'));
@@ -33,7 +33,8 @@
     const grid = document.getElementById('poly-list-container');
     if (!grid) return;
     grid.querySelectorAll('[data-exchange="kalshi"]').forEach(e=>e.remove());
-    for (const m of markets.slice(0, 8)) {
+    const peers=[...grid.querySelectorAll('[data-exchange="polymarket"]')];
+    for (const [index,m] of markets.slice(0, 8).entries()) {
       const card = node('article', undefined, 'poly-item');
       card.dataset.exchange='kalshi';
       card.append(node('span', 'Kalshi', 'market-exchange'));
@@ -67,7 +68,7 @@
         details.append(link);
       }
       card.append(details);
-      grid.append(card);
+      if(peers[index]) peers[index].after(card); else grid.append(card);
     }
 
     for (const slot of document.querySelectorAll('[data-kalshi-region]')) {
