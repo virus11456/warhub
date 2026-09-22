@@ -89,3 +89,6 @@ NOTAC（2026-09-15）：既有fetch_notams可用NOTAC_API_KEY切換正式API，�
 
 
 2026-09-22 資料收集第一階段：NOTAC正常入口改為可續接Delta鏡像，news_sampling五區最多50筆、90日保存；詳細欄位／額度／限制見warhub-osint與warhub-news。既有data.json承載NOTAC state與新聞摘要，data/news_samples.json保存90日樣本，analysis archive與merge_history保護新增檔，無新增部署觸發路徑；不改workflow排程、WPI公式或通知條件。首頁新聞仍最多15篇。自然排程未驗證前不可宣稱NOTAC已全量或新聞基準已足夠。
+
+
+2026-09-22 PizzINT 48h研究：正常fetch_data在source_health後呼叫pizza_backtest.build，以既有不可覆寫封存與研究種子還原DEFCON≤3／≤2觀測跨越並輸出pizza_backtest摘要；不新增抓取、workflow、推播或data檔案，既有data.json封存已涵蓋摘要。research固定種子保留來源路徑，當日新觀測隨正常排程及archive自然累積；靜態網站備援research/pizza-backtest.json有自己的as_of，不冒充即時結果。定義、未知窗口與審核門檻詳見warhub-activity；發布重試仍靠既有immutable archives保存，不覆蓋舊觀測。

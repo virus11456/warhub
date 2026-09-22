@@ -1,3 +1,4 @@
+require('./test_pizza_backtest.cjs');
 process.chdir(require('path').resolve(__dirname,'..'));
 const {JSDOM,VirtualConsole}=require('jsdom');const fs=require('fs');const assert=require('assert');
 {
