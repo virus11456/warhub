@@ -97,12 +97,7 @@ _WAR_KW_RE = re.compile(
 # 例：'Will Iran win the 2026 FIFA World Cup?' 含 "Iran" 但不是戰爭市場
 # 注意：不能排除 "GTA"——Polymarket 慣用「before GTA VI」當時間基準，
 # 例如 'Russia-Ukraine Ceasefire before GTA VI?' 是正經的戰爭市場
-EXCLUDE_KEYWORDS = [
-    "world cup", "fifa", "olympic", "super bowl", "nba", "nfl", "mlb",
-    "premier league", "champions league", "grammy", "oscar", "album",
-    "box office", "bitcoin", "ethereum", "eurovision", "tiktok",
-    "counter-strike", "esports", "valorant", "dota",
-]
+from market_selection import EXCLUDE_KEYWORDS, excluded_market_title, selected_market_risk
 
 # ─────────────────────────────────────────────────────────────
 # 地區風險引擎設定
@@ -364,10 +359,8 @@ async def fetch_polymarket(session: aiohttp.ClientSession) -> list[dict]:
         log.info(f"Fetched {len(markets)} Polymarket markets")
 
         for m in markets:
-            text = (m.get("question") or "").lower()
-            if any(ex in text for ex in EXCLUDE_KEYWORDS):
+            if excluded_market_title(m.get("question") or ""):
                 continue
-
             yes_price, no_price = _parse_outcome_prices(m)
 
             if yes_price is None or no_price is None:
@@ -382,7 +375,7 @@ async def fetch_polymarket(session: aiohttp.ClientSession) -> list[dict]:
                 "slug":       m.get("slug"),
                 "end_date":   m.get("endDate"),
             }
-            risk = market_risk(candidate)
+            risk = selected_market_risk(candidate)
             if risk is not None:
                 candidate["risk_score"] = round(risk, 2)
                 war_markets.append(candidate)

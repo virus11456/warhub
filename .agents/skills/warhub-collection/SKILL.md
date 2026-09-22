@@ -92,3 +92,6 @@ NOTAC（2026-09-15）：既有fetch_notams可用NOTAC_API_KEY切換正式API，�
 
 
 2026-09-22 PizzINT 48h研究：正常fetch_data在source_health後呼叫pizza_backtest.build，以既有不可覆寫封存與研究種子還原DEFCON≤3／≤2觀測跨越並輸出pizza_backtest摘要；不新增抓取、workflow、推播或data檔案，既有data.json封存已涵蓋摘要。research固定種子保留來源路徑，當日新觀測隨正常排程及archive自然累積；靜態網站備援research/pizza-backtest.json有自己的as_of，不冒充即時結果。定義、未知窗口與審核門檻詳見warhub-activity；發布重試仍靠既有immutable archives保存，不覆蓋舊觀測。
+
+
+Kalshi共用選題與离線adapter見 [warhub-kalshi](../warhub-kalshi/SKILL.md)。scripts/market_selection.py保留現有Polymarket排除→解析→market_risk的順序；Kalshi離線select_markets共用相同題目規則。此模組沒有fetch入口、不增加來源請求或計分；收集與公開展示尚未啟用，不能因程式部署即宣稱已接通Kalshi。
