@@ -1,15 +1,19 @@
-#kalshi-market-container { border-top:1px solid var(--border); margin-top:1.2rem; padding-top:1rem; scroll-margin-top:5rem; }
-#kalshi-market-container h3 { font:600 1rem/1.5 sans-serif; color:var(--accent); margin:0 0 .5rem; }
-#kalshi-market-container .poly-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:.8rem; }
-#kalshi-market-container .poly-item { display:flex; flex-direction:column; gap:.55rem; min-width:0; padding:1rem; }
-#kalshi-market-container .poly-question { font:500 .9rem/1.6 sans-serif; overflow-wrap:anywhere; }
-#kalshi-market-container strong { font:600 1.35rem/1.4 sans-serif; color:var(--accent); }
-#kalshi-market-container p { margin:0; font:400 .8rem/1.6 sans-serif; overflow-wrap:anywhere; }
-#kalshi-market-container .kalshi-status { color:var(--text-dim); margin-bottom:.5rem; }
-#kalshi-market-container details { margin-top:auto; font:400 .8rem/1.7 sans-serif; }
-#kalshi-market-container summary { cursor:pointer; color:var(--accent); }
-#kalshi-market-container a,.kalshi-region-reference a { color:var(--accent); text-decoration:none; }
-.kalshi-region-reference:empty { display:none; }
-.kalshi-region-reference { margin:.4rem 0; font:400 .75rem/1.5 sans-serif; }
-.kalshi-region-reference small { display:block; color:var(--text-dim); }
-@media(max-width:650px) { #kalshi-market-container .poly-grid { grid-template-columns:minmax(0,1fr); } }
+#poly-list-container {align-items:stretch}
+#poly-list-container>a {display:flex;min-width:0}
+#poly-list-container>a>.poly-item {width:100%;box-sizing:border-box}
+#poly-list-container .poly-item {display:flex;flex-direction:column;gap:.4rem;min-width:0;margin:0}
+#poly-list-container .poly-question {flex:1}
+#poly-list-container .market-exchange {color:var(--text-dim);font-size:.65rem;letter-spacing:.04em}
+#poly-list-container .market-yes {width:24px;font-size:.68rem;color:var(--text-dim)}
+#poly-list-container [data-exchange=kalshi] .poly-fill {background:var(--accent4)}
+#poly-list-container [data-exchange=kalshi] .poly-percent {color:var(--accent4)}
+#poly-list-container details {font-size:.72rem;color:var(--text-dim)}
+#poly-list-container details p {overflow-wrap:anywhere;margin:.3rem 0}
+#poly-list-container summary {cursor:pointer}
+#poly-list-container a {color:inherit;text-decoration:none}
+#kalshi-market-container {font-size:.7rem;color:var(--text-dim);margin-top:.6rem}
+#kalshi-market-container p {display:inline;margin-right:.5rem}
+.kalshi-region-reference:empty {display:none}
+.kalshi-region-reference {font-size:.75rem;margin:.4rem 0}
+.kalshi-region-reference a {color:var(--accent);text-decoration:none}
+.kalshi-region-reference small {display:block;color:var(--text-dim)}

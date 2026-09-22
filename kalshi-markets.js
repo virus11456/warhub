@@ -15,7 +15,7 @@
     const root = document.getElementById('kalshi-market-container');
     if (!root) return;
     root.replaceChildren();
-    root.append(node('h3', txt('Kalshi · 地緣政治背景', 'Kalshi · Geopolitical context')));
+
     const states = {
       available: ['選定系列已完成查詢', 'Selected series checked'],
       partial: ['部分資料 · 尚未查齊', 'Partial data · incomplete scan'],
@@ -30,13 +30,28 @@
     const stale = snapshot?.status === 'stale' || !Number.isFinite(fetched) || Date.now()-fetched > 21600000 || fetched > Date.now()+300000;
     if (Number.isFinite(fetched)) root.append(node('p', txt('取得時間：', 'Retrieved: ') + new Date(fetched).toLocaleString(en() ? 'en-GB' : 'zh-TW'), 'kalshi-status'));
     const markets = Array.isArray(snapshot?.markets) ? snapshot.markets : [];
-    const grid = node('div', undefined, 'poly-grid');
+    const grid = document.getElementById('poly-list-container');
+    if (!grid) return;
+    grid.querySelectorAll('[data-exchange="kalshi"]').forEach(e=>e.remove());
     for (const m of markets.slice(0, 8)) {
       const card = node('article', undefined, 'poly-item');
+      card.dataset.exchange='kalshi';
+      card.append(node('span', 'Kalshi', 'market-exchange'));
       card.append(node('div', en() ? (m.question_en || m.question || 'Title unavailable') : (m.question_zh || '中文翻譯待補'), 'poly-question'));
       const valid = !stale && m.quote_status === 'two_sided' && finite(m.display_midpoint) && m.display_midpoint >= 0 && m.display_midpoint <= 1 && Date.parse(m.end_date) > Date.now();
-      card.append(node('strong', valid ? `YES ${(m.display_midpoint*100).toFixed(1)}%` : txt('目前報價不可用', 'Current quote unavailable')));
-      card.append(node('p', txt('買賣中價 · 非實際發生機率', 'Bid/ask midpoint · not an event probability'), 'kalshi-status'));
+      const barrow=node('div', undefined, 'poly-bar-container');
+      barrow.append(node('span','YES ', 'market-yes'));
+      const bar=node('div',undefined,'poly-bar'),fill=node('div',undefined,'poly-fill');
+      fill.style.width=valid?(m.display_midpoint*100)+'%':'0%';bar.append(fill);
+      const value=node('strong',valid?(m.display_midpoint*100).toFixed(1)+'%':txt('缺值','N/A'),'poly-percent');
+      value.title=txt('買賣中價；非實際發生機率','Bid/ask midpoint; not an event probability');
+      barrow.append(bar,value);card.append(barrow);
+      const meta=node('div',undefined,'poly-meta');
+      meta.append(node('span',txt('合約量 ','Contracts ')+(finite(m.volume_contracts)?m.volume_contracts.toLocaleString():'—')));
+      const source=node('a','Kalshi ↗');source.href='https://kalshi.com';
+      if(typeof m.series_ticker==='string' && /^[A-Z0-9_-]+$/.test(m.series_ticker))source.href+='/markets/'+m.series_ticker.toLowerCase();
+      source.target='_blank';source.rel='noopener noreferrer';meta.append(source);card.append(meta);
+      if(!valid)card.append(node('small',txt('目前報價不可用','Current quote unavailable')));
       const details = node('details');
       details.append(node('summary', txt('原文與報價資料', 'Original title and quote details')));
       details.append(node('p', m.question || '—'));
@@ -54,13 +69,13 @@
       card.append(details);
       grid.append(card);
     }
-    root.append(grid);
+
     for (const slot of document.querySelectorAll('[data-kalshi-region]')) {
       slot.replaceChildren();
       const related = markets.filter(m => m.region === slot.dataset.kalshiRegion);
       if (!related.length) continue;
       const a = node('a', txt('Kalshi 背景參考 · ', 'Kalshi context · ') + related.length + txt(' 個期限題目 ↗', ' dated contracts ↗'));
-      a.href = '#kalshi-market-container';
+      a.href = '#poly-card';
       a.addEventListener('click', () => document.getElementById('poly-card')?.classList.remove('folded'));
       slot.append(a, node('small', stale ? txt('舊資料 · 暫不作即時參考', 'Stale · not a current reference') : txt('外交／政策背景；不重複計分', 'Diplomatic / policy context; not double-counted')));
     }
