@@ -86,3 +86,6 @@ NOTAC（2026-09-15）：既有fetch_notams可用NOTAC_API_KEY切換正式API，�
 2026-09-16 Telegram 摘要改為地區觀測（非風險評級）：逐區列市場因子是否有效、NOTAM 完整查詢／部分樣本／過期／缺資料，以及 GDELT 新聞強度狀態，不再只輸出 INSUFFICIENT_DATA。部分樣本優先讀 latest_attempt，不拿舊 total 當本輪全量；完整有效零值保留。WPI coverage 改標「有效權重（非全站資料完整率）」。僅通知呈現變更，地區模型、門檻、歷史與來源額度不變；NOTAC 每輪最新兩頁不會跨輪自動补齊。tests/test_alert_content.py 驗證不改快照、零值、過期與部分資料，不發真實測試訊息。
 
 2026-09-21 地區卡片的 regionalObservation 為前端展示用暫定觀測分數：原 score 有效時保留，否則按有效 poly/gdelt/notam 的35/25/15權重重新正規化；只接受0至100的有限數字，有效零保留，布林／缺值／非有限／越界排除。單一來源及暫定分數需明示來源，不能標為整體風險、戰爭機率或安全。既有過期／舊模型讀取守門清除因子，火點與廣域軍機仍不計分。暫定分數不寫入快照、歷史或Telegram，不显示升降箭頭；原模型門檻與歷史保留。tests/test_frontend.cjs驗證缺值、有效零、無效輸入與快照不變；test_site_languages.cjs驗證双語呈現。
+
+
+2026-09-22 資料收集第一階段：NOTAC正常入口改為可續接Delta鏡像，news_sampling五區最多50筆、90日保存；詳細欄位／額度／限制見warhub-osint與warhub-news。既有data.json承載NOTAC state與新聞摘要，data/news_samples.json保存90日樣本，analysis archive與merge_history保護新增檔，無新增部署觸發路徑；不改workflow排程、WPI公式或通知條件。首頁新聞仍最多15篇。自然排程未驗證前不可宣稱NOTAC已全量或新聞基準已足夠。

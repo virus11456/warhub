@@ -3674,7 +3674,7 @@ function renderNotacObservation(json) {
     const firs=(r.firs||[]).filter(f=>typeof f==='string'&&/^[A-Z]{4}$/.test(f)).join(',');
     const link=firs?'https://notac.aero/notams/?fir='+encodeURIComponent(firs):'https://notac.aero/notams/';
     const partial=r.provider==='NOTAC'&&!fresh&&a.partial===true;
-    const sampleTime=a.fetched_at||r.attempted_at;
+    const sampleTime=a.sample_observed_at||a.fetched_at||r.attempted_at;
     const sampleAge=Date.now()-Date.parse(sampleTime);
     const status=fresh?'完整查詢':partial?(!Number.isFinite(sampleAge)||sampleAge<0?'部分樣本（時間未明）':sampleAge>=6*3600000?'部分樣本（已過期）':'部分樣本'):'暫無可用資料';
     const value=fresh?num(r.total):partial?num(a.sample_count):'—';

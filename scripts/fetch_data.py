@@ -938,72 +938,55 @@ async def _translate_market_questions(session, markets):
             market["question_zh"] = re.sub(r"\s+x\s+", "與", translated)
 
 
-async def fetch_gnews(session: aiohttp.ClientSession) -> list[dict]:
-    """
-    以 Google News RSS 取與戰爭升級相關的即時頭條（免金鑰、持續更新）。
-    query 需同時命中「升級動作」與「地緣主角」→ 篩成開戰預測的領先訊號。
-    標題以 Google Translate 翻成繁中（原文留在 title_en）。
-    失敗時沿用上一輪 data.json 的 news，避免版面空白。
-    """
-    import urllib.parse, xml.etree.ElementTree as ET
-    url = (GNEWS_RSS + "?q=" + urllib.parse.quote(NEWS_QUERY)
-           + "&hl=en-US&gl=US&ceid=US:en")
-    for attempt, backoff in ((1, 4), (2, 8), (3, 0)):
-        try:
-            async with session.get(
-                url, timeout=aiohttp.ClientTimeout(total=25),
-                headers={"User-Agent": "Mozilla/5.0 (compatible; warhub/1.0)"},
-            ) as resp:
-                raw = await resp.read()
-            root = ET.fromstring(raw)
-            out, seen = [], set()
-            for it in root.findall(".//item"):
-                title = (it.findtext("title") or "").strip()
-                link  = (it.findtext("link") or "").strip()
-                pub   = (it.findtext("pubDate") or "").strip()
-                src_el = it.find("source")
-                source = (src_el.text or "").strip() if src_el is not None else ""
-                if not title or not link:
-                    continue
-                # 標題常為「Headline - Source」→ 去掉結尾來源
-                if source and title.endswith(" - " + source):
-                    title = title[: -(len(source) + 3)].strip()
-                key = title.lower()[:80]
-                if key in seen:
-                    continue
-                seen.add(key)
-                out.append({
-                    "title":  title,
-                    "url":    link,
-                    "domain": source,
-                    "ts":     _news_iso(pub),
-                    "topic":  _news_topic(title),
-                })
-                if len(out) >= 40:      # 先多收一些，稍後依時間挑最新 15 則
-                    break
-            # 依發布時間新→舊排序，取最新 15 則（ISO 字串可直接字典序排）
-            out.sort(key=lambda a: a.get("ts") or "", reverse=True)
-            out = out[:15]
-            if out:
-                await _translate_titles(session, out)   # 標題翻成繁中（_news_topic 已先用英文標好）
-                log.info(f"GNews: {len(out)} headlines")
-                return out
-        except Exception as e:
-            if backoff:
-                await asyncio.sleep(backoff)
-            else:
-                log.warning(f"GNews failed after retries: {e}")
-    # fallback：沿用上一輪
+async def fetch_gnews(session: aiohttp.ClientSession) -> dict:
+    """Five bounded regional RSS queries; archive samples, translate only the display."""
+    from news_sampling import QUERIES, parse_rss, merge_samples, headlines
+    now = datetime.now(timezone.utc)
     try:
-        prev = json.loads(DATA_FILE.read_text(encoding="utf-8")).get("news") or []
-        if prev:
-            log.warning("GNews unavailable, carried over previous headlines")
-            for n in prev:
-                n["stale"] = True
-            return prev
-    except Exception:
-        pass
-    return []
+        previous_snapshot = json.loads(DATA_FILE.read_text(encoding="utf-8"))
+        previous = previous_snapshot.get("news_sampling") or {}
+    except (OSError, ValueError):
+        previous_snapshot, previous = {}, {}
+    sample_file = DATA_DIR / "news_samples.json"
+    if sample_file.exists():
+        previous = json.loads(sample_file.read_text(encoding="utf-8"))
+        if not isinstance(previous, dict) or not isinstance(previous.get("by_region"), dict):
+            raise ValueError("Invalid saved news samples; stop rather than erase history")
+    batches = {}
+    blocked = False
+    for key, query in QUERIES.items():
+        batches[key] = {"status": "unavailable", "items": []}
+        if blocked:
+            continue
+        try:
+            async with session.get(GNEWS_RSS, params={"q": query, "hl": "en-US", "gl": "US", "ceid": "US:en"},
+                                   timeout=aiohttp.ClientTimeout(total=15),
+                                   headers={"User-Agent": USER_AGENT}) as response:
+                if response.status in (401, 403, 429):
+                    blocked = True
+                response.raise_for_status()
+                raw = bytearray()
+                async for chunk in response.content.iter_chunked(65536):
+                    raw.extend(chunk)
+                    if len(raw) > 2 * 1024 * 1024:
+                        raise ValueError("RSS response too large")
+            batches[key] = {"status": "available", "items": parse_rss(raw, key, now)}
+        except Exception as exc:
+            log.warning("Regional RSS %s unavailable: %s", key, type(exc).__name__)
+        await asyncio.sleep(0.6)
+    sampling = merge_samples(previous, batches, now)
+    sample_file = DATA_DIR / "news_samples.json"
+    sample_file.parent.mkdir(parents=True, exist_ok=True)
+    pending = sample_file.with_suffix(".tmp")
+    pending.write_text(json.dumps(sampling, ensure_ascii=False), encoding="utf-8")
+    pending.replace(sample_file)
+    display = headlines(sampling, now)
+    if not display and any(b["status"] != "available" for b in batches.values()):
+        display = [{**row, "stale": True} for row in previous_snapshot.get("news", [])]
+    await _translate_titles(session, display)
+    public_summary = {**sampling, "by_region": {key: {k: v for k, v in row.items() if k != "records"}
+                      for key, row in sampling["by_region"].items()}}
+    return {"headlines": display, "sampling": public_summary}
 
 
 # ─────────────────────────────────────────────────────────────
@@ -1690,7 +1673,7 @@ async def fetch_notams(session: aiohttp.ClientSession) -> dict:
         from notac_client import collect_regions
         return await collect_regions(session, token, dict(source_region_order(REGION_FIRS)), prev,
                                      NOTAM_DANGER_RE, NOTAM_CLOSURE_RE,
-                                     os.environ.get("WARHUB_SOURCE_ARCHIVE_DIR"))
+                                     os.environ.get("WARHUB_SOURCE_ARCHIVE_DIR"), incremental=True)
 
     from gdelt_quality import cooldown_active, cooldown_deadline
     if cooldown_active(prev):
@@ -2202,6 +2185,8 @@ async def main():
             pizzint_task, poly_task, aviation_task, firms_task, eonet_task,
             gdelt_task, news_task, seismic_task, wiki_task, notam_task, bars_task
         )
+        news_sampling = news["sampling"]
+        news = news["headlines"]
         food = await food_task if food_task else previous.get("food")
         usda = await usda_task if usda_task else previous.get("usda")
         try:
@@ -2319,6 +2304,7 @@ async def main():
         "eonet":         eonet[:20],
         "gdelt":         gdelt,
         "news":          news,
+        "news_sampling": news_sampling,
         "food":          food,
         "food_hist":     food_hist,
         "strat":         strat,

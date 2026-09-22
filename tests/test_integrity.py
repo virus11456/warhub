@@ -144,9 +144,11 @@ class Pipeline(unittest.IsolatedAsyncioTestCase):
             for name in funcs+lists:
                 value=[] if name in lists else {}
                 if name=='aviation':value={'error':'missing'}
+                if name=='gnews':value={'headlines':[], 'sampling':{'version':1,'by_region':{}}}
                 stack.enter_context(patch.object(f,'fetch_'+name,AsyncMock(return_value=value)))
             await f.main()
             data=json.loads(f.DATA_FILE.read_text())
+            self.assertEqual(data['news_sampling']['version'], 1)
             self.assertIsNone(data['score']['combined_score'])
             self.assertEqual(data['source_health']['pizza']['status'],'unavailable')
             self.assertNotIn('_notify',data)
@@ -172,6 +174,7 @@ class Pipeline(unittest.IsolatedAsyncioTestCase):
             for name in funcs+lists:
                 value=[] if name in lists else {}
                 if name=='aviation':value={'error':'missing'}
+                if name=='gnews':value={'headlines':[], 'sampling':{'version':1,'by_region':{}}}
                 stack.enter_context(patch.object(f,'fetch_'+name,AsyncMock(return_value=value)))
             await f.main()
             data=json.loads(f.DATA_FILE.read_text())

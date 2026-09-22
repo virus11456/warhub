@@ -196,10 +196,57 @@ def merge_metrics_daily(now=None):
     path.write_text(json.dumps({"days": dict(sorted(days.items()))}, ensure_ascii=False), encoding="utf-8")
 
 
+def merge_news_samples(now=None):
+    """Optional only before first rollout. Read errors never erase an existing archive."""
+    from news_sampling import stamp
+    from datetime import timedelta
+    rel = 'data/news_samples.json'
+    listed = subprocess.check_output(['git', 'ls-tree', '--name-only', 'origin/main', '--', rel],
+                                     stderr=subprocess.DEVNULL, text=True).strip()
+    path = DATA_DIR / 'news_samples.json'
+    sources = []
+    if listed:
+        sources.append(json.loads(subprocess.check_output(['git', 'show', 'origin/main:' + rel],
+                                                          stderr=subprocess.DEVNULL)))
+    if path.exists():
+        sources.append(json.loads(path.read_text(encoding='utf-8')))
+    if not sources:
+        return
+    now = now or datetime.now(timezone.utc)
+    regions = {}
+    for source in sources:
+        if not isinstance(source, dict) or source.get('version') != 1 or not isinstance(source.get('by_region'), dict):
+            raise ValueError('Invalid news sample archive')
+        for key, incoming in source['by_region'].items():
+            if not isinstance(incoming, dict) or not isinstance(incoming.get('records'), list):
+                raise ValueError('Invalid news sample region')
+            saved = regions.get(key)
+            if saved is None:
+                regions[key] = incoming
+                continue
+            a, b = stamp(saved.get('attempted_at')), stamp(incoming.get('attempted_at'))
+            newest = incoming if b and (not a or b >= a) else saved
+            records = {}
+            for row in saved['records'] + incoming['records']:
+                if not isinstance(row, dict) or not isinstance(row.get('sample_id'), str) or stamp(row.get('ts')) is None:
+                    raise ValueError('Invalid news sample')
+                if stamp(row['ts']) < now - timedelta(days=90):
+                    continue
+                old = records.get(row['sample_id'])
+                # Preserve earliest first-seen version; never replace original publication time.
+                if old and (stamp(old.get('first_seen_at')) or now) <= (stamp(row.get('first_seen_at')) or now):
+                    continue
+                records[row['sample_id']] = row
+            regions[key] = {**newest, 'records': sorted(records.values(), key=lambda r: r['ts'], reverse=True)}
+    result = {'version': 1, 'method': 'regional-rss-v1', 'by_region': regions}
+    path.write_text(json.dumps(result, ensure_ascii=False), encoding='utf-8')
+
+
 if __name__ == "__main__":
     merge_pla()
     merge_months("data/food_history.json", DATA_DIR / "food_history.json")
     merge_months("data/strat_history.json", DATA_DIR / "strat_history.json")
     merge_metrics_daily()
     merge_score_history()
+    merge_news_samples()
     print("history merge guard applied")
