@@ -158,7 +158,7 @@ def save_observation(directory, result):
     return path
 
 
-async def collect_regions(session, token, regions, previous, danger_re, closure_re, archive_dir=None, now=None):
+async def collect_regions(session, token, regions, previous, danger_re, closure_re, archive_dir=None, now=None, incremental=False):
     now = now or datetime.now(timezone.utc)
     # Shared credential limits apply across all regions. FAA cooldowns do not
     # suppress the newly configured official API provider.
@@ -166,6 +166,9 @@ async def collect_regions(session, token, regions, previous, danger_re, closure_
                  if isinstance(r, dict) and r.get('provider') == 'NOTAC']
     blocked = max((d for d in deadlines if d is not None and d > now), default=None)
     out = {}
+    if incremental:
+        from notac_sync import Budget, collect_delta
+        budget = Budget(previous, now)
     for key, firs in regions.items():
         old = previous.get(key) or {}
         attempted = parsed_time(old.get('attempted_at')) if old.get('provider') == 'NOTAC' else None
@@ -177,7 +180,9 @@ async def collect_regions(session, token, regions, previous, danger_re, closure_
                 out[key]['cooldown_until'] = blocked.isoformat()
             continue
         try:
-            result = await asyncio.wait_for(collect_region(session, token, firs, now), timeout=42)
+            result = (await collect_delta(session, token, firs, old, budget, danger_re, closure_re, now)
+                      if incremental else
+                      await asyncio.wait_for(collect_region(session, token, firs, now), timeout=42))
         except TimeoutError:
             result = {'provider': 'NOTAC', 'firs': firs, 'fetched_at': now.isoformat(),
                       'complete': False, 'reason': 'source_timeout', 'sample_count': None}
@@ -185,9 +190,9 @@ async def collect_regions(session, token, regions, previous, danger_re, closure_
         # Zero candidates in a sample never means zero across the whole FIR.
         rows = result.get('rows')
         if isinstance(rows, list) and (rows or result.get('complete')):
-            result['sample_danger'] = sum(bool(danger_re.search(r['text'])) for r in rows)
-            result['sample_closure'] = sum(bool(closure_re.search(r['text'])) for r in rows)
-            result['sample_order'] = 'newest'
+            result['sample_danger'] = sum(r.get('_danger', False) if incremental else bool(danger_re.search(r['text'])) for r in rows)
+            result['sample_closure'] = sum(r.get('_closure', False) if incremental else bool(closure_re.search(r['text'])) for r in rows)
+            result['sample_order'] = 'cursor' if incremental else 'newest'
             timing = {'current': 0, 'future': 0, 'ended': 0, 'unknown': 0}
             for row in rows:
                 start, end = parsed_time(row.get('effective_start')), parsed_time(row.get('effective_end'))
@@ -208,13 +213,13 @@ async def collect_regions(session, token, regions, previous, danger_re, closure_
         summary = {k: v for k, v in result.items() if k != 'rows'}
         summary['attempted_at'] = now.isoformat()
         if result.get('complete'):
-            messages = [r['text'] for r in result['rows']]
-            danger = sum(bool(danger_re.search(t)) for t in messages)
-            closure = any(closure_re.search(t) for t in messages)
+            danger = result['sample_danger']
+            closure = result['sample_closure'] > 0
             summary.update(observed_at=now.isoformat(), stale=False, danger=danger, closure=closure,
                            score=round(min(100.0, danger * 8 + (40 if closure else 0)), 1))
             before = parsed_time(old.get('observed_at'))
             if (old.get('provider') == 'NOTAC' and old.get('complete') is True
+                    and old.get('protocol') == summary.get('protocol')
                     and old.get('firs') == list(firs) and integer(old.get('total'))
                     and before and 0 < (now - before).total_seconds() <= 21600):
                 summary['comparison'] = {'observed_at': old['observed_at'],
@@ -224,6 +229,12 @@ async def collect_regions(session, token, regions, previous, danger_re, closure_
             summary = {**old, 'provider': 'NOTAC', 'firs': list(firs), 'stale': True,
                        'observed_provider': old.get('observed_provider', old.get('provider', 'FAA')) if old.get('observed_at') else None,
                        'attempted_at': now.isoformat(), 'reason': result.get('reason'), 'latest_attempt': summary}
+        if incremental:
+            summary['sync_state'] = result.get('sync_state', old.get('sync_state', {}))
+            summary['sync_budget'] = result.get('sync_budget', old.get('sync_budget', {}))
+            if 'latest_attempt' in summary:
+                summary['latest_attempt'] = {k: v for k, v in summary['latest_attempt'].items()
+                                             if k not in ('sync_state', 'sync_budget')}
         until = parsed_time(result.get('cooldown_until'))
         remaining = result.get('credits_remaining')
         if remaining is not None and remaining < 20:

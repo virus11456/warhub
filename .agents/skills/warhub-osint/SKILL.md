@@ -88,3 +88,11 @@ source metadata以notac/<取得時間>_<SHA256>.json.gz不可覆寫保存，沿�
 cross-context.js 是純前端衍生閱讀排序，使用既有台海洞察與 NOTAC 最新嘗試；同題20–28小時比較且未到期才按 abs(delta_pp) 找出目前已展示題目中最大變動，不平均／加總不同YES題目，不推論風險方向。並列公告樣本覆蓋與原查詢時間，時間超過6小時停止。不是新來源抓取、因果檢驗或戰爭機率模型；不寫資料、不改WPI、不通知。test_cross_context.cjs 離線驗證缺值、有效0、期限、部分資料、原資料不變。
 
 NOTAC 封存路徑 archives/notac/<ISO查詢時間（冒號換連字號）>_<SHA256>.json.gz 已納入 vercel-ignore-build.cjs 純資料跳過清單；與live data／其他archive同改時不部署。未部署的程式仍會觸發build，來源收集與保存頻率不變。test_deploy.mjs 以真實Git差異驗證。
+
+
+## 2026-09-22 第一階段：NOTAC Delta 續接
+上述2頁search僅保留給check_notac手動工具；正常fetch_notams透過collect_regions(incremental=True)改用notac_sync.collect_delta。官方https://notac.aero/api/notam-delta/：首次不送cursor，依next/next_cursor原樣續接，追上後取得修訂與撤銷。未加category/tag等會變更的主題篩選，FIR範圍沿用既有設定（中東為OIIX/LLLL同範圍）。目前未另做每日全量重建；來源若將公告移出FIR且不發withdrawal可能造成鏡像殘留，此限制仍需後續核驗。
+每區每輪最多2頁，但保存sync_state後下一輪接續，不重抓首頁。共享最多8請求／輪、90／UTC日、2800／UTC月；delta每請求3credits，月上限8400credits（只涵蓋本程式已保存計數，手動工具／其他客戶端另計）。讀remaining少於23停止，保留20credit餘裕，401/403/402/429沿用共享冷卻。無新cron、不強制收集。
+sync_state在notams各區內保留不透明cursor、FIR範圍、as_of、逐ID最小metadata與已解析關鍵字布林，無token/readings/原文。每頁全量驗證後才原子更新records及cursor；重複ID為upsert，slim撤銷按ID移除；失敗保留上一成功位置。只在next=null、as_of有效且未過6h時complete=true；部分狀態不計分，舊observed_at保留。已到截止／尚未開始的公告不加入目前總量；原欄位在state保留。不同protocol不接續比較。
+sync_budget保存每區請求計數，先扣再I/O，成功提交快照後跨runner沿用；整個job或提交失敗可能遺失該輪計數，不能宣稱帳戶硬性總額度。來源回應remaining與月初冷卻仍保護免費方案。正常analysis/source archive保留狀態版本，無需另寫data檔。
+tests/test_notac_sync.py離線驗證跨輪補齊、重複與修訂、撤銷、失敗不跳頁、原資料不变、來源時間、跨日月與本輪預算、有效0、舊觀測保存；原search工具測試保留。合併或部署不等於自然排程已完成初始同步，需另查正常快照的protocol／sync_state與complete。

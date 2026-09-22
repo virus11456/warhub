@@ -3,7 +3,7 @@
 const { execFileSync } = require('node:child_process');
 const previous = process.env.VERCEL_GIT_PREVIOUS_SHA || '';
 const liveFiles = new Set([
-  'data/data.json', 'data/history.json', 'data/metrics_daily.json',
+  'data/data.json', 'data/news_samples.json', 'data/history.json', 'data/metrics_daily.json',
   'data/pla_adiz.json', 'data/food_history.json', 'data/strat_history.json',
 ]);
 let skip = false;

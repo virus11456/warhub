@@ -64,3 +64,10 @@ Google 舊流程保留給未指定 provider 的本機相容用途，已有 GitHu
 固定字串抽取須遍歷 AST 物件屬性的 value（例如狀態 label 字典），不可一律略過 value。原有 emoji 轉 SVG 會移除文字中的圖示，i18n 同時建立去圖示的完整標籤對照，避免拆字混譯。每次新增 UI 後以 test_site_languages 驗證真實 renderer 動態文字；4032 是本次包含人工覆核與別名的靜態字串數，不是未來覆蓋保證。資源 URL 版本需與發布批次一致；本機驗收若看到舊樣式，核對實際 link href，不把舊畫面當新驗收。
 
 英文新聞驗收修正（2026-09-15）：scripts/reviewed_english.py 保存完全相同原標題的人工覆核譯文，優先於舊英文快取；不套用到相似標題、不改中文／原文／ts。valid_english 在快取及新回應都拒絕「機艦→aircraft carriers」（原文未提航母時）、陸委會機關誤譯、高市人名及沖繩政治變天誤譯。這是針對已發現錯誤的有限檢查，不能保證未來每篇語意都正確。失敗移除錯誤title_english並標unavailable；仍沿用同一服務的失敗停止規則。test_reviewed_english.py 驗證合計機艦不變成航母、真正航母不被誤拒，以及既有人工譯文。
+
+
+## 2026-09-22 第一階段：五區獨立樣本
+fetch_gnews沿用入口，回傳headlines及sampling；main分別存news和news_sampling。scripts/news_sampling.py定義五區query／parse_rss／merge_samples／headlines。每正常輪次每區最多1次RSS請求、15秒／2MB，401/403/429停止本輪後續區域；不新增排程。每區按發稿時間挑最近7日最多50筆、URL及正規化標題去重。RSS成功空集合為有效0樣本；失敗保存舊records與observed_at，sample_24h/source_names_24h為null而非0。HTTP成功不代表全媒體完整性。
+data/news_samples.json 的by_region保存90日records、首次見到時間、原發稿时间與原標題；相同URL保留舊版本，原輪次另由analysis archive長期保存。首頁各區最多3篇（共15篇），跨區去重，僅這15篇走既有繁中／英文翻譯，避免把250篇送翻譯服務；切換語言不抓來源。初次遷移若全無可展示樣本且查詢失敗，原news保留stale，不回填偽造first_seen。
+data.json.news_sampling只保存不含records的摘要；90日檔案在analysis archive一併保存，提交重試由merge_news_samples聯集，保留較早first_seen版本、較新查詢狀態，檔案損壞停止。deploy gate將其列為純資料，不因更新增加部署。\n當前stage僅累積樣本與來源名稱數，baseline_status=not_scored，不假稱獨立媒體、不做事件群數或新聞熱度分數，不替代GDELT/WPI；事件分組、有效日與此前28日基準為下一階段，至少14有效日也不能僅憑天數就自動出分。網站新聞強度欄仍反映原GDELT來源。
+tests/test_news_sampling.py驗證平衡首頁、50筆上限、去重、來源名稱數、90日窗口、原時間、失敗與有效0；test_integrity用新回傳結構驗證主流程保存。

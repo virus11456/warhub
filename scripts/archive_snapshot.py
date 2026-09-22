@@ -24,6 +24,12 @@ def archive_snapshot(source: Path, output: Path, code_sha: str) -> Path:
                 raise ValueError('data.json must be an object')
             data.pop('_notify', None)  # Delivery bookkeeping is not analysis data.
         snapshots[name] = data
+    news_path = source / 'news_samples.json'
+    if news_path.exists():
+        samples = json.loads(news_path.read_text(encoding='utf-8'))
+        if not isinstance(samples, dict) or not isinstance(samples.get('by_region'), dict):
+            raise ValueError('Invalid news sample archive')
+        snapshots['news_samples.json'] = samples
     observed = datetime.fromisoformat(snapshots['data.json']['updated_at'].replace('Z', '+00:00'))
     if observed.tzinfo is None:
         raise ValueError('Snapshot timestamp must include timezone')
