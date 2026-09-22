@@ -95,3 +95,7 @@ NOTAC（2026-09-15）：既有fetch_notams可用NOTAC_API_KEY切換正式API，�
 
 
 Kalshi共用選題與离線adapter見 [warhub-kalshi](../warhub-kalshi/SKILL.md)。scripts/market_selection.py保留現有Polymarket排除→解析→market_risk的順序；Kalshi離線select_markets共用相同題目規則。此模組沒有fetch入口、不增加來源請求或計分；收集與公開展示尚未啟用，不能因程式部署即宣稱已接通Kalshi。
+
+Kalshi後續本機工作：refresh已實作跨輪冷卻及原時間保留、獨立雙語renderer已有mock驗證；公開API有限實測成功，但兩個軍事相關系列無開放市場。仍未掛入main/index，未變更排程或WPI，詳見warhub-kalshi最新進度。
+
+2026-09-22 Kalshi正式接線：fetch_kalshi加入正常收集，輸出獨立kalshi欄位及source_health；每輪最多3次公開讀請求、來源110分鐘間隔、429冷卻持久化。詳見warhub-kalshi。外交／制裁／軍事政策僅作地區分數旁參考，不改WPI／地區权重，無新增排程或通知；data.json既有不可覆寫封存自然涵蓋新欄位。

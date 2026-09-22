@@ -80,3 +80,20 @@ class PolymarketCollectorParity(unittest.IsolatedAsyncioTestCase):
         self.assertEqual([m['id'] for m in result],['valid'])
         self.assertEqual(result[0]['yes_price'],.3)
         self.assertEqual(result[0]['risk_score'],30)
+
+
+class BackgroundSelectionTests(unittest.TestCase):
+    raw = KalshiAdapterTests.raw
+    def test_background_requires_opt_in_and_has_no_risk_score(self):
+        from kalshi_market_data import select_markets
+        raw=self.raw(ticker='KXUSAIRANAGREEMENT-TEST',title='Will the US agree to a new Iranian nuclear deal?',yes_sub_title='Before Mar 1, 2030')
+        self.assertEqual(select_markets([raw],'2026-09-22T00:00:00Z'),[])
+        item=select_markets([raw],'2026-09-22T00:00:00Z',include_background=True)[0]
+        self.assertEqual(item['region'],'mideast');self.assertEqual(item['event_direction'],'context_only')
+        self.assertNotIn('risk_score',item);self.assertIn('Before Mar 1, 2030',item['question'])
+    def test_same_title_different_option_stays_separate(self):
+        from kalshi_market_data import select_markets
+        a=self.raw(ticker='KXUSAIRANAGREEMENT-A',title='Will there be an agreement?',yes_sub_title='Before Mar 1, 2030')
+        b={**a,'ticker':'KXUSAIRANAGREEMENT-B','yes_sub_title':'Before Apr 1, 2030'}
+        rows=select_markets([a,b],'2026-09-22T00:00:00Z',include_background=True)
+        self.assertEqual(len(rows),2);self.assertNotEqual(rows[0]['question'],rows[1]['question'])

@@ -1,7 +1,7 @@
 """Public source status. Fetch time is not a claim about observation freshness."""
 from datetime import datetime, timezone
 
-LABELS = {'pizza':'PizzINT', 'polymarket':'Polymarket', 'aviation':'ADS-B', 'firms':'NASA FIRMS',
+LABELS = {'kalshi':'Kalshi', 'pizza':'PizzINT', 'polymarket':'Polymarket', 'aviation':'ADS-B', 'firms':'NASA FIRMS',
           'gdelt':'GDELT', 'notams':'FAA NOTAM', 'wikipedia':'Wikipedia', 'news':'Google News',
           'tw_news':'台海新聞', 'nuclear_seismic':'USGS', 'eonet':'NASA EONET', 'finance':'Yahoo Finance',
           'food':'Comtrade 糧食', 'strat':'Comtrade 物資', 'usda':'USDA ESR', 'bars':'BestTime', 'fred':'FRED'}
@@ -50,6 +50,10 @@ def source_health(data):
             dates = sorted({r['observation_date'] for r in valid})
             observed = dates[0] if dates else None
             note = '官方觀測日：' + '、'.join(dates) if dates else '缺少可核實的官方觀測日期'
+        if key == 'kalshi' and isinstance(v, dict):
+            status = v.get('status') if v.get('status') in ('available','partial','stale','unavailable') else 'unavailable'
+            note = '選定地緣政治系列；僅參考、不計入分數；取得時間不是報價發生時間'
+            observed = None
         if key == 'pizza':
             n = sum(1 for s in v or [] if s.get('busyness') is not None and s.get('is_open'))
             status = 'available' if n else 'unavailable'
@@ -68,3 +72,4 @@ def source_health(data):
                 status = 'stale'
         out[key] = {'label':label, 'status':status, 'observed_at':observed, 'note':note}
     return out
+

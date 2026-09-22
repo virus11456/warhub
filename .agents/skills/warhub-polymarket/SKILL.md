@@ -20,3 +20,5 @@ description: "Maintain WARHUB Polymarket Gamma collection, market selection, eve
 
 Kalshi共用篩選準備：scripts/market_selection.py::selected_market_risk抽出原fetch_polymarket的EXCLUDE_KEYWORDS前置排除，再原樣呼叫scoring.market_risk。Polymarket題目、價格、期限、停火方向與原篩選集合不变；WAR_KEYWORDS並不是現行fetch_polymarket的最終資格判斷。Kalshi離線select_markets使用同函式，無需跨平台配對才納入；同題價差配對另做審核。Kalshi仍須active有效雙邊報價，量單位contracts不等於Gamma美元volume。共用篩選已納入程式；Kalshi網路抓取與網站展示尚未啟用。tests/test_kalshi_market_data.py以原排除清單加market_risk比對兩平台選取結果，test_integrity.py驗證現有收集器。
 
+
+2026-09-22後續：Kalshi現已透過獨立fetch_kalshi及網站區塊接線；使用者允許的外交／制裁／軍事政策背景題走明確series範圍，不改Polymarket原篩選。Kalshi不塞入polymarket陣列或market_average；同題價差仍須審核事件／期限／條款，不自動平均。詳見warhub-kalshi最新文件。
