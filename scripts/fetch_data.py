@@ -2342,6 +2342,9 @@ async def main():
     from data_quality import source_health
     output["source_health"] = source_health(output)
 
+    from pizza_backtest import build as build_pizza_backtest
+    output["pizza_backtest"] = build_pizza_backtest(output)
+
     # 推播：更新完成後按時段去重回報 + 異常（未設定 Secrets 則自動跳過）；狀態寫回 _notify
     try:
         if os.environ.get("WARHUB_NO_NOTIFY") == "1":
@@ -2368,3 +2371,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
