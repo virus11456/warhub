@@ -55,6 +55,11 @@ def source_health(data):
             status = 'available' if n else 'unavailable'
             note = f'{n} 店有即時人流；未觀測不等同已打烊'
             observed = (data.get('defcon_details') or {}).get('at_time')
+        if key == 'news' and isinstance(data.get('news_sampling'), dict):
+            samples = data['news_sampling'].get('by_region') or {}
+            fresh = sum(r.get('status') == 'available' for r in samples.values() if isinstance(r, dict))
+            status = 'available' if fresh == 5 else 'partial' if fresh else 'stale' if v else 'unavailable'
+            note = f'{fresh}/5 地區取得新資料；舊值不計分'
         if key in (data.get('collection') or {}).get('reused_sources', []):
             note += '；本輪沿用慢資料，未重新查詢，原觀測時間不變'
             from collection_policy import elapsed_hours

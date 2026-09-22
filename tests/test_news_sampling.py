@@ -47,6 +47,8 @@ class Tests(unittest.TestCase):
         rows=n.parse_rss(xml,'taiwan',NOW)
         self.assertEqual(len(rows),50); self.assertEqual(rows[0]['title'],'Headline 0')
         with self.assertRaises(ValueError):n.parse_rss('<html/>','taiwan',NOW)
+        with self.assertRaises(ValueError):n.parse_rss('<rss><channel><item><title>bad</title></item></channel></rss>','taiwan',NOW)
+        self.assertEqual(n.parse_rss('<rss><channel/></rss>','taiwan',NOW),[])
 
 class CollectionTests(unittest.IsolatedAsyncioTestCase):
     async def test_collector_queries_five_regions_and_keeps_archive_out_of_public_summary(self):
@@ -119,3 +121,10 @@ class PublicationTests(unittest.TestCase):
             archived=a.archive_snapshot(source,Path(td)/'archives','fixture')
             payload=json.loads(gzip.decompress(archived.read_bytes()))
             self.assertEqual(payload['files']['news_samples.json'],samples)
+
+    def test_source_health_does_not_call_partial_regional_collection_complete(self):
+        from data_quality import source_health
+        summary={'by_region': {k: {'status': 'available' if k=='taiwan' else 'unavailable'} for k in n.QUERIES}}
+        result=source_health({'news':[{'title':'fixture'}], 'news_sampling':summary})
+        self.assertEqual(result['news']['status'],'partial')
+        self.assertIn('1/5',result['news']['note'])

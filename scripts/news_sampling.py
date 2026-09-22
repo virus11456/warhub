@@ -32,8 +32,9 @@ def parse_rss(raw, region, now):
     root = ET.fromstring(raw)
     if root.tag != 'rss' or root.find('channel') is None:
         raise ValueError('invalid_rss')
-    items = []
-    for node in root.findall('./channel/item'):
+    items, valid_items = [], 0
+    nodes = root.findall('./channel/item')
+    for node in nodes:
         title, url = (node.findtext('title') or '').strip(), (node.findtext('link') or '').strip()
         source = (node.findtext('source') or '').strip()
         if not title or urlsplit(url).scheme not in ('http', 'https') or not urlsplit(url).netloc:
@@ -45,12 +46,15 @@ def parse_rss(raw, region, now):
             published = published.astimezone(timezone.utc)
         except (ValueError, TypeError, AttributeError, OverflowError):
             continue
+        valid_items += 1
         if not now - timedelta(days=7) <= published <= now + timedelta(minutes=5):
             continue
         if source and title.endswith(' - ' + source):
             title = title[:-(len(source) + 3)].strip()
         items.append({'title': title, 'url': url, 'domain': source, 'ts': published.isoformat(),
                       'topic': TOPICS[region], 'region': region})
+    if nodes and not valid_items:
+        raise ValueError('no_valid_items')
     result, links, titles = [], set(), set()
     for item in sorted(items, key=lambda r: r['ts'], reverse=True):
         key = title_key(item['title'])
