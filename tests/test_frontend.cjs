@@ -58,6 +58,10 @@ assert.ok(d.querySelector('footer a[href="https://simples.com.tw/"]'));
 assert.ok(d.querySelector('footer').textContent.includes('SIMPLES 工具網'));
 assert.ok(d.querySelector('footer').textContent.includes('Stocktools'));
 assert.ok(d.querySelector('footer').textContent.includes('Toolist'));
+const hypeLinks=[...d.querySelectorAll('a[href="https://hypeboss.cc/"]')];
+assert.ok(hypeLinks.length>=2);
+assert.ok(hypeLinks.every(a=>a.textContent.includes('HypeBoss') && !/Crypig/i.test(a.textContent)));
+assert.ok(![...d.querySelectorAll('a')].some(a=>/opensky-network\.org/i.test(a.href)));
 const stocktoolsDeep=['https://www.stocktools.cc/tw/us-fee-calculator','https://www.stocktools.cc/tw/us-etf','https://www.stocktools.cc/tw/us-deposit','https://www.stocktools.cc/tw/us-open-account','https://www.stocktools.cc/tw/us-dividend','https://www.stocktools.cc/tw/us-first-buy','https://www.stocktools.cc/tw/us-premarket','https://www.stocktools.cc/tw/us-order-types','https://www.stocktools.cc/tw/us-adr','https://www.stocktools.cc/tw/us-fx','https://www.stocktools.cc/tw/us-fractional','https://www.stocktools.cc/tw/us-earnings'];
 for(const href of stocktoolsDeep){
   const links=[...d.querySelectorAll(`a[href="${href}"]`)];
