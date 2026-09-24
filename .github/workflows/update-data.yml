@@ -2,7 +2,7 @@ name: Update data
 
 on:
   schedule:
-    - cron: '23 * * * *'  # 每小時檢查；110 分鐘守門員限制實際抓取，避免延遲後再多等兩小時
+    - cron: '23 */6 * * *'  # 每 6 小時執行一次，降低 GitHub Actions 用量
   workflow_dispatch:
     inputs:
       collection_mode:
