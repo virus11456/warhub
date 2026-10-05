@@ -1,33 +1,32 @@
 {
-  "updated_at": "2026-10-05T04:00:11.497700+00:00",
+  "updated_at": "2026-10-05T05:57:44.917101+00:00",
   "collection": {
     "mode": "auto",
-    "slow_refresh": false,
+    "slow_refresh": true,
     "history_refresh": false,
-    "slow_attempted_at": "2026-10-04T22:57:34.791810+00:00",
+    "slow_attempted_at": "2026-10-05T05:57:09.253709+00:00",
     "history_attempted_at": "2026-10-04T22:57:34.791810+00:00",
-    "reused_sources": [
-      "food",
-      "usda",
-      "strat",
-      "fred"
-    ],
+    "reused_sources": [],
     "duration_seconds": {
-      "gdelt": 0.016,
-      "pizzint": 0.212,
-      "wikipedia_anxiety": 0.165,
-      "aviation": 0.336,
-      "polymarket": 0.48,
-      "firms": 0.766,
-      "bars": 0.733,
-      "nuclear_seismic": 1.415,
-      "eonet": 2.658,
-      "notams": 4.893,
-      "gnews": 6.584,
-      "kalshi": 2.227,
-      "tw_military_news": 0.614,
-      "pla_sorties": 2.23,
-      "finance": 4.408
+      "food_imports": 0.02,
+      "bars": 0.001,
+      "wikipedia_anxiety": 0.125,
+      "polymarket": 0.32,
+      "aviation": 0.343,
+      "firms": 0.419,
+      "eonet": 0.443,
+      "pizzint": 0.481,
+      "nuclear_seismic": 1.478,
+      "usda_esr": 3.015,
+      "notams": 4.951,
+      "gnews": 6.078,
+      "gdelt": 25.257,
+      "kalshi": 2.212,
+      "strategic_imports": 0.02,
+      "tw_military_news": 0.485,
+      "pla_sorties": 2.592,
+      "finance": 4.246,
+      "fred": 0.544
     }
   },
   "trade_availability": {
@@ -58,15 +57,14 @@
     "archived": 0
   },
   "gdelt_events_sampling": {
-    "attempted_at": "2026-10-04T23:02:01.953731+00:00",
+    "attempted_at": "2026-10-05T05:57:51.548393+00:00",
     "status": "sampled",
     "stale": false,
-    "last_success_at": "2026-10-04T23:02:01.953731+00:00",
-    "latest_batch": "20261004230000",
+    "last_success_at": "2026-10-05T05:57:51.548393+00:00",
+    "latest_batch": "20261005060000",
     "index": {
       "schema_version": 1,
       "processed_batches": [
-        "20260920161500",
         "20260921000000",
         "20260921073000",
         "20260921150000",
@@ -97,14 +95,10 @@
         "20261004011500",
         "20261004084500",
         "20261004153000",
-        "20261004230000"
+        "20261004230000",
+        "20261005060000"
       ],
       "gaps_between_saved_batches": [
-        {
-          "start": "20260920163000",
-          "end": "20260920234500",
-          "missing_batches": 30
-        },
         {
           "start": "20260921001500",
           "end": "20260921071500",
@@ -254,29 +248,26 @@
           "start": "20261004154500",
           "end": "20261004224500",
           "missing_batches": 29
+        },
+        {
+          "start": "20261004231500",
+          "end": "20261005054500",
+          "missing_batches": 27
         }
       ],
-      "event_ids": 34907,
-      "event_versions": 34907,
-      "unique_mentions": 99213,
-      "unresolved_mentions": 60512,
-      "distinct_article_urls": 14642,
+      "event_ids": 35134,
+      "event_versions": 35134,
+      "unique_mentions": 98910,
+      "unresolved_mentions": 60017,
+      "distinct_article_urls": 14611,
       "coverage_note": "Only saved batches are covered; no claim of complete daily coverage or independent sources."
     },
     "sampling_interval_hours": 6,
     "index_batch_limit": 32,
-    "archive_path": "archives/gdelt-events/20261004230000_b983ebffa7ed1c1acd866467941059d61ae08206d21476029cc1fa58324b22a2.json.gz"
+    "archive_path": "archives/gdelt-events/20261005060000_31a6dffa9924290aab648a15f1735e3a3c1c33500847f76416f7c8eba57a481c.json.gz"
   },
   "translation_cache": {
     "news": {
-      "US Plans October Talks in Abu Dhabi on Limited Ukraine-Russia Ceasefire": "美國計畫於十月在阿布達比就有限的烏克蘭-俄羅斯停火進行會談",
-      "Trump predicts swift Iran war end, vows oil plunge and AI lead over China - CHOSUNBIZ": "特朗普預測伊朗戰爭將迅速結束，誓言油價暴跌並以 AI 取代中國 - 朝鮮商報",
-      "Russian nuclear-capable bomber plane crashes, killing six people": "俄羅斯核可用轟炸機墜毀，六人遇難",
-      "Merz Says Russia ‘Not at All Interested’ in Talks to End War": "梅爾茲表示俄羅斯「完全不感興趣」於結束戰爭的談判",
-      "Iran’s currency hits a new record low as war erodes the country’s economic stability": "伊朗貨幣跌至新低，戰爭侵蝕國家經濟穩定性",
-      "Americans' view of the economy sinks to the lowest level since 2014, Conference Board survey says": "美國人對經濟的看法降至 2014 年以來最低水平，會議委員會調查顯示",
-      "Philippines Accuses Chinese Vessel Of Location Falsification Near Undersea Cables": "菲律賓指控中國船隻在海底電纜附近偽造位置",
-      "South Korea points finger at North over bloody mine blast": "南韓指責北韓造成血腥地雷爆炸",
       "US imposes sanctions on alleged intermediaries in Iran's military supplies — PBS NewsHour": "美國對伊朗軍事供應涉嫌中介實施制裁 — PBS NewsHour",
       "Kazakh president calls for freeze of Ukraine war": "哈薩克總統呼籲凍結烏克蘭戰爭",
       "American Troops Leave Iraq With a Warning for Iran": "美軍離開伊拉克，警告伊朗",
@@ -767,18 +758,26 @@
       "Ukrainian drones deliver new batch of food to Russian-occupied Oleshky": "烏克蘭無人機將新一批糧食送至俄羅斯佔領的奧列什基",
       "Taiwan reckons with the prospect of fending for itself as Trump pivots on China": "台灣面對自力更生的前景，特朗普在中國問題上轉向",
       "India seeks to be ‘a little bit more involved’ in ending Ukraine war: minister": "印度尋求在結束烏克蘭戰爭中「更進一步」：部長",
-      "Philippines accuses China of harassing patrols over Bajo de Masinloc": "菲律賓指控中國在馬西納洛克灣對巡邏船隻進行騷擾",
       "On the USS George Washington, young sailors adjust to war with Iran": "在「喬治·華盛頓號」上，年輕水手適應與伊朗的戰爭",
       "Major oil exporters agree to keep production steady in November": "主要石油出口國同意在十一月保持產量穩定",
       "The Greens have squibbed it on Ukraine, abandoning a democracy under attack": "綠黨在烏克蘭問題上失利，放棄對受攻擊民主的支持",
-      "South Korea's Gold Medal Spurs Controversy, Apologies": "韓國金牌引發爭議，致歉",
       "Staffers unanimous: Iran a drag on GOP": "工作人員一致認為伊朗拖累共和黨",
-      "Taiwan Coast Guard Repels Chinese Vessels With Water Cannons": "台灣海巡隊以水炮擊退中國船隻",
       "Rubio Heads To NATO Allies As Russian Threat, Middle East War Shape Agenda": "魯比歐前往北約盟友，俄羅斯威脅與中東戰爭成為議程焦點",
-      "S. Korea says allies can detect, intercept N. Korean hypersonic missile": "韓國表示盟友能偵測並攔截北韓高超音速彈道彈",
       "Trump cites N. Korea's nuclear arsenal, stresses ties with Kim Jong Un": "特朗普提及北韓核武庫，強調與金正恩的關係",
-      "Philippines accuses Chinese coast guard of blocking law enforcement mission near Pag-asa Island": "菲律賓指控中國海警阻擋在帕加沙島附近執法任務",
       "Philippines accuses Chinese coast guard of blocking law enforcement mission near Thitu": "菲律賓指控中國海警阻擋在提圖附近執法任務",
+      "Middle East oil exports recover to pre-Iran war levels despite Hormuz attacks": "中東石油出口恢復至伊朗戰前水平，儘管霍爾木茲遭受攻擊",
+      "The Ukraine war: Propaganda and the death of truth": "烏克蘭戰爭：宣傳與真相之死",
+      "Middle East oil exports surpass pre-war levels despite tensions, data shows": "中東石油出口超越戰前水平，數據顯示儘管緊張局勢",
+      "U.S. military removes bombers from U.K. base targeted in suspected terror plot": "美軍從英國基地撤除轟炸機，該基地被疑似恐怖陰謀目標",
+      "Lawmaker says North Korea erected fences south of Military Demarcation Line — Korea Herald": "立法者表示朝鮮在軍事分界線以南設置圍牆 — 朝鮮先驅報",
+      "India seeks bigger role in effort to end the Russia-Ukraine war": "印度尋求在結束俄烏戰爭的努力中扮演更大角色",
+      "Russia Fields Unmanned Tanks, Lasers and Drone Swarms in a 47,000-Troop War Game": "俄羅斯在 4.7 萬人戰役中部署無人坦克、雷射與無人機群",
+      "Chinese ships, planes block PH operations": "中國船隻、飛機封鎖菲律賓作戰",
+      "Philippines accuses China of harassing patrols over Bajo de Masinloc": "菲律賓指控中國在馬西納洛克灣對巡邏船隻進行騷擾",
+      "South Korea's Gold Medal Spurs Controversy, Apologies": "韓國金牌引發爭議，致歉",
+      "Taiwan Coast Guard Repels Chinese Vessels With Water Cannons": "台灣海巡隊以水炮擊退中國船隻",
+      "S. Korea says allies can detect, intercept N. Korean hypersonic missile": "韓國表示盟友能偵測並攔截北韓高超音速彈道彈",
+      "Philippines accuses Chinese coast guard of blocking law enforcement mission near Pag-asa Island": "菲律賓指控中國海警阻擋在帕加沙島附近執法任務",
       "Taiwan Receives First Two New-Build F-16C Block 70 Fighters After Years of Delays": "台灣接收首批兩架新造F-16C Block 70戰機，經多年延遲後完成交付",
       "US defense representatives reportedly set to embed in Taiwan’s defense ministry": "美國防務代表據報將嵌入台灣國防部"
     },
@@ -855,7 +854,6 @@
       "Houthi military action against Saudi Arabia on September 29?": "胡塞武裝對沙烏地阿拉伯於9月29日的軍事行動？",
       "Saudi Arabia military action against Yemen on September 24?": "沙烏地阿拉伯軍事行動於 9 月 24 日對也門？",
       "Saudi Arabia military action against Yemen on September 23?": "沙烏地阿拉伯於9月23日對也門的軍事行動？",
-      "Will North Korea invade South Korea before 2027?": "北韓會在 2027 年前入侵南韓嗎？",
       "Houthi military action against Saudi Arabia on September 23?": "胡塞武裝對沙特阿拉伯於9月23日的軍事行動？",
       "Israel military action against Lebanon on September 23?": "以色列於9月23日對黎巴嫩的軍事行動？",
       "Israel x Hamas Ceasefire Phase II by December 31?": "以色列與哈馬斯停火第二階段，是否於 12 月 31 日前完成？",
@@ -964,6 +962,8 @@
       "Israel military action against Lebanon on October 4?": "以色列於10月4日對黎巴嫩的軍事行動？",
       "US strike on Colombia by December 31?": "美國於12月31日前對哥倫比亞的打擊？",
       "Iran invades Kuwait by October 31?": "伊朗於10月31日前入侵科威特？",
+      "US x Cuba military clash in 2026?": "美國與古巴在 2026 年是否會發生軍事衝突？",
+      "Saudi troops enter Marib Governorate by October 31, 2026?": "沙烏地部隊於 2026 年 10 月 31 日前進入馬里布省？",
       "Will the U.S. invade Iran before 2027?": "美國會在2027年之前入侵伊朗嗎？",
       "US x Iran ceasefire continues through October 31?": "美國與伊朗停火持續至 10 月 31 日？",
       "US x Iran ceasefire continues through October 15?": "美國與伊朗停火持續至10月15日？",
@@ -976,40 +976,39 @@
       "NATO x Russia military clash by December 31, 2026?": "北約與俄羅斯 2026 年 12 月 31 日前發生軍事衝突？",
       "Russia x Ukraine ceasefire by October 31, 2026?": "俄羅斯與烏克蘭 2026 年 10 月 31 日前停火？",
       "Israel x Iran ceasefire continues through December 31?": "以色列與伊朗停火持續至12月31日？",
+      "Will Russia invade another country in 2026?": "俄羅斯是否會於 2026 年入侵另一個國家？",
       "Saudi-Houthi ceasefire agreement announced by October 31?": "沙烏地-胡塞停火協議是否於10月31日前宣布？",
       "Will the U.S. invade a Latin American country in 2026?": "美國會於 2026 年入侵拉丁美洲國家嗎？",
       "Russia x Ukraine ceasefire agreement by October 31, 2026?": "俄羅斯與烏克蘭 2026 年 10 月 31 日前達成停火協議？",
       "US x Iran ceasefire continues through October 9?": "美伊停火持續至10月9日？",
       "Israel x Turkey military clash before 2027?": "以色列與土耳其軍事衝突是否會於 2027 年前發生？",
-      "Will Russia invade another country in 2026?": "俄羅斯是否會於 2026 年入侵另一個國家？",
       "China x Japan military clash before 2027?": "中國與日本軍事衝突是否會在 2027 年前發生？",
       "China x Philippines military clash before 2027?": "2027年前中國與菲律賓發生軍事衝突？",
       "US x Iran ceasefire continues through October 12?": "美國與伊朗停火將持續至 10 月 12 日嗎？",
+      "Russia x Ukraine ceasefire agreement by December 31, 2027?": "俄羅斯與烏克蘭停火協議於2027年12月31日前？",
       "US x Iran ceasefire continues through November 30?": "美國與伊朗停火是否持續至 2026 年 11 月 30 日？",
       "US x Iran ceasefire continues through November 15?": "美國與伊朗停火持續至11月15日？",
       "US x Yemen ceasefire continues through October 9?": "美國與也門停火持續至10月9日？",
       "US x Yemen ceasefire continues through October 31?": "美國與也門停火持續至10月31日？",
       "Saudi troops fighting in Yemen by October 10, 2026?": "沙烏地部隊於 2026 年 10 月 10 日前在也門作戰嗎？",
-      "Israel x Iran ceasefire continues through November 30?": "以色列與伊朗停火持續至11月30日？",
       "Israel military action against Lebanon on October 19?": "以色列於10月19日對黎巴嫩的軍事行動？",
+      "Israel x Iran ceasefire continues through November 30?": "以色列與伊朗停火持續至11月30日？",
+      "Saudi troops fighting in Yemen by December 31, 2026?": "沙烏地阿拉伯部隊於 2026 年 12 月 31 日前在也門作戰嗎？",
       "US strike on Cuba by December 31?": "美國是否會在 12 月 31 日前對古巴發動攻擊？",
       "Houthi x Saudi Arabia effective ceasefire by October 31?": "胡塞與沙烏地阿拉伯是否能於10月31日前達成有效停火？",
       "Russia x Ukraine ceasefire agreement by March 31, 2027?": "俄羅斯與烏克蘭是否會在 2027 年 3 月 31 日前達成停火協議？",
-      "Will China invade Taiwan by December 31, 2027?": "中國會在 2027 年 12 月 31 日之前入侵台灣嗎？",
-      "US x China Military clash before 2027?": "美國與中國軍事衝突於2027年前？",
+      "Will North Korea invade South Korea before 2027?": "北韓會在 2027 年前入侵南韓嗎？",
       "Russia military action against an EU country by December 31, 2026?": "俄羅斯對歐盟國家採取軍事行動，是否在 2026 年 12 月 31 日前完成？",
+      "US x China Military clash before 2027?": "美國與中國軍事衝突於2027年前？",
       "Saudi troops fighting in Yemen by October 17, 2026?": "沙烏地部隊於 2026 年 10 月 17 日前在也門作戰？",
       "Saudi troops enter Sanaa by October 31, 2026?": "沙烏地部隊於 2026 年 10 月 31 日前進入薩那？",
       "Will the U.S. invade Cuba in 2026?": "美國會在 2026 年入侵古巴嗎？",
-      "Saudi troops fighting in Yemen by December 31, 2026?": "沙烏地阿拉伯部隊於 2026 年 12 月 31 日前在也門作戰嗎？",
       "NATO/EU troops fighting in Ukraine by December 31, 2026?": "NATO/EU 部隊是否會在 2026 年 12 月 31 日前參與烏克蘭戰鬥？",
-      "US x Cuba military clash in 2026?": "美國與古巴在 2026 年是否會發生軍事衝突？",
       "Ukraine signs peace deal with Russia before 2027?": "烏克蘭2027年前與俄羅斯簽署和平協議？",
-      "Saudi troops enter Marib Governorate by October 31, 2026?": "沙烏地部隊於 2026 年 10 月 31 日前進入馬里布省？",
       "Ukraine signs peace deal with Russia by October 31?": "烏克蘭是否會在 10 月 31 日前與俄羅斯簽署和平協議？",
-      "China x Taiwan military clash before 2027?": "2027年前中國與台灣發生軍事衝突？",
+      "Will China invade Taiwan by December 31, 2027?": "中國會在 2027 年 12 月 31 日之前入侵台灣嗎？",
       "US military draft authorized in 2026?": "美國在 2026 年授權徵召軍隊嗎？",
-      "Russia x Ukraine ceasefire agreement by December 31, 2027?": "俄羅斯與烏克蘭停火協議於2027年12月31日前？"
+      "China x Taiwan military clash before 2027?": "2027年前中國與台灣發生軍事衝突？"
     }
   },
   "english_translation_cache": {
@@ -1504,6 +1503,7 @@
     "地獄景象是什麼？美軍台海無人機戰略Hellscape的爭議與最新進展【持續更新】": "What Is Hellscape? The Controversy and Latest Developments of the U.S. Military Taiwan Strait UAV Strategy Hellscape【Continuously Updated】",
     "核威懾逼近北約?!解放軍南海給菲律賓立規矩": "Nuclear Deterrence Approaches NATO?! The PLA Sets Rules for the Philippines in the South China Sea",
     "美財長：Kimi上傳共軍武器計畫到Anthropic 讓中國驚覺AI開源模型威力": "US Treasury Secretary: Kimi Uploaded Chinese Military Weapon Plan to Anthropic, China Realizes Power of AI Open-Source Models",
+    "美財長：中國驚覺AI開源模型威力 因Kimi上傳共軍武器計畫到Anthropic": "US Treasury Secretary: China is shocked by the power of AI open-source models because Kimi uploaded a Communist military weapons plan to Anthropic",
     "今日無共機擾台 8艘次共艦在台海周邊活動": "No Chinese Aircraft Disrupt Taiwan Today; 8 Chinese Warships Activity Around Taiwan Strait",
     "8艘共艦9艘公務船擾台　國軍嚴密監控": "8 Chinese Warships and 9 Civilian Vessels Disrupt Taiwan; Military Maintains Tight Surveillance",
     "8艘共艦9艘公務船擾台 國軍嚴密監控": "8 Chinese Warships and 9 Civilian Vessels Disrupt Taiwan; Military Maintains Tight Surveillance",
@@ -1521,14 +1521,14 @@
     "combined_score": 19.0,
     "alert_level": "LOW",
     "pizza_score": null,
-    "polymarket_score": 18.962547629527165,
+    "polymarket_score": 18.918221944613798,
     "factors": {
-      "p": 18.96,
+      "p": 18.92,
       "a": 0.0,
       "g": null,
       "z": null,
       "f": null,
-      "s": 45.67,
+      "s": 45.81,
       "w": 21.7
     },
     "coverage": 0.66,
@@ -1559,9 +1559,6 @@
         null,
         null,
         null,
-        null,
-        null,
-        null,
         8,
         5,
         null,
@@ -1569,13 +1566,16 @@
         null,
         0,
         null,
+        null,
+        null,
+        null,
         null
       ],
       "is_closed_now": true,
       "place_id": "ChIJS1rpOC-3t4kRsLyM6aftM8k",
       "address": "https://www.google.com/maps/place/We,+The+Pizza/@38.8663614,-77.0588449,15.76z/data=!3m1!5s0x89b7b72f331803b7:0x7edf0a3adffa41c8!4m6!3m5!1s0x89b7b72f38e95a4b:0xc933eda7e98cbcb0!8m2!3d38.8551791!4d-77.049733!16s%2Fg%2F1q62g66vf?entry=ttu&g_ep=EgoyMDI1MDYxNi4wIKXMDSoASAFQAw%3D%3D",
       "data_source": "none",
-      "recorded_at": "2026-10-05T02:20:37.806Z"
+      "recorded_at": "2026-10-05T05:47:14.346Z"
     },
     {
       "name": "Pizzato Pizza",
@@ -1587,9 +1587,6 @@
       "spike_magnitude": null,
       "percentage_of_usual": null,
       "sparkline": [
-        null,
-        100,
-        null,
         null,
         null,
         null,
@@ -1610,27 +1607,27 @@
         null,
         0,
         null,
+        null,
+        null,
+        null,
         null
       ],
       "is_closed_now": false,
       "place_id": "ChIJrbin_Qm3t4kRVSytw_2DM1g",
       "address": "https://www.google.com/maps/place/Pizzato+Pizza/@38.8791607,-77.096414,15.18z/data=!4m6!3m5!1s0x89b7b709fda7b8ad:0x583383fdc3ad2c55!8m2!3d38.8806865!4d-77.089827!16s%2Fg%2F11v5zglw6h?entry=ttu&g_ep=EgoyMDI1MDYxNy4wIKXMDSoASAFQAw%3D%3D",
       "data_source": "none",
-      "recorded_at": "2026-10-05T02:20:37.806Z"
+      "recorded_at": "2026-10-05T05:47:14.346Z"
     },
     {
       "name": "Papa Johns Pizza",
       "busyness": null,
-      "is_open": null,
-      "status": "unavailable",
+      "is_open": false,
+      "status": "closed",
       "baseline": null,
       "spike": false,
       "spike_magnitude": null,
       "percentage_of_usual": null,
       "sparkline": [
-        null,
-        95,
-        null,
         null,
         null,
         null,
@@ -1651,27 +1648,27 @@
         null,
         0,
         null,
+        null,
+        null,
+        null,
         null
       ],
-      "is_closed_now": false,
+      "is_closed_now": true,
       "place_id": "ChIJo03BaX-3t4kRbyhPM0rTuqM",
       "address": "https://www.google.com/maps/place/Papa+Johns+Pizza/@38.8292633,-77.1901741,11.83z/data=!4m6!3m5!1s0x89b7b77f69c14da3:0xa3bad34a334f286f!8m2!3d38.8606821!4d-77.0922272!16s%2Fg%2F11t104lmtl?entry=ttu&g_ep=EgoyMDI1MDYxNy4wIKXMDSoASAFQAw%3D%3D",
       "data_source": "none",
-      "recorded_at": "2026-10-05T02:20:37.806Z"
+      "recorded_at": "2026-10-05T05:47:14.346Z"
     },
     {
       "name": "Domino's Pizza (Pentagon Closest)",
       "busyness": null,
-      "is_open": null,
-      "status": "unavailable",
+      "is_open": false,
+      "status": "closed",
       "baseline": null,
       "spike": false,
       "spike_magnitude": null,
       "percentage_of_usual": null,
       "sparkline": [
-        null,
-        0,
-        null,
         null,
         null,
         null,
@@ -1692,13 +1689,16 @@
         null,
         76,
         null,
+        null,
+        null,
+        null,
         null
       ],
-      "is_closed_now": false,
+      "is_closed_now": true,
       "place_id": "ChIJI6ACK7q2t4kRFcPtFhUuYhU",
       "address": "https://www.google.com/maps/place/Domino's+Pizza/@38.8627308,-77.0879692,17z/data=!3m1!4b1!4m6!3m5!1s0x89b7b6ba2b02a023:0x15622e1516edc315!8m2!3d38.8627267!4d-77.0853943!16s%2Fg%2F1wbryp46?entry=ttu&g_ep=EgoyMDI1MDYxNi4wIKXMDSoASAFQAw%3D%3D",
       "data_source": "none",
-      "recorded_at": "2026-10-05T02:20:37.806Z"
+      "recorded_at": "2026-10-05T05:47:14.346Z"
     },
     {
       "name": "Extreme Pizza",
@@ -1720,9 +1720,6 @@
         null,
         null,
         null,
-        null,
-        null,
-        null,
         40,
         37,
         null,
@@ -1733,27 +1730,27 @@
         null,
         83,
         null,
+        null,
+        null,
+        null,
         null
       ],
       "is_closed_now": true,
       "place_id": "ChIJcYireCe3t4kR4d9trEbGYjc",
       "address": "https://www.google.com/maps/place/Extreme+Pizza/@38.8602396,-77.0585603,17z/data=!3m1!4b1!4m6!3m5!1s0x89b7b72778ab8871:0x3762c646ac6ddfe1!8m2!3d38.8602396!4d-77.0559854!16s%2Fg%2F12llsn19l?entry=ttu&g_ep=EgoyMDI1MDYxNi4wIKXMDSoASAFQAw%3D%3D",
       "data_source": "none",
-      "recorded_at": "2026-10-05T02:20:37.806Z"
+      "recorded_at": "2026-10-05T05:47:14.346Z"
     },
     {
       "name": "District Pizza Palace",
       "busyness": null,
-      "is_open": null,
-      "status": "unavailable",
+      "is_open": false,
+      "status": "closed",
       "baseline": null,
       "spike": false,
       "spike_magnitude": null,
       "percentage_of_usual": null,
       "sparkline": [
-        null,
-        0,
-        null,
         null,
         null,
         null,
@@ -1774,13 +1771,16 @@
         null,
         100,
         null,
+        null,
+        null,
+        null,
         null
       ],
-      "is_closed_now": false,
+      "is_closed_now": true,
       "place_id": "ChIJ42QeLXu3t4kRnArvcaz2o3A",
       "address": "https://www.google.com/maps/place/District+Pizza+Palace/@38.8527414,-77.0557157,17z/data=!3m1!4b1!4m6!3m5!1s0x89b7b77b2d1e64e3:0x70a3f6ac71ef0a9c!8m2!3d38.8527414!4d-77.0531408!16s%2Fg%2F11vc1fb80v?entry=ttu&g_ep=EgoyMDI1MDYxNi4wIKXMDSoASAFQAw%3D%3D",
       "data_source": "none",
-      "recorded_at": "2026-10-05T02:20:37.806Z"
+      "recorded_at": "2026-10-05T05:47:14.346Z"
     },
     {
       "name": "Nighthawk Brewery & Pizza",
@@ -1797,15 +1797,15 @@
   "pizza_events": [],
   "defcon_level": 5,
   "defcon_details": {
-    "at_time": "2026-10-05T02:00:00.000Z",
-    "defcon_severity_decimal": 0.0635,
+    "at_time": "2026-10-05T05:00:00.000Z",
+    "defcon_severity_decimal": 0.0174,
     "raw_index": 0,
-    "smoothed_index": 6.35,
+    "smoothed_index": 1.74,
     "open_places": 0,
     "total_places": 6,
     "intensity_score": 0,
     "breadth_score": 0,
-    "night_multiplier": 1.14,
+    "night_multiplier": 1.22,
     "persistence_factor": 1,
     "places_above_150": 0,
     "places_above_200": 0,
@@ -1823,7 +1823,7 @@
       "question": "Will the U.S. invade Iran before 2027?",
       "yes_price": 0.155,
       "no_price": 0.845,
-      "volume": 71651279.42170301,
+      "volume": 71655634.95464504,
       "category": "geopolitics",
       "slug": "will-the-us-invade-iran-before-2027",
       "end_date": "2027-01-01T04:59:00Z",
@@ -1836,7 +1836,7 @@
       "question": "US x Iran ceasefire continues through October 31?",
       "yes_price": 0.715,
       "no_price": 0.285,
-      "volume": 1217343.139367999,
+      "volume": 1221351.990748999,
       "category": "geopolitics",
       "slug": "us-x-iran-ceasefire-continues-through-october-31-20260917",
       "end_date": "2026-10-31T23:59:00Z",
@@ -1849,7 +1849,7 @@
       "question": "US x Iran ceasefire continues through October 15?",
       "yes_price": 0.885,
       "no_price": 0.115,
-      "volume": 177208.260533,
+      "volume": 177212.010533,
       "category": "geopolitics",
       "slug": "us-x-iran-ceasefire-continues-through-october-15",
       "end_date": "2026-10-16T03:59:00Z",
@@ -1862,7 +1862,7 @@
       "question": "US x Iran ceasefire continues through October 7?",
       "yes_price": 0.9725,
       "no_price": 0.0275,
-      "volume": 270016.82377699995,
+      "volume": 270426.2788659999,
       "category": "geopolitics",
       "slug": "us-x-iran-ceasefire-continues-through-october-7",
       "end_date": "2026-10-08T03:59:00Z",
@@ -1873,13 +1873,13 @@
     {
       "id": "0x32851891e7ccfb249b1e120d77db70370fa92a13d821ce6c949de69402742aab",
       "question": "US x Iran ceasefire continues through December 31?",
-      "yes_price": 0.335,
-      "no_price": 0.665,
-      "volume": 338522.6774440001,
+      "yes_price": 0.33,
+      "no_price": 0.67,
+      "volume": 338528.6774440001,
       "category": "geopolitics",
       "slug": "us-x-iran-ceasefire-continues-through-december-31-20260918",
       "end_date": "2026-12-31T23:59:00Z",
-      "risk_score": 66.5,
+      "risk_score": 67.0,
       "translation_status": "cached",
       "question_zh": "美國與伊朗停火是否持續至 2026 年 12 月 31 日？"
     },
@@ -1888,7 +1888,7 @@
       "question": "NATO x Russia military clash by October 31, 2026?",
       "yes_price": 0.09,
       "no_price": 0.91,
-      "volume": 1370910.1396029987,
+      "volume": 1370947.639602999,
       "category": "geopolitics",
       "slug": "nato-x-russia-military-clash-by-october-31-2026",
       "end_date": "2026-11-01T03:59:00Z",
@@ -1899,26 +1899,26 @@
     {
       "id": "0x96498c10c79ecaafa2bbb92ada36c7ff617913b03d9220f8c95ce7d6776a0b0c",
       "question": "Will China blockade Taiwan in 2026?",
-      "yes_price": 0.039,
-      "no_price": 0.961,
-      "volume": 405009.24758599995,
+      "yes_price": 0.0385,
+      "no_price": 0.9615,
+      "volume": 405050.82762799994,
       "category": "geopolitics",
       "slug": "will-china-blockade-taiwan-by-in-2026",
       "end_date": "2027-01-01T04:59:00Z",
-      "risk_score": 3.9,
+      "risk_score": 3.85,
       "translation_status": "cached",
       "question_zh": "2026年中國會封鎖台灣嗎？"
     },
     {
       "id": "0xc3d5708780de5528998aeb53ca90e7ade64804f9f2386392a681435d5c42b44d",
       "question": "Israel x Iran ceasefire continues through October 31?",
-      "yes_price": 0.835,
-      "no_price": 0.165,
-      "volume": 1218808.7004919993,
+      "yes_price": 0.83,
+      "no_price": 0.17,
+      "volume": 1220837.8116039992,
       "category": "geopolitics",
       "slug": "israel-x-iran-ceasefire-continues-through-october-31",
       "end_date": "2026-10-31T20:29:00Z",
-      "risk_score": 16.5,
+      "risk_score": 17.0,
       "translation_status": "cached",
       "question_zh": "以色列與伊朗停火持續到10月31日？"
     },
@@ -1927,7 +1927,7 @@
       "question": "US x Iran ceasefire continues through October 5?",
       "yes_price": 0.9875,
       "no_price": 0.0125,
-      "volume": 23291.330378999995,
+      "volume": 23331.320378999997,
       "category": "geopolitics",
       "slug": "us-x-iran-ceasefire-continues-through-october-5",
       "end_date": "2026-10-06T03:59:00Z",
@@ -1938,13 +1938,13 @@
     {
       "id": "0xf2bf04609e7458df56c9bb4b1e051286dea11da1c944bbc1dafbcc6b76904e52",
       "question": "NATO x Russia military clash by December 31, 2026?",
-      "yes_price": 0.21,
-      "no_price": 0.79,
-      "volume": 2389739.755561,
+      "yes_price": 0.215,
+      "no_price": 0.785,
+      "volume": 2389797.4301070003,
       "category": "geopolitics",
       "slug": "nato-x-russia-military-clash-by-december-31-2026-244-538-582",
       "end_date": "2027-01-01T04:59:00Z",
-      "risk_score": 21.0,
+      "risk_score": 21.5,
       "translation_status": "cached",
       "question_zh": "北約與俄羅斯 2026 年 12 月 31 日前發生軍事衝突？"
     },
@@ -1966,13 +1966,26 @@
       "question": "Israel x Iran ceasefire continues through December 31?",
       "yes_price": 0.625,
       "no_price": 0.375,
-      "volume": 887683.120678,
+      "volume": 887683.240678,
       "category": "geopolitics",
       "slug": "israel-x-iran-ceasefire-continues-through-december-31-415",
       "end_date": "2026-12-31T20:29:00Z",
       "risk_score": 37.5,
       "translation_status": "cached",
       "question_zh": "以色列與伊朗停火持續至12月31日？"
+    },
+    {
+      "id": "0x8011cff605bac25673a202332b678e823cd7d82abad9e9770db01ea625808229",
+      "question": "Will Russia invade another country in 2026?",
+      "yes_price": 0.065,
+      "no_price": 0.935,
+      "volume": 595213.846051,
+      "category": "geopolitics",
+      "slug": "will-russia-invade-another-country-in-2026",
+      "end_date": "2027-01-01T04:59:00Z",
+      "risk_score": 6.5,
+      "translation_status": "cached",
+      "question_zh": "俄羅斯是否會於 2026 年入侵另一個國家？"
     },
     {
       "id": "0xe43eac2058693dbd067ac895986d7e1a174256aeced4ea847b98be7de37e2c21",
@@ -2005,7 +2018,7 @@
       "question": "Russia x Ukraine ceasefire agreement by October 31, 2026?",
       "yes_price": 0.0445,
       "no_price": 0.9555,
-      "volume": 1841396.2612049992,
+      "volume": 1841402.131204999,
       "category": "geopolitics",
       "slug": "russia-x-ukraine-ceasefire-agreement-by-october-31-2026",
       "end_date": "2026-11-01T03:59:00Z",
@@ -2018,7 +2031,7 @@
       "question": "US x Iran ceasefire continues through October 9?",
       "yes_price": 0.955,
       "no_price": 0.045,
-      "volume": 7481.240997999998,
+      "volume": 7486.480997999998,
       "category": "geopolitics",
       "slug": "us-x-iran-ceasefire-continues-through-october-9",
       "end_date": "2026-10-10T03:59:00Z",
@@ -2031,26 +2044,13 @@
       "question": "Israel x Turkey military clash before 2027?",
       "yes_price": 0.085,
       "no_price": 0.915,
-      "volume": 467660.2683589999,
+      "volume": 467660.26835899986,
       "category": "geopolitics",
       "slug": "israel-x-turkey-military-clash-before-2027",
       "end_date": "2027-01-01T04:59:00Z",
       "risk_score": 8.5,
       "translation_status": "cached",
       "question_zh": "以色列與土耳其軍事衝突是否會於 2027 年前發生？"
-    },
-    {
-      "id": "0x8011cff605bac25673a202332b678e823cd7d82abad9e9770db01ea625808229",
-      "question": "Will Russia invade another country in 2026?",
-      "yes_price": 0.065,
-      "no_price": 0.935,
-      "volume": 591806.456051,
-      "category": "geopolitics",
-      "slug": "will-russia-invade-another-country-in-2026",
-      "end_date": "2027-01-01T04:59:00Z",
-      "risk_score": 6.5,
-      "translation_status": "cached",
-      "question_zh": "俄羅斯是否會於 2026 年入侵另一個國家？"
     },
     {
       "id": "0xa466e17524bcc473279c4ca86f4f1fb01932946a8204e68f6ca96628f8bf2b5e",
@@ -2070,7 +2070,7 @@
       "question": "China x Philippines military clash before 2027?",
       "yes_price": 0.255,
       "no_price": 0.745,
-      "volume": 503296.89304200007,
+      "volume": 503320.403042,
       "category": "geopolitics",
       "slug": "china-x-philippines-military-clash-before-2027-20260723214807932",
       "end_date": "2027-01-01T04:59:00Z",
@@ -2081,15 +2081,28 @@
     {
       "id": "0x334954cfe7d8ae24e350972470c156f5b2cdd4616dcaa5bfb71b4e2b2298d690",
       "question": "US x Iran ceasefire continues through October 12?",
-      "yes_price": 0.925,
-      "no_price": 0.075,
-      "volume": 4113.774432,
+      "yes_price": 0.92,
+      "no_price": 0.08,
+      "volume": 4135.774432,
       "category": "geopolitics",
       "slug": "us-x-iran-ceasefire-continues-through-october-12",
       "end_date": "2026-10-13T03:59:00Z",
-      "risk_score": 7.5,
+      "risk_score": 8.0,
       "translation_status": "cached",
       "question_zh": "美國與伊朗停火將持續至 10 月 12 日嗎？"
+    },
+    {
+      "id": "0xa1092f590e543158e3f230aca48efd8c1c53198d68d96fcd9c6ef6a83937bb9d",
+      "question": "Russia x Ukraine ceasefire agreement by December 31, 2027?",
+      "yes_price": 0.665,
+      "no_price": 0.335,
+      "volume": 32628.898639,
+      "category": "geopolitics",
+      "slug": "russia-x-ukraine-ceasefire-agreement-by-december-31-2027",
+      "end_date": "2028-01-01T04:59:00Z",
+      "risk_score": 33.5,
+      "translation_status": "cached",
+      "question_zh": "俄羅斯與烏克蘭停火協議於2027年12月31日前？"
     },
     {
       "id": "0xb70b8da7839ecb8b166e0f3a8553e079b38e139ee164f5d8bfd99183d535fc33",
@@ -2107,26 +2120,26 @@
     {
       "id": "0xc83347e2b7a1d1341cba0fc6d03696c3be31c783b732355a04c8f8621ef4df09",
       "question": "US x Iran ceasefire continues through November 15?",
-      "yes_price": 0.555,
-      "no_price": 0.445,
-      "volume": 6090.0996350000005,
+      "yes_price": 0.525,
+      "no_price": 0.475,
+      "volume": 6171.816157000001,
       "category": "geopolitics",
       "slug": "us-x-iran-ceasefire-continues-through-november-15",
       "end_date": "2026-11-16T04:59:00Z",
-      "risk_score": 44.5,
+      "risk_score": 47.5,
       "translation_status": "cached",
       "question_zh": "美國與伊朗停火持續至11月15日？"
     },
     {
       "id": "0x28ef98bb4abf36d03e593430350c0cabd3edbff4630ec85ac6e9972d1b1638e1",
       "question": "US x Yemen ceasefire continues through October 9?",
-      "yes_price": 0.9625,
-      "no_price": 0.0375,
+      "yes_price": 0.961,
+      "no_price": 0.039,
       "volume": 20802.976720000006,
       "category": "geopolitics",
       "slug": "us-x-yemen-ceasefire-continues-through-october-9",
       "end_date": "2026-10-09T23:59:00Z",
-      "risk_score": 3.75,
+      "risk_score": 3.9,
       "translation_status": "cached",
       "question_zh": "美國與也門停火持續至10月9日？"
     },
@@ -2146,35 +2159,22 @@
     {
       "id": "0x441d7ead93ee549b8414931a7312f2bf12840917431af673f7022715df2ff1f8",
       "question": "Saudi troops fighting in Yemen by October 10, 2026?",
-      "yes_price": 0.036,
-      "no_price": 0.964,
+      "yes_price": 0.0345,
+      "no_price": 0.9655,
       "volume": 18231.812921999997,
       "category": "geopolitics",
       "slug": "saudi-troops-fighting-in-yemen-by-october-10-2026",
       "end_date": "2026-10-11T03:59:00Z",
-      "risk_score": 3.6,
+      "risk_score": 3.45,
       "translation_status": "cached",
       "question_zh": "沙烏地部隊於 2026 年 10 月 10 日前在也門作戰嗎？"
-    },
-    {
-      "id": "0x2dcbc71a3f8108936e768b503d565fbda7a644b2a0bd9ed45f74982a2bb11fba",
-      "question": "Israel x Iran ceasefire continues through November 30?",
-      "yes_price": 0.715,
-      "no_price": 0.285,
-      "volume": 472039.0114339999,
-      "category": "geopolitics",
-      "slug": "israel-x-iran-ceasefire-continues-through-november-30",
-      "end_date": "2026-11-30T20:29:00Z",
-      "risk_score": 28.5,
-      "translation_status": "cached",
-      "question_zh": "以色列與伊朗停火持續至11月30日？"
     },
     {
       "id": "0x94a46d8e26c6440ef7e71913b97b0497481bb90582e0f791b572b0d0c00f1459",
       "question": "Israel military action against Lebanon on October 19?",
       "yes_price": 0.725,
       "no_price": 0.275,
-      "volume": 2556.4773419999997,
+      "volume": 2720.628025999999,
       "category": "geopolitics",
       "slug": "israel-military-action-against-lebanon-on-october-19",
       "end_date": "2026-10-20T03:59:00Z",
@@ -2183,11 +2183,37 @@
       "question_zh": "以色列於10月19日對黎巴嫩的軍事行動？"
     },
     {
+      "id": "0x2dcbc71a3f8108936e768b503d565fbda7a644b2a0bd9ed45f74982a2bb11fba",
+      "question": "Israel x Iran ceasefire continues through November 30?",
+      "yes_price": 0.715,
+      "no_price": 0.285,
+      "volume": 472044.0114339999,
+      "category": "geopolitics",
+      "slug": "israel-x-iran-ceasefire-continues-through-november-30",
+      "end_date": "2026-11-30T20:29:00Z",
+      "risk_score": 28.5,
+      "translation_status": "cached",
+      "question_zh": "以色列與伊朗停火持續至11月30日？"
+    },
+    {
+      "id": "0xcef432844d5a66b2b5ab0a0866a5b266509c9f0cf5dc8221ebb4973185f4401d",
+      "question": "Saudi troops fighting in Yemen by December 31, 2026?",
+      "yes_price": 0.235,
+      "no_price": 0.765,
+      "volume": 19045.637243999998,
+      "category": "geopolitics",
+      "slug": "saudi-troops-fighting-in-yemen-by-december-31-2026",
+      "end_date": "2027-01-01T04:59:00Z",
+      "risk_score": 23.5,
+      "translation_status": "cached",
+      "question_zh": "沙烏地阿拉伯部隊於 2026 年 12 月 31 日前在也門作戰嗎？"
+    },
+    {
       "id": "0x3de0f3d7d7efb40cde68e814d40a0b232832083653c8e78260eb999baa967de0",
       "question": "US strike on Cuba by December 31?",
       "yes_price": 0.115,
       "no_price": 0.885,
-      "volume": 5387677.227258,
+      "volume": 5387687.2272580005,
       "category": "geopolitics",
       "slug": "us-strike-on-cuba-by-december-31",
       "end_date": "2027-01-01T04:59:00Z",
@@ -2213,7 +2239,7 @@
       "question": "Russia x Ukraine ceasefire agreement by March 31, 2027?",
       "yes_price": 0.335,
       "no_price": 0.665,
-      "volume": 177515.99861,
+      "volume": 177532.983685,
       "category": "geopolitics",
       "slug": "russia-x-ukraine-ceasefire-agreement-by-march-31-2027",
       "end_date": "2027-04-01T03:59:00Z",
@@ -2222,43 +2248,43 @@
       "question_zh": "俄羅斯與烏克蘭是否會在 2027 年 3 月 31 日前達成停火協議？"
     },
     {
-      "id": "0xe6d5e5da83874cd82c9b651a8a5d4fc541a800a295fb62e85124b4f5a04a4b7d",
-      "question": "Will China invade Taiwan by December 31, 2027?",
-      "yes_price": 0.115,
-      "no_price": 0.885,
-      "volume": 3383074.0417529996,
+      "id": "0x84dc47b1dd9cd99a9217b92a95690729334b647650bb6bf676bb31c3db0d7f79",
+      "question": "Will North Korea invade South Korea before 2027?",
+      "yes_price": 0.0215,
+      "no_price": 0.9785,
+      "volume": 448522.58139200014,
       "category": "geopolitics",
-      "slug": "will-china-invade-taiwan-by-december-31-2027",
-      "end_date": "2028-01-01T04:59:00Z",
-      "risk_score": 11.5,
+      "slug": "will-north-korea-invade-south-korea-before-2027",
+      "end_date": "2027-01-01T04:59:00Z",
+      "risk_score": 2.15,
       "translation_status": "cached",
-      "question_zh": "中國會在 2027 年 12 月 31 日之前入侵台灣嗎？"
+      "question_zh": "北韓會在 2027 年前入侵南韓嗎？"
+    },
+    {
+      "id": "0x575d41dd1659790a3d92bcd3c078d5d6a9f0f5d16c9a828e600cc85d1d08ea37",
+      "question": "Russia military action against an EU country by December 31, 2026?",
+      "yes_price": 0.105,
+      "no_price": 0.895,
+      "volume": 191256.013501,
+      "category": "geopolitics",
+      "slug": "russia-military-action-against-eu-country-by-december-31-2026",
+      "end_date": "2027-01-01T04:59:00Z",
+      "risk_score": 10.5,
+      "translation_status": "cached",
+      "question_zh": "俄羅斯對歐盟國家採取軍事行動，是否在 2026 年 12 月 31 日前完成？"
     },
     {
       "id": "0x844c84a7b6f8dbbdd72a1cf730062026c8c0b5ad6d30c9eb761263477fa283c6",
       "question": "US x China Military clash before 2027?",
       "yes_price": 0.022,
       "no_price": 0.978,
-      "volume": 217809.524442,
+      "volume": 217863.42444200002,
       "category": "geopolitics",
       "slug": "us-x-china-military-clash-before-2027",
       "end_date": "2027-01-01T04:59:00Z",
       "risk_score": 2.2,
       "translation_status": "cached",
       "question_zh": "美國與中國軍事衝突於2027年前？"
-    },
-    {
-      "id": "0x575d41dd1659790a3d92bcd3c078d5d6a9f0f5d16c9a828e600cc85d1d08ea37",
-      "question": "Russia military action against an EU country by December 31, 2026?",
-      "yes_price": 0.11,
-      "no_price": 0.89,
-      "volume": 190630.603501,
-      "category": "geopolitics",
-      "slug": "russia-military-action-against-eu-country-by-december-31-2026",
-      "end_date": "2027-01-01T04:59:00Z",
-      "risk_score": 11.0,
-      "translation_status": "cached",
-      "question_zh": "俄羅斯對歐盟國家採取軍事行動，是否在 2026 年 12 月 31 日前完成？"
     },
     {
       "id": "0x0668ce0398a97eb73a11ac0123fbbc37ac6919d6f751e5f155c8fa2a02cffd78",
@@ -2300,69 +2326,30 @@
       "question_zh": "美國會在 2026 年入侵古巴嗎？"
     },
     {
-      "id": "0xcef432844d5a66b2b5ab0a0866a5b266509c9f0cf5dc8221ebb4973185f4401d",
-      "question": "Saudi troops fighting in Yemen by December 31, 2026?",
-      "yes_price": 0.245,
-      "no_price": 0.755,
-      "volume": 18140.447243999995,
-      "category": "geopolitics",
-      "slug": "saudi-troops-fighting-in-yemen-by-december-31-2026",
-      "end_date": "2027-01-01T04:59:00Z",
-      "risk_score": 24.5,
-      "translation_status": "cached",
-      "question_zh": "沙烏地阿拉伯部隊於 2026 年 12 月 31 日前在也門作戰嗎？"
-    },
-    {
       "id": "0x9ec578f6ec257edab771698bd600a8eac1e59709a4e8e9cd53986cf8387e80e6",
       "question": "NATO/EU troops fighting in Ukraine by December 31, 2026?",
-      "yes_price": 0.0425,
-      "no_price": 0.9575,
+      "yes_price": 0.042,
+      "no_price": 0.958,
       "volume": 155062.44867999997,
       "category": "geopolitics",
       "slug": "natoeu-troops-fighting-in-ukraine-by-december-31-2026",
       "end_date": "2027-01-01T04:59:00Z",
-      "risk_score": 4.25,
+      "risk_score": 4.2,
       "translation_status": "cached",
       "question_zh": "NATO/EU 部隊是否會在 2026 年 12 月 31 日前參與烏克蘭戰鬥？"
-    },
-    {
-      "id": "0x333455a7be2dad4c981b49d700b80a0497c0274f72be3ab633a9ec020e80e884",
-      "question": "US x Cuba military clash in 2026?",
-      "yes_price": 0.16,
-      "no_price": 0.84,
-      "volume": 264521.519497,
-      "category": "geopolitics",
-      "slug": "us-x-cuba-military-clash-in-2026",
-      "end_date": "2027-01-01T04:59:00Z",
-      "risk_score": 16.0,
-      "translation_status": "cached",
-      "question_zh": "美國與古巴在 2026 年是否會發生軍事衝突？"
     },
     {
       "id": "0x4167e22670f31e5f93d132f78108f3fae809bd15cadf78983eff096845ed1415",
       "question": "Ukraine signs peace deal with Russia before 2027?",
       "yes_price": 0.085,
       "no_price": 0.915,
-      "volume": 2839757.855625001,
+      "volume": 2839757.855625,
       "category": "geopolitics",
       "slug": "ukraine-signs-peace-deal-with-russia-before-2027",
       "end_date": "2027-01-01T04:59:00Z",
       "risk_score": 91.5,
       "translation_status": "cached",
       "question_zh": "烏克蘭2027年前與俄羅斯簽署和平協議？"
-    },
-    {
-      "id": "0xba5ceb4388ff7abf589f770ef97a0029e3d1c34505dcdb696ece7ad978af874b",
-      "question": "Saudi troops enter Marib Governorate by October 31, 2026?",
-      "yes_price": 0.11,
-      "no_price": 0.89,
-      "volume": 8423.723739,
-      "category": "geopolitics",
-      "slug": "saudi-troops-enter-marib-governorate-by-october-31-2026",
-      "end_date": "2026-11-01T03:59:00Z",
-      "risk_score": 11.0,
-      "translation_status": "cached",
-      "question_zh": "沙烏地部隊於 2026 年 10 月 31 日前進入馬里布省？"
     },
     {
       "id": "0x3e365cd4a3ed1b8486bf270c69791a070886fd4398d9d4dccc055817aa8efbe8",
@@ -2378,17 +2365,17 @@
       "question_zh": "烏克蘭是否會在 10 月 31 日前與俄羅斯簽署和平協議？"
     },
     {
-      "id": "0x4c80df6f557bb0b9de08c0301ebdce500dd9bdc58400d9269fb8fab1709ed584",
-      "question": "China x Taiwan military clash before 2027?",
-      "yes_price": 0.0455,
-      "no_price": 0.9545,
-      "volume": 3449073.368412,
+      "id": "0xe6d5e5da83874cd82c9b651a8a5d4fc541a800a295fb62e85124b4f5a04a4b7d",
+      "question": "Will China invade Taiwan by December 31, 2027?",
+      "yes_price": 0.115,
+      "no_price": 0.885,
+      "volume": 3383106.626016,
       "category": "geopolitics",
-      "slug": "china-x-taiwan-military-clash-before-2027",
-      "end_date": "2027-01-01T04:59:00Z",
-      "risk_score": 4.55,
+      "slug": "will-china-invade-taiwan-by-december-31-2027",
+      "end_date": "2028-01-01T04:59:00Z",
+      "risk_score": 11.5,
       "translation_status": "cached",
-      "question_zh": "2027年前中國與台灣發生軍事衝突？"
+      "question_zh": "中國會在 2027 年 12 月 31 日之前入侵台灣嗎？"
     },
     {
       "id": "0x0734eb61d07f694bde1da2619cfb75d2a052b8f173180fb050894c30d73de98c",
@@ -2404,23 +2391,23 @@
       "question_zh": "美國在 2026 年授權徵召軍隊嗎？"
     },
     {
-      "id": "0xa1092f590e543158e3f230aca48efd8c1c53198d68d96fcd9c6ef6a83937bb9d",
-      "question": "Russia x Ukraine ceasefire agreement by December 31, 2027?",
-      "yes_price": 0.69,
-      "no_price": 0.31,
-      "volume": 30103.698639,
+      "id": "0x4c80df6f557bb0b9de08c0301ebdce500dd9bdc58400d9269fb8fab1709ed584",
+      "question": "China x Taiwan military clash before 2027?",
+      "yes_price": 0.0455,
+      "no_price": 0.9545,
+      "volume": 3449073.368412,
       "category": "geopolitics",
-      "slug": "russia-x-ukraine-ceasefire-agreement-by-december-31-2027",
-      "end_date": "2028-01-01T04:59:00Z",
-      "risk_score": 31.0,
+      "slug": "china-x-taiwan-military-clash-before-2027",
+      "end_date": "2027-01-01T04:59:00Z",
+      "risk_score": 4.55,
       "translation_status": "cached",
-      "question_zh": "俄羅斯與烏克蘭停火協議於2027年12月31日前？"
+      "question_zh": "2027年前中國與台灣發生軍事衝突？"
     }
   ],
   "kalshi": {
     "provider": "kalshi",
-    "attempted_at": "2026-10-05T04:00:01.655532+00:00",
-    "fetched_at": "2026-10-05T04:00:01.655532+00:00",
+    "attempted_at": "2026-10-05T05:57:34.516461+00:00",
+    "fetched_at": "2026-10-05T05:57:34.516461+00:00",
     "status": "available",
     "markets": [
       {
@@ -2431,7 +2418,7 @@
         "question": "Will the US agree to a new Iranian nuclear deal this year? | Before Nov 1, 2026",
         "title_original": "Will the US agree to a new Iranian nuclear deal this year?",
         "question_en": "Will the US agree to a new Iranian nuclear deal this year? | Before Nov 1, 2026",
-        "fetched_at": "2026-10-05T04:00:01.655532+00:00",
+        "fetched_at": "2026-10-05T05:57:34.516461+00:00",
         "source_updated_at": "2026-09-08T23:40:46.535481Z",
         "quote_observed_at": null,
         "end_date": "2026-11-01T15:00:00Z",
@@ -2452,10 +2439,10 @@
         "yes_bid": 0.02,
         "yes_ask": 0.03,
         "yes_bid_size": 30322.2,
-        "yes_ask_size": 103257.45,
+        "yes_ask_size": 100636.06,
         "last_price": 0.03,
-        "volume_contracts": 768755.9,
-        "volume_24h_contracts": 7196.12,
+        "volume_contracts": 771877.29,
+        "volume_24h_contracts": 10286.3,
         "quote_status": "two_sided",
         "display_midpoint": 0.025,
         "spread": 0.01,
@@ -2476,7 +2463,7 @@
         "question": "Will the US agree to a new Iranian nuclear deal this year? | Before Jan 1, 2027",
         "title_original": "Will the US agree to a new Iranian nuclear deal this year?",
         "question_en": "Will the US agree to a new Iranian nuclear deal this year? | Before Jan 1, 2027",
-        "fetched_at": "2026-10-05T04:00:01.655532+00:00",
+        "fetched_at": "2026-10-05T05:57:34.516461+00:00",
         "source_updated_at": "2026-09-08T23:40:46.783229Z",
         "quote_observed_at": null,
         "end_date": "2027-01-01T15:00:00Z",
@@ -2497,10 +2484,10 @@
         "yes_bid": 0.13,
         "yes_ask": 0.14,
         "yes_bid_size": 17183.24,
-        "yes_ask_size": 2452.61,
+        "yes_ask_size": 2445.9,
         "last_price": 0.14,
-        "volume_contracts": 1765786.99,
-        "volume_24h_contracts": 1439.01,
+        "volume_contracts": 1765793.7,
+        "volume_24h_contracts": 1444.59,
         "quote_status": "two_sided",
         "display_midpoint": 0.135,
         "spread": 0.01,
@@ -2521,7 +2508,7 @@
         "question": "Will the US agree to a new Iranian nuclear deal this year? | Before Dec 1, 2026",
         "title_original": "Will the US agree to a new Iranian nuclear deal this year?",
         "question_en": "Will the US agree to a new Iranian nuclear deal this year? | Before Dec 1, 2026",
-        "fetched_at": "2026-10-05T04:00:01.655532+00:00",
+        "fetched_at": "2026-10-05T05:57:34.516461+00:00",
         "source_updated_at": "2026-09-08T23:40:46.669586Z",
         "quote_observed_at": null,
         "end_date": "2026-12-01T15:00:00Z",
@@ -2566,7 +2553,7 @@
         "question": "Will the US agree to a new Iranian nuclear deal this year? | Before Jan 1, 2028",
         "title_original": "Will the US agree to a new Iranian nuclear deal this year?",
         "question_en": "Will the US agree to a new Iranian nuclear deal this year? | Before Jan 1, 2028",
-        "fetched_at": "2026-10-05T04:00:01.655532+00:00",
+        "fetched_at": "2026-10-05T05:57:34.516461+00:00",
         "source_updated_at": "2026-09-08T23:40:47.141267Z",
         "quote_observed_at": null,
         "end_date": "2028-01-01T15:00:00Z",
@@ -2584,15 +2571,15 @@
         },
         "rules_fingerprint": "4d45487e40910d0f7a773cc89d55114080f7d2099596321343553144d31a1a5d",
         "status": "active",
-        "yes_bid": 0.34,
-        "yes_ask": 0.37,
-        "yes_bid_size": 33.0,
-        "yes_ask_size": 1005.0,
+        "yes_bid": 0.33,
+        "yes_ask": 0.36,
+        "yes_bid_size": 1024.5,
+        "yes_ask_size": 95.0,
         "last_price": 0.33,
-        "volume_contracts": 115914.49,
-        "volume_24h_contracts": 340.86,
+        "volume_contracts": 116039.0,
+        "volume_24h_contracts": 465.37,
         "quote_status": "two_sided",
-        "display_midpoint": 0.355,
+        "display_midpoint": 0.345,
         "spread": 0.03,
         "price_basis": "bid_ask_midpoint",
         "region": "mideast",
@@ -2611,7 +2598,7 @@
         "question": "Will the US agree to a new Iranian nuclear deal this year? | Before Mar 1, 2027",
         "title_original": "Will the US agree to a new Iranian nuclear deal this year?",
         "question_en": "Will the US agree to a new Iranian nuclear deal this year? | Before Mar 1, 2027",
-        "fetched_at": "2026-10-05T04:00:01.655532+00:00",
+        "fetched_at": "2026-10-05T05:57:34.516461+00:00",
         "source_updated_at": "2026-09-08T23:40:47.016825Z",
         "quote_observed_at": null,
         "end_date": "2027-03-01T15:00:00Z",
@@ -2632,7 +2619,7 @@
         "yes_bid": 0.19,
         "yes_ask": 0.22,
         "yes_bid_size": 1026.0,
-        "yes_ask_size": 4.0,
+        "yes_ask_size": 19.0,
         "last_price": 0.2,
         "volume_contracts": 69508.17,
         "volume_24h_contracts": 302.67,
@@ -2656,7 +2643,7 @@
         "question": "Will the US agree to a new Iranian nuclear deal this year? | Before Jan 20, 2029",
         "title_original": "Will the US agree to a new Iranian nuclear deal this year?",
         "question_en": "Will the US agree to a new Iranian nuclear deal this year? | Before Jan 20, 2029",
-        "fetched_at": "2026-10-05T04:00:01.655532+00:00",
+        "fetched_at": "2026-10-05T05:57:34.516461+00:00",
         "source_updated_at": "2026-09-08T23:40:47.26217Z",
         "quote_observed_at": null,
         "end_date": "2029-01-20T15:00:00Z",
@@ -2675,15 +2662,15 @@
         "rules_fingerprint": "cb9eeb969f19a5c7b3e364afb7791d0e5af281f12d81e453f035c3eeebf1d0dc",
         "status": "active",
         "yes_bid": 0.36,
-        "yes_ask": 0.4,
-        "yes_bid_size": 16.2,
-        "yes_ask_size": 4.3,
-        "last_price": 0.39,
-        "volume_contracts": 129196.72,
-        "volume_24h_contracts": 12.35,
+        "yes_ask": 0.41,
+        "yes_bid_size": 17.2,
+        "yes_ask_size": 1162.0,
+        "last_price": 0.41,
+        "volume_contracts": 129201.64,
+        "volume_24h_contracts": 17.02,
         "quote_status": "two_sided",
-        "display_midpoint": 0.38,
-        "spread": 0.04,
+        "display_midpoint": 0.385,
+        "spread": 0.05,
         "price_basis": "bid_ask_midpoint",
         "region": "mideast",
         "topic": "diplomacy",
@@ -2701,7 +2688,7 @@
         "question": "Will the US agree to a new Iranian nuclear deal this year? | Before Feb 1, 2027",
         "title_original": "Will the US agree to a new Iranian nuclear deal this year?",
         "question_en": "Will the US agree to a new Iranian nuclear deal this year? | Before Feb 1, 2027",
-        "fetched_at": "2026-10-05T04:00:01.655532+00:00",
+        "fetched_at": "2026-10-05T05:57:34.516461+00:00",
         "source_updated_at": "2026-09-08T23:40:46.898021Z",
         "quote_observed_at": null,
         "end_date": "2027-02-01T15:00:00Z",
@@ -2720,15 +2707,15 @@
         "rules_fingerprint": "c6f842b553d770b7946ff06fa9a5a6d9ee7d6b883b8ecadb88c8a67e4b8956e3",
         "status": "active",
         "yes_bid": 0.15,
-        "yes_ask": 0.17,
-        "yes_bid_size": 72.29,
-        "yes_ask_size": 5.0,
+        "yes_ask": 0.18,
+        "yes_bid_size": 190.28,
+        "yes_ask_size": 70.0,
         "last_price": 0.15,
         "volume_contracts": 25103.9,
         "volume_24h_contracts": 2.33,
         "quote_status": "two_sided",
-        "display_midpoint": 0.16,
-        "spread": 0.02,
+        "display_midpoint": 0.165,
+        "spread": 0.03,
         "price_basis": "bid_ask_midpoint",
         "region": "mideast",
         "topic": "diplomacy",
@@ -2760,25 +2747,25 @@
   },
   "finance": {
     "GC=F": {
-      "price": 4172.8,
-      "chg": -0.7,
-      "ma30": 4428.2733,
-      "dev": -5.8,
-      "observed_at": "2026-10-05T03:50:04+00:00"
+      "price": 4167.5,
+      "chg": 0.12,
+      "ma30": 4414.6366,
+      "dev": -5.6,
+      "observed_at": "2026-10-05T05:47:37+00:00"
     },
     "BZ=F": {
-      "price": 101.48,
-      "chg": -0.81,
-      "ma30": 99.1987,
-      "dev": 2.3,
-      "observed_at": "2026-10-05T03:49:18+00:00"
+      "price": 101.58,
+      "chg": -0.66,
+      "ma30": 99.481,
+      "dev": 2.1,
+      "observed_at": "2026-10-05T05:47:06+00:00"
     },
     "USDCHF=X": {
-      "price": 0.8313,
-      "chg": 0.09,
+      "price": 0.8302,
+      "chg": -0.04,
       "ma30": 0.8165,
-      "dev": 1.8,
-      "observed_at": "2026-10-05T04:00:05+00:00"
+      "dev": 1.7,
+      "observed_at": "2026-10-05T05:57:39+00:00"
     },
     "^VIX": {
       "price": 15.31,
@@ -2788,11 +2775,11 @@
       "observed_at": "2026-10-02T20:15:01+00:00"
     },
     "ZW=F": {
-      "price": 687.5,
-      "chg": 0.7,
-      "ma30": 716.0333,
-      "dev": -4.0,
-      "observed_at": "2026-10-05T03:50:02+00:00"
+      "price": 688.5,
+      "chg": 0.81,
+      "ma30": 716.0417,
+      "dev": -3.8,
+      "observed_at": "2026-10-05T05:47:23+00:00"
     },
     "LMT": {
       "price": 505.41,
@@ -2849,14 +2836,14 @@
       "em_oas": {
         "value": 1.61,
         "observation_date": "2026-10-01",
-        "fetched_at": "2026-10-04T23:01:58.059078+00:00",
+        "fetched_at": "2026-10-05T05:57:44.416484+00:00",
         "status": "available",
         "series_id": "BAMLEMCBPIOAS"
       },
       "hy_oas": {
         "value": 3.24,
         "observation_date": "2026-10-01",
-        "fetched_at": "2026-10-04T23:01:58.270045+00:00",
+        "fetched_at": "2026-10-05T05:57:44.611009+00:00",
         "status": "available",
         "series_id": "BAMLH0A0HYM2"
       }
@@ -2866,49 +2853,27 @@
   },
   "aviation": {
     "summary": {
-      "tankers": 7,
+      "tankers": 5,
       "awacs": 0,
       "uav": 0,
-      "transport": 28,
+      "transport": 24,
       "fighter": 0,
       "c4isr": 3,
-      "total": 111,
-      "anomaly_pct": -50.4,
-      "baseline_7d": 224.0
+      "total": 131,
+      "anomaly_pct": -41.0,
+      "baseline_7d": 222.2
     },
     "aircraft": [
       {
-        "icao24": "480C42",
-        "callsign": "MMF85",
-        "type": "A332",
-        "type_code": "A332",
-        "role": "tanker",
-        "alt_ft": 7300,
-        "lat": 50.820613,
-        "lon": 7.360535,
-        "region": "歐洲"
-      },
-      {
-        "icao24": "AE0363",
-        "callsign": "RCH117",
+        "icao24": "AE015F",
+        "callsign": "RCH423",
         "type": "KC-135R",
         "type_code": "K35R",
         "role": "tanker",
-        "alt_ft": 34000,
+        "alt_ft": 36000,
         "lat": null,
         "lon": null,
         "region": "未知"
-      },
-      {
-        "icao24": "AE042C",
-        "callsign": "RCH191",
-        "type": "KC-135R",
-        "type_code": "K35R",
-        "role": "tanker",
-        "alt_ft": 37000,
-        "lat": 45.990475,
-        "lon": -65.110202,
-        "region": "46.0,-65.1"
       },
       {
         "icao24": "896C72",
@@ -2916,10 +2881,32 @@
         "type": "A332",
         "type_code": "A332",
         "role": "tanker",
-        "alt_ft": 23000,
-        "lat": 24.622747,
-        "lon": 55.384961,
+        "alt_ft": 24000,
+        "lat": 24.836699,
+        "lon": 55.451159,
         "region": "中東"
+      },
+      {
+        "icao24": "AE038C",
+        "callsign": "—",
+        "type": "KC-135R",
+        "type_code": "K35R",
+        "role": "tanker",
+        "alt_ft": 35000,
+        "lat": 33.357688,
+        "lon": -81.193015,
+        "region": "北美"
+      },
+      {
+        "icao24": "AE0151",
+        "callsign": "—",
+        "type": "KC-135R",
+        "type_code": "K35R",
+        "role": "tanker",
+        "alt_ft": 33000,
+        "lat": 36.382861,
+        "lon": -78.538539,
+        "region": "北美"
       },
       {
         "icao24": "AE038D",
@@ -2927,76 +2914,43 @@
         "type": "KC-135R",
         "type_code": "K35R",
         "role": "tanker",
-        "alt_ft": 35000,
-        "lat": 33.641459,
-        "lon": -81.021123,
-        "region": "北美"
+        "alt_ft": 33000,
+        "lat": 45.935857,
+        "lon": -64.93265,
+        "region": "45.9,-64.9"
       },
       {
-        "icao24": "AE042D",
-        "callsign": "—",
-        "type": "KC-135R",
-        "type_code": "K35R",
-        "role": "tanker",
-        "alt_ft": 19300,
-        "lat": null,
-        "lon": null,
-        "region": "未知"
-      },
-      {
-        "icao24": "AE04D1",
-        "callsign": "—",
-        "type": "KC-135R",
-        "type_code": "K35R",
-        "role": "tanker",
-        "alt_ft": 22950,
-        "lat": null,
-        "lon": null,
-        "region": "未知"
-      },
-      {
-        "icao24": "71F00E",
-        "callsign": "CI151",
-        "type": "P-8 Poseidon",
-        "type_code": "P8",
-        "role": "c4isr",
-        "alt_ft": 5075,
-        "lat": null,
-        "lon": null,
-        "region": "未知"
-      },
-      {
-        "icao24": "AE67DE",
+        "icao24": "AE67EF",
         "callsign": "—",
         "type": "P-8 Poseidon",
         "type_code": "P8",
         "role": "c4isr",
-        "alt_ft": 29000,
+        "alt_ft": 13125,
         "lat": null,
         "lon": null,
         "region": "未知"
       },
       {
-        "icao24": "AE9F86",
+        "icao24": "AE67B9",
         "callsign": "—",
-        "type": "E-6B Mercury",
-        "type_code": "E6",
+        "type": "P-8 Poseidon",
+        "type_code": "P8",
         "role": "c4isr",
-        "alt_ft": 35000,
+        "alt_ft": 8075,
         "lat": null,
         "lon": null,
         "region": "未知"
       },
       {
-        "icao24": "7585D1",
-        "callsign": "177",
-        "type": "C295",
-        "type_code": "C295",
-        "role": "transport",
-        "alt_ft": 5100,
-        "lat": 14.804123,
-        "lon": 119.926853,
-        "region": "西太平洋"
+        "icao24": "AE67A6",
+        "callsign": "—",
+        "type": "P-8 Poseidon",
+        "type_code": "P8",
+        "role": "c4isr",
+        "alt_ft": 23500,
+        "lat": null,
+        "lon": null,
+        "region": "未知"
       },
       {
         "icao24": "702C02",
@@ -3004,32 +2958,21 @@
         "type": "C-130",
         "type_code": "C130",
         "role": "transport",
-        "alt_ft": 15075,
+        "alt_ft": 15100,
         "lat": null,
         "lon": null,
         "region": "未知"
       },
       {
-        "icao24": "702C25",
-        "callsign": "EAGLE01",
-        "type": "C-130J",
-        "type_code": "C30J",
+        "icao24": "87CC20",
+        "callsign": "BRONC79",
+        "type": "C-130",
+        "type_code": "C130",
         "role": "transport",
-        "alt_ft": 10625,
-        "lat": 23.717377,
-        "lon": 90.405172,
-        "region": "23.7,90.4"
-      },
-      {
-        "icao24": "0D05AF",
-        "callsign": "FAM3206",
-        "type": "C295",
-        "type_code": "C295",
-        "role": "transport",
-        "alt_ft": 22000,
-        "lat": 17.755325,
-        "lon": -97.311594,
-        "region": "17.8,-97.3"
+        "alt_ft": 2000,
+        "lat": null,
+        "lon": null,
+        "region": "未知"
       },
       {
         "icao24": "46788F",
@@ -3037,43 +2980,43 @@
         "type": "C295",
         "type_code": "C295",
         "role": "transport",
-        "alt_ft": 17000,
-        "lat": 62.286942,
-        "lon": 26.217957,
+        "alt_ft": 20025,
+        "lat": 61.142864,
+        "lon": 23.709337,
         "region": "歐洲"
       },
       {
-        "icao24": "800E42",
-        "callsign": "HERCULES",
-        "type": "C-130J",
-        "type_code": "C30J",
+        "icao24": "3F447A",
+        "callsign": "GAF160",
+        "type": "A400M",
+        "type_code": "A400",
         "role": "transport",
-        "alt_ft": 21000,
+        "alt_ft": 0,
         "lat": null,
         "lon": null,
         "region": "未知"
       },
       {
-        "icao24": "AE1457",
-        "callsign": "LAVA70",
-        "type": "C-17 Globemaster III",
-        "type_code": "C17",
+        "icao24": "33FD5F",
+        "callsign": "IAM1496",
+        "type": "B350",
+        "type_code": "B350",
         "role": "transport",
-        "alt_ft": 4675,
-        "lat": -36.652635,
-        "lon": 174.759003,
-        "region": "南太平洋"
+        "alt_ft": 28000,
+        "lat": 43.417038,
+        "lon": 13.759003,
+        "region": "歐洲"
       },
       {
-        "icao24": "06A248",
-        "callsign": "LHOB294",
-        "type": "C-17 Globemaster III",
-        "type_code": "C17",
+        "icao24": "70C08E",
+        "callsign": "MJN238",
+        "type": "C-130",
+        "type_code": "C130",
         "role": "transport",
-        "alt_ft": 23800,
-        "lat": 36.376648,
-        "lon": 34.285355,
-        "region": "歐洲"
+        "alt_ft": 18000,
+        "lat": 24.627686,
+        "lon": 57.116343,
+        "region": "中東"
       },
       {
         "icao24": "AE123F",
@@ -3082,42 +3025,31 @@
         "type_code": "C17",
         "role": "transport",
         "alt_ft": 36000,
-        "lat": null,
-        "lon": null,
-        "region": "未知"
-      },
-      {
-        "icao24": "AE057B",
-        "callsign": "RCH2128",
-        "type": "C-5M Super Galaxy",
-        "type_code": "C5M",
-        "role": "transport",
-        "alt_ft": 375,
-        "lat": 38.289495,
-        "lon": -121.887459,
-        "region": "北美"
-      },
-      {
-        "icao24": "AE0588",
-        "callsign": "RCH2138",
-        "type": "C-5M Super Galaxy",
-        "type_code": "C5M",
-        "role": "transport",
-        "alt_ft": 34000,
-        "lat": 52.031601,
-        "lon": 4.386084,
+        "lat": 49.45981,
+        "lon": 15.532812,
         "region": "歐洲"
       },
       {
-        "icao24": "AE0587",
-        "callsign": "RCH2195",
+        "icao24": "AE2F9E",
+        "callsign": "RAIDR61",
+        "type": "C-130J",
+        "type_code": "C30J",
+        "role": "transport",
+        "alt_ft": 23000,
+        "lat": -33.018106,
+        "lon": 135.850151,
+        "region": "南太平洋"
+      },
+      {
+        "icao24": "AE056B",
+        "callsign": "RCH2012",
         "type": "C-5M Super Galaxy",
         "type_code": "C5M",
         "role": "transport",
-        "alt_ft": 31000,
-        "lat": null,
-        "lon": null,
-        "region": "未知"
+        "alt_ft": 31775,
+        "lat": 51.498512,
+        "lon": 5.79849,
+        "region": "歐洲"
       },
       {
         "icao24": "AE20C2",
@@ -3125,106 +3057,159 @@
         "type": "C-17 Globemaster III",
         "type_code": "C17",
         "role": "transport",
-        "alt_ft": 31000,
-        "lat": 45.573602,
-        "lon": 21.883768,
-        "region": "歐洲"
+        "alt_ft": 35000,
+        "lat": null,
+        "lon": null,
+        "region": "未知"
       },
       {
-        "icao24": "AE07D6",
-        "callsign": "RCH424",
+        "icao24": "AE20C8",
+        "callsign": "RCH328",
         "type": "C-17 Globemaster III",
         "type_code": "C17",
         "role": "transport",
-        "alt_ft": 5750,
-        "lat": 35.383797,
-        "lon": -77.786359,
+        "alt_ft": 24525,
+        "lat": 49.661481,
+        "lon": 9.002059,
+        "region": "歐洲"
+      },
+      {
+        "icao24": "AE1460",
+        "callsign": "RCH407",
+        "type": "C-17 Globemaster III",
+        "type_code": "C17",
+        "role": "transport",
+        "alt_ft": 0,
+        "lat": 35.752945,
+        "lon": 139.345193,
+        "region": "歐亞 / 中東"
+      },
+      {
+        "icao24": "AE07D7",
+        "callsign": "RCH538",
+        "type": "C-17 Globemaster III",
+        "type_code": "C17",
+        "role": "transport",
+        "alt_ft": 36000,
+        "lat": 42.402054,
+        "lon": -70.037592,
         "region": "北美"
       },
       {
-        "icao24": "AE1197",
-        "callsign": "RCH5013",
+        "icao24": "AE07E7",
+        "callsign": "RCH674",
         "type": "C-17 Globemaster III",
         "type_code": "C17",
         "role": "transport",
-        "alt_ft": 38000,
-        "lat": 40.789479,
-        "lon": 24.176312,
+        "alt_ft": 32000,
+        "lat": 35.095034,
+        "lon": 28.481426,
         "region": "歐洲"
       },
       {
-        "icao24": "896C2F",
-        "callsign": "SUHL102",
-        "type": "C-17 Globemaster III",
-        "type_code": "C17",
+        "icao24": "710028",
+        "callsign": "SAIFC1",
+        "type": "C295",
+        "type_code": "C295",
         "role": "transport",
-        "alt_ft": 6000,
+        "alt_ft": 10525,
         "lat": null,
         "lon": null,
         "region": "未知"
       },
       {
-        "icao24": "7CFA33",
-        "callsign": "TRCH44",
+        "icao24": "AE4A7D",
+        "callsign": "TORII11",
         "type": "B350",
         "type_code": "B350",
         "role": "transport",
-        "alt_ft": 12000,
-        "lat": -36.581543,
-        "lon": 149.200058,
-        "region": "南太平洋"
+        "alt_ft": 8225,
+        "lat": 36.904083,
+        "lon": 127.451282,
+        "region": "歐亞 / 中東"
       },
       {
-        "icao24": "896C2D",
-        "callsign": "UAF1241",
+        "icao24": "AE1453",
+        "callsign": "TREK311",
         "type": "C-17 Globemaster III",
         "type_code": "C17",
         "role": "transport",
-        "alt_ft": 8375,
-        "lat": 24.318244,
-        "lon": 55.165237,
-        "region": "中東"
-      },
-      {
-        "icao24": "800797",
-        "callsign": "VUAUJ",
-        "type": "C-17 Globemaster III",
-        "type_code": "C17",
-        "role": "transport",
-        "alt_ft": 37025,
+        "alt_ft": 30000,
         "lat": null,
         "lon": null,
         "region": "未知"
       },
       {
-        "icao24": "710388",
+        "icao24": "89602B",
+        "callsign": "YASAT11",
+        "type": "C-130",
+        "type_code": "C130",
+        "role": "transport",
+        "alt_ft": 425,
+        "lat": 24.45845,
+        "lon": 54.647268,
+        "region": "中東"
+      },
+      {
+        "icao24": "87CC1A",
         "callsign": "—",
         "type": "C-130",
         "type_code": "C130",
         "role": "transport",
-        "alt_ft": 27000,
+        "alt_ft": 7400,
+        "lat": null,
+        "lon": null,
+        "region": "未知"
+      },
+      {
+        "icao24": "33FFE2",
+        "callsign": "—",
+        "type": "C-130",
+        "type_code": "C130",
+        "role": "transport",
+        "alt_ft": 0,
+        "lat": null,
+        "lon": null,
+        "region": "未知"
+      },
+      {
+        "icao24": "896C42",
+        "callsign": "—",
+        "type": "C295",
+        "type_code": "C295",
+        "role": "transport",
+        "alt_ft": 8000,
+        "lat": null,
+        "lon": null,
+        "region": "未知"
+      },
+      {
+        "icao24": "AE20BA",
+        "callsign": "—",
+        "type": "C-130J",
+        "type_code": "C30J",
+        "role": "transport",
+        "alt_ft": 22900,
         "lat": null,
         "lon": null,
         "region": "未知"
       }
     ],
     "region_counts": {
-      "歐洲": 6,
-      "未知": 17,
-      "46.0,-65.1": 1,
-      "中東": 2,
+      "未知": 12,
+      "中東": 3,
       "北美": 3,
-      "西太平洋": 1,
-      "23.7,90.4": 1,
-      "17.8,-97.3": 1,
-      "南太平洋": 2
+      "45.9,-64.9": 1,
+      "歐洲": 6,
+      "南太平洋": 1,
+      "歐亞 / 中東": 1
     },
     "source": "https://opendata.adsb.fi/api/v2/mil",
     "trends": {
       "tankers": {
-        "d1": 0,
-        "d7": -32,
-        "d30": -29
+        "d1": -29,
+        "d7": -51,
+        "d30": -49
       },
       "awacs": {
         "d1": -100,
@@ -3237,26 +3222,26 @@
         "d30": -100
       },
       "c4isr": {
-        "d1": -29,
+        "d1": -27,
         "d7": -53,
         "d30": -51
       }
     }
   },
   "firms": {
-    "total_24h": 15042,
-    "high_conf_count": 4314,
-    "delta_pct": "+131%",
-    "delta_ratio": 1.3142,
+    "total_24h": 8908,
+    "high_conf_count": 2691,
+    "delta_pct": "+37%",
+    "delta_ratio": 0.3705,
     "by_region": {
-      "south_america": 3741,
-      "asia": 464,
-      "oceania": 4152,
-      "other": 3746,
-      "middle_east": 287,
-      "africa": 1700,
-      "europe_russia": 783,
-      "north_america": 169
+      "other": 2400,
+      "middle_east": 235,
+      "africa": 721,
+      "europe_russia": 435,
+      "south_america": 2328,
+      "asia": 363,
+      "oceania": 2329,
+      "north_america": 97
     },
     "conflict_hotspots": [
       {
@@ -3300,16 +3285,6 @@
         "region": "ukraine"
       },
       {
-        "lat": 35.6,
-        "lon": 43.375,
-        "frp": 118.4,
-        "conf": 100,
-        "daynight": "D",
-        "acq_date": "2026-10-03",
-        "acq_time": "1219",
-        "region": "iraq"
-      },
-      {
         "lat": 49.543,
         "lon": 40.966,
         "frp": 114.8,
@@ -3350,24 +3325,14 @@
         "region": "iraq"
       },
       {
-        "lat": 36.771,
-        "lon": 40.274,
-        "frp": 75.2,
-        "conf": 94,
-        "daynight": "D",
-        "acq_date": "2026-10-03",
-        "acq_time": "1219",
-        "region": "syria"
-      },
-      {
-        "lat": 49.967,
-        "lon": 44.668,
-        "frp": 54.6,
-        "conf": 90,
-        "daynight": "D",
-        "acq_date": "2026-10-03",
-        "acq_time": "1223",
-        "region": "russia"
+        "lat": 34.897,
+        "lon": 43.804,
+        "frp": 68.6,
+        "conf": 100,
+        "daynight": "N",
+        "acq_date": "2026-10-05",
+        "acq_time": "0056",
+        "region": "iraq"
       },
       {
         "lat": 54.75,
@@ -3384,6 +3349,16 @@
         "lon": 47.251,
         "frp": 48.4,
         "conf": 84,
+        "daynight": "D",
+        "acq_date": "2026-10-04",
+        "acq_time": "1123",
+        "region": "russia"
+      },
+      {
+        "lat": 50.849,
+        "lon": 48.02,
+        "frp": 44.1,
+        "conf": 80,
         "daynight": "D",
         "acq_date": "2026-10-04",
         "acq_time": "1123",
@@ -3408,21 +3383,31 @@
         "acq_date": "2026-10-04",
         "acq_time": "1257",
         "region": "syria"
+      },
+      {
+        "lat": 37.011,
+        "lon": 126.487,
+        "frp": 26.4,
+        "conf": 0,
+        "daynight": "D",
+        "acq_date": "2026-10-04",
+        "acq_time": "0625",
+        "region": "korea"
       }
     ],
     "conflict_counts": {
-      "korea": 6,
-      "iran": 403,
-      "russia": 25,
-      "ukraine": 129,
-      "syria": 35,
-      "iraq": 83,
-      "israel": 3,
-      "yemen": 2
+      "iran": 321,
+      "ukraine": 87,
+      "iraq": 50,
+      "syria": 22,
+      "yemen": 2,
+      "korea": 3,
+      "russia": 15,
+      "israel": 2
     },
-    "conflict_total": 686,
+    "conflict_total": 502,
     "baseline_kind": "fixed_reference_not_7day_mean",
-    "observed_at": "2026-10-04T23:41:00Z",
+    "observed_at": "2026-10-05T03:45:00Z",
     "baseline_24h": 6500,
     "source": "https://firms.modaps.eosdis.nasa.gov/data/active_fire/modis-c6.1/csv/MODIS_C6_1_Global_24h.csv"
   },
@@ -3503,9 +3488,9 @@
       "id": "EONET_24962",
       "title": "Super Typhoon Choi-wan",
       "category": "Severe Storms",
-      "date": "2026-10-04T18:00:00Z",
-      "lat": 24.4,
-      "lon": 147.1,
+      "date": "2026-10-05T00:00:00Z",
+      "lat": 25.2,
+      "lon": 146.5,
       "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_24962"
     },
     {
@@ -3557,9 +3542,9 @@
       "id": "EONET_24786",
       "title": "Hurricane Nolo",
       "category": "Severe Storms",
-      "date": "2026-10-04T18:00:00Z",
-      "lat": 24,
-      "lon": -179.2,
+      "date": "2026-10-05T00:00:00Z",
+      "lat": 24.8,
+      "lon": 179.3,
       "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_24786"
     },
     {
@@ -3575,9 +3560,9 @@
       "id": "EONET_24875",
       "title": "Hurricane Rachel",
       "category": "Severe Storms",
-      "date": "2026-10-04T18:00:00Z",
+      "date": "2026-10-05T00:00:00Z",
       "lat": 20.1,
-      "lon": -114,
+      "lon": -114.5,
       "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_24875"
     },
     {
@@ -3596,18 +3581,18 @@
       "avg48h": 4,
       "delta_pct": 34.4,
       "stale": true,
-      "cooldown_until": "2026-10-05T04:57:45.212302+00:00"
+      "cooldown_until": "2026-10-05T11:57:34.511762+00:00"
     },
     "mideast": {
       "latest": 2.352,
       "avg48h": 2.746,
       "delta_pct": -14.4,
       "stale": true,
-      "cooldown_until": "2026-10-05T04:57:45.212302+00:00"
+      "cooldown_until": "2026-10-05T11:57:34.511762+00:00"
     },
     "taiwan": {
       "stale": true,
-      "cooldown_until": "2026-10-05T04:57:45.212302+00:00"
+      "cooldown_until": "2026-10-05T11:57:34.511762+00:00"
     },
     "korea": {
       "observed_at": "2026-09-30T08:00:00+00:00",
@@ -3618,33 +3603,159 @@
       "avg48h": 0.241,
       "delta_pct": 85.0,
       "stale": true,
-      "cooldown_until": "2026-10-05T04:57:45.212302+00:00"
+      "cooldown_until": "2026-10-05T11:57:34.511762+00:00"
     },
     "southsea": {
       "latest": 0.024,
       "avg48h": 0.022,
       "delta_pct": 10.2,
       "stale": true,
-      "cooldown_until": "2026-10-05T04:57:45.212302+00:00"
+      "cooldown_until": "2026-10-05T11:57:34.511762+00:00"
     }
   },
   "news": [
     {
-      "title": "印度尋求在結束烏克蘭戰爭中「更進一步」：部長",
-      "url": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxQc1hEVUxoVTU2UHNBRFVEVW81NFp3cFhuZk40ck45TzJXcjRaS3U2YjMwREVMVVJ5a2FGMlFTNzZYUDNBM0RyR05vQnBjRy1JNnZMN3pCMm5YaVZ6NlZNY216YVBFVWtFa293dHVBVDhLX2k1LTkxajJPQ3NMZ29DUGQ3c0pSUldRQkY3TG1RM3RPZ2pRcUFMeDNPT0htbm1vMHcya1JMZ2ZWWTFfM0NCWS0ySUh5ZkxRLUlteXdmQ3hFeknSAcMBQVVfeXFMTzRqY25UMUZiZnpMRmd5SDR0ajlvX1RTNGZQU2t2SVEwbHB0YjFhcVVFcEZkNVFHeTdrWEpOa3Q2XzNDZ1M2T3hNam9FaE9wVWpadmpxcndDck82QXRTV2VmM0hMbGxrNWpxTW5LaXEzU1RwUkxia1BnbGE5dkdqTFdlSUNWbFNrR3FxTUgwODZrb0c0M0tXcmY5Q3d3NkY3bE55aVJaTzZBQk5PWVRucko5WW45aFFIekY0ZlRGMkkwU080?oc=5",
-      "domain": "South China Morning Post",
-      "ts": "2026-10-05T03:47:33+00:00",
-      "topic": "俄烏",
-      "region": "ukraine",
-      "sample_id": "2c61b2d6747c8fa66eb62176790371db2c23e43fdbf2bbdcaf069b960993c3d9",
-      "first_seen_at": "2026-10-05T03:59:55.082675+00:00",
+      "title": "中東石油出口恢復至伊朗戰前水平，儘管霍爾木茲遭受攻擊",
+      "url": "https://news.google.com/rss/articles/CBMirwFBVV95cUxPRDhKSHVGN2g3eUkyRUNPMnBxV1cyZlR6X3VnZG9xS3R0WDJXTHBoMmtRY0JvMzd2OWpKTXppU1VaZHlfQ3dCR3Z3MHRaZlNVOHEyYXZuUzREUG9IOFRIX3ZSOUVlTDViOVVMenRxZl8zUHl1dDRtWkQwdUt4NFZnM2tDdk1Zejdqak0tOURVUFg3SjVmZ2pYQkxBTHFBR29tRGpMRV9ucFl5YXR5SV9N0gGvAUFVX3lxTFBZR3F6Y2ozRXM1TE54c3QzajhjWWZhV0kzTTFNcVhTODR2RTNZVll0QlNoUS1zQTJMMkt0RmRJNTNJaURVNUpKZmZMWXBJblk2ODUzSnRGN3pBazNyOEdGeTE4djhiUWh6ZVhwTzZqVHQ5UVNkLU1iTlpPczlITU50eTZLU3c1SnZ5NHRpTTBhX1pGUkhXOWFkLV95MEZ5eXY4ZlR6RWxLNExIdmtTbmM?oc=5",
+      "domain": "DW.com",
+      "ts": "2026-10-05T05:37:30+00:00",
+      "topic": "中東",
+      "region": "mideast",
+      "sample_id": "c8412f24b0c87ab272b0a64f125fba068e5dafd3dd981e2c99a5c54c8396f448",
+      "first_seen_at": "2026-10-05T05:57:09.297654+00:00",
       "stale": false,
-      "title_en": "India seeks to be ‘a little bit more involved’ in ending Ukraine war: minister",
+      "title_en": "Middle East oil exports recover to pre-Iran war levels despite Hormuz attacks",
       "translation_status": "translated",
-      "title_zh": "印度尋求在結束烏克蘭戰爭中「更進一步」：部長",
+      "title_zh": "中東石油出口恢復至伊朗戰前水平，儘管霍爾木茲遭受攻擊",
       "translation_provider": "groq",
       "translation_model": "openai/gpt-oss-20b",
-      "title_english": "India seeks to be ‘a little bit more involved’ in ending Ukraine war: minister",
+      "title_english": "Middle East oil exports recover to pre-Iran war levels despite Hormuz attacks",
+      "english_translation_status": "original"
+    },
+    {
+      "title": "烏克蘭戰爭：宣傳與真相之死",
+      "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxQRkZaR19oOXpNc3dRMF8yZGpUT2lWa0dMZkVNY0o0T2pIRGhmRDlTSUlHQVFWSGZjUTNKYzZsOV9PcDV6WXExZUFuVkNwNjdPTkdVQmxLOW1udHQyNHhHNkdPLVBFMC1jVU1ackpWc0U4a1Z4eFlCamt3S2RLYUUxVVhkZW5xb3VCckdObXJza0d6d2xlMjNLNUkybDlfXzJEYjZ0LWt3Q2V0MzVDNUVMbGVISDY?oc=5",
+      "domain": "Independent Australia",
+      "ts": "2026-10-05T05:26:15+00:00",
+      "topic": "俄烏",
+      "region": "ukraine",
+      "sample_id": "ba23e4b43f7979ac836f037ec15c3791f66a4cd86a2db151a4225b8895cf98ec",
+      "first_seen_at": "2026-10-05T05:57:09.297654+00:00",
+      "stale": false,
+      "title_en": "The Ukraine war: Propaganda and the death of truth",
+      "translation_status": "translated",
+      "title_zh": "烏克蘭戰爭：宣傳與真相之死",
+      "translation_provider": "groq",
+      "translation_model": "openai/gpt-oss-20b",
+      "title_english": "The Ukraine war: Propaganda and the death of truth",
+      "english_translation_status": "original"
+    },
+    {
+      "title": "中東石油出口超越戰前水平，數據顯示儘管緊張局勢",
+      "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxPOEhhbUlVX0RoZF9XN2JHcEZNdmhHeWpFM3dyVE13YlNlbm9MX2UzY2ttMlkxM3RHMFF0eXp5V25rUlhHWDBqYWdxbnozU01rUlRjTTh2czc0ZzRVVWkzbmNxUlktbnd5MDdnVEJTQTZqSnRIWnNhUW1DU2RqbGE3dUlEWVVObFZ3dVRsTGF3WmdIX0JuU1RwcHAxMEIwRUNTOEk2MHZRTnlMMi1ZZHg1TnBCQlR4UdIBuwFBVV95cUxPbFdJZGZrWjJoX29LaEZQNVVhRHoyZVpSaUZBWWpYNVlCT2dEX0lzaTdHNFZnenpkWFFTeG5qWmUzb0F4ZWNhN2t0NXk2N1hoOHJHbGMtN24xcUl3dEw1bFpTeUtteV9maGhQZTQ4cXJFRjcxcXlJdExZWk9FNHQzZVZsdEc1aml1X0hua28yQVRGMlhPZ2pmLXZaYkhaRU02VlpNb3NsYnl2ZkJZUGVQRGRyXzdhVzgzR28w?oc=5",
+      "domain": "Al Jazeera",
+      "ts": "2026-10-05T05:24:40+00:00",
+      "topic": "中東",
+      "region": "mideast",
+      "sample_id": "c5d496e4b8379bbba1c7478b966e0ddc073260dd22b65dd4ff06105a6cb56d22",
+      "first_seen_at": "2026-10-05T05:57:09.297654+00:00",
+      "stale": false,
+      "title_en": "Middle East oil exports surpass pre-war levels despite tensions, data shows",
+      "translation_status": "translated",
+      "title_zh": "中東石油出口超越戰前水平，數據顯示儘管緊張局勢",
+      "translation_provider": "groq",
+      "translation_model": "openai/gpt-oss-20b",
+      "title_english": "Middle East oil exports surpass pre-war levels despite tensions, data shows",
+      "english_translation_status": "original"
+    },
+    {
+      "title": "美軍從英國基地撤除轟炸機，該基地被疑似恐怖陰謀目標",
+      "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxPMkpxWlg0bUxwb0NsTllSWndLRnRSRk9tTmdhY2ZZc2MzNEFza0tZaDdLRnU3TGxUeWd4Q3VObTkyWHNFODVYTjN6cjlDOFI5VzBMM3BhUmh3eHRfQWJQQ1FySm5naTJMWUtLRUtPaTd4RVV0bFB1ZzdpVmlQUFdxUFktWU9oUWt5bHRQZXkwa3VoTVk3c18wcUxxZElWZkdmYUhpVkF3MXlBVnA0T3hTWVR0Zmptam8?oc=5",
+      "domain": "washingtonpost.com",
+      "ts": "2026-10-05T05:22:07+00:00",
+      "topic": "中東",
+      "region": "mideast",
+      "sample_id": "41dd49a7a839821149d1acac0262f388e2cec958e4691b468c8737a872f2d194",
+      "first_seen_at": "2026-10-05T05:57:09.297654+00:00",
+      "stale": false,
+      "title_en": "U.S. military removes bombers from U.K. base targeted in suspected terror plot",
+      "translation_status": "translated",
+      "title_zh": "美軍從英國基地撤除轟炸機，該基地被疑似恐怖陰謀目標",
+      "translation_provider": "groq",
+      "translation_model": "openai/gpt-oss-20b",
+      "title_english": "U.S. military removes bombers from U.K. base targeted in suspected terror plot",
+      "english_translation_status": "original"
+    },
+    {
+      "title": "立法者表示朝鮮在軍事分界線以南設置圍牆 — 朝鮮先驅報",
+      "url": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxObDVaaFZQV01hb1FCamREelZGNzE5bmMwNjVKZ19ZemhoSlhFRER3Nzc2OE0tZGpKOU9JZDN4S1I2d3hibWJjVVFjb0lZNk8yZXdQcnNtdHhfTkJKajBiSkY0S3R4c0lEVnRhaUxlNWx4VkRlSUd4RGNwSzJJeXBFSi1aMFlVWHVQUTdySjNYUWdVM05WblRrcV9YbS1yd1FqN3k2ZFBia0ptbE8xLTVOV0poZ0hBaXhv?oc=5",
+      "domain": "UA.NEWS",
+      "ts": "2026-10-05T05:12:34+00:00",
+      "topic": "朝鮮",
+      "region": "korea",
+      "sample_id": "11eb54285520eaed3386d5d240fa07ee7192b1e19ab050689ff57bd2cbd20796",
+      "first_seen_at": "2026-10-05T05:57:09.297654+00:00",
+      "stale": false,
+      "title_en": "Lawmaker says North Korea erected fences south of Military Demarcation Line — Korea Herald",
+      "translation_status": "translated",
+      "title_zh": "立法者表示朝鮮在軍事分界線以南設置圍牆 — 朝鮮先驅報",
+      "translation_provider": "groq",
+      "translation_model": "openai/gpt-oss-20b",
+      "title_english": "Lawmaker says North Korea erected fences south of Military Demarcation Line — Korea Herald",
+      "english_translation_status": "original"
+    },
+    {
+      "title": "印度尋求在結束俄烏戰爭的努力中扮演更大角色",
+      "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxOQmFYbm1yQk1oODVVVXRLVnJvSzdIX1dzSjJ5WG1BdFh6cHdrcWJRRDRPWDRSV3hrTnMzemtyXzZ6cnBhUG1UNm8tVFFyTkNVNk9zUHMyVjRZUXU0bWNTRFFFOFlJNzFHbm1tbzZQMTVyblBqN2FFOVlqWVZXNWtpV3lETU80bE5YeG8xUnB2MUlNajJsVlNyd1hnZDBJUQ?oc=5",
+      "domain": "The Spokesman-Review",
+      "ts": "2026-10-05T04:40:30+00:00",
+      "topic": "俄烏",
+      "region": "ukraine",
+      "sample_id": "22d688a4a25f42870bf567c2f7642d84d79a65099594f0f497bdf116c32e81a1",
+      "first_seen_at": "2026-10-05T05:57:09.297654+00:00",
+      "stale": false,
+      "title_en": "India seeks bigger role in effort to end the Russia-Ukraine war",
+      "translation_status": "translated",
+      "title_zh": "印度尋求在結束俄烏戰爭的努力中扮演更大角色",
+      "translation_provider": "groq",
+      "translation_model": "openai/gpt-oss-20b",
+      "title_english": "India seeks bigger role in effort to end the Russia-Ukraine war",
+      "english_translation_status": "original"
+    },
+    {
+      "title": "俄羅斯在 4.7 萬人戰役中部署無人坦克、雷射與無人機群",
+      "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxQeURtd3Zzb0RTejV5VVl2X3FuV2M3ejloVXJkZk10TDNpZ2hLczJiSkt1Wm9IeTRVb3pUeWJNNG9lUUhmZUVSQkF2M0dRVkg1ckY2S1JoQWNJRjg5R2JOZ1pLaWY1MUg2TEJNQ0pUZTB4U05pVzVFMzZMRm0wVG1iUUtubE40bTRtUU5Fc2VhazRldnNyd1RtNkgtQzRHVlo3T3c?oc=5",
+      "domain": "The SOFX Report",
+      "ts": "2026-10-05T04:32:21+00:00",
+      "topic": "俄烏",
+      "region": "ukraine",
+      "sample_id": "15167b317ce5870738fab2839ca8b414a8458f60b684fb593aad75dec6578299",
+      "first_seen_at": "2026-10-05T05:57:09.297654+00:00",
+      "stale": false,
+      "title_en": "Russia Fields Unmanned Tanks, Lasers and Drone Swarms in a 47,000-Troop War Game",
+      "translation_status": "translated",
+      "title_zh": "俄羅斯在 4.7 萬人戰役中部署無人坦克、雷射與無人機群",
+      "translation_provider": "groq",
+      "translation_model": "openai/gpt-oss-20b",
+      "title_english": "Russia Fields Unmanned Tanks, Lasers and Drone Swarms in a 47,000-Troop War Game",
+      "english_translation_status": "original"
+    },
+    {
+      "title": "中國船隻、飛機封鎖菲律賓作戰",
+      "url": "https://news.google.com/rss/articles/CBMifkFVX3lxTE5lM2NxbFAzTVk0MGdyREk4YUFJRlcxeHl2OUhlRGR6NjVURWpidFhaaVE1R05VNHBocHEzWFRLMHU5T09LdGEtbm9ZSHB6MGYyU0YtZnliRkI4YkZxTU5lZjdnMTVkTFRld3hndDBiUE4tUHhCRW1hYnZ5SlFZZw?oc=5",
+      "domain": "Inquirer.net",
+      "ts": "2026-10-05T04:23:10+00:00",
+      "topic": "南海",
+      "region": "southsea",
+      "sample_id": "94fdf178ce2667e97fe564e3c0e5050be3951d84cd4f4b5c0017dd1941fbccb0",
+      "first_seen_at": "2026-10-05T05:57:09.297654+00:00",
+      "stale": false,
+      "title_en": "Chinese ships, planes block PH operations",
+      "translation_status": "translated",
+      "title_zh": "中國船隻、飛機封鎖菲律賓作戰",
+      "translation_provider": "groq",
+      "translation_model": "openai/gpt-oss-20b",
+      "title_english": "Chinese ships, planes block PH operations",
       "english_translation_status": "original"
     },
     {
@@ -3658,65 +3769,9 @@
       "first_seen_at": "2026-10-05T03:59:55.082675+00:00",
       "stale": false,
       "title_en": "Philippines accuses China of harassing patrols over Bajo de Masinloc",
-      "translation_status": "translated",
+      "translation_status": "cached",
       "title_zh": "菲律賓指控中國在馬西納洛克灣對巡邏船隻進行騷擾",
-      "translation_provider": "groq",
-      "translation_model": "openai/gpt-oss-20b",
       "title_english": "Philippines accuses China of harassing patrols over Bajo de Masinloc",
-      "english_translation_status": "original"
-    },
-    {
-      "title": "在「喬治·華盛頓號」上，年輕水手適應與伊朗的戰爭",
-      "url": "https://news.google.com/rss/articles/CBMizwFBVV95cUxOYVBzS0xtMnAyX3V5bWQ2TURvWjNBNmxGc1hjemx0a0tNeXFiWVQwdGNVQ2d6Vk1VckhzLWJGc1BpSTBrX2RIaVd6QlZrZFprXzNpaVNqZ0R4SGhTck5zZUFYa2JSZGZjMlpEZU9waGhEcU9GRW9wMmpJUXlIWl9NN08xRm1fZTBiTzhZSGhFNmZsWnJMaFQ2dHNJX1I5WXlfalpSY0R6ckVyNVN2T1h3c21FUnFtZ3AyQ0pncEhZR0ZUOG1uRlcwaHNJWU5yM00?oc=5",
-      "domain": "Red Lake Nation News",
-      "ts": "2026-10-05T03:35:27+00:00",
-      "topic": "中東",
-      "region": "mideast",
-      "sample_id": "2d0c6641b1655c8e8307ecf10828c78aed2020c7ad02a993d7865b3e6bfc839b",
-      "first_seen_at": "2026-10-05T03:59:55.082675+00:00",
-      "stale": false,
-      "title_en": "On the USS George Washington, young sailors adjust to war with Iran",
-      "translation_status": "translated",
-      "title_zh": "在「喬治·華盛頓號」上，年輕水手適應與伊朗的戰爭",
-      "translation_provider": "groq",
-      "translation_model": "openai/gpt-oss-20b",
-      "title_english": "On the USS George Washington, young sailors adjust to war with Iran",
-      "english_translation_status": "original"
-    },
-    {
-      "title": "主要石油出口國同意在十一月保持產量穩定",
-      "url": "https://news.google.com/rss/articles/CBMioAFBVV95cUxNU3JJT24zWi1uSUZUYmFOaEl2RFkxd2NSRC0yNUk0TUFVajliYlVrRU0weG1ENDA1ZEFwVzlrUXVvdmtEbGxnYWJsSl9aT2hKeThWcXR4OHNIeW1oeTRYRllUNG84ODU5UDBWWUtDeURGVzBBSjZMa1N0YkJkWk9aRlNpU3hSSG91SnhjQTRVZDUzX3EwdUJ3UC14VlhqSHRP?oc=5",
-      "domain": "WRAL",
-      "ts": "2026-10-05T03:33:45+00:00",
-      "topic": "中東",
-      "region": "mideast",
-      "sample_id": "6c0e6e57b61f12bed96767588f805b0fbae9504789e5f94f1ef23814151a7860",
-      "first_seen_at": "2026-10-05T03:59:55.082675+00:00",
-      "stale": false,
-      "title_en": "Major oil exporters agree to keep production steady in November",
-      "translation_status": "translated",
-      "title_zh": "主要石油出口國同意在十一月保持產量穩定",
-      "translation_provider": "groq",
-      "translation_model": "openai/gpt-oss-20b",
-      "title_english": "Major oil exporters agree to keep production steady in November",
-      "english_translation_status": "original"
-    },
-    {
-      "title": "綠黨在烏克蘭問題上失利，放棄對受攻擊民主的支持",
-      "url": "https://news.google.com/rss/articles/CBMivAFBVV95cUxOTW93cDlsZFN4eWFmOGJtbTh1dHZiRHp3eTRxS2trUTZPczdLREI5OU9OZU5ncjFGbXR0dUEtVXlnOVRUajJTejdTaE1TSy04ZENPbUNBMGdYbXlFYm1NQlVSUFExZ295cnZPRkxLUTktRTBBSkJBSy1VRlE5WlZHbDBsc3ViNENhVFdDbnZjbnN6amIxREtXTzU1OWdicUd4eFlRWGdTcFR1SFNnRzUwVlAtU3RIX2o3azI0Nw?oc=5",
-      "domain": "Lowy Institute",
-      "ts": "2026-10-05T03:25:49+00:00",
-      "topic": "俄烏",
-      "region": "ukraine",
-      "sample_id": "5bb723a10b6e90616353c8394c1c0c7bfb599db6fc69aa08ccafef7c6193a92b",
-      "first_seen_at": "2026-10-05T03:59:55.082675+00:00",
-      "stale": false,
-      "title_en": "The Greens have squibbed it on Ukraine, abandoning a democracy under attack",
-      "translation_status": "translated",
-      "title_zh": "綠黨在烏克蘭問題上失利，放棄對受攻擊民主的支持",
-      "translation_provider": "groq",
-      "translation_model": "openai/gpt-oss-20b",
-      "title_english": "The Greens have squibbed it on Ukraine, abandoning a democracy under attack",
       "english_translation_status": "original"
     },
     {
@@ -3730,29 +3785,9 @@
       "first_seen_at": "2026-10-05T03:59:55.082675+00:00",
       "stale": false,
       "title_en": "South Korea's Gold Medal Spurs Controversy, Apologies",
-      "translation_status": "translated",
+      "translation_status": "cached",
       "title_zh": "韓國金牌引發爭議，致歉",
-      "translation_provider": "groq",
-      "translation_model": "openai/gpt-oss-20b",
       "title_english": "South Korea's Gold Medal Spurs Controversy, Apologies",
-      "english_translation_status": "original"
-    },
-    {
-      "title": "工作人員一致認為伊朗拖累共和黨",
-      "url": "https://news.google.com/rss/articles/CBMibkFVX3lxTFBkT0Yxb2Y0MExnMENkbzN3N1RVSUp3MVVvNjJueTFYVF84VEF5S0piT01UWHFFRVhLS3JkZjRFMllSbTVQaVdvUmhKV1J3dmRmYVpnU1hBX3dOZHlIM1BRREU3UF9FRTFtUHpjZmR3?oc=5",
-      "domain": "Punchbowl News",
-      "ts": "2026-10-05T02:54:18+00:00",
-      "topic": "中東",
-      "region": "mideast",
-      "sample_id": "9b9bce4ab52fcf5dab2252fdae27218902afc4ee70e11fbc732921c8b8e71afe",
-      "first_seen_at": "2026-10-05T03:59:55.082675+00:00",
-      "stale": false,
-      "title_en": "Staffers unanimous: Iran a drag on GOP",
-      "translation_status": "translated",
-      "title_zh": "工作人員一致認為伊朗拖累共和黨",
-      "translation_provider": "groq",
-      "translation_model": "openai/gpt-oss-20b",
-      "title_english": "Staffers unanimous: Iran a drag on GOP",
       "english_translation_status": "original"
     },
     {
@@ -3766,29 +3801,9 @@
       "first_seen_at": "2026-10-05T03:59:55.082675+00:00",
       "stale": false,
       "title_en": "Taiwan Coast Guard Repels Chinese Vessels With Water Cannons",
-      "translation_status": "translated",
+      "translation_status": "cached",
       "title_zh": "台灣海巡隊以水炮擊退中國船隻",
-      "translation_provider": "groq",
-      "translation_model": "openai/gpt-oss-20b",
       "title_english": "Taiwan Coast Guard Repels Chinese Vessels With Water Cannons",
-      "english_translation_status": "original"
-    },
-    {
-      "title": "魯比歐前往北約盟友，俄羅斯威脅與中東戰爭成為議程焦點",
-      "url": "https://news.google.com/rss/articles/CBMicEFVX3lxTE1CcnNtd0hrQlpqeFh2MldQU3U5YklfYjF5MzYtbTRJN3hqemdINlpaUkEwMXRLZTNkWU1aWEhXbXR6T1hqYTVLY1QzR2t2aXJ2V0dGSVdkakRwWmplNmZFYkc1UnktV2JEZWJOTTZ3Z2_SAXNBVV95cUxQaXZwekVPaWhLZGpJT2JZZ1Q3Y0ZkTHJaaDR3TnoyNFlNUFNmRWdGZVBfdXdDRnRsbnpjSUVaYUtENmwzcGlneFJCSVpDYUxGT1pVdkNlRkNESUMxTF95VWZfWTB6QnpvUUdGeGNwU1ZBVkN3?oc=5",
-      "domain": "Radio Free Europe/Radio Liberty",
-      "ts": "2026-10-05T02:18:14+00:00",
-      "topic": "俄烏",
-      "region": "ukraine",
-      "sample_id": "114321cded06d0d83c3c731d335cd1232afec66fb5ddffe451547d662c41798b",
-      "first_seen_at": "2026-10-05T03:59:55.082675+00:00",
-      "stale": false,
-      "title_en": "Rubio Heads To NATO Allies As Russian Threat, Middle East War Shape Agenda",
-      "translation_status": "translated",
-      "title_zh": "魯比歐前往北約盟友，俄羅斯威脅與中東戰爭成為議程焦點",
-      "translation_provider": "groq",
-      "translation_model": "openai/gpt-oss-20b",
-      "title_english": "Rubio Heads To NATO Allies As Russian Threat, Middle East War Shape Agenda",
       "english_translation_status": "original"
     },
     {
@@ -3802,29 +3817,9 @@
       "first_seen_at": "2026-10-05T01:28:53.984940+00:00",
       "stale": false,
       "title_en": "S. Korea says allies can detect, intercept N. Korean hypersonic missile",
-      "translation_status": "translated",
+      "translation_status": "cached",
       "title_zh": "韓國表示盟友能偵測並攔截北韓高超音速彈道彈",
-      "translation_provider": "groq",
-      "translation_model": "openai/gpt-oss-20b",
       "title_english": "S. Korea says allies can detect, intercept N. Korean hypersonic missile",
-      "english_translation_status": "original"
-    },
-    {
-      "title": "特朗普提及北韓核武庫，強調與金正恩的關係",
-      "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxQSXhtNC1QOHRuQVd3V2FwTkpqeDdVWUtONXozLV9sazJnUHBrRndXdE9SX3FxMGc4MkV4UjdLRW9mdXo1RHBYVGZZRVBKRHRaUEhvS3hrdXFiclZZQ0RsSE9ERW1PZHZMM2N5WDdTZDk1aFFKSTVXMndqUmZzbFBqblc1OW91M25LeExRUmprVERETHBTUVR1WTBDc3l4UVJJZC1XUXVSelpYQTNnNXlXbS1JdWZsUHfSAbwBQVVfeXFMUHlaajZBYTBFWUp3TWJtX3N3cldBY2VwRkswdThVdGVRbEY3MGhRT01ZUGZqelRlYXNoX0JSTElveFlMWGU0VTI2OV9teUNFdUFxcFUtTFJzWEp6dXJXV1NqOFRzbnhxUUFpMkxWT3FyNElCbUxudXlvNVZUbW5aOUkxbFhWYzZibWcyS2NpTzRtZ1NRVlo1ZnI0Y0NMbldWN0tVVXkwSzl3RmwyOW0wVFFoMlVpVktwRFdWbXk?oc=5",
-      "domain": "upi.com",
-      "ts": "2026-10-05T01:02:58+00:00",
-      "topic": "朝鮮",
-      "region": "korea",
-      "sample_id": "ca52606062594d12ca9204de0b60bf1c2a07b9448c4d9064c03ed958d4d220c2",
-      "first_seen_at": "2026-10-05T01:28:53.984940+00:00",
-      "stale": false,
-      "title_en": "Trump cites N. Korea's nuclear arsenal, stresses ties with Kim Jong Un",
-      "translation_status": "translated",
-      "title_zh": "特朗普提及北韓核武庫，強調與金正恩的關係",
-      "translation_provider": "groq",
-      "translation_model": "openai/gpt-oss-20b",
-      "title_english": "Trump cites N. Korea's nuclear arsenal, stresses ties with Kim Jong Un",
       "english_translation_status": "original"
     },
     {
@@ -3838,27 +3833,9 @@
       "first_seen_at": "2026-10-05T01:28:53.984940+00:00",
       "stale": false,
       "title_en": "Philippines accuses Chinese coast guard of blocking law enforcement mission near Pag-asa Island",
-      "translation_status": "translated",
-      "title_zh": "菲律賓指控中國海警阻擋在帕加沙島附近執法任務",
-      "translation_provider": "groq",
-      "translation_model": "openai/gpt-oss-20b",
-      "title_english": "Philippines accuses Chinese coast guard of blocking law enforcement mission near Pag-asa Island",
-      "english_translation_status": "original"
-    },
-    {
-      "title": "菲律賓指控中國海警阻擋在提圖附近執法任務",
-      "url": "https://news.google.com/rss/articles/CBMi0AFBVV95cUxORHJ2cmhreHZMeVJ4a3dpeDdyZXZUamJCdEFvSzhIU2p6bmp2dFVsV0xVZ28yVHBYTkU5OUROMTZVZ2tZcldWNGZQaGtjNloxaWdlOEhuQzYzNlhWZjBlS24wZkw2ZnBZRF9PYjd0OTNLVDBJNUg2YUo5ZWVqdGVTaTRlbHA4NU5oMVloY0V2MGotRXFBa2JuUURWVm5SaFI5T0NKRGx0VTJSWkw4Y0lDaWN2MEQzUUhPaWdzZk02ZDNWRXNFc0lyXzNmaGZvR3Zn?oc=5",
-      "domain": "daily-sun.com",
-      "ts": "2026-10-04T13:43:47+00:00",
-      "topic": "南海",
-      "region": "southsea",
-      "sample_id": "3e73c12a58bdd83296a2ab38d2b00348f38ee70bc1f0be05ec343f52f71ddafe",
-      "first_seen_at": "2026-10-04T15:26:07.564284+00:00",
-      "stale": false,
-      "title_en": "Philippines accuses Chinese coast guard of blocking law enforcement mission near Thitu",
       "translation_status": "cached",
-      "title_zh": "菲律賓指控中國海警阻擋在提圖附近執法任務",
-      "title_english": "Philippines accuses Chinese coast guard of blocking law enforcement mission near Thitu",
+      "title_zh": "菲律賓指控中國海警阻擋在帕加沙島附近執法任務",
+      "title_english": "Philippines accuses Chinese coast guard of blocking law enforcement mission near Pag-asa Island",
       "english_translation_status": "original"
     },
     {
@@ -3900,42 +3877,42 @@
     "by_region": {
       "ukraine": {
         "status": "available",
-        "attempted_at": "2026-10-05T03:59:55.082675+00:00",
-        "observed_at": "2026-10-05T03:59:55.082675+00:00",
-        "sample_24h": 113,
-        "source_names_24h": 81,
+        "attempted_at": "2026-10-05T05:57:09.297654+00:00",
+        "observed_at": "2026-10-05T05:57:09.297654+00:00",
+        "sample_24h": 104,
+        "source_names_24h": 75,
         "baseline_status": "not_scored"
       },
       "mideast": {
         "status": "available",
-        "attempted_at": "2026-10-05T03:59:55.082675+00:00",
-        "observed_at": "2026-10-05T03:59:55.082675+00:00",
-        "sample_24h": 97,
-        "source_names_24h": 67,
+        "attempted_at": "2026-10-05T05:57:09.297654+00:00",
+        "observed_at": "2026-10-05T05:57:09.297654+00:00",
+        "sample_24h": 99,
+        "source_names_24h": 66,
         "baseline_status": "not_scored"
       },
       "taiwan": {
         "status": "available",
-        "attempted_at": "2026-10-05T03:59:55.082675+00:00",
-        "observed_at": "2026-10-05T03:59:55.082675+00:00",
-        "sample_24h": 7,
+        "attempted_at": "2026-10-05T05:57:09.297654+00:00",
+        "observed_at": "2026-10-05T05:57:09.297654+00:00",
+        "sample_24h": 5,
         "source_names_24h": 5,
         "baseline_status": "not_scored"
       },
       "korea": {
         "status": "available",
-        "attempted_at": "2026-10-05T03:59:55.082675+00:00",
-        "observed_at": "2026-10-05T03:59:55.082675+00:00",
-        "sample_24h": 55,
-        "source_names_24h": 42,
+        "attempted_at": "2026-10-05T05:57:09.297654+00:00",
+        "observed_at": "2026-10-05T05:57:09.297654+00:00",
+        "sample_24h": 49,
+        "source_names_24h": 38,
         "baseline_status": "not_scored"
       },
       "southsea": {
         "status": "available",
-        "attempted_at": "2026-10-05T03:59:55.082675+00:00",
-        "observed_at": "2026-10-05T03:59:55.082675+00:00",
-        "sample_24h": 8,
-        "source_names_24h": 7,
+        "attempted_at": "2026-10-05T05:57:09.297654+00:00",
+        "observed_at": "2026-10-05T05:57:09.297654+00:00",
+        "sample_24h": 9,
+        "source_names_24h": 8,
         "baseline_status": "not_scored"
       }
     }
@@ -4065,7 +4042,8 @@
       }
     ],
     "breadth_up": 0,
-    "note": "出口國鏡像合計（涵蓋範圍有限，缺值不表示中國停止公布）· 月資料約 3–4 月落差 · 結構性背景指標"
+    "note": "出口國鏡像合計（涵蓋範圍有限，缺值不表示中國停止公布）· 月資料約 3–4 月落差 · 結構性背景指標",
+    "cache_reused_at": "2026-10-05T05:57:09.351120+00:00"
   },
   "food_hist": [
     {
@@ -4710,7 +4688,7 @@
       }
     ],
     "note": "出口國鏡像合計（涵蓋範圍有限，缺值不表示中國停止公布）· 月資料約 3–4 月落差 · 單月僅供參考、看趨勢 · 抓不到經俄/伊等不通報管道",
-    "cache_reused_at": "2026-10-04T22:59:34.664908+00:00"
+    "cache_reused_at": "2026-10-05T05:57:36.744136+00:00"
   },
   "strat_hist": [
     {
@@ -5362,12 +5340,12 @@
   ],
   "tw_news": [
     {
-      "title": "美財長：Kimi上傳共軍武器計畫到Anthropic 讓中國驚覺AI開源模型威力",
-      "url": "https://news.google.com/rss/articles/CBMi_gJBVV95cUxNRzdDeEpOWElMZlpCV3BDS19rSVVSS1EyVU5ianRxUmZrZmVIcUpnZWVKUDlNTGNWT1N0aDAyYS1lLU1zQlBNTXZfYXB3OS1sN0Z6TjcwZjktUXY5XzdaNzY5VUhDS2xMRVhLaHRZbWYtcGpEZXRJVjBSa3Rmc1hILXlHV2paUlMxOUhiVnF3NFp1YUZOcUFmQVpUNGhoYllMdTlMRnlKazU5QWdISWF3ZjJTMEVyaDhpYk4xSjZSXzBWaF9uRnBXeG0tSlhiakUxWWIwaTVFYm5OaWJaVGx5OUtFbjRVNzh4aEl0ek5WclN4RllZQWNnZkY1dFhXcUNNRnVwODdOQ1BKYUVrUlprSUVjeDdxQmZoTmdkbDA2YmxaRm1TMThUcGVfcV9HWVBOMnlZUWlZVFFOdjhxRTlmREl2SlpwTjcwNDJwZjBsWVFZTnJkQ0E1X0k1NjRpc0N0ZVlPUV9fUWczaUNTeUhyWXYtdTViN2JtLUw1Qkt3?oc=5",
-      "domain": "Yahoo新聞",
-      "ts": "2026-10-05T03:35:52+00:00",
+      "title": "美財長：中國驚覺AI開源模型威力 因Kimi上傳共軍武器計畫到Anthropic",
+      "url": "https://news.google.com/rss/articles/CBMidEFVX3lxTE9na18zb0h4RDg4VzJtdHZwbmx4VVhER1lheWVheEl0NnZPZS1admJzMjRxN3FpaDZHQ3hkVXJVbWhUZzB4YlBjaGFqa2VKMGlFUFBQR3FKaVplRzAwU0VJNEJWRzhRaEFLWllXZzlCTzZtUy1F?oc=5",
+      "domain": "LINE TODAY",
+      "ts": "2026-10-05T03:32:11+00:00",
       "topic": "台海",
-      "title_english": "US Treasury Secretary: Kimi Uploaded Chinese Military Weapon Plan to Anthropic, China Realizes Power of AI Open-Source Models",
+      "title_english": "US Treasury Secretary: China is shocked by the power of AI open-source models because Kimi uploaded a Communist military weapons plan to Anthropic",
       "english_translation_status": "translated"
     },
     {
@@ -5377,7 +5355,7 @@
       "ts": "2026-10-05T01:57:00+00:00",
       "topic": "共軍機艦",
       "title_english": "No Chinese Aircraft Disrupt Taiwan Today; 8 Chinese Warships Activity Around Taiwan Strait",
-      "english_translation_status": "translated"
+      "english_translation_status": "cached"
     },
     {
       "title": "8艘共艦9艘公務船擾台　國軍嚴密監控",
@@ -5386,7 +5364,7 @@
       "ts": "2026-10-05T01:38:57+00:00",
       "topic": "共軍機艦",
       "title_english": "8 Chinese Warships and 9 Civilian Vessels Disrupt Taiwan; Military Maintains Tight Surveillance",
-      "english_translation_status": "translated"
+      "english_translation_status": "cached"
     },
     {
       "title": "8艘共艦9艘公務船擾台 國軍嚴密監控",
@@ -5395,7 +5373,7 @@
       "ts": "2026-10-05T01:19:00+00:00",
       "topic": "共軍機艦",
       "title_english": "8 Chinese Warships and 9 Civilian Vessels Disrupt Taiwan; Military Maintains Tight Surveillance",
-      "english_translation_status": "translated"
+      "english_translation_status": "cached"
     },
     {
       "title": "美財長：中國AI模型Kimi蒸餾洩漏解放軍武器計畫| 國際",
@@ -5404,7 +5382,7 @@
       "ts": "2026-10-05T00:04:00+00:00",
       "topic": "台海",
       "title_english": "US Treasury Secretary: Chinese AI Model Kimi Distills and Leaks PLA Weapon Plan | International",
-      "english_translation_status": "translated"
+      "english_translation_status": "cached"
     },
     {
       "title": "社評／台海降壓台灣政治也該翻頁- 國際",
@@ -5431,7 +5409,7 @@
       "ts": "2026-10-04T22:39:00+00:00",
       "topic": "台海",
       "title_english": "China's AI Model Disaster! US Treasury Secretary: Kimi K3 Claims to Be Claude, Leaks PLA Weapon Plan",
-      "english_translation_status": "translated"
+      "english_translation_status": "cached"
     },
     {
       "title": "南海衝突再升溫！共軍殲16危險逼近菲機 中國海警護航非法漁船",
@@ -5458,12 +5436,12 @@
       "ts": "2026-10-04T19:26:35+00:00",
       "topic": "台海",
       "title_english": "Observing PLA's Anti-UAV 'Iron Triangle' Outstanding Performance",
-      "english_translation_status": "translated"
+      "english_translation_status": "cached"
     },
     {
       "title": "共軍在寮國海外基地啟用 印太擴張加劇",
       "url": "https://news.google.com/rss/articles/CBMibkFVX3lxTFBjVFdKMFRNekJTQnhVbnhPZU40T3J0aW5nbXhmNWU1aVVzUkhndGJ6SzVBeHd3aDVQeUNFaFRPS3pYTm1mUzVOTTdfZUstMThlU1FjZmZIWGMyRlEzVXN4enVrZ1BEdnpnLWVZZ2Vn?oc=5",
-      "domain": "ydn.com.tw",
+      "domain": "青年日報",
       "ts": "2026-10-04T17:32:00+00:00",
       "topic": "台海",
       "title_english": "China's military activates overseas base in Laos, intensifying Indo-Pacific expansion",
@@ -5991,7 +5969,7 @@
   },
   "usda": {
     "schema_version": 2,
-    "updated_at": "2026-10-04T22:57:37.680684+00:00",
+    "updated_at": "2026-10-05T05:57:12.365792+00:00",
     "week_ending": "2026-09-24",
     "items": [
       {
@@ -6121,214 +6099,19 @@
     ]
   },
   "notams": {
-    "korea": {
-      "provider": "NOTAC",
-      "firs": [
-        "ZKKP"
-      ],
-      "fetched_at": "2026-10-05T03:59:55.126792+00:00",
-      "protocol": "delta-v1",
-      "complete": true,
-      "available": true,
-      "total": 2,
-      "reported_count": 2,
-      "pages": 1,
-      "credits_remaining": 9376,
-      "reason": "complete_query",
-      "sync_state": {
-        "version": 1,
-        "firs": [
-          "ZKKP"
-        ],
-        "records": {
-          "eee3edc9-d390-4e20-9dab-9fbcf9c5b33a": {
-            "id": "eee3edc9-d390-4e20-9dab-9fbcf9c5b33a",
-            "number": "A0145/11",
-            "status": "active",
-            "affected_fir": "ZKKP",
-            "location_code": "ZKPY",
-            "q_code": "QOBCE",
-            "effective_start": "2011-11-30T00:53:00Z",
-            "effective_end": null,
-            "record_updated_at": "2026-07-22T16:56:52.530133Z",
-            "record_archived_at": null,
-            "_danger": false,
-            "_closure": false
-          },
-          "0164e7d8-9451-44db-a7ed-0d679bfdac62": {
-            "id": "0164e7d8-9451-44db-a7ed-0d679bfdac62",
-            "number": "A0099/14",
-            "status": "expired",
-            "affected_fir": "ZKKP",
-            "location_code": "ZKPY",
-            "q_code": "QFAHW",
-            "effective_start": "2014-10-01T00:00:00Z",
-            "effective_end": "2014-10-31T23:59:00Z",
-            "record_updated_at": "2026-07-22T16:56:52.530342Z",
-            "record_archived_at": null,
-            "_danger": false,
-            "_closure": false
-          },
-          "c05bc156-86e2-4fe1-85b4-82efa468aef1": {
-            "id": "c05bc156-86e2-4fe1-85b4-82efa468aef1",
-            "number": "A0101/14",
-            "status": "expired",
-            "affected_fir": "ZKKP",
-            "location_code": "ZKPY",
-            "q_code": "QMXLC",
-            "effective_start": "2014-10-01T00:00:00Z",
-            "effective_end": "2014-10-31T23:59:00Z",
-            "record_updated_at": "2026-07-22T16:56:52.530376Z",
-            "record_archived_at": null,
-            "_danger": true,
-            "_closure": false
-          },
-          "bf90d5b8-37cb-4eee-b9a9-5d5093051b31": {
-            "id": "bf90d5b8-37cb-4eee-b9a9-5d5093051b31",
-            "number": "A0103/14",
-            "status": "expired",
-            "affected_fir": "ZKKP",
-            "location_code": "ZKPY",
-            "q_code": "QMKLC",
-            "effective_start": "2014-10-01T00:00:00Z",
-            "effective_end": "2014-10-31T23:59:00Z",
-            "record_updated_at": "2026-07-22T16:56:52.530496Z",
-            "record_archived_at": null,
-            "_danger": true,
-            "_closure": false
-          },
-          "244c6ce8-0756-454f-aca1-71d3fd7a0514": {
-            "id": "244c6ce8-0756-454f-aca1-71d3fd7a0514",
-            "number": "A0050/09",
-            "status": "active",
-            "affected_fir": "ZKKP",
-            "location_code": "ZKKP",
-            "q_code": "QCBXX",
-            "effective_start": "2009-08-25T00:01:00Z",
-            "effective_end": null,
-            "record_updated_at": "2026-07-22T16:56:52.530655Z",
-            "record_archived_at": null,
-            "_danger": false,
-            "_closure": false
-          },
-          "a5dde0f4-7b2b-478a-b6bb-a243d10b5e4b": {
-            "id": "a5dde0f4-7b2b-478a-b6bb-a243d10b5e4b",
-            "number": "A0098/14",
-            "status": "expired",
-            "affected_fir": "ZKKP",
-            "location_code": "ZKPY",
-            "q_code": "QFAHW",
-            "effective_start": "2014-10-01T00:00:00Z",
-            "effective_end": "2014-10-31T23:59:00Z",
-            "record_updated_at": "2026-07-22T16:56:52.891682Z",
-            "record_archived_at": null,
-            "_danger": false,
-            "_closure": false
-          },
-          "bd1645a9-0068-4022-ad87-0a3e02aa9902": {
-            "id": "bd1645a9-0068-4022-ad87-0a3e02aa9902",
-            "number": "A0100/14",
-            "status": "expired",
-            "affected_fir": "ZKKP",
-            "location_code": "ZKPY",
-            "q_code": "QFAHX",
-            "effective_start": "2014-10-01T00:00:00Z",
-            "effective_end": "2014-10-31T23:59:00Z",
-            "record_updated_at": "2026-07-22T16:56:52.892169Z",
-            "record_archived_at": null,
-            "_danger": false,
-            "_closure": false
-          },
-          "fa1a48ec-cefa-496d-bb54-5d395311632e": {
-            "id": "fa1a48ec-cefa-496d-bb54-5d395311632e",
-            "number": "A0084/19",
-            "status": "expired",
-            "affected_fir": "ZKKP",
-            "location_code": "ZKPY",
-            "q_code": "QFAHX",
-            "effective_start": "2019-09-30T00:26:00Z",
-            "effective_end": "2019-10-31T23:59:00Z",
-            "record_updated_at": "2026-07-22T16:56:52.892224Z",
-            "record_archived_at": null,
-            "_danger": false,
-            "_closure": false
-          },
-          "08e3d90a-6b78-4673-8d9a-594669a86744": {
-            "id": "08e3d90a-6b78-4673-8d9a-594669a86744",
-            "number": "A0102/14",
-            "status": "expired",
-            "affected_fir": "ZKKP",
-            "location_code": "ZKPY",
-            "q_code": "QMXLC",
-            "effective_start": "2014-10-01T00:00:00Z",
-            "effective_end": "2014-10-31T23:59:00Z",
-            "record_updated_at": "2026-07-22T16:56:52.892653Z",
-            "record_archived_at": null,
-            "_danger": true,
-            "_closure": false
-          },
-          "3ef5380f-24ac-4ac8-928a-0f37372ac231": {
-            "id": "3ef5380f-24ac-4ac8-928a-0f37372ac231",
-            "number": "A0104/14",
-            "status": "expired",
-            "affected_fir": "ZKKP",
-            "location_code": "ZKPY",
-            "q_code": "QMKXX",
-            "effective_start": "2014-10-01T00:00:00Z",
-            "effective_end": "2014-10-31T23:59:00Z",
-            "record_updated_at": "2026-07-22T16:56:52.892831Z",
-            "record_archived_at": null,
-            "_danger": false,
-            "_closure": false
-          }
-        },
-        "cursor": "djJ8ZGVsdGF8MjAyNi0wNy0yMlQxNjo1Njo1Mi44OTI4MzErMDA6MDB8M2VmNTM4MGYtMjRhYy00YWM4LTkyOGEtMGYzNzM3MmFjMjMx",
-        "tombstones": {},
-        "as_of": "2026-10-05T03:59:56.508236Z",
-        "caught_up_at": "2026-10-05T03:59:56.508236Z"
-      },
-      "sync_budget": {
-        "day": "2026-10-05",
-        "month": "2026-10",
-        "day_calls": 2,
-        "month_calls": 41
-      },
-      "sample_count": 2,
-      "partial": false,
-      "sample_observed_at": "2026-10-05T03:59:56.508236Z",
-      "sample_danger": 0,
-      "sample_closure": 0,
-      "sample_order": "cursor",
-      "sample_timing": {
-        "current": 0,
-        "future": 0,
-        "ended": 0,
-        "unknown": 2
-      },
-      "attempted_at": "2026-10-05T03:59:55.126792+00:00",
-      "observed_at": "2026-10-05T03:59:55.126792+00:00",
-      "stale": false,
-      "danger": 0,
-      "closure": false,
-      "score": 0,
-      "comparison": {
-        "observed_at": "2026-10-05T01:28:54.016683+00:00",
-        "total_change": 0
-      }
-    },
     "southsea": {
       "provider": "NOTAC",
       "firs": [
         "RPHI"
       ],
-      "fetched_at": "2026-10-05T03:59:55.126792+00:00",
+      "fetched_at": "2026-10-05T05:57:09.394643+00:00",
       "protocol": "delta-v1",
       "complete": true,
       "available": true,
       "total": 427,
       "reported_count": 427,
       "pages": 1,
-      "credits_remaining": 9373,
+      "credits_remaining": 9361,
       "reason": "complete_query",
       "sync_state": {
         "version": 1,
@@ -9920,40 +9703,12 @@
             "_danger": false,
             "_closure": false
           },
-          "4683d1d9-1721-4d05-af75-aaf7e7918026": {
-            "id": "4683d1d9-1721-4d05-af75-aaf7e7918026",
-            "number": "B4416/26",
-            "status": "active",
-            "affected_fir": "RPHI",
-            "location_code": "RPSV",
-            "q_code": "QWPLW",
-            "effective_start": "2026-08-31T22:00:00Z",
-            "effective_end": "2026-11-30T10:00:00Z",
-            "record_updated_at": "2026-08-28T12:00:04.065723Z",
-            "record_archived_at": null,
-            "_danger": false,
-            "_closure": false
-          },
           "4d0f4533-d1a8-4bb9-b904-c1e8ac199648": {
             "id": "4d0f4533-d1a8-4bb9-b904-c1e8ac199648",
             "number": "B4414/26",
             "status": "active",
             "affected_fir": "RPHI",
             "location_code": "RPVZ",
-            "q_code": "QWPLW",
-            "effective_start": "2026-08-31T22:00:00Z",
-            "effective_end": "2026-11-30T10:00:00Z",
-            "record_updated_at": "2026-08-28T12:00:04.065723Z",
-            "record_archived_at": null,
-            "_danger": false,
-            "_closure": false
-          },
-          "aaeee54e-e15b-44b0-bd69-8c24bd907b72": {
-            "id": "aaeee54e-e15b-44b0-bd69-8c24bd907b72",
-            "number": "B4415/26",
-            "status": "active",
-            "affected_fir": "RPHI",
-            "location_code": "RPSB",
             "q_code": "QWPLW",
             "effective_start": "2026-08-31T22:00:00Z",
             "effective_end": "2026-11-30T10:00:00Z",
@@ -15324,22 +15079,64 @@
             "_danger": false,
             "_closure": false
           },
-          "809cbe76-d959-495e-8aaa-9f3badb1f325": {
-            "id": "809cbe76-d959-495e-8aaa-9f3badb1f325",
-            "number": "B5299/26",
+          "0ad11ee1-7507-4df8-a9f7-0587899636b3": {
+            "id": "0ad11ee1-7507-4df8-a9f7-0587899636b3",
+            "number": "B5304/26",
             "status": "active",
             "affected_fir": "RPHI",
             "location_code": "RPHI",
-            "q_code": "QANLC",
-            "effective_start": "2026-10-05T02:40:00Z",
+            "q_code": "QANLT",
+            "effective_start": "2026-10-05T04:54:00Z",
             "effective_end": "2026-10-05T16:00:00Z",
-            "record_updated_at": "2026-10-05T03:01:24.985197Z",
+            "record_updated_at": "2026-10-05T05:01:27.720012Z",
+            "record_archived_at": null,
+            "_danger": false,
+            "_closure": false
+          },
+          "5f59a5d7-9c40-4c01-bf33-410fa37519a8": {
+            "id": "5f59a5d7-9c40-4c01-bf33-410fa37519a8",
+            "number": "B5301/26",
+            "status": "active",
+            "affected_fir": "RPHI",
+            "location_code": "RPSB",
+            "q_code": "QWPLW",
+            "effective_start": "2026-10-05T04:33:00Z",
+            "effective_end": "2026-11-30T10:00:00Z",
+            "record_updated_at": "2026-10-05T05:01:27.720012Z",
+            "record_archived_at": null,
+            "_danger": false,
+            "_closure": false
+          },
+          "76a956ee-2917-4705-aea4-4ca35bb76551": {
+            "id": "76a956ee-2917-4705-aea4-4ca35bb76551",
+            "number": "B5302/26",
+            "status": "active",
+            "affected_fir": "RPHI",
+            "location_code": "RPSV",
+            "q_code": "QWPLW",
+            "effective_start": "2026-10-05T04:41:00Z",
+            "effective_end": "2026-11-30T10:00:00Z",
+            "record_updated_at": "2026-10-05T05:01:27.720012Z",
+            "record_archived_at": null,
+            "_danger": false,
+            "_closure": false
+          },
+          "d105c232-52a5-4b2a-b47a-c57c956441fa": {
+            "id": "d105c232-52a5-4b2a-b47a-c57c956441fa",
+            "number": "B5303/26",
+            "status": "upcoming",
+            "affected_fir": "RPHI",
+            "location_code": "RPVB",
+            "q_code": "QMRLC",
+            "effective_start": "2026-10-07T16:00:00Z",
+            "effective_end": "2026-10-16T20:00:00Z",
+            "record_updated_at": "2026-10-05T05:01:27.720012Z",
             "record_archived_at": null,
             "_danger": true,
             "_closure": false
           }
         },
-        "cursor": "djJ8ZGVsdGF8MjAyNi0xMC0wNVQwMzowMToyNC45ODUxOTcrMDA6MDB8ODA5Y2JlNzYtZDk1OS00OTVlLThhYWEtOWYzYmFkYjFmMzI1",
+        "cursor": "djJ8ZGVsdGF8MjAyNi0xMC0wNVQwNTowMToyNy43MjAwMTIrMDA6MDB8ZDEwNWMyMzItNTJhNS00YjJhLWI0N2EtYzU3Yzk1NjQ0MWZh",
         "tombstones": {
           "f2f08596-0d61-42ba-b138-9a338ffa4010": "2026-09-24T00:30:04.240776Z",
           "7f3aba1c-749f-4240-9cce-74baeaf22844": "2026-09-24T01:30:03.931736Z",
@@ -15702,21 +15499,24 @@
           "809b0e46-aaa6-46e7-a985-5eaa0f6378c9": "2026-10-05T02:30:03.871178Z",
           "a7fe22be-924c-41f4-9b21-e59ea0c6222a": "2026-10-05T02:30:03.871178Z",
           "a74ac135-b240-4798-83d2-abc710bf0ba9": "2026-10-05T03:00:03.914242Z",
-          "f1681ae6-2261-4f74-ba3c-32b19d765294": "2026-10-05T03:00:03.914242Z"
+          "f1681ae6-2261-4f74-ba3c-32b19d765294": "2026-10-05T03:00:03.914242Z",
+          "4683d1d9-1721-4d05-af75-aaf7e7918026": "2026-10-05T05:00:03.780102Z",
+          "809cbe76-d959-495e-8aaa-9f3badb1f325": "2026-10-05T05:00:03.780102Z",
+          "aaeee54e-e15b-44b0-bd69-8c24bd907b72": "2026-10-05T05:00:03.780102Z"
         },
-        "as_of": "2026-10-05T03:59:57.337491Z",
-        "caught_up_at": "2026-10-05T03:59:57.337491Z"
+        "as_of": "2026-10-05T05:57:10.143851Z",
+        "caught_up_at": "2026-10-05T05:57:10.143851Z"
       },
       "sync_budget": {
         "day": "2026-10-05",
         "month": "2026-10",
-        "day_calls": 2,
-        "month_calls": 46
+        "day_calls": 3,
+        "month_calls": 47
       },
       "sample_count": 427,
       "partial": false,
-      "sample_observed_at": "2026-10-05T03:59:57.337491Z",
-      "sample_danger": 26,
+      "sample_observed_at": "2026-10-05T05:57:10.143851Z",
+      "sample_danger": 25,
       "sample_closure": 0,
       "sample_order": "cursor",
       "sample_timing": {
@@ -15725,15 +15525,15 @@
         "ended": 0,
         "unknown": 93
       },
-      "attempted_at": "2026-10-05T03:59:55.126792+00:00",
-      "observed_at": "2026-10-05T03:59:55.126792+00:00",
+      "attempted_at": "2026-10-05T05:57:09.394643+00:00",
+      "observed_at": "2026-10-05T05:57:09.394643+00:00",
       "stale": false,
-      "danger": 26,
+      "danger": 25,
       "closure": false,
       "score": 100.0,
       "comparison": {
-        "observed_at": "2026-10-05T01:28:54.016683+00:00",
-        "total_change": -4
+        "observed_at": "2026-10-05T03:59:55.126792+00:00",
+        "total_change": 0
       }
     },
     "ukraine": {
@@ -15741,14 +15541,14 @@
       "firs": [
         "UKBV"
       ],
-      "fetched_at": "2026-10-05T03:59:55.126792+00:00",
+      "fetched_at": "2026-10-05T05:57:09.394643+00:00",
       "protocol": "delta-v1",
       "complete": true,
       "available": true,
       "total": 3,
       "reported_count": 3,
       "pages": 1,
-      "credits_remaining": 9370,
+      "credits_remaining": 9358,
       "reason": "complete_query",
       "sync_state": {
         "version": 1,
@@ -15801,18 +15601,18 @@
         },
         "cursor": "djJ8ZGVsdGF8MjAyNi0wOS0wOFQwOTowMjowNi41OTE0NjArMDA6MDB8YTNlY2ZkMjQtMmE0OC00Mjk2LTk4YjYtNmU2MzI5MGYwMjUx",
         "tombstones": {},
-        "as_of": "2026-10-05T03:59:58.254475Z",
-        "caught_up_at": "2026-10-05T03:59:58.254475Z"
+        "as_of": "2026-10-05T05:57:10.997847Z",
+        "caught_up_at": "2026-10-05T05:57:10.997847Z"
       },
       "sync_budget": {
         "day": "2026-10-05",
         "month": "2026-10",
-        "day_calls": 2,
-        "month_calls": 41
+        "day_calls": 3,
+        "month_calls": 42
       },
       "sample_count": 3,
       "partial": false,
-      "sample_observed_at": "2026-10-05T03:59:58.254475Z",
+      "sample_observed_at": "2026-10-05T05:57:10.997847Z",
       "sample_danger": 0,
       "sample_closure": 0,
       "sample_order": "cursor",
@@ -15822,14 +15622,14 @@
         "ended": 0,
         "unknown": 0
       },
-      "attempted_at": "2026-10-05T03:59:55.126792+00:00",
-      "observed_at": "2026-10-05T03:59:55.126792+00:00",
+      "attempted_at": "2026-10-05T05:57:09.394643+00:00",
+      "observed_at": "2026-10-05T05:57:09.394643+00:00",
       "stale": false,
       "danger": 0,
       "closure": false,
       "score": 0,
       "comparison": {
-        "observed_at": "2026-10-05T01:28:54.016683+00:00",
+        "observed_at": "2026-10-05T03:59:55.126792+00:00",
         "total_change": 0
       }
     },
@@ -15839,14 +15639,14 @@
         "OIIX",
         "LLLL"
       ],
-      "fetched_at": "2026-10-05T03:59:55.126792+00:00",
+      "fetched_at": "2026-10-05T05:57:09.394643+00:00",
       "protocol": "delta-v1",
       "complete": true,
       "available": true,
-      "total": 346,
-      "reported_count": 346,
+      "total": 350,
+      "reported_count": 350,
       "pages": 1,
-      "credits_remaining": 9367,
+      "credits_remaining": 9355,
       "reason": "complete_query",
       "sync_state": {
         "version": 1,
@@ -21935,36 +21735,36 @@
           "5fd791a0-eb21-42a4-85c2-6d0853610620": "2026-10-04T19:30:04.026219Z",
           "e538ab33-874c-47a5-81e8-bd59f497ad02": "2026-10-04T19:30:04.026219Z"
         },
-        "as_of": "2026-10-05T03:59:59.037554Z",
-        "caught_up_at": "2026-10-05T03:59:59.037554Z"
+        "as_of": "2026-10-05T05:57:11.749493Z",
+        "caught_up_at": "2026-10-05T05:57:11.749493Z"
       },
       "sync_budget": {
         "day": "2026-10-05",
         "month": "2026-10",
-        "day_calls": 2,
-        "month_calls": 41
+        "day_calls": 3,
+        "month_calls": 42
       },
-      "sample_count": 346,
+      "sample_count": 350,
       "partial": false,
-      "sample_observed_at": "2026-10-05T03:59:59.037554Z",
-      "sample_danger": 49,
+      "sample_observed_at": "2026-10-05T05:57:11.749493Z",
+      "sample_danger": 53,
       "sample_closure": 0,
       "sample_order": "cursor",
       "sample_timing": {
-        "current": 321,
+        "current": 325,
         "future": 0,
         "ended": 0,
         "unknown": 25
       },
-      "attempted_at": "2026-10-05T03:59:55.126792+00:00",
-      "observed_at": "2026-10-05T03:59:55.126792+00:00",
+      "attempted_at": "2026-10-05T05:57:09.394643+00:00",
+      "observed_at": "2026-10-05T05:57:09.394643+00:00",
       "stale": false,
-      "danger": 49,
+      "danger": 53,
       "closure": false,
       "score": 100.0,
       "comparison": {
-        "observed_at": "2026-10-05T01:28:54.016683+00:00",
-        "total_change": 1
+        "observed_at": "2026-10-05T03:59:55.126792+00:00",
+        "total_change": 4
       }
     },
     "taiwan": {
@@ -21972,14 +21772,14 @@
       "firs": [
         "RCAA"
       ],
-      "fetched_at": "2026-10-05T03:59:55.126792+00:00",
+      "fetched_at": "2026-10-05T05:57:09.394643+00:00",
       "protocol": "delta-v1",
       "complete": true,
       "available": true,
-      "total": 556,
-      "reported_count": 556,
-      "pages": 1,
-      "credits_remaining": 9364,
+      "total": 557,
+      "reported_count": 557,
+      "pages": 2,
+      "credits_remaining": 9349,
       "reason": "complete_query",
       "sync_state": {
         "version": 1,
@@ -33103,20 +32903,6 @@
             "_danger": false,
             "_closure": false
           },
-          "ec962954-cfc0-46ae-86bc-86aea147756d": {
-            "id": "ec962954-cfc0-46ae-86bc-86aea147756d",
-            "number": "A3640/26",
-            "status": "active",
-            "affected_fir": "RCAA",
-            "location_code": "RCYU",
-            "q_code": "QWZXX",
-            "effective_start": "2026-10-02T03:54:00Z",
-            "effective_end": "2026-10-05T03:54:00Z",
-            "record_updated_at": "2026-10-02T04:01:34.665603Z",
-            "record_archived_at": null,
-            "_danger": false,
-            "_closure": false
-          },
           "18443973-e366-4f20-8276-16d7d31a98c0": {
             "id": "18443973-e366-4f20-8276-16d7d31a98c0",
             "number": "A3642/26",
@@ -33718,9 +33504,303 @@
             "record_archived_at": null,
             "_danger": false,
             "_closure": false
+          },
+          "e1a681d0-2a6f-4af9-bfcd-5b4dcde17cec": {
+            "id": "e1a681d0-2a6f-4af9-bfcd-5b4dcde17cec",
+            "number": "A3681/26",
+            "status": "active",
+            "affected_fir": "RCAA",
+            "location_code": "RCAA",
+            "q_code": "QPFCA",
+            "effective_start": "2026-10-05T04:00:00Z",
+            "effective_end": "2026-10-05T07:00:00Z",
+            "record_updated_at": "2026-10-05T04:01:16.608615Z",
+            "record_archived_at": null,
+            "_danger": false,
+            "_closure": false
+          },
+          "151b8282-3b12-4df2-9382-3fe79239425c": {
+            "id": "151b8282-3b12-4df2-9382-3fe79239425c",
+            "number": "U2541/26",
+            "status": "upcoming",
+            "affected_fir": "RCAA",
+            "location_code": "RCAA",
+            "q_code": "QWULW",
+            "effective_start": "2026-10-27T16:00:00Z",
+            "effective_end": "2027-01-22T16:00:00Z",
+            "record_updated_at": "2026-10-05T04:31:24.267720Z",
+            "record_archived_at": null,
+            "_danger": false,
+            "_closure": false
+          },
+          "2b73d786-7834-4270-9987-798904d0ea63": {
+            "id": "2b73d786-7834-4270-9987-798904d0ea63",
+            "number": "U2543/26",
+            "status": "upcoming",
+            "affected_fir": "RCAA",
+            "location_code": "RCAA",
+            "q_code": "QWULW",
+            "effective_start": "2026-10-27T16:00:00Z",
+            "effective_end": "2027-01-22T16:00:00Z",
+            "record_updated_at": "2026-10-05T04:31:24.267720Z",
+            "record_archived_at": null,
+            "_danger": false,
+            "_closure": false
+          },
+          "3d237225-fa3f-4b65-ad22-0782d22217b7": {
+            "id": "3d237225-fa3f-4b65-ad22-0782d22217b7",
+            "number": "U2544/26",
+            "status": "upcoming",
+            "affected_fir": "RCAA",
+            "location_code": "RCKW",
+            "q_code": "QWULW",
+            "effective_start": "2026-10-27T16:00:00Z",
+            "effective_end": "2027-01-22T16:00:00Z",
+            "record_updated_at": "2026-10-05T04:31:24.267720Z",
+            "record_archived_at": null,
+            "_danger": false,
+            "_closure": false
+          },
+          "50b8b3ab-48f9-4000-92bb-52b2e5a5f939": {
+            "id": "50b8b3ab-48f9-4000-92bb-52b2e5a5f939",
+            "number": "U2540/26",
+            "status": "upcoming",
+            "affected_fir": "RCAA",
+            "location_code": "RCAA",
+            "q_code": "QWULW",
+            "effective_start": "2026-10-27T16:00:00Z",
+            "effective_end": "2027-01-22T16:00:00Z",
+            "record_updated_at": "2026-10-05T04:31:24.267720Z",
+            "record_archived_at": null,
+            "_danger": false,
+            "_closure": false
+          },
+          "593f9244-e89a-4666-91e0-4d3df4c033e2": {
+            "id": "593f9244-e89a-4666-91e0-4d3df4c033e2",
+            "number": "U2539/26",
+            "status": "upcoming",
+            "affected_fir": "RCAA",
+            "location_code": "RCAA",
+            "q_code": "QWULW",
+            "effective_start": "2026-10-12T16:00:00Z",
+            "effective_end": "2026-12-01T16:00:00Z",
+            "record_updated_at": "2026-10-05T04:31:24.267720Z",
+            "record_archived_at": null,
+            "_danger": false,
+            "_closure": false
+          },
+          "66c5482d-29d8-4733-ab68-e7b20e4a3111": {
+            "id": "66c5482d-29d8-4733-ab68-e7b20e4a3111",
+            "number": "U2536/26",
+            "status": "upcoming",
+            "affected_fir": "RCAA",
+            "location_code": "RCAA",
+            "q_code": "QWULW",
+            "effective_start": "2026-10-12T16:00:00Z",
+            "effective_end": "2026-12-01T16:00:00Z",
+            "record_updated_at": "2026-10-05T04:31:24.267720Z",
+            "record_archived_at": null,
+            "_danger": false,
+            "_closure": false
+          },
+          "a005b287-189e-4d70-8b2e-9e45c6a0e5f2": {
+            "id": "a005b287-189e-4d70-8b2e-9e45c6a0e5f2",
+            "number": "U2538/26",
+            "status": "upcoming",
+            "affected_fir": "RCAA",
+            "location_code": "RCAA",
+            "q_code": "QWULW",
+            "effective_start": "2026-10-12T16:00:00Z",
+            "effective_end": "2026-12-01T16:00:00Z",
+            "record_updated_at": "2026-10-05T04:31:24.267720Z",
+            "record_archived_at": null,
+            "_danger": false,
+            "_closure": false
+          },
+          "a2d56797-4ed1-449b-8573-e76097e22cb9": {
+            "id": "a2d56797-4ed1-449b-8573-e76097e22cb9",
+            "number": "U2537/26",
+            "status": "upcoming",
+            "affected_fir": "RCAA",
+            "location_code": "RCAA",
+            "q_code": "QWULW",
+            "effective_start": "2026-10-12T16:00:00Z",
+            "effective_end": "2026-12-01T16:00:00Z",
+            "record_updated_at": "2026-10-05T04:31:24.267720Z",
+            "record_archived_at": null,
+            "_danger": false,
+            "_closure": false
+          },
+          "a6e014c1-a7a6-4c7e-92e7-9db9ff371459": {
+            "id": "a6e014c1-a7a6-4c7e-92e7-9db9ff371459",
+            "number": "U2542/26",
+            "status": "upcoming",
+            "affected_fir": "RCAA",
+            "location_code": "RCAA",
+            "q_code": "QWULW",
+            "effective_start": "2026-10-27T16:00:00Z",
+            "effective_end": "2027-01-22T16:00:00Z",
+            "record_updated_at": "2026-10-05T04:31:24.267720Z",
+            "record_archived_at": null,
+            "_danger": false,
+            "_closure": false
+          },
+          "f6b98dfe-3dc9-4bd2-a40d-23bcb365712d": {
+            "id": "f6b98dfe-3dc9-4bd2-a40d-23bcb365712d",
+            "number": "U2535/26",
+            "status": "upcoming",
+            "affected_fir": "RCAA",
+            "location_code": "RCAA",
+            "q_code": "QWULW",
+            "effective_start": "2026-10-12T16:00:00Z",
+            "effective_end": "2026-12-01T16:00:00Z",
+            "record_updated_at": "2026-10-05T04:31:24.267720Z",
+            "record_archived_at": null,
+            "_danger": false,
+            "_closure": false
+          },
+          "2dc73c1e-870b-4f21-a929-45ce9802302b": {
+            "id": "2dc73c1e-870b-4f21-a929-45ce9802302b",
+            "number": "U2546/26",
+            "status": "upcoming",
+            "affected_fir": "RCAA",
+            "location_code": "RCAA",
+            "q_code": "QWULW",
+            "effective_start": "2026-10-27T16:00:00Z",
+            "effective_end": "2027-01-22T16:00:00Z",
+            "record_updated_at": "2026-10-05T05:01:27.720012Z",
+            "record_archived_at": null,
+            "_danger": false,
+            "_closure": false
+          },
+          "fef86b64-996f-40c1-852d-48f55dcd9302": {
+            "id": "fef86b64-996f-40c1-852d-48f55dcd9302",
+            "number": "U2545/26",
+            "status": "upcoming",
+            "affected_fir": "RCAA",
+            "location_code": "RCAA",
+            "q_code": "QWULW",
+            "effective_start": "2026-10-27T16:00:00Z",
+            "effective_end": "2027-01-22T16:00:00Z",
+            "record_updated_at": "2026-10-05T05:01:27.720012Z",
+            "record_archived_at": null,
+            "_danger": false,
+            "_closure": false
+          },
+          "0cdedbfd-df1c-4581-8f52-6f46ced30314": {
+            "id": "0cdedbfd-df1c-4581-8f52-6f46ced30314",
+            "number": "U2550/26",
+            "status": "upcoming",
+            "affected_fir": "RCAA",
+            "location_code": "RCKW",
+            "q_code": "QWULW",
+            "effective_start": "2026-10-27T16:00:00Z",
+            "effective_end": "2027-01-22T16:00:00Z",
+            "record_updated_at": "2026-10-05T05:31:27.277677Z",
+            "record_archived_at": null,
+            "_danger": false,
+            "_closure": false
+          },
+          "13d8036e-d2a0-45e8-b8a2-2a76cd329adc": {
+            "id": "13d8036e-d2a0-45e8-b8a2-2a76cd329adc",
+            "number": "U2548/26",
+            "status": "upcoming",
+            "affected_fir": "RCAA",
+            "location_code": "RCAA",
+            "q_code": "QWULW",
+            "effective_start": "2026-10-27T16:00:00Z",
+            "effective_end": "2027-01-22T16:00:00Z",
+            "record_updated_at": "2026-10-05T05:31:27.277677Z",
+            "record_archived_at": null,
+            "_danger": false,
+            "_closure": false
+          },
+          "173c3394-fe49-4c9c-b161-d7986dfd37b9": {
+            "id": "173c3394-fe49-4c9c-b161-d7986dfd37b9",
+            "number": "U2547/26",
+            "status": "upcoming",
+            "affected_fir": "RCAA",
+            "location_code": "RCAA",
+            "q_code": "QWULW",
+            "effective_start": "2026-10-27T16:00:00Z",
+            "effective_end": "2027-01-22T16:00:00Z",
+            "record_updated_at": "2026-10-05T05:31:27.277677Z",
+            "record_archived_at": null,
+            "_danger": false,
+            "_closure": false
+          },
+          "457d8117-bda0-4b92-9940-f9760eedd5cf": {
+            "id": "457d8117-bda0-4b92-9940-f9760eedd5cf",
+            "number": "U2554/26",
+            "status": "upcoming",
+            "affected_fir": "RCAA",
+            "location_code": "RCAA",
+            "q_code": "QWULW",
+            "effective_start": "2026-10-27T16:00:00Z",
+            "effective_end": "2027-01-22T16:00:00Z",
+            "record_updated_at": "2026-10-05T05:31:27.277677Z",
+            "record_archived_at": null,
+            "_danger": false,
+            "_closure": false
+          },
+          "5f3401f4-67bd-49a9-a7e8-17b1256dc950": {
+            "id": "5f3401f4-67bd-49a9-a7e8-17b1256dc950",
+            "number": "U2549/26",
+            "status": "upcoming",
+            "affected_fir": "RCAA",
+            "location_code": "RCKW",
+            "q_code": "QWULW",
+            "effective_start": "2026-10-27T16:00:00Z",
+            "effective_end": "2027-01-22T16:00:00Z",
+            "record_updated_at": "2026-10-05T05:31:27.277677Z",
+            "record_archived_at": null,
+            "_danger": false,
+            "_closure": false
+          },
+          "990e5890-bb0b-42a7-81bc-bd4f5af98002": {
+            "id": "990e5890-bb0b-42a7-81bc-bd4f5af98002",
+            "number": "U2553/26",
+            "status": "upcoming",
+            "affected_fir": "RCAA",
+            "location_code": "RCNN",
+            "q_code": "QWULW",
+            "effective_start": "2026-10-27T16:00:00Z",
+            "effective_end": "2027-01-22T16:00:00Z",
+            "record_updated_at": "2026-10-05T05:31:27.277677Z",
+            "record_archived_at": null,
+            "_danger": false,
+            "_closure": false
+          },
+          "e383cacf-6d49-44b6-92b5-4d3e84157079": {
+            "id": "e383cacf-6d49-44b6-92b5-4d3e84157079",
+            "number": "U2552/26",
+            "status": "upcoming",
+            "affected_fir": "RCAA",
+            "location_code": "RCAA",
+            "q_code": "QWULW",
+            "effective_start": "2026-10-27T16:00:00Z",
+            "effective_end": "2027-01-22T16:00:00Z",
+            "record_updated_at": "2026-10-05T05:31:27.277677Z",
+            "record_archived_at": null,
+            "_danger": false,
+            "_closure": false
+          },
+          "e7463dc4-21f1-469b-a450-f582a3ba98fd": {
+            "id": "e7463dc4-21f1-469b-a450-f582a3ba98fd",
+            "number": "U2551/26",
+            "status": "upcoming",
+            "affected_fir": "RCAA",
+            "location_code": "RCAA",
+            "q_code": "QWULW",
+            "effective_start": "2026-10-27T16:00:00Z",
+            "effective_end": "2027-01-22T16:00:00Z",
+            "record_updated_at": "2026-10-05T05:31:27.277677Z",
+            "record_archived_at": null,
+            "_danger": false,
+            "_closure": false
           }
         },
-        "cursor": "djJ8ZGVsdGF8MjAyNi0xMC0wNVQwMzozMToyMi4zNTcwMTUrMDA6MDB8ZTQzZTQ4MTgtNmQ2Zi00MDYxLWIzYmQtMjlmOTIwYmNlYzA3",
+        "cursor": "djJ8ZGVsdGF8MjAyNi0xMC0wNVQwNTozMToyNy4yNzc2NzcrMDA6MDB8ZTc0NjNkYzQtMjFmMS00NjliLWE0NTAtZjU4MmEzYmE5OGZk",
         "tombstones": {
           "b9aff760-7fc5-4629-91ba-ac4ec6024979": "2026-09-28T01:30:03.677220Z",
           "f2d4a609-1d62-4e58-a72a-0518809c3c52": "2026-09-28T01:30:03.677220Z",
@@ -33992,37 +34072,233 @@
           "defe3ab9-ee9a-4020-839a-0f6da06e69b6": "2026-10-04T08:30:04.052468Z",
           "e5783fc9-0ddc-4d17-8169-dcafdc8a5869": "2026-10-04T08:30:04.052468Z",
           "58dbe4fd-8f06-4fc8-9db8-280bd46a9ed6": "2026-10-04T10:30:04.272730Z",
-          "a4717e31-90db-440c-b038-1d2fb53af56e": "2026-10-04T10:30:04.272730Z"
+          "a4717e31-90db-440c-b038-1d2fb53af56e": "2026-10-04T10:30:04.272730Z",
+          "ec962954-cfc0-46ae-86bc-86aea147756d": "2026-10-05T04:00:04.097224Z"
         },
-        "as_of": "2026-10-05T03:59:59.901972Z",
-        "caught_up_at": "2026-10-05T03:59:59.901972Z"
+        "as_of": "2026-10-05T05:57:13.319201Z",
+        "caught_up_at": "2026-10-05T05:57:13.319201Z"
       },
       "sync_budget": {
         "day": "2026-10-05",
         "month": "2026-10",
-        "day_calls": 2,
-        "month_calls": 43
+        "day_calls": 4,
+        "month_calls": 45
       },
-      "sample_count": 556,
+      "sample_count": 557,
       "partial": false,
-      "sample_observed_at": "2026-10-05T03:59:59.901972Z",
+      "sample_observed_at": "2026-10-05T05:57:13.319201Z",
       "sample_danger": 19,
       "sample_closure": 0,
       "sample_order": "cursor",
       "sample_timing": {
-        "current": 556,
+        "current": 557,
         "future": 0,
         "ended": 0,
         "unknown": 0
       },
-      "attempted_at": "2026-10-05T03:59:55.126792+00:00",
-      "observed_at": "2026-10-05T03:59:55.126792+00:00",
+      "attempted_at": "2026-10-05T05:57:09.394643+00:00",
+      "observed_at": "2026-10-05T05:57:09.394643+00:00",
       "stale": false,
       "danger": 19,
       "closure": false,
       "score": 100.0,
       "comparison": {
-        "observed_at": "2026-10-05T01:28:54.016683+00:00",
+        "observed_at": "2026-10-05T03:59:55.126792+00:00",
+        "total_change": 1
+      }
+    },
+    "korea": {
+      "provider": "NOTAC",
+      "firs": [
+        "ZKKP"
+      ],
+      "fetched_at": "2026-10-05T05:57:09.394643+00:00",
+      "protocol": "delta-v1",
+      "complete": true,
+      "available": true,
+      "total": 2,
+      "reported_count": 2,
+      "pages": 1,
+      "credits_remaining": 9346,
+      "reason": "complete_query",
+      "sync_state": {
+        "version": 1,
+        "firs": [
+          "ZKKP"
+        ],
+        "records": {
+          "eee3edc9-d390-4e20-9dab-9fbcf9c5b33a": {
+            "id": "eee3edc9-d390-4e20-9dab-9fbcf9c5b33a",
+            "number": "A0145/11",
+            "status": "active",
+            "affected_fir": "ZKKP",
+            "location_code": "ZKPY",
+            "q_code": "QOBCE",
+            "effective_start": "2011-11-30T00:53:00Z",
+            "effective_end": null,
+            "record_updated_at": "2026-07-22T16:56:52.530133Z",
+            "record_archived_at": null,
+            "_danger": false,
+            "_closure": false
+          },
+          "0164e7d8-9451-44db-a7ed-0d679bfdac62": {
+            "id": "0164e7d8-9451-44db-a7ed-0d679bfdac62",
+            "number": "A0099/14",
+            "status": "expired",
+            "affected_fir": "ZKKP",
+            "location_code": "ZKPY",
+            "q_code": "QFAHW",
+            "effective_start": "2014-10-01T00:00:00Z",
+            "effective_end": "2014-10-31T23:59:00Z",
+            "record_updated_at": "2026-07-22T16:56:52.530342Z",
+            "record_archived_at": null,
+            "_danger": false,
+            "_closure": false
+          },
+          "c05bc156-86e2-4fe1-85b4-82efa468aef1": {
+            "id": "c05bc156-86e2-4fe1-85b4-82efa468aef1",
+            "number": "A0101/14",
+            "status": "expired",
+            "affected_fir": "ZKKP",
+            "location_code": "ZKPY",
+            "q_code": "QMXLC",
+            "effective_start": "2014-10-01T00:00:00Z",
+            "effective_end": "2014-10-31T23:59:00Z",
+            "record_updated_at": "2026-07-22T16:56:52.530376Z",
+            "record_archived_at": null,
+            "_danger": true,
+            "_closure": false
+          },
+          "bf90d5b8-37cb-4eee-b9a9-5d5093051b31": {
+            "id": "bf90d5b8-37cb-4eee-b9a9-5d5093051b31",
+            "number": "A0103/14",
+            "status": "expired",
+            "affected_fir": "ZKKP",
+            "location_code": "ZKPY",
+            "q_code": "QMKLC",
+            "effective_start": "2014-10-01T00:00:00Z",
+            "effective_end": "2014-10-31T23:59:00Z",
+            "record_updated_at": "2026-07-22T16:56:52.530496Z",
+            "record_archived_at": null,
+            "_danger": true,
+            "_closure": false
+          },
+          "244c6ce8-0756-454f-aca1-71d3fd7a0514": {
+            "id": "244c6ce8-0756-454f-aca1-71d3fd7a0514",
+            "number": "A0050/09",
+            "status": "active",
+            "affected_fir": "ZKKP",
+            "location_code": "ZKKP",
+            "q_code": "QCBXX",
+            "effective_start": "2009-08-25T00:01:00Z",
+            "effective_end": null,
+            "record_updated_at": "2026-07-22T16:56:52.530655Z",
+            "record_archived_at": null,
+            "_danger": false,
+            "_closure": false
+          },
+          "a5dde0f4-7b2b-478a-b6bb-a243d10b5e4b": {
+            "id": "a5dde0f4-7b2b-478a-b6bb-a243d10b5e4b",
+            "number": "A0098/14",
+            "status": "expired",
+            "affected_fir": "ZKKP",
+            "location_code": "ZKPY",
+            "q_code": "QFAHW",
+            "effective_start": "2014-10-01T00:00:00Z",
+            "effective_end": "2014-10-31T23:59:00Z",
+            "record_updated_at": "2026-07-22T16:56:52.891682Z",
+            "record_archived_at": null,
+            "_danger": false,
+            "_closure": false
+          },
+          "bd1645a9-0068-4022-ad87-0a3e02aa9902": {
+            "id": "bd1645a9-0068-4022-ad87-0a3e02aa9902",
+            "number": "A0100/14",
+            "status": "expired",
+            "affected_fir": "ZKKP",
+            "location_code": "ZKPY",
+            "q_code": "QFAHX",
+            "effective_start": "2014-10-01T00:00:00Z",
+            "effective_end": "2014-10-31T23:59:00Z",
+            "record_updated_at": "2026-07-22T16:56:52.892169Z",
+            "record_archived_at": null,
+            "_danger": false,
+            "_closure": false
+          },
+          "fa1a48ec-cefa-496d-bb54-5d395311632e": {
+            "id": "fa1a48ec-cefa-496d-bb54-5d395311632e",
+            "number": "A0084/19",
+            "status": "expired",
+            "affected_fir": "ZKKP",
+            "location_code": "ZKPY",
+            "q_code": "QFAHX",
+            "effective_start": "2019-09-30T00:26:00Z",
+            "effective_end": "2019-10-31T23:59:00Z",
+            "record_updated_at": "2026-07-22T16:56:52.892224Z",
+            "record_archived_at": null,
+            "_danger": false,
+            "_closure": false
+          },
+          "08e3d90a-6b78-4673-8d9a-594669a86744": {
+            "id": "08e3d90a-6b78-4673-8d9a-594669a86744",
+            "number": "A0102/14",
+            "status": "expired",
+            "affected_fir": "ZKKP",
+            "location_code": "ZKPY",
+            "q_code": "QMXLC",
+            "effective_start": "2014-10-01T00:00:00Z",
+            "effective_end": "2014-10-31T23:59:00Z",
+            "record_updated_at": "2026-07-22T16:56:52.892653Z",
+            "record_archived_at": null,
+            "_danger": true,
+            "_closure": false
+          },
+          "3ef5380f-24ac-4ac8-928a-0f37372ac231": {
+            "id": "3ef5380f-24ac-4ac8-928a-0f37372ac231",
+            "number": "A0104/14",
+            "status": "expired",
+            "affected_fir": "ZKKP",
+            "location_code": "ZKPY",
+            "q_code": "QMKXX",
+            "effective_start": "2014-10-01T00:00:00Z",
+            "effective_end": "2014-10-31T23:59:00Z",
+            "record_updated_at": "2026-07-22T16:56:52.892831Z",
+            "record_archived_at": null,
+            "_danger": false,
+            "_closure": false
+          }
+        },
+        "cursor": "djJ8ZGVsdGF8MjAyNi0wNy0yMlQxNjo1Njo1Mi44OTI4MzErMDA6MDB8M2VmNTM4MGYtMjRhYy00YWM4LTkyOGEtMGYzNzM3MmFjMjMx",
+        "tombstones": {},
+        "as_of": "2026-10-05T05:57:14.263345Z",
+        "caught_up_at": "2026-10-05T05:57:14.263345Z"
+      },
+      "sync_budget": {
+        "day": "2026-10-05",
+        "month": "2026-10",
+        "day_calls": 3,
+        "month_calls": 42
+      },
+      "sample_count": 2,
+      "partial": false,
+      "sample_observed_at": "2026-10-05T05:57:14.263345Z",
+      "sample_danger": 0,
+      "sample_closure": 0,
+      "sample_order": "cursor",
+      "sample_timing": {
+        "current": 0,
+        "future": 0,
+        "ended": 0,
+        "unknown": 2
+      },
+      "attempted_at": "2026-10-05T05:57:09.394643+00:00",
+      "observed_at": "2026-10-05T05:57:09.394643+00:00",
+      "stale": false,
+      "danger": 0,
+      "closure": false,
+      "score": 0,
+      "comparison": {
+        "observed_at": "2026-10-05T03:59:55.126792+00:00",
         "total_change": 0
       }
     }
@@ -34072,39 +34348,9 @@
   },
   "bars": {
     "available": false,
-    "bars": [
-      {
-        "name": "Sine Irish Pub",
-        "live_available": false,
-        "live_busyness": null,
-        "error": true,
-        "http_status": 409
-      },
-      {
-        "name": "Freddie's Beach Bar",
-        "live_available": false,
-        "live_busyness": null,
-        "error": true,
-        "http_status": 409
-      },
-      {
-        "name": "Highline RxR",
-        "live_available": false,
-        "live_busyness": null,
-        "error": true,
-        "http_status": 409
-      },
-      {
-        "name": "Ireland's Four Courts",
-        "live_available": false,
-        "live_busyness": null,
-        "error": true,
-        "http_status": 409
-      }
-    ],
-    "open_count": 0,
-    "total": 4,
-    "reason": "來源請求或回應失敗；請檢查帳號權限及場地覆蓋"
+    "reason": "非下班時段（僅美東 16–24 時查詢）",
+    "et_hour": 1,
+    "bars": []
   },
   "regions": [
     {
@@ -34116,11 +34362,11 @@
       "coverage": 0.5,
       "model_version": "wpi-4.0",
       "factors": {
-        "poly": 57.4,
+        "poly": 57.5,
         "notam": 0,
         "notam_danger": 0,
         "notam_closure": false,
-        "firms_hotspots": 154,
+        "firms_hotspots": 102,
         "avi_count": 6
       },
       "top_market": "Ukraine signs peace deal with Russia before 2027?"
@@ -34136,10 +34382,10 @@
       "factors": {
         "poly": 16.4,
         "notam": 100.0,
-        "notam_danger": 49,
+        "notam_danger": 53,
         "notam_closure": false,
-        "firms_hotspots": 526,
-        "avi_count": 2
+        "firms_hotspots": 397,
+        "avi_count": 4
       },
       "top_market": "Will the U.S. invade Iran before 2027?"
     },
@@ -34157,7 +34403,7 @@
         "notam_danger": 19,
         "notam_closure": false,
         "firms_hotspots": 0,
-        "avi_count": 1
+        "avi_count": 0
       },
       "top_market": "China x Taiwan military clash before 2027?"
     },
@@ -34167,16 +34413,17 @@
       "flag": "🇰🇵",
       "score": null,
       "level": "INSUFFICIENT_DATA",
-      "coverage": 0.15,
+      "coverage": 0.5,
       "model_version": "wpi-4.0",
       "factors": {
+        "poly": 2.1,
         "notam": 0,
         "notam_danger": 0,
         "notam_closure": false,
-        "firms_hotspots": 6,
-        "avi_count": 1
+        "firms_hotspots": 3,
+        "avi_count": 0
       },
-      "top_market": null
+      "top_market": "Will North Korea invade South Korea before 2027?"
     },
     {
       "key": "southsea",
@@ -34189,10 +34436,10 @@
       "factors": {
         "poly": 25.5,
         "notam": 100.0,
-        "notam_danger": 26,
+        "notam_danger": 25,
         "notam_closure": false,
         "firms_hotspots": 0,
-        "avi_count": 1
+        "avi_count": 0
       },
       "top_market": "China x Philippines military clash before 2027?"
     }
@@ -34212,7 +34459,7 @@
   },
   "taiwan_insight": {
     "version": 1,
-    "as_of": "2026-10-05T04:00:11.497700+00:00",
+    "as_of": "2026-10-05T05:57:44.917101+00:00",
     "activity": {
       "status": "within_baseline",
       "latest": {
@@ -34256,31 +34503,31 @@
         "question_zh": "中國會在 2027 年 12 月 31 日之前入侵台灣嗎？",
         "end_date": "2028-01-01T04:59:00Z",
         "yes_price": 0.115,
-        "volume": 3383074.0417529996,
+        "volume": 3383106.626016,
         "slug": "will-china-invade-taiwan-by-december-31-2027",
         "yes_percent": 11.5,
         "delta_pp": 0.0,
-        "comparison_at": "2026-10-04T03:45:13.016075+00:00",
-        "comparison_hours": 24.2
+        "comparison_at": "2026-10-04T06:16:38.350600+00:00",
+        "comparison_hours": 23.7
       },
       {
         "id": "0x96498c10c79ecaafa2bbb92ada36c7ff617913b03d9220f8c95ce7d6776a0b0c",
         "question": "Will China blockade Taiwan in 2026?",
         "question_zh": "2026年中國會封鎖台灣嗎？",
         "end_date": "2027-01-01T04:59:00Z",
-        "yes_price": 0.039,
-        "volume": 405009.24758599995,
+        "yes_price": 0.0385,
+        "volume": 405050.82762799994,
         "slug": "will-china-blockade-taiwan-by-in-2026",
-        "yes_percent": 3.9,
-        "delta_pp": 0.65,
-        "comparison_at": "2026-10-04T03:45:13.016075+00:00",
-        "comparison_hours": 24.2
+        "yes_percent": 3.85,
+        "delta_pp": 0.7,
+        "comparison_at": "2026-10-04T06:16:38.350600+00:00",
+        "comparison_hours": 23.7
       }
     ],
     "news": {
       "input_status": "available",
-      "sample_24h": 23,
-      "publishers_24h": 14,
+      "sample_24h": 21,
+      "publishers_24h": 13,
       "latest_at": "2026-10-05T03:35:52+00:00"
     },
     "timeline": [
@@ -34290,6 +34537,14 @@
         "title": "美財長：Kimi上傳共軍武器計畫到Anthropic 讓中國驚覺AI開源模型威力",
         "title_english": "US Treasury Secretary: Kimi Uploaded Chinese Military Weapon Plan to Anthropic, China Realizes Power of AI Open-Source Models",
         "url": "https://news.google.com/rss/articles/CBMi_gJBVV95cUxNRzdDeEpOWElMZlpCV3BDS19rSVVSS1EyVU5ianRxUmZrZmVIcUpnZWVKUDlNTGNWT1N0aDAyYS1lLU1zQlBNTXZfYXB3OS1sN0Z6TjcwZjktUXY5XzdaNzY5VUhDS2xMRVhLaHRZbWYtcGpEZXRJVjBSa3Rmc1hILXlHV2paUlMxOUhiVnF3NFp1YUZOcUFmQVpUNGhoYllMdTlMRnlKazU5QWdISWF3ZjJTMEVyaDhpYk4xSjZSXzBWaF9uRnBXeG0tSlhiakUxWWIwaTVFYm5OaWJaVGx5OUtFbjRVNzh4aEl0ek5WclN4RllZQWNnZkY1dFhXcUNNRnVwODdOQ1BKYUVrUlprSUVjeDdxQmZoTmdkbDA2YmxaRm1TMThUcGVfcV9HWVBOMnlZUWlZVFFOdjhxRTlmREl2SlpwTjcwNDJwZjBsWVFZTnJkQ0E1X0k1NjRpc0N0ZVlPUV9fUWczaUNTeUhyWXYtdTViN2JtLUw1Qkt3?oc=5",
+        "time_label": "新聞發稿時間"
+      },
+      {
+        "kind": "news",
+        "at": "2026-10-05T03:32:11+00:00",
+        "title": "美財長：中國驚覺AI開源模型威力 因Kimi上傳共軍武器計畫到Anthropic",
+        "title_english": "US Treasury Secretary: China is shocked by the power of AI open-source models because Kimi uploaded a Communist military weapons plan to Anthropic",
+        "url": "https://news.google.com/rss/articles/CBMidEFVX3lxTE9na18zb0h4RDg4VzJtdHZwbmx4VVhER1lheWVheEl0NnZPZS1admJzMjRxN3FpaDZHQ3hkVXJVbWhUZzB4YlBjaGFqa2VKMGlFUFBQR3FKaVplRzAwU0VJNEJWRzhRaEFLWllXZzlCTzZtUy1F?oc=5",
         "time_label": "新聞發稿時間"
       },
       {
@@ -34434,14 +34689,6 @@
         "title": "旺報社評》台海降壓 台灣政治也該翻頁",
         "title_english": "Wangbao Editorial: Tensions in the Taiwan Strait Ease, Taiwan Politics Should Also Turn a Page",
         "url": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTE0wb0NGbGJGVDhub3lJcEV3aVdrZDJtc01UWHdQNzJCYlN3ZmVmX0F2M250dS1RZk94YUktU1hDU01rR1ZVVEI5RVczMTg2RW1VUjhNR3JITmFsTkp0MjlxN3B2RHhZQUE?oc=5",
-        "time_label": "新聞發稿時間"
-      },
-      {
-        "kind": "news",
-        "at": "2026-10-04T07:56:08+00:00",
-        "title": "地獄景象是什麼？美軍台海無人機戰略Hellscape的爭議與最新進展【持續更新】",
-        "title_english": "What Is Hellscape? The Controversy and Latest Developments of the U.S. Military Taiwan Strait UAV Strategy Hellscape【Continuously Updated】",
-        "url": "https://news.google.com/rss/articles/CBMisgNBVV95cUxNbFpaWDY2MlAtc282bTVraGVfaTJ1MmFJZTBFT29ac0UwaDFDUDRqcHRtWDh2Q016cmNBUmxoc2lqVXlSQ0NTQkdjWkU0VUttYUpPMF9EOHQ3UHlocldodzBQQnBreEZpM2gtRVh0TFJ1YkVueXJqd3ZjSGRWQUFSREU2dFk0S0M5aWxpeTQyQ2RHcFcxMFliTUhMSnhGZEx2dXN1elBSYkpXd21idGtIT3JBNmx4aUNMU0s3U3lDRGJyYXR6bXlIS0hEV01sMzlhVDFNZHB5dnYtN1ZwR2dpSzVacmhfR2ZXN19RSjVlY083UGlFd09ONktyZ19VRGg5ZkNUZF9fSl9DUmxlclpDS2VJcW5NTzVDeWN1N2tMWXhtUjR2WFIxV05SdURvZGU0QzlPRzk5VnFQNjdVV1ZIZWRkMGJKSWtEQVl3V1RXdGZyTkZ6Z3l1M2V4c2hOMG84QlQ2SEhJZHp1TG1pSXV3NXhxbmNjTzJLU21MY2tPMm9BM0lVdWt5akVqNmFtQ3ZIbzZONUFFdm1UNnB6azB5LWVEaFJaTzNJYnA1MFVXbkFzQQ?oc=5",
         "time_label": "新聞發稿時間"
       }
     ],
@@ -36533,6 +36780,38 @@
             "slug": "will-china-blockade-taiwan-by-in-2026"
           }
         ]
+      },
+      {
+        "at": "2026-10-05T05:57:44.917101+00:00",
+        "markets": [
+          {
+            "id": "0x4c80df6f557bb0b9de08c0301ebdce500dd9bdc58400d9269fb8fab1709ed584",
+            "question": "China x Taiwan military clash before 2027?",
+            "question_zh": "2027年前中國與台灣發生軍事衝突？",
+            "end_date": "2027-01-01T04:59:00Z",
+            "yes_price": 0.0455,
+            "volume": 3449073.368412,
+            "slug": "china-x-taiwan-military-clash-before-2027"
+          },
+          {
+            "id": "0xe6d5e5da83874cd82c9b651a8a5d4fc541a800a295fb62e85124b4f5a04a4b7d",
+            "question": "Will China invade Taiwan by December 31, 2027?",
+            "question_zh": "中國會在 2027 年 12 月 31 日之前入侵台灣嗎？",
+            "end_date": "2028-01-01T04:59:00Z",
+            "yes_price": 0.115,
+            "volume": 3383106.626016,
+            "slug": "will-china-invade-taiwan-by-december-31-2027"
+          },
+          {
+            "id": "0x96498c10c79ecaafa2bbb92ada36c7ff617913b03d9220f8c95ce7d6776a0b0c",
+            "question": "Will China blockade Taiwan in 2026?",
+            "question_zh": "2026年中國會封鎖台灣嗎？",
+            "end_date": "2027-01-01T04:59:00Z",
+            "yes_price": 0.0385,
+            "volume": 405050.82762799994,
+            "slug": "will-china-blockade-taiwan-by-in-2026"
+          }
+        ]
       }
     ],
     "news_observations": [
@@ -36543,6 +36822,14 @@
         "domain": "Yahoo新聞",
         "ts": "2026-10-05T03:35:52+00:00",
         "title_english": "US Treasury Secretary: Kimi Uploaded Chinese Military Weapon Plan to Anthropic, China Realizes Power of AI Open-Source Models"
+      },
+      {
+        "title": "美財長：中國驚覺AI開源模型威力 因Kimi上傳共軍武器計畫到Anthropic",
+        "title_zh": null,
+        "url": "https://news.google.com/rss/articles/CBMidEFVX3lxTE9na18zb0h4RDg4VzJtdHZwbmx4VVhER1lheWVheEl0NnZPZS1admJzMjRxN3FpaDZHQ3hkVXJVbWhUZzB4YlBjaGFqa2VKMGlFUFBQR3FKaVplRzAwU0VJNEJWRzhRaEFLWllXZzlCTzZtUy1F?oc=5",
+        "domain": "LINE TODAY",
+        "ts": "2026-10-05T03:32:11+00:00",
+        "title_english": "US Treasury Secretary: China is shocked by the power of AI open-source models because Kimi uploaded a Communist military weapons plan to Anthropic"
       },
       {
         "title": "今日無共機擾台 8艘次共艦在台海周邊活動",
@@ -37484,14 +37771,6 @@
         "domain": "Yahoo新聞",
         "ts": "2026-09-30T07:33:22+00:00",
         "title_english": "South China Sea Conflict Escalates; Li Dazhong: Liberation Army Police Coordination Upgraded, Normalized Control"
-      },
-      {
-        "title": "中共又搞事！十一前夕「大陣仗軍機擾台」 最新情況曝光",
-        "title_zh": null,
-        "url": "https://news.google.com/rss/articles/CBMi1AJBVV95cUxPaUpZOWxPcnRlUUVlNGlCLXdxNDNhQU5BUi1QdXR1bkFxMU1tNjFNdHdnV09LZGkzaEYzVkRyMXc2czRxTkpMRkZEODZyNjZVM1czaFV6cmkxMEhfWlIwc0Z1MUtTb0t4WER0ZURyb04zTzJYOVltbTFmTWRxR054eV9ZYW13UkhvRjNEMml2WUM2VFU0YllvLUd6VzFySzhEUFlkVnpVa2Z3VkxrMV83dzk1b2RRaWRrMG9OOTVTYS1WZ3ZWUnUxVnJEbFl2TmdWRERPYjNXXzZ5b2VNMENyOEE0Um1Nc09ocEpQb1RYU2hNSDRITmJJSW5iams3S1o4bVpQRW9SbDBGNkRENkpQN1B1X0YwVFV0eEhaYmJLMVc1eEVKZlpUeDdQSGFuUk1PMEFRcVBDV1FMMTNGX3FTSTFuRXV2RFdldWktaHlpbTB1Rk14?oc=5",
-        "domain": "Yahoo新聞",
-        "ts": "2026-09-30T07:06:25+00:00",
-        "title_english": "China Causes Trouble Again! On the Eve of the 11th, 'Massive Air Force Disrupts Taiwan' Latest Situation Exposed"
       }
     ]
   },
@@ -37505,7 +37784,7 @@
     "pizza": {
       "label": "PizzINT",
       "status": "unavailable",
-      "observed_at": "2026-10-05T02:00:00.000Z",
+      "observed_at": "2026-10-05T05:00:00.000Z",
       "note": "0 店有即時人流；未觀測不等同已打烊"
     },
     "polymarket": {
@@ -37523,7 +37802,7 @@
     "firms": {
       "label": "NASA FIRMS",
       "status": "available",
-      "observed_at": "2026-10-04T23:41:00Z",
+      "observed_at": "2026-10-05T03:45:00Z",
       "note": ""
     },
     "gdelt": {
@@ -37578,39 +37857,39 @@
       "label": "Comtrade 糧食",
       "status": "partial",
       "observed_at": "2026-10-04T22:57:34.889287+00:00",
-      "note": "觀測期間：2026-07；與抓取時間不同；本輪沿用慢資料，未重新查詢，原觀測時間不變"
+      "note": "觀測期間：2026-07；與抓取時間不同；沿用22小時來源快取，未重新查詢，原取得時間不變"
     },
     "strat": {
       "label": "Comtrade 物資",
       "status": "partial",
       "observed_at": "2026-10-04T08:35:39.723355+00:00",
-      "note": "觀測期間：2026-08；與抓取時間不同；沿用22小時來源快取，未重新查詢，原取得時間不變；本輪沿用慢資料，未重新查詢，原觀測時間不變"
+      "note": "觀測期間：2026-08；與抓取時間不同；沿用22小時來源快取，未重新查詢，原取得時間不變"
     },
     "usda": {
       "label": "USDA ESR",
       "status": "partial",
-      "observed_at": "2026-10-04T22:57:37.680684+00:00",
-      "note": "觀測期間：2026-09-24；與抓取時間不同；本輪沿用慢資料，未重新查詢，原觀測時間不變"
+      "observed_at": "2026-10-05T05:57:12.365792+00:00",
+      "note": "觀測期間：2026-09-24；與抓取時間不同"
     },
     "bars": {
       "label": "BestTime",
       "status": "unavailable",
       "observed_at": null,
-      "note": "來源請求或回應失敗；請檢查帳號權限及場地覆蓋"
+      "note": "非下班時段（僅美東 16–24 時查詢）"
     },
     "fred": {
       "label": "FRED",
       "status": "available",
       "observed_at": "2026-10-01",
-      "note": "官方觀測日：2026-10-01；本輪沿用慢資料，未重新查詢，原觀測時間不變"
+      "note": "官方觀測日：2026-10-01"
     }
   },
   "pizza_backtest": {
     "version": "pizza-48h-v1",
-    "as_of": "2026-10-05T04:00:11.497700+00:00",
-    "observations": 185,
+    "as_of": "2026-10-05T05:57:44.917101+00:00",
+    "observations": 186,
     "first_at": "2026-09-11T09:38:46.471173+00:00",
-    "last_at": "2026-10-05T04:00:11.497700+00:00",
+    "last_at": "2026-10-05T05:57:44.917101+00:00",
     "groups": {
       "3": {
         "threshold": 3,
@@ -37823,22 +38102,22 @@
     ]
   },
   "_notify": {
-    "bucket": 497543,
-    "level": "INSUFFICIENT_DATA",
+    "bucket": 497549,
+    "level": "LOW",
     "pizza_extreme": false,
-    "hotspots": 461,
+    "hotspots": 502,
     "hotspot_counter_version": 2,
-    "digest_snapshot_at": "2026-10-04T23:01:58.843978+00:00",
-    "digest_success_at": "2026-10-04T23:19:09.053738+00:00",
+    "digest_snapshot_at": "2026-10-05T05:57:44.917101+00:00",
+    "digest_success_at": "2026-10-05T05:57:47.921064+00:00",
     "digest_receipts": {
       "cde273581399382baf070aa308d9f34cc3f9f5e52d79108d56d3358b8e55acac": true,
       "93904c1d1cddd51347c917a536caa16bf08fd38c60ade385b934cd7e97b4a398": true
     },
-    "digest_attempt_bucket": 497543,
+    "digest_attempt_bucket": 497549,
     "telegram_retry_at": 0,
     "delivery_version": 1,
     "delivery": {
-      "checked_at": "2026-10-04T23:19:09.053738+00:00",
+      "checked_at": "2026-10-05T05:57:47.921064+00:00",
       "alerts": {},
       "digest": {
         "cde273581399382baf070aa308d9f34cc3f9f5e52d79108d56d3358b8e55acac": true,
