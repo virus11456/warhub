@@ -27,3 +27,16 @@ class UIAssets(unittest.TestCase):
         with self.assertRaises(ValueError):restore('仍是中文',[])
         with self.assertRaises(ValueError):restore('[[N0]] notices, 100 confirmed', ['40'])
         with self.assertRaises(ValueError):restore(' ', [])
+
+
+class PixelIconSprite(unittest.TestCase):
+    def test_icons_use_merged_paths_not_per_pixel_rects(self):
+        import re
+        html=(Path(__file__).resolve().parents[1]/'index.html').read_text(encoding='utf-8')
+        sprite=next(line for line in html.split('\n') if '<symbol id="ic-' in line)
+        symbols=re.findall(r'<symbol id="ic-([^"]+)"[^>]*>(.*?)</symbol>',sprite)
+        self.assertGreaterEqual(len(symbols),50)
+        for name,body in symbols:
+            self.assertNotIn('<rect',body,name)
+            self.assertRegex(body,r'^(<path fill="#[0-9a-f]{6}" d="(M\d+ \d+h\d+v\d+h-\d+z)+"/>)+$',name)
+        self.assertLess(len(sprite.encode()),30000)
