@@ -3858,22 +3858,44 @@ function drawMetricsHist(){
   }
   var span=(maxV-minV)||1;
   function Y(v){ return padT+(H-padT-padB)*(1-(v-minV)/span); }
-  var n=pts.length, slot=(W-padL-padR)/Math.max(n,1);
+  // 群聚改用日曆軸：缺紀錄日保留空位並標示，不補零、不把前後日期接在一起。
+  var slots=pts, missing=0;
+  if(isCluster){
+    var byD={}; pts.forEach(function(pt){byD[pt.d]=pt.v;}); slots=[];
+    for(var cur=new Date(pts[0].d+'T00:00:00Z'), endD=pts[pts.length-1].d; ; cur.setUTCDate(cur.getUTCDate()+1)){
+      var dd=cur.toISOString().slice(0,10); slots.push({d:dd,v:(dd in byD)?byD[dd]:null});
+      if(dd>=endD||slots.length>800) break;
+    }
+    missing=slots.filter(function(x){return x.v==null;}).length;
+  }
+  var n=slots.length, slot=(W-padL-padR)/Math.max(n,1);
   function CX(i){ return n<=1?(padL+(W-padL-padR)/2):(padL+slot*(i+0.5)); }
   // grid + y labels
-  for(var g=0;g<=4;g++){ var gy=padT+(H-padT-padB)*g/4, gv=maxV-(span*g/4);
+  var gridN=isCluster?6:4;
+  for(var g=0;g<=gridN;g++){ var gy=padT+(H-padT-padB)*g/gridN, gv=maxV-(span*g/gridN);
     p.push('<line class="fh-svg-grid" x1="'+padL+'" y1="'+gy+'" x2="'+(W-padR)+'" y2="'+gy+'"/>');
     p.push('<text class="fh-svg-axis" x="'+(padL-6)+'" y="'+(gy+4)+'" text-anchor="end">'+(isCluster?Math.round(gv):(+gv).toFixed(gv<10?1:0))+'</text>');
   }
   // x labels: first & last
-  p.push('<text class="fh-svg-axis" x="'+CX(0)+'" y="'+(H-8)+'" text-anchor="middle">'+pts[0].d.slice(5)+'</text>');
-  if(n>1) p.push('<text class="fh-svg-axis" x="'+CX(n-1)+'" y="'+(H-8)+'" text-anchor="middle">'+pts[n-1].d.slice(5)+'</text>');
+  p.push('<text class="fh-svg-axis" x="'+CX(0)+'" y="'+(H-8)+'" text-anchor="middle">'+slots[0].d.slice(5)+'</text>');
+  if(n>1) p.push('<text class="fh-svg-axis" x="'+CX(n-1)+'" y="'+(H-8)+'" text-anchor="middle">'+slots[n-1].d.slice(5)+'</text>');
   var hit=[];
   if(isCluster){
     var y0=Y(0), bw=Math.max(2,Math.min(26,slot*0.7));
-    pts.forEach(function(pt,i){
+    slots.forEach(function(pt,i){
+      var cx=CX(i);
+      if(pt.v==null){
+        p.push('<rect class="md-missing" x="'+(cx-bw/2).toFixed(1)+'" y="'+(y0-6).toFixed(1)+'" width="'+bw.toFixed(1)+'" height="6" fill="none" stroke="var(--text-dim)" stroke-dasharray="2 2" opacity=".6"></rect>');
+        hit.push('<rect x="'+(cx-slot/2).toFixed(1)+'" y="'+padT+'" width="'+slot.toFixed(1)+'" height="'+(y0-padT).toFixed(1)+'" fill="transparent" data-tip="<b>'+pt.d+'</b><br>無紀錄或六類不完整（不補零）"></rect>');
+        return;
+      }
+      if(pt.v===0){
+        p.push('<rect class="md-zero" x="'+(cx-bw/2).toFixed(1)+'" y="'+(y0-3).toFixed(1)+'" width="'+bw.toFixed(1)+'" height="3" fill="var(--accent)" opacity=".45"></rect>');
+        hit.push('<rect x="'+(cx-slot/2).toFixed(1)+'" y="'+padT+'" width="'+slot.toFixed(1)+'" height="'+(y0-padT).toFixed(1)+'" fill="transparent" data-tip="<b>'+pt.d+'</b><br>避險群聚 0 / 6（六類皆未觸發）"></rect>');
+        return;
+      }
       var lvl=pt.v, col= lvl>=5?'#ff3b30': lvl>=4?'#ff7a18': lvl>=2?'var(--accent3)':'var(--accent)';
-      var by=Y(lvl), h=Math.max(0,y0-by), cx=CX(i);
+      var by=Y(lvl), h=Math.max(0,y0-by);
       p.push('<rect x="'+(cx-bw/2).toFixed(1)+'" y="'+by.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+h.toFixed(1)+'" fill="'+col+'" opacity=".85"></rect>');
       hit.push('<rect x="'+(cx-slot/2).toFixed(1)+'" y="'+padT+'" width="'+slot.toFixed(1)+'" height="'+(y0-padT).toFixed(1)+'" fill="transparent" data-tip="<b>'+pt.d+'</b><br>避險群聚 '+lvl+' / 6"></rect>');
     });
@@ -3887,7 +3909,7 @@ function drawMetricsHist(){
   }
   svg.innerHTML=p.concat(hit).join('');
   var leg=document.getElementById('md-legend');
-  if(leg) leg.innerHTML='<b style="color:var(--accent)">'+_mdLabel(key)+'</b>　'+(MD_DESC[key]||'')+'　·　資料點：'+n+' 天'+explanation;
+  if(leg) leg.innerHTML='<b style="color:var(--accent)">'+_mdLabel(key)+'</b>　'+(MD_DESC[key]||'')+'　·　資料點：'+pts.length+' 天'+(isCluster?'　·　矮條＝0（六類皆未觸發）；虛線框＝缺紀錄 '+missing+' 天，不補零':'')+explanation;
 }
 function _mdLabel(key){ for(var i=0;i<MD_KEYS.length;i++) if(MD_KEYS[i][0]===key) return MD_KEYS[i][1].replace('🔴 ',''); return key; }
 

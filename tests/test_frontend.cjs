@@ -335,6 +335,15 @@ if(mode==='valid'){
  d.querySelector('#md-range [data-months="12"]').click();
  assert.equal(w.MD_STATE.months,12);assert.equal(d.querySelectorAll('#md-svg circle').length,3);
  assert.equal(JSON.stringify(ds),saved);
+ // Cluster: valid zero stays visible, missing calendar days are marked (not zero), axis ticks are integers.
+ const cd=new Date(win.end+'T00:00:00Z'),day=k=>{const x=new Date(cd);x.setUTCDate(x.getUTCDate()-k);return x.toISOString().slice(0,10);};
+ const cs={};cs[day(4)]={fin:{risk_off_cluster:2,risk_off_observed:6}};cs[day(3)]={fin:{risk_off_cluster:0,risk_off_observed:6}};
+ cs[day(0)]={fin:{risk_off_cluster:1,risk_off_observed:6}};
+ w.MD_JSON={days:cs};w.MD_STATE={key:'cluster',months:1};w.renderMetricsHist();
+ assert.equal(d.querySelectorAll('#md-svg rect.md-zero').length,1);
+ assert.equal(d.querySelectorAll('#md-svg rect.md-missing').length,2);
+ assert.ok(d.querySelector('#md-legend').textContent.includes('缺紀錄 2 天'));
+ assert.deepEqual([...d.querySelectorAll('#md-svg text.fh-svg-axis')].map(t=>t.textContent).filter(t=>/^\d+$/.test(t)),['6','5','4','3','2','1','0']);
 }
 assert.equal(result.wpi,mode==='valid'?'42':'--');dom.window.close();
 }})().catch(e=>{console.error(e);process.exit(1)});
