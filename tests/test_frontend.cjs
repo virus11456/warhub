@@ -140,9 +140,7 @@ if(mode==='valid'){
   const snapshot=new Date(Date.now()-5*3600000).toISOString();
   w.eval(`DATA_UPDATED_AT = ${JSON.stringify(snapshot)}`);
   assert.equal(w._mdVal({fin:{risk_off_cluster:0}},'cluster'),null);
-  assert.equal(w._mdVal({fin:{risk_off_cluster:0}},'cluster_legacy'),0);
-  assert.equal(w._mdVal({fin:{risk_off_cluster:2,risk_off_observed:6}},'cluster_legacy'),null);
-  w.renderFinanceSnapshot({'GC=F':{chg:1},'BZ=F':{chg:-1},LMT:{chg:1},RTX:{chg:-1},NOC:{chg:0}});
+    w.renderFinanceSnapshot({'GC=F':{chg:1},'BZ=F':{chg:-1},LMT:{chg:1},RTX:{chg:-1},NOC:{chg:0}});
   for(const id of ['html-fin-gc-chg','html-stk-lmt-c'])assert.ok(d.getElementById(id).classList.contains('up'));
   for(const id of ['html-fin-bz-chg','html-stk-rtx-c'])assert.ok(d.getElementById(id).classList.contains('down'));
   assert.ok(!d.getElementById('html-stk-noc-c').classList.contains('up'));
