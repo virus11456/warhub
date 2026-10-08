@@ -8,7 +8,9 @@ import xml.etree.ElementTree as ET
 QUERIES = {
     'ukraine': '(Ukraine OR Russia OR Kyiv) (war OR military OR ceasefire OR missile)',
     'mideast': '(Iran OR Israel OR Gaza OR Lebanon) (war OR military OR ceasefire OR missile)',
-    'taiwan': '(Taiwan OR "Taiwan Strait") (military OR exercise OR blockade OR aircraft)',
+    # 2026-10-08: widened after live RSS gave ~5 items/24h; place names plus drills/warship/coast guard (~21/24h).
+    'taiwan': ('(Taiwan OR "Taiwan Strait" OR Taipei OR Kinmen OR Matsu) '
+               '(military OR exercise OR drills OR blockade OR aircraft OR warship OR "coast guard" OR invasion OR defense)'),
     'korea': '("North Korea" OR "South Korea") (military OR missile OR nuclear OR exercise)',
     'southsea': '("South China Sea" OR Philippines OR Scarborough) (military OR coast guard OR clash)',
 }
