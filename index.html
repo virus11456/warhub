@@ -1133,10 +1133,6 @@
   .wpi-f-name     { font-size: .74rem; }
   .wpi-f-desc     { font-size: .68rem; }
   .wpi-f-wt       { font-size: .64rem; }
-  .wpi-al-name    { font-size: .76rem; }
-  .wpi-al-cond    { font-size: .66rem; }
-  .wpi-al-sub     { font-size: .66rem; }
-  .wpi-al-title   { font-size: .68rem; }
   .wpi-formula    { font-size: .66rem; }
   .wpi-num-lbl    { font-size: .68rem; }
   .wpi-scale      { font-size: .66rem; }
@@ -1206,11 +1202,6 @@
     .wpi-f-wt    { font-size: .6rem; }
 
     /* WPI 右欄的「各地區風險」迷你列與頂部 hero、下方看板重複 → 手機隱藏 */
-    .wpi-mini-regions { display: none; }
-    /* 未驗證組合假說改雙欄，較不佔高 */
-    .wpi-alerts { display: block; }
-    .wpi-al-sub { display: none; }
-    .wpi-al-item { padding: .45rem .55rem; }
 
     /* 地區看板卡片緊湊 */
     #region-board { grid-template-columns: minmax(0, 1fr) !important; }
@@ -1221,7 +1212,6 @@
     .alert-hdr-sub { display: none; }
 
     /* 趨勢圖高度壓縮 */
-    #trend-chart svg { max-height: 150px; }
   }
 
   @media (max-width: 400px) {
@@ -1388,7 +1378,7 @@
 </div>
 
 <div class="container">
-  <details open id="experimental-observations" style="margin:1.5rem 0;border:1px solid var(--border);padding:1rem">
+  <details id="experimental-observations" style="margin:1.5rem 0;border:1px solid var(--border);padding:1rem">
     <summary style="cursor:pointer;color:var(--text)">主要看板｜WPI、披薩與酒吧</summary>
     <p style="color:var(--text-dim);line-height:1.8">以下模型未經預測能力回測，不用來觸發戰情警報。保留原有公式、數值及歷史供研究；人流不等於訂單，也不能證實軍方加班或行動。</p>
   <!-- ══════════ 戰情摘要（指揮中心）══════════ -->
@@ -1606,31 +1596,6 @@
         <div class="wpi-formula">WPI = 有效因子加權總和 ÷ 有效權重總和；覆蓋至少 60% 且至少 3 個有效因子才出分</div>
       </div>
 
-      <!-- 右：三級警戒 + 地區熱度 -->
-      <div class="wpi-alerts">
-        <div class="wpi-al-title">未驗證組合假說</div>
-        <div class="wpi-al-item" id="html-wpi-al-low">
-          <div class="wpi-al-dot low"></div>
-          <div><div class="wpi-al-name">組合一</div><div class="wpi-al-cond">僅 Polymarket 波動</div><div class="wpi-al-sub">單一市場變動不足以判斷情勢</div></div>
-          <div class="wpi-al-status" id="html-wpi-al-low-st">—</div>
-        </div>
-        <div class="wpi-al-item" id="html-wpi-al-med">
-          <div class="wpi-al-dot med"></div>
-          <div><div class="wpi-al-name">組合二</div><div class="wpi-al-cond">市場波動 + 披薩指數上升</div><div class="wpi-al-sub">不能推論軍方加班</div></div>
-          <div class="wpi-al-status" id="html-wpi-al-med-st">—</div>
-        </div>
-        <div class="wpi-al-item" id="html-wpi-al-high">
-          <div class="wpi-al-dot high"></div>
-          <div><div class="wpi-al-name">組合三</div><div class="wpi-al-cond">以上皆有 + 大量加油機</div><div class="wpi-al-sub">多源訊號同時變動，需查證原因</div></div>
-          <div class="wpi-al-status" id="html-wpi-al-high-st">—</div>
-        </div>
-        <div class="wpi-mini-regions">
-          <div class="wpi-al-title" style="margin-top:1rem">各地區風險（即時計算）</div>
-          <div id="region-mini-list" style="display:flex;flex-direction:column;gap:.3rem">
-            <div style="font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim)">⏳ 載入地區風險資料…</div>
-          </div>
-        </div>
-      </div>
     </div>
 
     <div class="wpi-footer">
@@ -1683,14 +1648,6 @@
       觀測分數依有效來源加權（市場 35、新聞 25、領空 15），缺值不補零。資料未達原模型門檻時顯示暫定分數；單一來源只代表該項觀察，不代表地區整體風險或開戰機率。暫定分數不寫入歷史、不顯示升降箭頭。
     </div>
 
-    <!-- 7 天風險趨勢圖 -->
-    <div style="margin-top:1rem;border-top:1px solid var(--border);padding-top:.8rem">
-      <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:.5rem">
-        <div style="font-family:'Orbitron',monospace;font-size:.66rem;letter-spacing:2px;color:var(--text-dim)">📈 風險趨勢（7 天）</div>
-        <div id="trend-legend" style="display:flex;gap:.9rem;font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim)"></div>
-      </div>
-      <div id="trend-chart" style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim)">⏳ 歷史資料累積中…</div>
-    </div>
   </div>
 
   <!-- Threat Hero -->
@@ -1717,7 +1674,7 @@
   .wpi-badge.critical { color:var(--crit); border-color:var(--crit); background:rgba(255,0,255,.08); }
   @keyframes wpi-blink { 0%,100%{opacity:1} 50%{opacity:.6} }
 
-  .wpi-body { display:grid; grid-template-columns:minmax(0,1fr) 320px minmax(0,1fr); gap:1.8rem; align-items:center; }
+  .wpi-body { display:grid; grid-template-columns:minmax(0,1fr) 320px; gap:1.8rem; align-items:center; }
   .wpi-factors { display:flex; flex-direction:column; gap:.6rem; }
   .wpi-factor { background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.07); padding:.5rem .65rem; }
   .wpi-f-hdr  { display:flex; align-items:center; gap:.4rem; margin-bottom:.3rem; }
@@ -1742,20 +1699,7 @@
   .wpi-formula { box-sizing:border-box; width:100%; max-width:320px; white-space:normal; overflow-wrap:anywhere; line-height:1.7; text-align:center; margin-top:.6rem; font-family:'Share Tech Mono',monospace; font-size:.64rem; color:var(--text-dim); background:rgba(0,0,0,.3); padding:.3rem .6rem; border:1px solid rgba(255,255,255,.07); }
   .wpi-formula em { color:var(--accent); font-style:normal; }
 
-  .wpi-alerts { display:flex; flex-direction:column; gap:.55rem; }
-  .wpi-al-title { font-family:'Orbitron',monospace; font-size:.6rem; color:var(--text-dim); letter-spacing:3px; margin-bottom:.2rem; }
-  .wpi-al-item { display:flex; align-items:flex-start; gap:.55rem; padding:.5rem .65rem; background:rgba(255,255,255,.02); border:1px solid rgba(255,255,255,.07); border-left:3px solid rgba(255,255,255,.1); transition:all .3s; }
-  .wpi-al-item.triggered { background:rgba(255,255,255,.05); }
-  .wpi-al-dot { width:8px; height:8px; border-radius:50%; margin-top:3px; flex-shrink:0; }
-  .wpi-al-dot.low  { background:var(--accent); }
-  .wpi-al-dot.med  { background:var(--accent3); }
-  .wpi-al-dot.high { background:var(--accent2); box-shadow:0 0 6px var(--accent2); }
-  .wpi-al-name { font-family:'Share Tech Mono',monospace; font-size:.68rem; color:var(--text-primary); font-weight:700; }
-  .wpi-al-cond { font-family:'Share Tech Mono',monospace; font-size:.64rem; color:var(--text-dim); margin-top:.1rem; }
-  .wpi-al-sub  { font-family:'Share Tech Mono',monospace; font-size:.6rem; color:rgba(255,255,255,.22); margin-top:.08rem; }
-  .wpi-al-status { margin-left:auto; flex-shrink:0; font-family:'Orbitron',monospace; font-size:.62rem; font-weight:700; color:var(--text-dim); }
   .wpi-footer { display:flex; gap:.8rem; align-items:center; flex-wrap:wrap; margin-top:1rem; padding-top:.7rem; border-top:1px solid rgba(0,207,232,.1); font-family:'Share Tech Mono',monospace; font-size:.57rem; color:var(--text-dim); }
-  @media(max-width:1100px){ .wpi-body{ grid-template-columns:1fr 1fr; } }
   @media(max-width:800px) { .wpi-body{ grid-template-columns:1fr; } .wpi-gauge-wrap{order:-1;} }
   </style>
 
@@ -1873,12 +1817,6 @@
     <div id="taiwan-insight-body" style="line-height:1.8">等待下一輪資料產生洞察。</div>
     <details style="margin-top:1rem"><summary>近 7 天觀測時間軸（最近 20 筆）</summary><div id="taiwan-insight-timeline"></div></details>
   </div>
-
-  <section class="card" id="notac-card" style="margin-bottom:1.5rem">
-    <h2 class="section-title">領空公告觀察 · NOTAM</h2>
-    <p class="observation-caption">航空運作背景 · 公告不等於軍事行動</p>
-    <div id="notac-body">等待已核實的 NOTAC 資料。</div>
-  </section>
 
   <!-- 🎖️ 台海軍事動態 -->
   <div class="card" id="twnews-card" style="margin-bottom:1.5rem">
@@ -2556,9 +2494,6 @@ function htmlWpiRender() {
   const wpi   = htmlWpiCalc(sc);
   const level = htmlWpiLevel(wpi);
   const pizza = HTML_WPI_STATE.pizza;
-  const pizzaHigh = HTML_WPI_STATE.spikes || pizza.some(s => (s.busyness||0) >= 70);
-  const tankersUp = (HTML_WPI_STATE.avi.summary?.tankers ?? 0) >= 8 && sc.a != null && sc.a >= 50;
-  const alts  = { low: sc.p>=40, med: sc.p>=40 && pizzaHigh, high: sc.p>=40 && pizzaHigh && tankersUp };
 
   // 數字 + 像素錶盤
   if (wpi == null) { const n=document.getElementById('html-wpi-num'); if(n)n.textContent='--'; }
@@ -2616,21 +2551,6 @@ function htmlWpiRender() {
     if (desc) desc.textContent = f.desc;
   });
 
-  // 三級警戒
-  [
-    { id:'html-wpi-al-low',  stId:'html-wpi-al-low-st',  trig:alts.low,  hiCls:false, st:alts.low ?'✓ 觸發':'—' },
-    { id:'html-wpi-al-med',  stId:'html-wpi-al-med-st',  trig:alts.med,  hiCls:false, st:alts.med ?'⚠ 觸發':'—' },
-    { id:'html-wpi-al-high', stId:'html-wpi-al-high-st', trig:alts.high, hiCls:true,  st:alts.high?'🚨 觸發':'—' },
-  ].forEach(al => {
-    const el = document.getElementById(al.id);
-    const st = document.getElementById(al.stId);
-    if (el) {
-      el.className = `wpi-al-item${al.trig?' triggered':''}`;
-      if (al.trig) el.style.borderLeftColor = al.hiCls ? 'var(--accent2)' : 'var(--accent3)';
-    }
-    if (st) { st.textContent=al.st; st.style.color=al.trig?(al.hiCls?'var(--accent2)':'var(--accent3)'):''; }
-  });
-
   // 時間戳
   const ts = document.getElementById('html-wpi-updated');
   if (ts) ts.textContent = `資料時間：${observedTime()} · 有效權重覆蓋 ${Math.round((BACKEND_SCORE?.coverage || 0)*100)}% · 人工權重觀察指數，非開戰機率`;
@@ -2671,7 +2591,7 @@ async function fetchRealPizzaData() {
       if(status)status.textContent=(expired?'⚠ 保留資料已過期：':'已保留較新的資料：')+observedTime()+'；本次回傳較舊，未覆蓋';
       const live=document.querySelector('.live-lbl');
       if(live)live.textContent=expired?'資料已過期':'保留較新資料';
-      if(expired && OBSERVED_DATA){renderTaiwanInsight(OBSERVED_DATA);renderNotacObservation(OBSERVED_DATA);}
+      if(expired && OBSERVED_DATA){renderTaiwanInsight(OBSERVED_DATA);}
       if(expired && OBSERVED_DATA?.regions)renderRegions(OBSERVED_DATA.regions.map(r=>({...r,score:null,level:'INSUFFICIENT_DATA',coverage:0,factors:{}})));
       htmlWpiRender();
       return;
@@ -2749,7 +2669,6 @@ async function fetchRealPizzaData() {
       HTML_WPI_STATE.spikes = !!(json.pizza_events && json.pizza_events.length);
       if (Array.isArray(json.regions) && json.regions.length) {
         renderRegions(json.regions);
-        renderTrendChart(json.regions);
       }
       renderHero(json);
       window.renderPizzaBacktest?.(json.pizza_backtest);
@@ -2791,7 +2710,6 @@ async function fetchRealPizzaData() {
     try { renderTwNews(json); }
     catch(err) { console.warn('[WARHUBS] renderTwNews error:', err.message); }
 
-    try { renderNotacObservation(json); } catch(err) { console.warn("NOTAC render error", err.message); }
     try { renderTaiwanInsight(json); } catch(err) { console.warn("Taiwan insight render error", err.message); }
     try { renderPla(json); }
     catch(err) { console.warn('[WARHUBS] renderPla error:', err.message); }
@@ -2828,7 +2746,7 @@ async function fetchRealPizzaData() {
       if (mres && mres.ok) { MD_JSON = await mres.json(); Object.values(MD_JSON.days || {}).forEach(d=>{ if(d.model_version !== 'wpi-4.0') {d.combined=null;d.poly=null;d.regions={};} }); renderMetricsHist(); }
     } catch(err) { console.warn('[WARHUBS] metrics_daily fetch error:', err.message); }
 
-      if(json.regions){renderRegions(json.regions);renderTrendChart(json.regions);}
+      if(json.regions){renderRegions(json.regions);}
     })().catch(err=>console.warn('[WARHUBS] history render error:',err.message));
 
     // Footer status indicator (在頁尾顯示「上次成功更新」)
@@ -2891,87 +2809,6 @@ function trendArrow(cur, regionKey) {
   return `<span style="color:var(--text-dim)" title="${title}">→</span>`;
 }
 
-// ─── 7 天風險趨勢圖（SVG 折線）───────────────────────────────
-const TREND_COLORS = ['var(--accent)', 'var(--accent2)', 'var(--accent3)', '#a374ff', '#35e08a'];
-
-function renderTrendChart(regions) {
-  const chartEl  = document.getElementById('trend-chart');
-  const legendEl = document.getElementById('trend-legend');
-  if (!chartEl) return;
-
-  const end = Math.min(Date.parse(DATA_UPDATED_AT), Date.now());
-  const valid = v => typeof v === 'number' && Number.isFinite(v) && v >= 0 && v <= 100;
-  const hist = (Array.isArray(WW_HISTORY) ? WW_HISTORY : [])
-    .filter(h => h && h.model_version === 'wpi-4.0' && Number.isFinite(Date.parse(h.ts)) &&
-      Date.parse(h.ts) <= end && Date.parse(h.ts) >= end - 7 * 86400000)
-    .sort((a, b) => Date.parse(a.ts) - Date.parse(b.ts));
-  if (legendEl) legendEl.textContent = '';
-  if (hist.length < 4) {
-    chartEl.textContent = `⏳ 歷史資料累積中（目前 ${hist.length} 筆，需至少 4 筆；資料約每 2 小時累積）…`;
-    return;
-  }
-
-  // 序列：綜合指數 + 目前分數最高的 3 個地區
-  const topRegions = (regions || []).slice(0, 3);
-  const series = [
-    { label: '綜合指數', get: h => h.combined, basis: h => h.score_basis?.combined },
-    ...topRegions.map(r => ({ label: `${r.flag}${r.name}`, get: h => h.regions?.[r.key], basis: h => h.score_basis?.regions?.[r.key] })),
-  ];
-
-  const W = 720, H = 150, PAD_L = 26, PAD_R = 8, PAD_T = 8, PAD_B = 18;
-  const t0 = Date.parse(hist[0].ts), t1 = Date.parse(hist[hist.length - 1].ts);
-  const spanX = Math.max(1, t1 - t0);
-  const x = ts => PAD_L + ((Date.parse(ts) - t0) / spanX) * (W - PAD_L - PAD_R);
-  const y = v  => PAD_T + (1 - Math.max(0, Math.min(100, v)) / 100) * (H - PAD_T - PAD_B);
-
-  const gridLines = [0, 25, 50, 75, 100].map(v =>
-    `<line x1="${PAD_L}" y1="${y(v)}" x2="${W - PAD_R}" y2="${y(v)}" stroke="rgba(255,255,255,.07)" stroke-width="1"/>
-     <text x="${PAD_L - 4}" y="${y(v) + 3}" text-anchor="end" font-size="8" fill="rgba(255,255,255,.3)" font-family="monospace">${v}</text>`
-  ).join('');
-
-  // X 軸日期標籤（頭/中/尾）
-  const fmtDay = ts => { const d = new Date(ts); return `${d.getMonth() + 1}/${d.getDate()}`; };
-  const xLabels = [hist[0], hist[Math.floor(hist.length / 2)], hist[hist.length - 1]].map(h =>
-    `<text x="${x(h.ts)}" y="${H - 4}" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.3)" font-family="monospace">${fmtDay(h.ts)}</text>`
-  ).join('');
-
-  const lines = series.map((s, i) => {
-    const segments = [];
-    let segment = [], previous = null;
-    const flush = () => { if (segment.length) segments.push(segment); segment = []; };
-    for (const h of hist) {
-      const v = s.get(h), ts = Date.parse(h.ts), rawBasis = s.basis(h);
-      const basis = Array.isArray(rawBasis) && rawBasis.length && rawBasis.every(k => typeof k === 'string')
-        ? JSON.stringify([...rawBasis].sort()) : null;
-      if (!valid(v)) { flush(); previous = null; continue; }
-      if (!previous || !basis || basis !== previous.basis || ts - previous.ts > 6 * 3600000 || ts <= previous.ts) flush();
-      segment.push({ts:h.ts,v});
-      previous = {ts,basis};
-    }
-    flush();
-    return segments.map(points => {
-      if (points.length === 1) return `<circle cx="${x(points[0].ts).toFixed(1)}" cy="${y(points[0].v).toFixed(1)}" r="2" fill="${TREND_COLORS[i]}"/>`;
-      return `<polyline points="${points.map(p => `${x(p.ts).toFixed(1)},${y(p.v).toFixed(1)}`).join(' ')}" fill="none" stroke="${TREND_COLORS[i]}" stroke-width="${i === 0 ? 2 : 1.3}" opacity="${i === 0 ? 1 : .8}"/>`;
-    }).join('');
-  }).join('');
-
-  // 每個時間點一條透明感應帶：滑鼠移過去顯示該時刻綜合指數與各地區分數
-  const fmtTs = ts => { const d = new Date(ts); return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
-  const bandW = (W - PAD_L - PAD_R) / Math.max(1, hist.length);
-  const hitBands = hist.map(h => {
-    const cx = x(h.ts);
-    const rows = series.map((s,i) => { const v = s.get(h); return !valid(v) ? `<br>${escapeHtml(s.label)}：缺資料` : `<br><span style="color:${TREND_COLORS[i]}">■</span> ${escapeHtml(s.label)} ${Math.round(v)}`; }).join('');
-    const tip = `<b>${escapeHtml(fmtTs(h.ts))}</b>${rows}`;
-    return `<rect x="${(cx-bandW/2).toFixed(1)}" y="${PAD_T}" width="${bandW.toFixed(1)}" height="${(H-PAD_T-PAD_B).toFixed(1)}" fill="transparent" data-tip="${tip.replace(/"/g,'&quot;')}"/>`;
-  }).join('');
-  chartEl.innerHTML = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">${gridLines}${xLabels}${lines}${hitBands}</svg>`;
-
-  if (legendEl) {
-    legendEl.innerHTML = series.map((s, i) =>
-      `<span><i style="display:inline-block;width:14px;height:2px;background:${TREND_COLORS[i]};vertical-align:middle;margin-right:4px"></i>${escapeHtml(s.label)}</span>`
-    ).join('') + '<span>缺資料、間隔超過 6 小時或計分基礎不同時不連線；孤立觀測以點呈現。</span>';
-  }
-}
 
 // ─── 戰情摘要（Hero）─────────────────────────────────────────
 function renderHero(json) {
@@ -3076,21 +2913,6 @@ function renderRegions(regions) {
           ${factorRow('廣域軍機', null)}<small>廣域可見：${f.avi_count ?? '--'} 架（非當地全量；不計分）</small>
         </div>
         <div style="margin-top:auto;padding-top:.55rem;font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.top_market ? escapeHtml(r.top_market) : ''}">${r.top_market ? '📊 ' + escapeHtml(zhMarket(r.top_market)) : '&nbsp;'}</div>
-      </div>`;
-    }).join('');
-  }
-
-  // WPI 右欄迷你列表
-  const mini = document.getElementById('region-mini-list');
-  if (mini) {
-    mini.innerHTML = regions.map(r => {
-      const observation = regionalObservation(r);
-      const st = observation.provisional ? {color:'var(--accent)',zh:'暫定觀測'} : REGION_LEVEL_STYLE[r.level] || REGION_LEVEL_STYLE.INSUFFICIENT_DATA;
-      return `<div style="display:grid;grid-template-columns:82px 1fr 34px 30px;align-items:center;gap:.4rem;font-family:'Share Tech Mono',monospace;font-size:.68rem">
-        <span>${r.flag} ${escapeHtml(r.name)}</span>
-        <div style="height:4px;background:rgba(255,255,255,.08)"><div style="width:${observation.score ?? 0}%;height:100%;background:${st.color}"></div></div>
-        <span style="color:${st.color};text-align:right">${(observation.score == null ? '--' : Math.round(observation.score))}</span>
-        <span style="font-size:.62rem">${observation.provisional ? '暫定' : trendArrow(r.score, r.key)}</span>
       </div>`;
     }).join('');
   }
@@ -3664,52 +3486,6 @@ function renderStrat(json){
     var ut=s.updated_at?new Date(s.updated_at).toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'—';
     upd.textContent='參考月 '+(s.ref_month||'—')+'（對比 '+(s.prev_year_month||'')+'）· 最後更新 '+ut+'（每日重查·月資料約月更）';
   }
-}
-function renderNotacObservation(json) {
-  const el=document.getElementById('notac-body');if(!el)return;
-  const names={taiwan:'台北 FIR',ukraine:'基輔 FIR',mideast:'德黑蘭／特拉維夫 FIR',korea:'平壤 FIR',southsea:'馬尼拉 FIR'};
-  const fmt=t=>Number.isFinite(Date.parse(t))?new Date(t).toLocaleString('zh-TW',{timeZone:'Asia/Taipei',year:'numeric',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'時間缺資料';
-  const num=n=>Number.isInteger(n)&&n>=0?String(n):'缺資料';
-  el.innerHTML=Object.entries(names).map(([key,name])=>{
-    const r=(json.notams||{})[key]||{}, a=r.latest_attempt||r;
-    const age=Date.now()-Date.parse(r.observed_at);
-    const fresh=r.provider==='NOTAC'&&r.complete===true&&!r.stale&&Number.isFinite(age)&&age>=0&&age<6*3600000;
-    let text;
-    if(fresh){
-      text='有效公告 '+num(r.total)+' 筆（API active 狀態；實際生效期間另核對）；限制／危險關鍵字候選 '+num(r.danger)+' 筆。';
-      const c=r.comparison, gap=c?Date.parse(r.observed_at)-Date.parse(c.observed_at):NaN;
-      text+='<br>查詢時間：'+fmt(r.observed_at)+'（不是公告發布時間）';
-      text+=c&&Number.isInteger(c.total_change)&&gap>0&&gap<=6*3600000?'<br>較 '+fmt(c.observed_at)+' 同範圍完整查詢 '+(c.total_change>0?'+':'')+c.total_change+' 筆；數量變化不是情勢升級。':'<br>同範圍比較資料累積中。';
-    }else if(r.provider==='NOTAC'){
-      text='本輪未取得完整可用公告，暫停判讀。';
-      if(a.partial)text+='<br>已取得樣本 '+num(a.sample_count)+' 筆／來源回報 '+num(a.reported_count)+' 筆；分頁未收齊，不代表零公告。';
-      if(a.partial && Number.isInteger(a.sample_danger))text+='<br>已取得樣本中的限制／危險關鍵字候選：'+num(a.sample_danger)+' 筆；非全區數量，也不是已核實軍事公告。';
-      if(r.observed_at)text+='<br>保留舊觀測時間：'+fmt(r.observed_at);
-      if(r.attempted_at)text+='<br>最近嘗試：'+fmt(r.attempted_at);
-    }else{text='等待 NOTAC 查詢；舊 FAA 資料保留，不混算比較。';}
-    const timing=a.sample_timing;
-    if(timing && ['current','future','ended','unknown'].every(k=>Number.isInteger(timing[k])&&timing[k]>=0)
-      &&Object.values(timing).reduce((sum,v)=>sum+v,0)===a.sample_count){
-      text+='<br>查詢當時的樣本時段：已進入生效期間 '+timing.current+'、尚未開始 '+timing.future+'、已過截止 '+timing.ended+'、時間不明 '+timing.unknown+'。依公告起訖時間分類，不推定軍事用途。';
-    }
-    const firs=(r.firs||[]).filter(f=>typeof f==='string'&&/^[A-Z]{4}$/.test(f)).join(',');
-    const link=firs?'https://notac.aero/notams/?fir='+encodeURIComponent(firs):'https://notac.aero/notams/';
-    const partial=r.provider==='NOTAC'&&!fresh&&a.partial===true;
-    const sampleTime=a.sample_observed_at||a.fetched_at||r.attempted_at;
-    const sampleAge=Date.now()-Date.parse(sampleTime);
-    const status=fresh?'完整查詢':partial?(!Number.isFinite(sampleAge)||sampleAge<0?'部分樣本（時間未明）':sampleAge>=6*3600000?'部分樣本（已過期）':'部分樣本'):'暫無可用資料';
-    const value=fresh?num(r.total):partial?num(a.sample_count):'—';
-    const unit=fresh?'有效公告（API active）':partial?'樣本公告':'等待更新';
-    const time=fresh?r.observed_at:sampleTime;
-    const icon='<svg class="notac-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="10" opacity=".3"/><path d="m12 4 2 7 6 4v2l-7-2v4l2 1v1l-3-1-3 1v-1l2-1v-4l-7 2v-2l6-4z"/></svg>';
-    const stateIcon=fresh?'✓':partial?(sampleAge>=6*3600000?'◷':'◐'):'—';
-    return '<article class="notac-tile"><div class="notac-tile-head"><div class="notac-region">'+icon+'<strong>'+name+'</strong></div><span class="notac-status"><span aria-hidden="true">'+stateIcon+'</span> '+status+'</span></div>'
-      +'<div class="notac-count"><b>'+value+'</b><span>'+unit+'</span></div>'
-      +(partial?'<div class="notac-coverage">來源回報 '+num(a.reported_count)+' 筆 · 尚未收齊</div>':'')
-      +'<div class="notac-time">查詢時間：'+fmt(time)+'</div>'
-      +'<details class="reading-details"><summary>查詢詳情與限制</summary><div>'+text+'</div></details>'
-      +'<a class="notac-source" href="'+link+'" target="_blank" rel="noopener">查看來源公告 →</a></article>';
-  }).join('');
 }
 
 function renderTaiwanInsight(json) {
@@ -4583,9 +4359,9 @@ async function fetchFirmsEvents() { /* no-op: 改由 fetchRealPizzaData 從 data
 <script>
 /* 區段折疊：點卡片標題即可收合；狀態記在 localStorage；披薩/Polymarket/進階指標預設收合 */
 (function(){
-  var KEY='warhub_fold_v1', store={}, firstVisit=true;
+  var KEY='warhub_fold_v2', store={}, firstVisit=true;
   try{ var s=localStorage.getItem(KEY); if(s){ store=JSON.parse(s)||{}; firstVisit=false; } }catch(e){}
-  var DEFAULT_FOLD=['披薩','Polymarket','WAR PRESSURE','糧食'];
+  var DEFAULT_FOLD=['披薩','Polymarket','WAR PRESSURE','糧食','戰略物資','避險群聚'];
   function persist(){ try{ localStorage.setItem(KEY,JSON.stringify(store)); }catch(e){} }
   function clean(t){ return (t||'').replace(/\s+/g,' ').trim().slice(0,26); }
   function caret(f){ var c=document.createElement('span'); c.className='fold-caret'; c.textContent=f?'\u25B8':'\u25BE'; return c; }
