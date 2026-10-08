@@ -2865,8 +2865,9 @@ function trendArrow(cur, regionKey) {
   const factors = regionKey ? OBSERVED_DATA?.regions?.find(r => r.key === regionKey)?.factors : BACKEND_SCORE?.factors;
   // Events-file news intensity is a different measurement; history stores it under its own key.
   const eventsSource = regionKey ? factors?.gdelt_source === 'events' : BACKEND_SCORE?.g_source === 'events';
+  const notamRelative = regionKey && factors?.notam_source === 'relative';
   const basis = keys.filter(k => typeof factors?.[k] === 'number' && Number.isFinite(factors[k]))
-    .map(k => eventsSource && (k === 'gdelt' || k === 'g') ? k + '_events' : k).sort();
+    .map(k => eventsSource && (k === 'gdelt' || k === 'g') ? k + '_events' : notamRelative && k === 'notam' ? 'notam_rel' : k).sort();
   if (!basis.length) return '';
   const target = snapshot - 24 * 3600000;
   let best = null, bestDiff = Infinity;
@@ -3052,8 +3053,8 @@ function renderRegions(regions) {
       // 每列都渲染（缺值顯示 --），確保各卡高度一致
       const factorRow = (label, val, extra) => {
         const has = val != null;
-        const right = has ? (extra ?? Math.round(val)) : '--';
-        return `<div style="display:grid;grid-template-columns:68px minmax(0,1fr) 68px;align-items:center;gap:.5rem;font-size:.74rem">
+        const right = has ? (extra ?? Math.round(val)) : (extra ?? '--');
+        return `<div style="display:grid;grid-template-columns:68px minmax(0,1fr) auto;align-items:center;gap:.5rem;font-size:.74rem">
           <span style="color:var(--text)">${label}</span>
           <div style="height:5px;min-width:0;background:rgba(255,255,255,.08)"><div style="width:${has ? Math.min(100,val) : 0}%;height:100%;background:${st.color};opacity:.8"></div></div>
           <span style="text-align:right;color:var(--text);white-space:nowrap">${right}</span>
@@ -3071,7 +3072,8 @@ function renderRegions(regions) {
         <div style="display:flex;flex-direction:column;gap:.34rem;font-family:'Share Tech Mono',monospace">
           ${factorRow('市場盤口', f.poly)}
           ${factorRow(f.gdelt_source === 'events' ? '新聞事件' : '新聞強度', f.gdelt, gdeltDelta)}
-          ${factorRow('領空', f.notam, f.notam == null ? null : (f.notam_closure ? '⛔ 關閉' : (f.notam_danger ?? 0) + ' 警戒'))}
+          ${factorRow('領空', f.notam, f.notam_closure ? '⛔ 關閉' : f.notam_danger == null ? null
+            : f.notam == null ? `${f.notam_danger} 筆·累積中` : `${f.notam_danger}／平常 ${f.notam_baseline ?? '--'}`)}
           ${factorRow('熱異常', null)}<small>觀測像元：${f.firms_hotspots ?? '--'}（不計分）</small>
           ${factorRow('廣域軍機', null)}<small>廣域可見：${f.avi_count ?? '--'} 架（非當地全量；不計分）</small>
         </div>
