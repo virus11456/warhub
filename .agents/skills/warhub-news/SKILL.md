@@ -71,3 +71,8 @@ fetch_gnews沿用入口，回傳headlines及sampling；main分別存news和news_
 data/news_samples.json 的by_region保存90日records、首次見到時間、原發稿时间與原標題；相同URL保留舊版本，原輪次另由analysis archive長期保存。首頁各區最多3篇（共15篇），跨區去重，僅這15篇走既有繁中／英文翻譯，避免把250篇送翻譯服務；切換語言不抓來源。初次遷移若全無可展示樣本且查詢失敗，原news保留stale，不回填偽造first_seen。
 data.json.news_sampling只保存不含records的摘要；90日檔案在analysis archive一併保存，提交重試由merge_news_samples聯集，保留較早first_seen版本、較新查詢狀態，檔案損壞停止。deploy gate將其列為純資料，不因更新增加部署。\n當前stage僅累積樣本與來源名稱數，baseline_status=not_scored，不假稱獨立媒體、不做事件群數或新聞熱度分數，不替代GDELT/WPI；事件分組、有效日與此前28日基準為下一階段，至少14有效日也不能僅憑天數就自動出分。網站新聞強度欄仍反映原GDELT來源。
 tests/test_news_sampling.py驗證平衡首頁、50筆上限、去重、來源名稱數、90日窗口、原時間、失敗與有效0；test_integrity用新回傳結構驗證主流程保存。
+
+## 2026-10-08 台海查詢放寬
+
+實測 Google News RSS（en-US）台海原查詢 24 小時僅約 5 筆，改為 (Taiwan／"Taiwan Strait"／Taipei／Kinmen／Matsu) × (military／exercise／drills／blockade／aircraft／warship／"coast guard"／invasion／defense)，同次實測約 21 筆、多數直接相關；不加 PLA（會帶入寮國、韓國等離題結果）。南海放寬地名（Spratly、West Philippine Sea 等）實測仍約 3–5 筆、無明顯增益，維持原查詢；中文 RSS 只多 1–2 筆且需另做英文翻譯，未加入。查詢變更後 sample_24h 會跳升，是收錄範圍變大而非新聞熱度變化；method 仍為 regional-rss-v1，比較變更前後樣本數時須以 2026-10-08 為界。每區仍每輪 1 個請求，不增加排程或翻譯量。
+

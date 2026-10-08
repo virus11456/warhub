@@ -11,6 +11,14 @@ class Tests(unittest.TestCase):
         return {'status':'available','items':[{'title':f'{region} news {i}','url':f'https://example.test/{region}/{i}',
             'domain':'one publisher','ts':NOW.isoformat(),'region':region,'topic':n.TOPICS[region]} for i in range(count)]}
 
+    def test_queries_have_balanced_groups_and_taiwan_place_names(self):
+        for region, query in n.QUERIES.items():
+            self.assertEqual(query.count('('), query.count(')'), region)
+            self.assertEqual(query.count('"') % 2, 0, region)
+        for term in ('Kinmen', 'Matsu', '"coast guard"', 'drills'):
+            self.assertIn(term, n.QUERIES['taiwan'])
+        self.assertNotIn('PLA', n.QUERIES['taiwan'].split())
+
     def test_balanced_display_and_original_archive_not_mutated(self):
         batches={k:self.batch(k) for k in n.QUERIES}
         data=n.merge_samples({},batches,NOW); original=copy.deepcopy(data)
