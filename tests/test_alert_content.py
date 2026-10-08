@@ -98,6 +98,10 @@ class ContentTests(unittest.TestCase):
         self.assertIn('公告查詢 0 筆', alerts.build_digest(data))
         data['notams']['taiwan']['stale'] = True
         self.assertIn('公告過期', alerts.build_digest(data))
+        data['regions'][0]['factors'].update(gdelt=0, gdelt_source='events')
+        text = alerts.build_digest(data)
+        self.assertIn('新聞強度有資料（事件檔備援）', text)
+        self.assertNotIn('新聞強度過期', text)
         data['notams'] = {}
         data['regions'][0]['factors'] = {}
         self.assertIn('公告缺資料', alerts.build_digest(data))

@@ -14,7 +14,7 @@ description: "Maintain WARHUB collector orchestration, source freshness, schedul
 | 全球新聞、台海新聞、共機標題計數、繁中翻譯 | [warhub-news](../warhub-news/SKILL.md) | 3 |
 | 預測市場篩選、事件方向、中文市場題目 | [warhub-polymarket](../warhub-polymarket/SKILL.md) | 1 |
 | 披薩與酒吧即時人流 | [warhub-activity](../warhub-activity/SKILL.md) | 2 |
-| 航空、衛星火點、自然事件、新聞強度、地震、瀏覽量、領空 | [warhub-osint](../warhub-osint/SKILL.md) | 7 |
+| 航空、衛星火點、自然事件、新聞強度、地震、瀏覽量、領空 | [warhub-osint](../warhub-osint/SKILL.md) | 8 |
 | 中國進口鏡像、月歷史、美國出口銷售 | [warhub-trade](../warhub-trade/SKILL.md) | 5 |
 | Yahoo Finance 與 FRED | [warhub-finance](../warhub-finance/SKILL.md) | 2 |
 
@@ -101,3 +101,5 @@ Kalshi後續本機工作：refresh已實作跨輪冷卻及原時間保留、獨�
 2026-09-22 Kalshi正式接線：fetch_kalshi加入正常收集，輸出獨立kalshi欄位及source_health；每輪最多3次公開讀請求、來源110分鐘間隔、429冷卻持久化。詳見warhub-kalshi。外交／制裁／軍事政策僅作地區分數旁參考，不改WPI／地區权重，無新增排程或通知；data.json既有不可覆寫封存自然涵蓋新欄位。
 
 2026-09-23 台海洞察呈現：先顯示共機活動相對既有基準的白話摘要，明示不代表全球戰爭機率或安全保證。官方比較方法、保存新聞樣本與交叉限制預設收合；有效零、來源時間、同題市場比較條件及全部資料仍保留。僅顯示層調整，不改公式、來源抓取、歷史或時間戳。
+
+2026-10-08 GDELT 新聞強度備援：DOC API 對共用 IP 限流，新增 fetch_gdelt_events 由 Events export 檔計算地區衝突事件報導佔比，DOC 新鮮時仍優先；不同定義另存 gdelt_events、計分基礎鍵分開。每輪最多9請求、40秒，同輪收集無新排程或通知。詳見 warhub-osint。
