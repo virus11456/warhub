@@ -44,9 +44,13 @@ def manifest_entries(text):
 def rows_from_zip(blob, entry, columns):
     if len(blob) != entry['bytes'] or hashlib.md5(blob).hexdigest() != entry['md5']:
         raise ValueError('download_integrity_mismatch')
+    return rows_from_archive(blob, entry['url'].rsplit('/',1)[1][:-4], columns)
+
+
+def rows_from_archive(blob, expected, columns):
+    """Layout/column checks shared by manifest-verified and older listed batches."""
     with zipfile.ZipFile(io.BytesIO(blob)) as archive:
         names = archive.infolist()
-        expected = entry['url'].rsplit('/',1)[1][:-4]
         if len(names) != 1 or names[0].filename != expected or names[0].file_size > 50_000_000:
             raise ValueError('invalid_archive_layout')
         text = archive.read(names[0]).decode('utf-8')

@@ -99,8 +99,11 @@ def _fmt_regions(regions, data=None):
         else:
             parts.append('公告缺資料')
         g = (data.get('gdelt') or {}).get(key) or {}
-        parts.append('新聞強度過期' if g.get('stale') else
-                     ('新聞強度有資料' if _valid_number(factors.get('gdelt'), 100) else '新聞強度缺資料'))
+        if factors.get('gdelt_source') == 'events' and _valid_number(factors.get('gdelt'), 100):
+            parts.append('新聞強度有資料（事件檔備援）')
+        else:
+            parts.append('新聞強度過期' if g.get('stale') else
+                         ('新聞強度有資料' if _valid_number(factors.get('gdelt'), 100) else '新聞強度缺資料'))
         # Old model scores remain in saved history; these are observations, not risk levels.
         lines.append(f"  • {r.get('name', '?')}：" + '；'.join(parts))
     return '\n'.join(lines) or '  （尚無地區觀測）'

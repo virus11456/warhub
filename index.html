@@ -2590,7 +2590,11 @@ function htmlWpiRender() {
   [
     { key:'p', pfx:'html-wpi-p', desc:`事件方向觀察值 ${(sc.p == null ? '--' : sc.p.toFixed(1))}%` },
     { key:'a', pfx:'html-wpi-a', desc:aDesc },
-    { key:'g', pfx:'html-wpi-g', desc: sc.g == null ? '新聞強度未取得有效新資料｜不計分（與下方新聞標題來源不同）' : `新聞強度分數 ${sc.g.toFixed(1)}` },
+    { key:'g', pfx:'html-wpi-g', desc: sc.g == null
+        ? (Object.values(raw.gdelt_events?.regions||{}).some(r=>r&&r.reason==='baseline_accumulating')
+            ? '原新聞 API 限流；GDELT 事件檔基準累積中，暫不計分'
+            : '新聞強度未取得有效新資料｜不計分（與下方新聞標題來源不同）')
+        : `新聞強度分數 ${sc.g.toFixed(1)}`+(BACKEND_SCORE?.g_source==='events'?'（GDELT 事件檔備援，相對 48 小時基準）':'') },
     { key:'z', pfx:'html-wpi-z', desc:sc.z==null?'店家清單已載入，但無有效即時人流｜不計分':`人流異常分數 ${sc.z.toFixed(1)}` },
     { key:'w', pfx:'html-wpi-w', desc: sc.w == null ? '戰爭條目瀏覽量 vs 30日基準' : `公眾焦慮指數 ${sc.w.toFixed(1)}` },
     { key:'f', pfx:'html-wpi-f', desc:fDesc },
@@ -2859,7 +2863,10 @@ function trendArrow(cur, regionKey) {
       snapshot > Date.now() || Date.now() - snapshot >= 6 * 3600000) return '';
   const keys = regionKey ? ['poly','gdelt','notam'] : ['p','a','g','z','f','s','w'];
   const factors = regionKey ? OBSERVED_DATA?.regions?.find(r => r.key === regionKey)?.factors : BACKEND_SCORE?.factors;
-  const basis = keys.filter(k => typeof factors?.[k] === 'number' && Number.isFinite(factors[k])).sort();
+  // Events-file news intensity is a different measurement; history stores it under its own key.
+  const eventsSource = regionKey ? factors?.gdelt_source === 'events' : BACKEND_SCORE?.g_source === 'events';
+  const basis = keys.filter(k => typeof factors?.[k] === 'number' && Number.isFinite(factors[k]))
+    .map(k => eventsSource && (k === 'gdelt' || k === 'g') ? k + '_events' : k).sort();
   if (!basis.length) return '';
   const target = snapshot - 24 * 3600000;
   let best = null, bestDiff = Infinity;
@@ -3063,7 +3070,7 @@ function renderRegions(regions) {
         <div class="region-score-basis" style="font-size:.75rem;color:var(--text-dim);margin-bottom:.6rem">${observation.basis || '等待有效來源'}${observation.provisional ? ' · 資料有限，非整體風險' : ''}</div>
         <div style="display:flex;flex-direction:column;gap:.34rem;font-family:'Share Tech Mono',monospace">
           ${factorRow('市場盤口', f.poly)}
-          ${factorRow('新聞強度', f.gdelt, gdeltDelta)}
+          ${factorRow(f.gdelt_source === 'events' ? '新聞事件' : '新聞強度', f.gdelt, gdeltDelta)}
           ${factorRow('領空', f.notam, f.notam == null ? null : (f.notam_closure ? '⛔ 關閉' : (f.notam_danger ?? 0) + ' 警戒'))}
           ${factorRow('熱異常', null)}<small>觀測像元：${f.firms_hotspots ?? '--'}（不計分）</small>
           ${factorRow('廣域軍機', null)}<small>廣域可見：${f.avi_count ?? '--'} 架（非當地全量；不計分）</small>

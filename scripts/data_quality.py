@@ -25,6 +25,21 @@ def source_health(data):
                 fresh = [r for r in v.values() if isinstance(r,dict) and not r.get('stale') and not r.get('partial') and r.get('available') is not False]
                 status = 'available' if len(fresh)==5 else ('partial' if fresh else 'stale')
                 note = f'{len(fresh)}/5 地區取得新資料；舊值不計分'
+                if key == 'gdelt':
+                    events = (data.get('gdelt_events') or {}).get('regions') or {}
+                    doc_fresh = {k for k, r in v.items() if isinstance(r, dict) and not r.get('stale')}
+                    backup = [k for k, r in events.items() if k not in doc_fresh and isinstance(r, dict)
+                              and not r.get('stale') and r.get('score') is not None]
+                    n = len(doc_fresh) + len(backup)
+                    status = 'available' if n == 5 else ('partial' if n else status)
+                    note = f'{n}/5 地區有新聞強度'
+                    if backup:
+                        label = 'GDELT（事件檔備援）'
+                        note += f'；{len(backup)} 區用事件檔，與原 API 定義不同'
+                    elif any(r.get('reason') == 'baseline_accumulating' for r in events.values() if isinstance(r, dict) and not r.get('stale')):
+                        note += '；原 API 限流，事件檔基準累積中'
+                    else:
+                        note += '；舊值不計分'
                 if key == 'notams' and any(r.get('provider') == 'NOTAC' for r in v.values() if isinstance(r,dict)):
                     label = 'NOTAC / FAA NOTAM'
                     note += '；僅查詢範圍，部分頁面不計分'

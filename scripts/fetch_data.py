@@ -806,6 +806,72 @@ async def fetch_gdelt(session: aiohttp.ClientSession) -> dict:
 
 
 
+GDELT_EVENTS_BUDGET_SECONDS = 40
+
+
+async def fetch_gdelt_events(session: aiohttp.ClientSession, previous: dict | None = None) -> dict:
+    """
+    GDELT 2.0 Events 匯出檔（每 15 分鐘一批）的地區衝突事件報導佔比；DOC API 被共用 IP 限流時的備援。
+    每輪最多 1 個清單 + 8 個批次檔（約 2 小時、<1 MB），不重試；失敗保留舊序列並標 stale，不補零。
+    與 DOC timelinevol 是不同量測，另存於 gdelt_events，只和自己的 48 小時基準比較。
+    """
+    from datetime import timedelta
+    from probe_gdelt_events import BASE, LIMIT, manifest_entries, rows_from_zip, rows_from_archive
+    from gdelt_event_intensity import BATCHES, batch_stamps, count_articles, sample, update_series, regional_metrics
+    previous = previous or {}
+    now = datetime.now(timezone.utc)
+    state = {"provider": "gdelt_events", "attempted_at": now.isoformat(),
+             "last_success_at": previous.get("last_success_at"), "latest_batch": previous.get("latest_batch")}
+    new_sample = None
+
+    async def get(url):
+        async with session.get(url, timeout=aiohttp.ClientTimeout(total=15),
+                               headers={"User-Agent": USER_AGENT}) as resp:
+            if resp.status in (401, 403, 429):
+                raise SourceBackoff(f"HTTP {resp.status}")
+            resp.raise_for_status()
+            body = bytearray()
+            async for chunk in resp.content.iter_chunked(65536):
+                body.extend(chunk)
+                if len(body) > LIMIT:
+                    raise ValueError("download_limit")
+        return bytes(body)
+
+    async def collect():
+        nonlocal new_sample
+        entries = manifest_entries((await get(BASE + "lastupdate.txt")).decode())
+        latest = entries["export"]
+        stamps = batch_stamps(latest["batch"])
+        batches = []
+        for stamp in stamps:
+            try:
+                blob = await get(BASE + f"{stamp}.export.CSV.zip")
+                rows = (rows_from_zip(blob, latest, 61) if stamp == latest["batch"]
+                        else rows_from_archive(blob, f"{stamp}.export.CSV", 61))
+                batches.append(rows)
+            except SourceBackoff:
+                raise
+            except Exception as exc:
+                log.warning("GDELT events batch %s skipped: %s", stamp, type(exc).__name__)
+        if len(batches) < BATCHES - 2:
+            raise ValueError("insufficient_batches")
+        end = datetime.strptime(stamps[-1], "%Y%m%d%H%M%S").replace(tzinfo=timezone.utc)
+        start = datetime.strptime(stamps[0], "%Y%m%d%H%M%S").replace(tzinfo=timezone.utc) - timedelta(minutes=15)
+        new_sample = {**sample(count_articles(batches), start, end), "batches": len(batches)}
+        state.update(latest_batch=stamps[-1])
+
+    try:
+        await asyncio.wait_for(collect(), timeout=GDELT_EVENTS_BUDGET_SECONDS)
+        state.update(status="available", last_success_at=now.isoformat())
+    except Exception as exc:
+        state.update(status="failed", error=type(exc).__name__)
+        log.warning("GDELT events unavailable (%s); previous observations kept as stale", type(exc).__name__)
+    state["series"] = update_series(previous.get("series"), new_sample, now)
+    state["regions"] = regional_metrics(state["series"], now, fresh=new_sample is not None)
+    scored = sum(1 for r in state["regions"].values() if r.get("score") is not None and not r.get("stale"))
+    log.info("GDELT events: %s, %d samples, %d/%d regions scored", state["status"], len(state["series"]), scored, len(state["regions"]))
+    return state
+
 # ─────────────────────────────────────────────────────────────
 # Google News RSS — 即時戰情快訊（早期預警：白宮/中國/戰爭升級相關頭條）
 # 免金鑰、持續更新、不受 GDELT 對 GitHub runner IP 的限速影響
@@ -1855,8 +1921,9 @@ def _region_poly_score(cfg: dict, polymarket: list[dict]) -> tuple[float | None,
 
 def build_region_risks(polymarket: list[dict], gdelt: dict,
                        firms: dict, aviation: dict,
-                       notams: dict | None = None) -> list[dict]:
+                       notams: dict | None = None, gdelt_events: dict | None = None) -> list[dict]:
     notams = notams or {}
+    event_regions = (gdelt_events or {}).get("regions") or {}
     by_region_hits = firms.get("conflict_counts")
     avi_by_region = aviation.get("region_counts")
 
@@ -1876,6 +1943,14 @@ def build_region_risks(polymarket: list[dict], gdelt: dict,
             factors["gdelt"] = round(min(100.0, g["latest"] * 25), 1)
             factors["gdelt_delta"] = g["delta_pct"]
             weights["gdelt"] = 0.25
+        else:
+            ev = event_regions.get(key) or {}
+            if not ev.get("stale") and number(ev.get("score")):
+                # 事件檔備援：相對自身 48h 基準（基準=50），與 DOC 百分比不同定義。
+                factors["gdelt"] = ev["score"]
+                factors["gdelt_delta"] = ev.get("delta_pct")
+                factors["gdelt_source"] = "events"
+                weights["gdelt"] = 0.25
 
         nt = notams.get(key)
         if nt and not nt.get("stale"):
@@ -1933,8 +2008,11 @@ def update_history(score: dict, pizza_index, regions: list[dict], wiki_score=Non
         "regions": {r["key"]: r["score"] for r in regions},
         # Preserve the exact contributing factor set; absent metadata stays unknown.
         "score_basis": {
-            "combined": sorted(k for k in WEIGHTS if number((score.get("factors") or {}).get(k))),
-            "regions": {r["key"]: sorted(k for k in ("poly", "gdelt", "notam")
+            # Events-file news intensity is a different measurement: keep it a distinct basis key.
+            "combined": sorted(("g_events" if k == "g" and score.get("g_source") == "events" else k)
+                               for k in WEIGHTS if number((score.get("factors") or {}).get(k))),
+            "regions": {r["key"]: sorted(("gdelt_events" if k == "gdelt" and (r.get("factors") or {}).get("gdelt_source") == "events" else k)
+                        for k in ("poly", "gdelt", "notam")
                         if number((r.get("factors") or {}).get(k))) for r in regions},
         },
     }
@@ -2195,6 +2273,7 @@ async def main():
         firms_task    = asyncio.create_task(measured("firms", fetch_firms(session)))
         eonet_task    = asyncio.create_task(measured("eonet", fetch_eonet(session)))
         gdelt_task    = asyncio.create_task(measured("gdelt", fetch_gdelt(session)))
+        gdelt_events_task = asyncio.create_task(measured("gdelt_events", fetch_gdelt_events(session, previous.get("gdelt_events"))))
         news_task     = asyncio.create_task(measured("gnews", fetch_gnews(session)))
         food_task     = asyncio.create_task(measured("food_imports", fetch_food_imports(session))) if collection["slow_refresh"] else None
         usda_task     = asyncio.create_task(measured("usda_esr", fetch_usda_esr(session))) if collection["slow_refresh"] else None
@@ -2207,6 +2286,7 @@ async def main():
             pizzint_task, poly_task, aviation_task, firms_task, eonet_task,
             gdelt_task, news_task, seismic_task, wiki_task, notam_task, bars_task
         )
+        gdelt_events = await gdelt_events_task
         kalshi = await measured("kalshi", fetch_kalshi(session, previous.get("kalshi")))
         news_sampling = news["sampling"]
         news = news["headlines"]
@@ -2271,7 +2351,7 @@ async def main():
                 aviation["summary"]["baseline_7d"] = round(baseline,1)
     except (ValueError, KeyError, TypeError, OSError):
         pass
-    score        = calculate_score(pizza_index, polymarket, aviation=aviation, firms=firms, gdelt=gdelt, wikipedia=wikipedia, finance=finance)
+    score        = calculate_score(pizza_index, polymarket, aviation=aviation, firms=firms, gdelt=gdelt, wikipedia=wikipedia, finance=finance, gdelt_events=gdelt_events)
 
     # 前一份 data.json 的警戒等級 + 推播狀態（供 alerts.py 判斷升級/去重）
     prev_level = "NORMAL"
@@ -2293,7 +2373,7 @@ async def main():
         except Exception:
             pass
 
-    regions = build_region_risks(polymarket, gdelt, firms, aviation, notams)
+    regions = build_region_risks(polymarket, gdelt, firms, aviation, notams, gdelt_events)
     history = update_history(score, pizza_index, regions,
                              (wikipedia or {}).get("score"), aviation)
     # 軍機機型 24h/7d/30d 歷史變化（資料累積後自動填入）
@@ -2327,6 +2407,7 @@ async def main():
         "firms":         firms,
         "eonet":         eonet[:20],
         "gdelt":         gdelt,
+        "gdelt_events":  gdelt_events,
         "news":          news,
         "news_sampling": news_sampling,
         "food":          food,

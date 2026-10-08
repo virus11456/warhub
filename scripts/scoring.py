@@ -44,7 +44,7 @@ def aggregate(factors, weights=WEIGHTS, min_coverage=.60, min_factors=3):
     score = round(sum(valid[k]*weights[k] for k in valid)/coverage, 1) if coverage >= min_coverage and len(valid) >= min_factors else None
     return score, round(coverage, 2)
 
-def calculate_wpi(pizza_index, markets, aviation=None, firms=None, gdelt=None, wikipedia=None, finance=None):
+def calculate_wpi(pizza_index, markets, aviation=None, firms=None, gdelt=None, wikipedia=None, finance=None, gdelt_events=None):
     a, f, g, w, fin = aviation or {}, firms or {}, gdelt or {}, wikipedia or {}, finance or {}
     factors = dict.fromkeys(WEIGHTS)
     factors['p'] = market_average(markets)
@@ -54,6 +54,12 @@ def calculate_wpi(pizza_index, markets, aviation=None, firms=None, gdelt=None, w
     if not a.get('error') and number(ap): factors['a'] = clamp(ap / 2)
     # Global fires do not identify conflict. Keep F unavailable until a validated regional baseline exists.
     gv = [clamp(v['latest']*25) for v in g.values() if not v.get('stale') and number(v.get('latest'))]
+    g_source = 'doc' if gv else None
+    if not gv:
+        # DOC unavailable: events-file regional scores (own 48h baseline), labelled separately.
+        regions = (gdelt_events or {}).get('regions') or {}
+        gv = [clamp(v['score']) for v in regions.values() if not v.get('stale') and number(v.get('score'))]
+        g_source = 'events' if gv else None
     factors['g'] = sum(gv)/len(gv) if gv else None
     factors['w'] = w.get('score') if not w.get('stale') else None
     sv = []
@@ -66,7 +72,7 @@ def calculate_wpi(pizza_index, markets, aviation=None, firms=None, gdelt=None, w
     return {'model_version': MODEL_VERSION, 'combined_score': score, 'alert_level': level,
             'pizza_score': factors['z'], 'polymarket_score': factors['p'],
             'factors': {k: round(v,2) if number(v) else None for k,v in factors.items()},
-            'coverage': coverage, 'is_probability': False, 'experimental': True}
+            'coverage': coverage, 'is_probability': False, 'experimental': True, 'g_source': g_source}
 
 
 def risk_off_cluster(finance):

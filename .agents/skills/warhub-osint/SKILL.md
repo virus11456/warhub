@@ -13,6 +13,7 @@ description: "Maintain WARHUB ADS-B, FIRMS, EONET, GDELT, USGS, Wikipedia and NO
 | `fetch_firms` | NASA MODIS 全球 24h CSV；`firms` | 確認欄位、UTC 觀測時間與 24h 範圍；熱異常含野火、工業等，不能直接標成戰火 |
 | `fetch_eonet` | NASA EONET v3 開放自然事件；`eonet` | 開放事件及其 geometry 時間，非戰爭事件；保留事件類別、座標與時間 |
 | `fetch_gdelt` | GDELT DOC API timelinevol；`gdelt` | 新聞報導強度，非新聞條數／衝突機率。逐地區記錄成功與 stale，其他 RSS 有新聞不能補此因子 |
+| `fetch_gdelt_events` | GDELT 2.0 Events export 檔（lastupdate 清單＋最近8批）；`gdelt_events` | DOC 限流時的新聞強度備援：地區衝突事件（QuadClass 3/4）報導數佔全部事件報導數。與 timelinevol 定義不同，另存且只和自身48h基準比較 |
 | `fetch_nuclear_seismic` | USGS FDSN event API；`nuclear_seismic` | 72h、試驗場周邊 150km 篩選；無地震須查詢成功才可成立，地震不等於核試 |
 | `fetch_wikipedia_anxiety` | Wikimedia Pageviews；`wikipedia` | 英文條目、每日資料截至前一日；最近兩天均量比更早樣本中位數，至少 10 點才有值。是關注度代理，非群眾焦慮實測 |
 | `fetch_notams` | NOTAC API（有 key）／FAA 舊路徑（無 key）；`notams` | 領空公告，查詢成功的空清單與 403／缺資料不同；不能用舊公告冒充新觀測 |
@@ -96,3 +97,12 @@ NOTAC 封存路徑 archives/notac/<ISO查詢時間（冒號換連字號）>_<SHA
 sync_state在notams各區內保留不透明cursor、FIR範圍、as_of、逐ID最小metadata與已解析關鍵字布林，無token/readings/原文。每頁全量驗證後才原子更新records及cursor；重複ID為upsert，slim撤銷按ID移除；失敗保留上一成功位置。只在next=null、as_of有效且未過6h時complete=true；部分狀態不計分，舊observed_at保留。已到截止／尚未開始的公告不加入目前總量；原欄位在state保留。不同protocol不接續比較。
 sync_budget保存每區請求計數，先扣再I/O，成功提交快照後跨runner沿用；整個job或提交失敗可能遺失該輪計數，不能宣稱帳戶硬性總額度。來源回應remaining與月初冷卻仍保護免費方案。正常analysis/source archive保留狀態版本，無需另寫data檔。
 tests/test_notac_sync.py離線驗證跨輪補齊、重複與修訂、撤銷、失敗不跳頁、原資料不变、來源時間、跨日月與本輪預算、有效0、舊觀測保存；原search工具測試保留。合併或部署不等於自然排程已完成初始同步，需另查正常快照的protocol／sync_state與complete。
+
+## GDELT 事件檔備援（2026-10-08）
+
+GDELT DOC API 對共用 IP（GitHub runner 及雲端主機）第一個請求即回 429，重試或換 URL 無效。`fetch_gdelt_events` 每輪讀 lastupdate 清單（1 請求）與最近8批 export（每批約60–130KB，最多8請求），共40秒預算、不重試；401／403／429 立即停止。最新批以清單 MD5／位元組驗證，較早批檢查 zip 單一檔名與61欄（清單只列最新批），最多缺2批，否則本輪失敗。下載以 iter_chunked 讀到結束並限制大小；不可用單次 `content.read(n)`，它只回傳已到達部分。
+
+`scripts/gdelt_event_intensity.py`：GlobalEventID 去重；總數為所有事件 NumArticles，地區數為 QuadClass 3/4 且 Actor CAMEO 國碼或 ActionGeo FIPS 落在地區（南海另比對地名與中菲、中越成對）。每輪一個2小時樣本存入 `gdelt_events.series`（保留48h，同 window_end 取代不重複）。基準須≥12個先前樣本、跨≥24小時，且基準地區報導數合計≥30；否則 reason=baseline_accumulating／baseline_too_sparse，不計分、不補零。分數＝min(100, 50×本輪佔比／基準平均佔比)；有效零佔比為0分。超過6小時或本輪失敗標 stale，不計分。
+
+計分：DOC 新鮮時優先；否則地區 `factors.gdelt` 用事件分數並標 `gdelt_source=events`，WPI `score.g_source=events`。history `score_basis` 分別記 `gdelt_events`／`g_events`，前端箭頭同樣對應，不與 DOC 分數比較。台海、朝鮮、南海每2小時常只有個位數報導，台海分數雜訊大、南海可能長期不足；部署後先累積約1–2天基準。tests/test_gdelt_event_intensity.py 以 mock 驗證計數、去重、基準門檻、有效零、限流停止、分段下載與計分基礎。
+
