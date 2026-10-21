@@ -1953,11 +1953,16 @@ def build_region_risks(polymarket: list[dict], gdelt: dict,
                 weights["gdelt"] = 0.25
 
         nt = notams.get(key)
+        rel = (nt or {}).get("relative") or {}
         if nt and not nt.get("stale"):
-            factors["notam"] = nt["score"]
             factors["notam_danger"] = nt["danger"]
             factors["notam_closure"] = nt["closure"]
-            weights["notam"] = 0.15
+            # Scored only against the region's own 7-day level; no score while that baseline is short.
+            if number(rel.get("score")):
+                factors["notam"] = rel["score"]
+                factors["notam_baseline"] = rel.get("baseline_danger")
+                factors["notam_source"] = "relative"
+                weights["notam"] = 0.15
 
         # Thermal detections are shown as observations, not scored as confirmed warfare.
         if by_region_hits is not None and not firms.get("stale") and not firms.get("error"):
@@ -2011,7 +2016,8 @@ def update_history(score: dict, pizza_index, regions: list[dict], wiki_score=Non
             # Events-file news intensity is a different measurement: keep it a distinct basis key.
             "combined": sorted(("g_events" if k == "g" and score.get("g_source") == "events" else k)
                                for k in WEIGHTS if number((score.get("factors") or {}).get(k))),
-            "regions": {r["key"]: sorted(("gdelt_events" if k == "gdelt" and (r.get("factors") or {}).get("gdelt_source") == "events" else k)
+            "regions": {r["key"]: sorted(("gdelt_events" if k == "gdelt" and (r.get("factors") or {}).get("gdelt_source") == "events"
+                                          else "notam_rel" if k == "notam" and (r.get("factors") or {}).get("notam_source") == "relative" else k)
                         for k in ("poly", "gdelt", "notam")
                         if number((r.get("factors") or {}).get(k))) for r in regions},
         },
@@ -2373,6 +2379,19 @@ async def main():
         except Exception:
             pass
 
+    # NOTAM relative to each region's own 7-day level (the absolute keyword count saturated at 100).
+    from notam_baseline import update as notam_update, relative as notam_relative, seed_from_archives
+    baseline_now = datetime.now(timezone.utc)
+    notam_series = previous.get("notam_baseline")
+    if not isinstance(notam_series, dict) or not notam_series:
+        try:
+            notam_series = seed_from_archives(DATA_DIR.parent / "archives", baseline_now)
+        except OSError:
+            notam_series = {}
+    notam_baseline = notam_update(notam_series, notams, baseline_now)
+    for key, record in (notams or {}).items():
+        if isinstance(record, dict):
+            record["relative"] = notam_relative(notam_baseline.get(key), record)
     regions = build_region_risks(polymarket, gdelt, firms, aviation, notams, gdelt_events)
     history = update_history(score, pizza_index, regions,
                              (wikipedia or {}).get("score"), aviation)
@@ -2419,6 +2438,7 @@ async def main():
         "usda":          usda,
         "wikipedia":     wikipedia,
         "notams":        notams,
+        "notam_baseline": notam_baseline,
         "nuclear_seismic": nuclear_seismic,
         "bars":          bars,
         "regions":       regions,
