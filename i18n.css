@@ -41,16 +41,6 @@ body .container :is(.osint-updated,.avi-box-lbl,.avi-tr .row,.avi-item){font-fam
 body .container .osint-adv-hdr{font-size:14px;letter-spacing:.03em;flex-wrap:wrap;gap:.5rem}
 body .container .avi-tr .row{white-space:normal;flex-wrap:wrap}
 .observation-caption{font:13px/1.6 Arial,'Noto Sans TC',sans-serif;color:#a9bdcb;margin:.4rem 0 .8rem}
-#notac-body{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem;align-items:stretch;grid-auto-rows:1fr}
-.notac-tile{min-width:0;border:1px solid #304252;padding:1rem;background:#101d28;font:14px/1.6 Arial,'Noto Sans TC',sans-serif}
-.notac-tile-head{display:flex;justify-content:space-between;align-items:start;gap:.5rem;flex-wrap:wrap}
-.notac-status{font-size:12px;color:#b8c7d3;background:#22313e;padding:.15rem .4rem}
-.notac-count{display:flex;align-items:baseline;gap:.7rem;margin:.7rem 0 .3rem;flex-wrap:wrap}
-.notac-count b{font-size:32px;line-height:1.2;color:#c9f7fa;font-variant-numeric:tabular-nums}
-.notac-count span,.notac-time{font-size:12px;color:#9eb2c2}
-.notac-coverage{font-size:13px;color:#e0c78a}
-.notac-source{display:inline-block;margin-top:.7rem;color:#8de9ef;text-decoration:none}
-.notac-source:hover{color:#fff}
 body .container .pla-wrap{display:grid;grid-template-columns:180px minmax(0,1fr);gap:1.4rem;padding:1.2rem;background:#101d28;border:1px solid #304252}
 .pla-summary{border-right:1px solid #304252;padding-right:1rem;align-self:stretch}
 .pla-date{font:13px/1.6 Arial,sans-serif;color:#a9bdcb;margin-top:.8rem}
@@ -61,17 +51,10 @@ body .container .pla-wrap{display:grid;grid-template-columns:180px minmax(0,1fr)
 body .container .pla-chart-panel .fh-chart{max-width:none}
 body .container .pla-chart-panel .fh-chart svg{min-width:560px}
 .pla-elevated{color:#ff8e9b;font-size:13px}
-@media(max-width:1000px){#notac-body{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:600px){#notac-body{grid-template-columns:1fr}body .container .pla-wrap{grid-template-columns:1fr;gap:.8rem}.pla-summary{border-right:0;border-bottom:1px solid #304252;padding:0 0 .8rem}.pla-latest-value b{font-size:36px}}
+@media(max-width:600px){body .container .pla-wrap{grid-template-columns:1fr;gap:.8rem}.pla-summary{border-right:0;border-bottom:1px solid #304252;padding:0 0 .8rem}.pla-latest-value b{font-size:36px}}
 /* Instrument-panel hierarchy: quiet frames, bright controls, compact summaries. */
 body.theme-8bit .container .card{border:1px solid #334357!important;border-radius:8px!important;box-shadow:0 4px 16px #0003!important;background:#0b1420!important}
-body.theme-8bit .container :is(.notac-tile,.pla-wrap){border-radius:6px!important}
-.notac-region{display:flex;align-items:center;gap:.65rem;min-width:0}
-.notac-icon{width:32px;height:32px;flex:none;color:#79ccd7}
-.notac-region strong{font-size:15px;color:#d7e8f2}
-.notac-status>span{margin-right:.2rem;color:#afc5d5}
-.notac-count{padding-left:2.65rem}
-.notac-coverage,.notac-time{padding-left:2.65rem}
+body.theme-8bit .container :is(.pla-wrap){border-radius:6px!important}
 @media(max-width:600px){body .container .fh-chart{overscroll-behavior-x:contain}body .container .fh-tab{min-height:42px}body .container .news-title{font-size:14px!important}}
 
 /* Unified grain explorer: preserve source-specific chart axes and legends. */
@@ -89,12 +72,6 @@ body.theme-8bit .container :is(.notac-tile,.pla-wrap){border-radius:6px!importan
 }
 
 /* Equal collapsed NOTAM cards, with aligned footer actions and no clipped details. */
-.notac-tile{display:flex;flex-direction:column}
-.notac-tile-head{min-height:3.2rem}
-.notac-time{margin-top:auto;padding-top:.3rem}
-.notac-tile>.reading-details{margin-bottom:0}
-.notac-tile>.notac-source{align-self:flex-start}
-#notac-body:has(details[open]){grid-auto-rows:auto}
 
 .site-disclaimer{margin:1.5rem 0;padding:1rem;border:1px solid #334357;border-radius:8px;color:#a9bdcb;font:14px/1.8 Arial,'Noto Sans TC',sans-serif}
 .site-disclaimer h2{font-size:16px;color:#d7e8f2;margin:0 0 .4rem}
