@@ -1356,6 +1356,19 @@
   .fh-tab{min-height:40px;padding:.5rem .8rem}
   .container{padding-left:12px;padding-right:12px}
 }
+/* Region board: no orphan gap on tablets (5 regions). Phones stay 1 column (rule above at 640px). */
+@media (min-width:641px) and (max-width:899px){
+  #region-board{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  #region-board>:last-child:nth-child(odd){grid-column:1/-1}
+}
+@media (min-width:900px) and (max-width:1279px){
+  #region-board{grid-template-columns:repeat(6,minmax(0,1fr))!important}
+  #region-board>*{grid-column:span 2}
+  #region-board>:nth-last-child(2):nth-child(3n+1),#region-board>:last-child:nth-child(3n+2){grid-column:span 3}
+}
+@media (min-width:1280px){
+  #region-board{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))!important}
+}
 </style>
 </head>
 <body class="theme-8bit">
