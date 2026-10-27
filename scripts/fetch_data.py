@@ -181,6 +181,19 @@ PENTAGON_BARS = [
 # 只在美東傍晚下班時段查詢（省 API credit、也是訊號最關鍵的時段）
 BAR_QUERY_ET_HOURS = range(16, 24)  # 16:00–23:59 ET
 
+# PizzINT 沒有即時人流時的 BestTime 備援（同樣只在美東下班時段查、只查缺即時值的店）。
+# 地址由 PizzINT 提供的 Google Maps 座標反查；BestTime 回傳的場地座標須在 PizzINT 座標
+# PIZZA_BESTTIME_MAX_KM 內才採用，避免把同名的其他分店當成同一家。
+PIZZA_BESTTIME_VENUES = {
+    "We, The Pizza":                     {"name": "We, The Pizza",         "address": "2100 Crystal Dr, Arlington, VA 22202"},
+    "Pizzato Pizza":                     {"name": "Pizzato Pizza",         "address": "2632 N Pershing Dr, Arlington, VA 22201"},
+    "Papa Johns Pizza":                  {"name": "Papa Johns Pizza",      "address": "3400 Columbia Pike, Arlington, VA 22204"},
+    "Domino's Pizza (Pentagon Closest)": {"name": "Domino's Pizza",        "address": "2602 Columbia Pike, Arlington, VA 22204"},
+    "Extreme Pizza":                     {"name": "Extreme Pizza",         "address": "550 14th Rd S, Arlington, VA 22202"},
+    "District Pizza Palace":             {"name": "District Pizza Palace", "address": "2325 S Eads St, Arlington, VA 22202"},
+}
+PIZZA_BESTTIME_MAX_KM = 0.4
+
 # 核試驗場座標（USGS 地震監測用）
 NUCLEAR_TEST_SITES = [
     {"key": "punggye",  "name": "豐溪里（北韓）",     "lat": 41.28,  "lon": 129.09},
@@ -243,8 +256,9 @@ def pizza_hourly(src: dict) -> tuple[list[dict], dict | None]:
     return hourly, (usual or None)
 
 
-def transform_pizza_shops(pizzint_payload: dict) -> list[dict]:
-    """把 pizzint.watch 的 shop list 轉成我們前端要的格式"""
+def transform_pizza_shops(pizzint_payload: dict, fallback: dict | None = None) -> list[dict]:
+    """把 pizzint.watch 的 shop list 轉成我們前端要的格式；fallback＝BestTime 備援（只補 PizzINT 缺的即時值）"""
+    fallback = fallback or {}
     raw_shops = pizzint_payload.get("data", []) or []
     by_name = {s.get("name"): s for s in raw_shops}
 
@@ -267,6 +281,11 @@ def transform_pizza_shops(pizzint_payload: dict) -> list[dict]:
 
         cur_pop = src.get("current_popularity")  # 0-100 or None
         pct_usual = src.get("percentage_of_usual")  # deviation %
+        backup = fallback.get(display_name) if cur_pop is None and not src.get("is_closed_now") else None
+        if backup:
+            cur_pop = backup["live_busyness"]
+            usual = backup.get("forecasted")
+            pct_usual = (round(cur_pop / usual * 100) if isinstance(usual, (int, float)) and not isinstance(usual, bool) and usual > 0 else None)
         is_open = False if src.get("is_closed_now") else (True if cur_pop is not None else None)
         busyness = int(cur_pop) if cur_pop is not None else None
 
@@ -290,6 +309,8 @@ def transform_pizza_shops(pizzint_payload: dict) -> list[dict]:
             for p in (src.get("sparkline_24h") or [])
         ][-24:]
         hourly_24h, usual_week = pizza_hourly(src)
+        if backup:
+            hourly_24h = (hourly_24h + [{"at": backup["recorded_at"], "v": busyness, "source": "besttime"}])[-24:]
 
         shops.append({
             "name":      display_name,
@@ -306,8 +327,8 @@ def transform_pizza_shops(pizzint_payload: dict) -> list[dict]:
             "is_closed_now": bool(src.get("is_closed_now")),
             "place_id":  src.get("place_id"),
             "address":   src.get("address"),
-            "data_source": src.get("data_source"),
-            "recorded_at": src.get("recorded_at"),
+            "data_source": "besttime" if backup else src.get("data_source"),
+            "recorded_at": backup["recorded_at"] if backup else src.get("recorded_at"),
         })
     return shops
 
@@ -1861,52 +1882,125 @@ async def fetch_notams(session: aiohttp.ClientSession) -> dict:
 # BestTime — Pentagon 周邊酒吧即時人流（反向披薩指數）
 # 酒吧下班後「該忙卻異常冷清」= 幕僚沒去喝酒、留守加班
 # ─────────────────────────────────────────────────────────────
+def besttime_et_hour() -> int | None:
+    if ZoneInfo is None:
+        return None
+    try:
+        return datetime.now(ZoneInfo("America/New_York")).hour
+    except Exception:
+        return None
+
+
+async def besttime_live(session: aiohttp.ClientSession, key: str, venue: dict) -> dict:
+    """單一場地的 BestTime 即時人流；失敗或無即時值時 live_busyness=None（不代表未營業）。"""
+    params = {"api_key_private": key, "venue_name": venue["name"],
+              "venue_address": venue["address"]}
+    try:
+        async with session.post(
+            BESTTIME_API, params=params,
+            timeout=aiohttp.ClientTimeout(total=25),
+            headers={"User-Agent": USER_AGENT},
+        ) as resp:
+            if resp.status != 200:
+                return {"name":venue["name"], "live_available":False, "live_busyness":None,
+                        "error":True, "http_status":resp.status}
+            data = await resp.json(content_type=None)
+            if not isinstance(data,dict) or not isinstance(data.get('analysis'),dict):
+                return {"name":venue["name"], "live_available":False, "live_busyness":None,
+                        "error":True, "failure_type":"invalid_schema"}
+        an = data.get("analysis") or {}
+        info = data.get("venue_info") or {}
+        live_ok = an.get("venue_live_busyness_available") is True
+        return {
+            "name": venue["name"],
+            "live_available": live_ok,
+            "live_busyness": an.get("venue_live_busyness") if live_ok else None,
+            "forecasted": an.get("venue_forecasted_busyness"),
+            "delta": an.get("venue_live_forecasted_delta") if live_ok else None,
+            "open": info.get("venue_open"),
+            "venue_lat": info.get("venue_lat"),
+            "venue_lng": info.get("venue_lon", info.get("venue_lng")),
+            "venue_address": info.get("venue_address"),
+        }
+    except Exception as e:
+        log.warning(f"BestTime {venue['name']} failed: {type(e).__name__}")
+        return {"name": venue["name"], "live_available": False, "live_busyness": None,
+                "forecasted": None, "delta": None, "open": None, "error": True}
+
+
+def _maps_coords(url) -> tuple[float, float] | None:
+    m = re.search(r"!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)", url or "") or re.search(r"@(-?\d+\.\d+),(-?\d+\.\d+)", url or "")
+    return (float(m.group(1)), float(m.group(2))) if m else None
+
+
+def _km(a, b) -> float:
+    import math
+    lat1, lon1, lat2, lon2 = map(math.radians, (*a, *b))
+    h = math.sin((lat2 - lat1) / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin((lon2 - lon1) / 2) ** 2
+    return 6371 * 2 * math.asin(math.sqrt(h))
+
+
+def _same_venue(maps_url, our_address, result) -> bool:
+    """BestTime 找到的場地是否就是 PizzINT 那家：有座標比距離；沒座標則比門牌與街名。"""
+    expected = _maps_coords(maps_url)
+    try:
+        got = (float(result["venue_lat"]), float(result["venue_lng"]))
+    except (KeyError, TypeError, ValueError):
+        got = None
+    if expected and got:
+        return _km(expected, got) <= PIZZA_BESTTIME_MAX_KM
+    returned = (result.get("venue_address") or "").lower()
+    number, street = our_address.split(",")[0].split(" ", 1)
+    word = max(street.split(), key=len).lower()
+    return bool(returned) and re.search(rf"\b{re.escape(number)}\b", returned) is not None and word in returned
+
+
+async def fetch_pizza_besttime(session: aiohttp.ClientSession, pizzint_payload: dict) -> dict:
+    """
+    PizzINT 缺即時人流時，以 BestTime 補查（僅美東 16–24 時、僅缺值且非明確打烊的店）。
+    回傳 {店名: {live_busyness, forecasted, recorded_at, ...}}；只收座標吻合且有即時值的結果。
+    """
+    key = os.environ.get("BESTTIME_API_KEY", "").strip()
+    et_hour = besttime_et_hour()
+    if not key or et_hour is None or et_hour not in BAR_QUERY_ET_HOURS:
+        return {}
+    by_name = {s.get("name"): s for s in (pizzint_payload.get("data") or []) if isinstance(s, dict)}
+    wanted = [n for n in SHOPS_TO_DISPLAY
+              if n in by_name and n in PIZZA_BESTTIME_VENUES
+              and by_name[n].get("current_popularity") is None and not by_name[n].get("is_closed_now")]
+    if not wanted:
+        return {}
+    results = await asyncio.gather(*(besttime_live(session, key, PIZZA_BESTTIME_VENUES[n]) for n in wanted))
+    at = datetime.now(timezone.utc).isoformat()
+    out = {}
+    for name, r in zip(wanted, results):
+        live = r.get("live_busyness")
+        if not r.get("live_available") or not isinstance(live, (int, float)) or isinstance(live, bool) or not 0 <= live <= 200:
+            continue
+        if not _same_venue(by_name[name].get("address"), PIZZA_BESTTIME_VENUES[name]["address"], r):
+            log.warning(f"BestTime pizza {name}: venue location mismatch, ignored")
+            continue
+        out[name] = {"live_busyness": int(round(live)), "forecasted": r.get("forecasted"), "recorded_at": at}
+    log.info(f"Pizza BestTime fallback: {len(out)}/{len(wanted)} shops with live data")
+    return out
+
+
 async def fetch_bars(session: aiohttp.ClientSession) -> dict:
     key = os.environ.get("BESTTIME_API_KEY", "").strip()
     if not key:
         return {"available": False, "reason": "未設定 BESTTIME_API_KEY", "bars": []}
 
     # 只在美東傍晚下班時段查詢（省 credit）
-    et_hour = None
-    if ZoneInfo is not None:
-        try:
-            et_hour = datetime.now(ZoneInfo("America/New_York")).hour
-        except Exception:
-            et_hour = None
+    et_hour = besttime_et_hour()
     if et_hour is not None and et_hour not in BAR_QUERY_ET_HOURS:
         return {"available": False, "reason": "非下班時段（僅美東 16–24 時查詢）",
                 "et_hour": et_hour, "bars": []}
 
     async def one(bar):
-        params = {"api_key_private": key, "venue_name": bar["name"],
-                  "venue_address": bar["address"]}
-        try:
-            async with session.post(
-                BESTTIME_API, params=params,
-                timeout=aiohttp.ClientTimeout(total=25),
-                headers={"User-Agent": USER_AGENT},
-            ) as resp:
-                if resp.status != 200:
-                    return {"name":bar["name"], "live_available":False, "live_busyness":None,
-                            "error":True, "http_status":resp.status}
-                data = await resp.json(content_type=None)
-                if not isinstance(data,dict) or not isinstance(data.get('analysis'),dict):
-                    return {"name":bar["name"], "live_available":False, "live_busyness":None,
-                            "error":True, "failure_type":"invalid_schema"}
-            an = data.get("analysis") or {}
-            live_ok = an.get("venue_live_busyness_available") is True
-            return {
-                "name": bar["name"],
-                "live_available": live_ok,
-                "live_busyness": an.get("venue_live_busyness") if live_ok else None,
-                "forecasted": an.get("venue_forecasted_busyness"),
-                "delta": an.get("venue_live_forecasted_delta") if live_ok else None,
-                "open": (data.get("venue_info") or {}).get("venue_open"),
-            }
-        except Exception as e:
-            log.warning(f"BestTime {bar['name']} failed: {type(e).__name__}")
-            return {"name": bar["name"], "live_available": False, "live_busyness": None,
-                    "forecasted": None, "delta": None, "open": None, "error": True}
+        result = await besttime_live(session, key, bar)
+        for extra in ("venue_lat", "venue_lng", "venue_address"):
+            result.pop(extra, None)
+        return result
 
     bars = await asyncio.gather(*(one(b) for b in PENTAGON_BARS))
     live_bars = [b for b in bars if b["live_available"] and b["live_busyness"] is not None]
@@ -2331,6 +2425,7 @@ async def main():
             gdelt_task, news_task, seismic_task, wiki_task, notam_task, bars_task
         )
         gdelt_events = await gdelt_events_task
+        pizza_fallback = await measured("pizza_besttime", fetch_pizza_besttime(session, pizzint_data))
         kalshi = await measured("kalshi", fetch_kalshi(session, previous.get("kalshi")))
         news_sampling = news["sampling"]
         news = news["headlines"]
@@ -2374,7 +2469,7 @@ async def main():
 
         english_cache = await english_titles(session, [*news, *tw_news], previous)
 
-    pizza_shops  = transform_pizza_shops(pizzint_data)
+    pizza_shops  = transform_pizza_shops(pizzint_data, pizza_fallback)
     pizza_index  = (pizzint_data.get("defcon_details") or {}).get("smoothed_index")
     if pizza_index is None:
         pizza_index = pizzint_data.get("overall_index")

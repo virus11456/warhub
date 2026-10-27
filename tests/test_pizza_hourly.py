@@ -41,3 +41,69 @@ class PizzaHourlyTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+from unittest.mock import patch
+
+MAPS = 'https://www.google.com/maps/place/x/@38.85,-77.04,17z/data=!3d38.8551791!4d-77.049733!16s'
+
+
+class FakeResp:
+    def __init__(self, body, status=200): self.body, self.status = body, status
+    async def __aenter__(self): return self
+    async def __aexit__(self, *a): return False
+    async def json(self, content_type=None): return self.body
+
+
+class FakeSession:
+    def __init__(self, body): self.body, self.calls = body, []
+    def post(self, url, params=None, **kw):
+        self.calls.append(params['venue_name'])
+        return FakeResp(self.body)
+
+
+def live(busy=55, lat=38.8552, lng=-77.0497, address=None, forecast=50):
+    info = {'venue_open': 'Open'}
+    if lat is not None: info.update(venue_lat=lat, venue_lon=lng)
+    if address: info['venue_address'] = address
+    return {'analysis': {'venue_live_busyness_available': True, 'venue_live_busyness': busy,
+                         'venue_forecasted_busyness': forecast, 'venue_live_forecasted_delta': busy - forecast},
+            'venue_info': info}
+
+
+class PizzaBestTimeTests(unittest.IsolatedAsyncioTestCase):
+    payload = {'data': [shop(address=MAPS), {'name': 'Pizzato Pizza', 'current_popularity': 40, 'address': MAPS},
+                        {'name': 'Extreme Pizza', 'current_popularity': None, 'is_closed_now': True, 'address': MAPS}]}
+
+    async def run_fb(self, body, hour=18, key='k'):
+        session = FakeSession(body)
+        with patch.dict('os.environ', {'BESTTIME_API_KEY': key}), patch.object(collector, 'besttime_et_hour', return_value=hour):
+            return await collector.fetch_pizza_besttime(session, self.payload), session
+
+    async def test_only_after_work_hours_and_only_shops_missing_live_values(self):
+        out, session = await self.run_fb(live())
+        self.assertEqual(session.calls, ['We, The Pizza'])          # live shop and explicitly closed shop not queried
+        self.assertEqual(out['We, The Pizza']['live_busyness'], 55)
+        out, session = await self.run_fb(live(), hour=13)
+        self.assertEqual((out, session.calls), ({}, []))
+        out, session = await self.run_fb(live(), key='')
+        self.assertEqual((out, session.calls), ({}, []))
+
+    async def test_wrong_venue_or_no_live_value_is_ignored(self):
+        self.assertEqual((await self.run_fb(live(lat=38.95, lng=-77.2)))[0], {})
+        no_live = live(); no_live['analysis']['venue_live_busyness_available'] = False
+        self.assertEqual((await self.run_fb(no_live))[0], {})
+        # Without coordinates the street number and name must match.
+        self.assertIn('We, The Pizza', (await self.run_fb(live(lat=None, address='2100 Crystal Dr, Arlington')))[0])
+        self.assertEqual((await self.run_fb(live(lat=None, address='1800 Wilson Blvd, Arlington')))[0], {})
+
+    def test_backup_fills_only_missing_values_and_is_labelled(self):
+        fb = {'We, The Pizza': {'live_busyness': 0, 'forecasted': 40, 'recorded_at': 't'},
+              'Pizzato Pizza': {'live_busyness': 99, 'forecasted': 10, 'recorded_at': 't'}}
+        rows = {r['name']: r for r in collector.transform_pizza_shops(self.payload, fb)}
+        we = rows['We, The Pizza']
+        self.assertEqual((we['busyness'], we['is_open'], we['data_source'], we['percentage_of_usual']), (0, True, 'besttime', 0))
+        self.assertEqual(we['hourly_24h'][-1], {'at': 't', 'v': 0, 'source': 'besttime'})
+        self.assertEqual(rows['Pizzato Pizza']['busyness'], 40)          # PizzINT value wins
+        self.assertNotEqual(rows['Pizzato Pizza']['data_source'], 'besttime')
+        self.assertEqual(rows['Extreme Pizza']['status'], 'closed')

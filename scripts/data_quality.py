@@ -72,7 +72,8 @@ def source_health(data):
         if key == 'pizza':
             n = sum(1 for s in v or [] if s.get('busyness') is not None and s.get('is_open'))
             status = 'available' if n else 'unavailable'
-            note = f'{n} 店有即時人流；未觀測不等同已打烊'
+            b = sum(1 for s in v or [] if s.get('busyness') is not None and s.get('is_open') and s.get('data_source') == 'besttime')
+            note = f'{n} 店有即時人流' + (f'（{b} 店為 BestTime 備援）' if b else '') + '；未觀測不等同已打烊'
             observed = (data.get('defcon_details') or {}).get('at_time')
         if key == 'news' and isinstance(data.get('news_sampling'), dict):
             samples = data['news_sampling'].get('by_region') or {}

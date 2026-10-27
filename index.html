@@ -1376,6 +1376,7 @@
   #region-board{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))!important}
 }
 
+.pizza-src{margin-top:.15rem;font-size:.75rem;color:var(--accent3);font-weight:400}
 .pizza-radar-summary{display:flex;flex-direction:column;gap:.25rem;margin:.6rem 0 .8rem;padding:.7rem .9rem;border:1px solid var(--border);border-left:4px solid var(--text-dim);background:rgba(255,255,255,.03);font-size:.9rem;line-height:1.5}
 .pizza-radar-summary strong{font-size:1.05rem;color:var(--text)}
 .pizza-radar-summary span{color:var(--text-dim);font-size:.8rem}
@@ -2383,7 +2384,7 @@ function renderPizzaShops(shops) {
         </div>
         ${pizzaHourlyChart(shop, isClosed ? 'var(--accent)' : barColor) || sparklineSvg(shop.sparkline, barColor)}
         <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:rgba(255,255,255,0.25);margin-top:0.2rem;text-align:right;">
-          ${isClosed ? '目前未營業' : '<span style=\"font-weight:700;\">' + devStr + '</span>'}
+          ${isClosed ? '目前未營業' : '<span style=\"font-weight:700;\">' + devStr + '</span>'}${shop.data_source === 'besttime' && shop.busyness != null ? '<div class=\"pizza-src\">來源：BestTime 備援</div>' : ''}
         </div>
       </div>
     </div>`;
@@ -2720,6 +2721,7 @@ async function fetchRealPizzaData() {
         shop.hourly_24h          = Array.isArray(incoming.hourly_24h) ? incoming.hourly_24h : null;
         shop.usual_week          = incoming.usual_week || null;
         shop.recorded_at         = incoming.recorded_at || null;
+        shop.data_source         = incoming.data_source || null;
       });
 
       const status = evaluatePizzaStatus(PIZZA_SHOPS_DATA);
