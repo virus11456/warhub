@@ -66,6 +66,9 @@ assert.equal(w.pizzaHourlyChart({name:'y'},'red'),'');
 w.renderPizzaShops([{...shop,is_open:true,busyness:30,status:'quiet'}]);
 assert.ok(d.querySelector('#pizza-hourly-legend').textContent.includes('週二'));
 assert.equal(d.querySelectorAll('#pizza-shops-grid .pizza-hourly').length,1);}
+d.defaultView.renderPizzaShops([{name:'b',is_open:true,busyness:30,status:'quiet',data_source:'besttime'},{name:'c',is_open:true,busyness:30,status:'quiet',data_source:'google'}]);
+assert.equal(d.querySelectorAll('#pizza-shops-grid .pizza-src').length,1,'backup source is labelled only on backup values');
+
 // Air activity: notices vs usual per region; missing stays missing, zero stays zero, closure wins the summary.
 {const w=d.defaultView,sum=()=>d.querySelector('#air-summary').textContent,rows=()=>d.querySelector('#air-regions').textContent;
 const regions=[{key:'taiwan',name:'台海',factors:{notam_danger:20,notam_baseline:20.1,avi_count:0}},

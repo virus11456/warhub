@@ -5,12 +5,13 @@ description: "Maintain WARHUB PizzINT and BestTime foot-traffic collectors. Use 
 
 # WARHUB 披薩與酒吧人流
 
-讀 `scripts/fetch_data.py` 的 `fetch_pizzint`、`transform_pizza_shops`、`fetch_bars` 及 `scripts/data_quality.py`。執行與封存規則見 [抓取與封存](../warhub-collection/SKILL.md)。
+讀 `scripts/fetch_data.py` 的 `fetch_pizzint`、`transform_pizza_shops`、`fetch_pizza_besttime`、`fetch_bars` 及 `scripts/data_quality.py`。執行與封存規則見 [抓取與封存](../warhub-collection/SKILL.md)。
 
 | 入口 | 來源 | 輸出 |
 |---|---|---|
 | `fetch_pizzint` | `https://www.pizzint.watch/api/dashboard-data` | 原始店家經轉換產生 `data.json.pizza`、`pizza_index` 等，供 WPI 與店家卡 |
 | `fetch_bars` | BestTime `/api/v1/forecasts/live` | `data.json.bars`；需 `BESTTIME_API_KEY` |
+| `fetch_pizza_besttime` | BestTime `/api/v1/forecasts/live`（與酒吧共用 `besttime_live`） | 只補 PizzINT 缺即時值的披薩店；寫入 `data.json.pizza[].data_source='besttime'` |
 
 PizzINT 每輪快來源；以 `SHOPS_TO_DISPLAY` 精確對應上游名稱。先檢查店家是否存在，再判斷目前人流、營業狀態和可比較基準。店家清單有資料不表示即時人流可用。`current_popularity=None` 不得填零；沒有任何有效即時店家時，披薩指數不能當有效零分。
 
@@ -38,3 +39,5 @@ research/pizza-reviews.json 保存版本化重大行動定義與逐事件審核�
 2026-10-27店家24小時長條圖：`pizza_hourly`（由`transform_pizza_shops`呼叫，同一次PizzINT請求，不增加請求或排程）另存兩欄。`hourly_24h`為上游`sparkline_24h`最近24筆`{at: 原recorded_at, v}`，v只收0–100，None＝無資料，0是有效空店，不互補。`usual_week`為`baseline_popular_times`轉成`'0'`(週日)…`'6'`(週六)各24格（索引＝美東小時），無效日鍵／小時／數值丟棄成None；週日＝0依店家平日／週末型態判斷，上游改格式時先比對辦公區店家（如We, The Pizza）平日高、週末低再調整。舊`sparkline`保留相容。前端`pizzaHourlyChart`以快照最新觀測時間的美東日期與星期：灰柱＝該星期平常值，亮柱＝同一美東日期的實測，虛線框＝資料時間所在小時；昨日點不畫，圖例只在格子上方顯示一次。這是Google平常人潮與實測對照，不代表訂單量。測試：tests/test_pizza_hourly.py、tests/test_frontend.cjs。
 
 2026-10-27 PizzINT 上游停更：dashboard-data 每家店 data_source='none'、current_popularity 與 sparkline_24h 全為 null（24小時內0筆實測），屬上游無資料，非本站解析錯誤。前端 renderPizzaRadar 在全部店家 data_source==='none' 時顯示「來源 PizzINT 目前沒有提供即時人流（上游暫停，不是店家打烊）」，不當作打烊或零。Nighthawk Brewery & Pizza 已不在上游清單，從 SHOPS_TO_DISPLAY 與前端 PIZZA_SHOPS_DATA 移除；歷史快照不改。以 BestTime 為披薩店備援會耗用付費額度，需使用者另行同意。
+
+2026-10-27 披薩店 BestTime 備援（使用者同意，僅美東下班時段）：fetch_pizza_besttime 只在 BAR_QUERY_ET_HOURS（美東16–24時，含夏令）且有 BESTTIME_API_KEY 時執行，只查 PizzINT current_popularity 為 null 且非 is_closed_now 的店（最多6家／輪，約每2小時一輪），不重試。場地用 PIZZA_BESTTIME_VENUES 的名稱＋地址（由 PizzINT Google Maps 座標反查）；BestTime 回傳場地座標須在 PizzINT 座標 0.4 公里內，無座標時門牌號與街名須相符，否則丟棄（避免同名分店）。只採 venue_live_busyness_available=true 的值；無值不補零、不代表打烊。transform_pizza_shops 只在 PizzINT 缺值時填入：busyness＝BestTime 即時值、percentage_of_usual＝即時÷預測×100（預測缺或為0則 None）、data_source='besttime'、recorded_at＝查詢時間，並把該點附加到 hourly_24h（source='besttime'）。PizzINT 有值時一律以 PizzINT 為準。pizza_index／DEFCON 仍只用 PizzINT，不以備援值計算。前端卡片標「來源：BestTime 備援」，source_health 註明備援店數。測試：tests/test_pizza_hourly.py（時段、只查缺值店、座標／地址比對、PizzINT 優先、有效零）、tests/test_frontend.cjs。
