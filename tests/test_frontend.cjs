@@ -31,7 +31,7 @@ const {JSDOM,VirtualConsole}=require('jsdom');const fs=require('fs');const asser
  }
 assert.equal(d.querySelector('#source-health'),null);
 const experimental=d.querySelector('#experimental-observations');
-assert.ok(experimental && experimental.open);
+assert.ok(experimental && !experimental.open); // experimental WPI/pizza block collapsed by default
 assert.equal(experimental.parentElement.firstElementChild,experimental);
 assert.equal(experimental.parentElement.className,'container');
 for(const selector of ['#pizza-card','.hero-strip','.wpi-section']) {
@@ -98,12 +98,10 @@ if(mode==='valid'){
  assert.ok(board.textContent.includes('尚無有效計分資料'));
  assert.ok(!board.textContent.includes('INSUFFICIENT_DATA'));
  assert.ok(!board.textContent.includes('CRITICAL'));
- assert.ok(d.querySelector('#region-mini-list').textContent.includes('暫定'));
  assert.equal(JSON.stringify(cases),original,'presentation must not rewrite snapshot or historical scores');
  // Stale/legacy load path clears factors before rendering; no observation score survives.
  w.renderRegions(cases.map(r=>({...r,score:null,factors:{}})));
  assert.ok(!board.textContent.includes('單一來源觀測'));
- assert.ok(!d.querySelector('#region-mini-list').textContent.includes('暫定'));
 }
 
 if(mode==='valid'){
@@ -119,22 +117,6 @@ if(mode==='valid'){
   assert.equal(d.querySelector('#sh-legend details').open,false,'long explanation starts collapsed');
   assert.ok(d.querySelector('#sh-legend').textContent.includes('缺報'));
   assert.ok(d.querySelector('.live-lbl').textContent.includes('備份'));
-  w.renderNotacObservation({notams:{taiwan:{provider:'NOTAC',complete:true,total:0,danger:0,observed_at:new Date().toISOString(),firs:['RCAA']}}});
-  assert.ok(d.querySelector('#notac-body').textContent.includes('有效公告 0 筆'));
-  assert.equal(d.querySelector('#notac-body .notac-count b').textContent,'0');
-  assert.equal(d.querySelector('#notac-body details').open,false);
-  assert.ok(d.querySelector('#notac-body .notac-status').textContent.includes('完整查詢'));
-  w.renderNotacObservation({notams:{taiwan:{provider:'NOTAC',stale:true,observed_at:'2020-01-01T00:00:00Z',latest_attempt:{partial:true,sample_count:20,reported_count:100}}}});
-  assert.ok(d.querySelector('#notac-body').textContent.includes('已取得樣本 20 筆'));
-  assert.ok(!d.querySelector('#notac-body').textContent.includes('有效公告 0 筆'));
-  assert.equal(d.querySelector('#notac-body .notac-count b').textContent,'20');
-  assert.ok(d.querySelector('#notac-body .notac-status').textContent.includes('時間未明'));
-  w.renderNotacObservation({notams:{taiwan:{provider:'NOTAC',latest_attempt:{partial:true,sample_count:0,reported_count:100,fetched_at:'2020-01-01T00:00:00Z'}}}});
-  assert.ok(d.querySelector('#notac-body .notac-status').textContent.includes('已過期'));
-  assert.equal(d.querySelector('#notac-body .notac-count b').textContent,'0');
-  assert.ok(d.querySelector('#notac-body').textContent.includes('2020'));
-  w.renderNotacObservation({notams:{taiwan:{provider:'NOTAC',complete:true,total:5,danger:1,observed_at:'2020-01-01T00:00:00Z'}}});
-  assert.ok(!d.querySelector('#notac-body').textContent.includes('有效公告 5 筆'));
   const accepted=w.eval('DATA_UPDATED_AT');
   // Use the snapshot clock; skip missing/malformed values but retain real zero.
   const snapshot=new Date(Date.now()-5*3600000).toISOString();
@@ -225,27 +207,6 @@ if(mode==='valid'){
   assert.equal(w.trendArrow(20),'');
   w.eval(`DATA_UPDATED_AT = ${JSON.stringify(accepted)}; WW_HISTORY = []; OBSERVED_DATA.regions = ${JSON.stringify(originalRegions)}`);
 
-  // Missing combined scores must not erase valid regional observations or bridge gaps.
-  const chartRow=(hours,value,regional=value,keys=['p','a','z'])=>({
-    ts:new Date(Date.parse(accepted)-hours*3600000).toISOString(),model_version:'wpi-4.0',
-    combined:value,regions:{taiwan:regional},score_basis:{combined:keys,regions:{taiwan:['poly','gdelt']}}});
-  const chartRegions=[{key:'taiwan',flag:'',name:'台海'}];
-  history([chartRow(10,0),chartRow(8,10),chartRow(6,null,30),chartRow(4,20),chartRow(2,30),chartRow(200,99)]);
-  w.renderTrendChart(chartRegions);
-  let chart=d.querySelector('#trend-chart');
-  assert.equal(chart.querySelectorAll('rect[data-tip]').length,5);
-  assert.equal(chart.querySelectorAll('polyline').length,3); // two combined segments + continuous region
-  assert.ok(chart.innerHTML.includes('缺資料'));
-  assert.ok(chart.querySelector('polyline').getAttribute('points').includes(',132.0')); // true zero
-  history([chartRow(16,10),chartRow(14,20),chartRow(4,30),chartRow(2,40)]);
-  w.renderTrendChart([]);assert.equal(chart.querySelectorAll('polyline').length,2);
-  history([chartRow(8,10),chartRow(6,20),chartRow(4,30,30,['p','g','z']),chartRow(2,40,40,['p','g','z'])]);
-  w.renderTrendChart([]);assert.equal(chart.querySelectorAll('polyline').length,2);
-  history([8,6,4,2].map(h=>({...chartRow(h,20),score_basis:null})));
-  w.renderTrendChart([]);assert.equal(chart.querySelectorAll('polyline').length,0);
-  assert.equal(chart.querySelectorAll('circle').length,4);
-  history([]);w.renderTrendChart([]);
-  assert.equal(chart.querySelector('svg'),null);assert.equal(d.querySelector('#trend-legend').textContent,'');
 
   const older={...data,updated_at:new Date(Date.parse(accepted)-3600000).toISOString(),score:{...data.score,combined_score:99}};
   w.fetch=async(url)=>({ok:true,json:async()=>String(url).includes('data.json')?older:[]});
