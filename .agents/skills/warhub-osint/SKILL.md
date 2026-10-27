@@ -115,3 +115,5 @@ GDELT DOC API 對共用 IP（GitHub runner 及雲端主機）第一個請求即�
 
 
 2026-10-27 GDELT events 批次缺檔修正：lastupdate.txt 常先於檔案上線，最新1–3批會暫時404；原本固定取最新8批、少於6批就整輪失敗（2026-10-27 15:31 即因此 ValueError，地區新聞強度全部變 stale）。fetch_gdelt_events 改為由新到舊逐批取，缺檔往前補，最多多試 BATCH_EXTRA=4 批（每輪至多 1 清單＋12 批，仍不重試），取滿8批即停；視窗起訖以實際取到的最舊／最新批次為準，latest_batch 為實際最新批。仍少於6批才失敗並沿用舊序列標 stale，不補零。tests/test_gdelt_event_intensity.py 覆蓋最新兩批404與大量缺檔。collect_gdelt_events.py（六小時原始封存抽樣）只抓清單所列最新批，未改。
+
+2026-10-27 地區卡移除「參考（不計分）：熱異常 · 廣域軍機」行：軍機數已在空中動態卡逐區顯示，熱異常在地球圖與 FIRMS 卡；regions[].factors.firms_hotspots／avi_count 資料與計分不變。

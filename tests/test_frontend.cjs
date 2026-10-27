@@ -143,6 +143,7 @@ if(mode==='valid'){
  assert.ok(!board.textContent.includes('資料有限'),'caveat shown once under the board, not on every card');
  assert.ok(board.parentElement.textContent.includes('資料有限，不是整體風險'));
  assert.ok(board.textContent.includes('尚無有效計分資料'));
+ assert.ok(!board.textContent.includes('參考（不計分）'),'aircraft/heat reference line removed; aircraft live in the air card');
  assert.ok(!board.textContent.includes('INSUFFICIENT_DATA'));
  assert.ok(!board.textContent.includes('CRITICAL'));
  assert.equal(JSON.stringify(cases),original,'presentation must not rewrite snapshot or historical scores');
