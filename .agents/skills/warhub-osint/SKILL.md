@@ -110,3 +110,5 @@ GDELT DOC API 對共用 IP（GitHub runner 及雲端主機）第一個請求即�
 
 舊地區分數 min(100, danger×8 + 關閉40) 在繁忙 FIR 飽和：台北約19、中東約50、南海約26筆危險關鍵字公告，永遠100；烏克蘭／北韓長期約0。`scripts/notam_baseline.py` 改為各區自身7天基準：只收 complete、非 stale、有效時間與非負整數 danger 的觀測，依 observed_at 去重存於 data.json.notam_baseline。需≥12個較早樣本且跨≥24小時；分數＝min(100, 50×(本輪+1)／(基準平均+1))，平常＝50，+1 平滑讓 0 對 0 為50、3 對 0 為100。基準不足或本輪不完整時不計分、不用舊絕對分數，卡片仍顯示原始筆數與「累積中」。首次沒有序列時一次性從 archives 已保存分析快照（非 source_observation）回建最近7天真實觀測，最多讀800檔約數秒；不推測、不補值。地區 factors.notam_source=relative，history score_basis 記 notam_rel，前端箭頭同步對應，不與舊分數比較。關閉旗標照常顯示但不再加分。tests/test_notam_baseline.py 驗證基準門檻、平滑、去重、7天窗口、回建只讀分析快照與計分基礎。
 
+
+2026-10-27「空中動態」卡（只改呈現，不改NOTAM／ADS-B收集或地區計分）：原「航空異常監控(AVI)」從收合的進階OSINT格移到台海區塊下方的#air-card，與領空公告合併。renderAirActivity逐地區讀regions[].factors：notam_danger（現在危險公告數）、notam_baseline（7天平常值）、notam_closure、avi_count，與notams[key].observed_at／stale。缺值顯示「無新鮮完整資料」或「平常值累積中」，0是有效值；airCompare：現在≥平常1.5倍且至少多3筆＝明顯偏多，≤一半且至少少3筆＝偏少，其餘＝跟平常差不多。摘要優先序：關閉公告→明顯偏多→都差不多→資料不足，並附全球可見軍機總數。avi-*元素id不變，renderAviation照舊填入；機型清單收進details。資料過期路徑呼叫renderAirActivity({})暫停判讀。測試：tests/test_frontend.cjs。
