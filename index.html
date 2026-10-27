@@ -1375,6 +1375,14 @@
   #region-board{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))!important}
 }
 
+/* Phones: two pizza cards per row so all six fit on about one screen. */
+@media (max-width:640px){
+  #pizza-shops-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:.45rem}
+  #pizza-shops-grid .pizza-shop{padding:.55rem;min-width:0}
+  #pizza-shops-grid .shop-name{overflow-wrap:anywhere;line-height:1.35;margin-bottom:.35rem}
+  #pizza-shops-grid .shop-status{flex-wrap:wrap;row-gap:.15rem}
+  #pizza-shops-grid .pizza-hourly svg{height:36px!important}
+}
 .pizza-src{margin-top:.15rem;font-size:.75rem;color:var(--accent3);font-weight:400}
 .pizza-radar-summary{display:flex;flex-direction:column;gap:.25rem;margin:.6rem 0 .8rem;padding:.7rem .9rem;border:1px solid var(--border);border-left:4px solid var(--text-dim);background:rgba(255,255,255,.03);font-size:.9rem;line-height:1.5}
 .pizza-radar-summary strong{font-size:1.05rem;color:var(--text)}
