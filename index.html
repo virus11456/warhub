@@ -2298,7 +2298,6 @@ const PIZZA_SHOPS_DATA = [
   { name: "Domino's Pizza (Pentagon Closest)", busyness: null, baseline: 35, icon: "🍕", is_open: null, status: "unavailable" },
   { name: "Extreme Pizza",                     busyness: null, baseline: 30, icon: "🍕", is_open: null, status: "unavailable" },
   { name: "District Pizza Palace",             busyness: null, baseline: 32, icon: "🍕", is_open: null, status: "unavailable" },
-  { name: "Nighthawk Brewery & Pizza",         busyness: null, baseline: 35, icon: "🍕", is_open: null, status: "unavailable" },
 ];
 
 // 異常閾值設定
@@ -2874,6 +2873,7 @@ function renderPizzaRadar(json) {
   const barsList = Array.isArray(bars.bars) ? bars.bars : [];
   let headline, tone;
   if (!shops.length) { headline = '尚未取得披薩店資料'; tone = 'dim'; }
+  else if (!live.length && shops.every(s => s && s.data_source === 'none')) { headline = '來源 PizzINT 目前沒有提供即時人流（上游暫停，不是店家打烊）'; tone = 'dim'; }
   else if (!live.length) { headline = `${dc ? `華府 ${dc} 的資料：` : ''}${shops.length} 家店都沒有即時人流`; tone = 'dim'; }
   else if (busy.length) { headline = `${busy.length} 家店人流高於平常${top != null ? `（最高為平常的 ${Math.round(top)}%）` : ''}`; tone = 'hot'; }
   else { headline = `${live.length}/${shops.length} 家店營業中，人流在平常範圍內`; tone = 'ok'; }

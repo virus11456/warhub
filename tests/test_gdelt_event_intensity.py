@@ -159,14 +159,15 @@ class Session:
     def __init__(self, files, status=200): self.files, self.status, self.urls = files, status, []
     def get(self, url, **kwargs):
         self.urls.append(url)
-        return Response(self.status, self.files.get(url.rsplit('/', 1)[1], b''))
+        name = url.rsplit('/', 1)[1]
+        return Response(self.status if self.status != 200 or name in self.files else 404, self.files.get(name, b''))
 
 
 class FetchTests(unittest.IsolatedAsyncioTestCase):
     def files(self):
         latest = datetime.now(timezone.utc).replace(second=0, microsecond=0)
         latest -= timedelta(minutes=latest.minute % 15)
-        stamps = gei.batch_stamps(latest.strftime('%Y%m%d%H%M%S'))
+        stamps = gei.batch_stamps(latest.strftime('%Y%m%d%H%M%S'), gei.BATCHES + gei.BATCH_EXTRA)
         files = {f'{s}.export.CSV.zip': export_zip(s, [event(int(s[-6:]) + i, 10, a1='UKR' if i == 0 else 'USA')
                                                        for i in range(2)]) for s in stamps}
         blob = files[f'{stamps[-1]}.export.CSV.zip']
@@ -182,6 +183,29 @@ class FetchTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(state['series'][-1]['region_articles']['ukraine'], 80)
         self.assertEqual(state['series'][-1]['total_articles'], 160)
         self.assertEqual(state['regions']['ukraine']['reason'], 'baseline_accumulating')
+
+    async def test_newest_batches_not_yet_online_are_replaced_by_older_ones(self):
+        files = self.files()
+        names = sorted(n for n in files if n.endswith('.export.CSV.zip'))
+        for name in names[-3:-1]:          # lastupdate lists the newest, but two recent files still 404
+            del files[name]
+        session = Session(files)
+        state = await collector.fetch_gdelt_events(session, {})
+        self.assertEqual(state['status'], 'available')
+        self.assertEqual(state['series'][-1]['batches'], gei.BATCHES)
+        self.assertEqual(len(session.urls), 1 + gei.BATCHES + 2)
+        oldest = datetime.strptime(names[-gei.BATCHES - 2][:14], '%Y%m%d%H%M%S').replace(tzinfo=timezone.utc)
+        self.assertEqual(state['series'][-1]['window_start'], (oldest - timedelta(minutes=15)).isoformat())
+
+    async def test_too_many_missing_batches_fail_without_inventing_a_sample(self):
+        files = self.files()
+        for name in sorted(n for n in files if n.endswith('.export.CSV.zip'))[:-1]:
+            del files[name]
+        session = Session(files)
+        state = await collector.fetch_gdelt_events(session, {})
+        self.assertEqual((state['status'], state['error']), ('failed', 'ValueError'))
+        self.assertEqual(len(session.urls), 1 + gei.BATCHES + gei.BATCH_EXTRA)
+        self.assertEqual(state['series'], [])
 
     async def test_rate_limit_keeps_previous_observations_stale(self):
         previous = {'series': series(14, end=datetime.now(timezone.utc) - timedelta(hours=1)),

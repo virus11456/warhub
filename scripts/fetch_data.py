@@ -77,8 +77,7 @@ SHOPS_TO_DISPLAY = [
     "Domino's Pizza (Pentagon Closest)",
     "Extreme Pizza",
     "District Pizza Palace",
-    "Nighthawk Brewery & Pizza",
-]
+]  # Nighthawk Brewery & Pizza：2026-10 起 PizzINT 已不再追蹤，移除以免永遠顯示無資料
 
 WAR_KEYWORDS = [
     "war", "strike", "airstrike", "attack", "invasion", "invade",
@@ -846,12 +845,12 @@ GDELT_EVENTS_BUDGET_SECONDS = 40
 async def fetch_gdelt_events(session: aiohttp.ClientSession, previous: dict | None = None) -> dict:
     """
     GDELT 2.0 Events 匯出檔（每 15 分鐘一批）的地區衝突事件報導佔比；DOC API 被共用 IP 限流時的備援。
-    每輪最多 1 個清單 + 8 個批次檔（約 2 小時、<1 MB），不重試；失敗保留舊序列並標 stale，不補零。
+    每輪 1 個清單 + 8 個批次檔（約 2 小時、<1 MB）；最新批次尚未上線時最多往前多試 4 批，不重試；失敗保留舊序列並標 stale，不補零。
     與 DOC timelinevol 是不同量測，另存於 gdelt_events，只和自己的 48 小時基準比較。
     """
     from datetime import timedelta
     from probe_gdelt_events import BASE, LIMIT, manifest_entries, rows_from_zip, rows_from_archive
-    from gdelt_event_intensity import BATCHES, batch_stamps, count_articles, sample, update_series, regional_metrics
+    from gdelt_event_intensity import BATCHES, BATCH_EXTRA, batch_stamps, count_articles, sample, update_series, regional_metrics
     previous = previous or {}
     now = datetime.now(timezone.utc)
     state = {"provider": "gdelt_events", "attempted_at": now.isoformat(),
@@ -875,24 +874,29 @@ async def fetch_gdelt_events(session: aiohttp.ClientSession, previous: dict | No
         nonlocal new_sample
         entries = manifest_entries((await get(BASE + "lastupdate.txt")).decode())
         latest = entries["export"]
-        stamps = batch_stamps(latest["batch"])
-        batches = []
+        # lastupdate.txt 常先於檔案上線：最新 1–3 批可能暫時 404。由新到舊逐批取，缺的往前補，
+        # 最多多試 BATCH_EXTRA 批；視窗以實際取到的最舊／最新批次為準。
+        stamps = batch_stamps(latest["batch"], BATCHES + BATCH_EXTRA)[::-1]
+        got = []
         for stamp in stamps:
+            if len(got) >= BATCHES:
+                break
             try:
                 blob = await get(BASE + f"{stamp}.export.CSV.zip")
                 rows = (rows_from_zip(blob, latest, 61) if stamp == latest["batch"]
                         else rows_from_archive(blob, f"{stamp}.export.CSV", 61))
-                batches.append(rows)
+                got.append((stamp, rows))
             except SourceBackoff:
                 raise
             except Exception as exc:
                 log.warning("GDELT events batch %s skipped: %s", stamp, type(exc).__name__)
-        if len(batches) < BATCHES - 2:
+        if len(got) < BATCHES - 2:
             raise ValueError("insufficient_batches")
-        end = datetime.strptime(stamps[-1], "%Y%m%d%H%M%S").replace(tzinfo=timezone.utc)
-        start = datetime.strptime(stamps[0], "%Y%m%d%H%M%S").replace(tzinfo=timezone.utc) - timedelta(minutes=15)
-        new_sample = {**sample(count_articles(batches), start, end), "batches": len(batches)}
-        state.update(latest_batch=stamps[-1])
+        got.sort()
+        end = datetime.strptime(got[-1][0], "%Y%m%d%H%M%S").replace(tzinfo=timezone.utc)
+        start = datetime.strptime(got[0][0], "%Y%m%d%H%M%S").replace(tzinfo=timezone.utc) - timedelta(minutes=15)
+        new_sample = {**sample(count_articles([rows for _, rows in got]), start, end), "batches": len(got)}
+        state.update(latest_batch=got[-1][0])
 
     try:
         await asyncio.wait_for(collect(), timeout=GDELT_EVENTS_BUDGET_SECONDS)

@@ -112,3 +112,6 @@ GDELT DOC API 對共用 IP（GitHub runner 及雲端主機）第一個請求即�
 
 
 2026-10-27「空中動態」卡（只改呈現，不改NOTAM／ADS-B收集或地區計分）：原「航空異常監控(AVI)」從收合的進階OSINT格移到台海區塊下方的#air-card，與領空公告合併。renderAirActivity逐地區讀regions[].factors：notam_danger（現在危險公告數）、notam_baseline（7天平常值）、notam_closure、avi_count，與notams[key].observed_at／stale。缺值顯示「無新鮮完整資料」或「平常值累積中」，0是有效值；airCompare：現在≥平常1.5倍且至少多3筆＝明顯偏多，≤一半且至少少3筆＝偏少，其餘＝跟平常差不多。摘要優先序：關閉公告→明顯偏多→都差不多→資料不足，並附全球可見軍機總數。avi-*元素id不變，renderAviation照舊填入；機型清單收進details。資料過期路徑呼叫renderAirActivity({})暫停判讀。測試：tests/test_frontend.cjs。
+
+
+2026-10-27 GDELT events 批次缺檔修正：lastupdate.txt 常先於檔案上線，最新1–3批會暫時404；原本固定取最新8批、少於6批就整輪失敗（2026-10-27 15:31 即因此 ValueError，地區新聞強度全部變 stale）。fetch_gdelt_events 改為由新到舊逐批取，缺檔往前補，最多多試 BATCH_EXTRA=4 批（每輪至多 1 清單＋12 批，仍不重試），取滿8批即停；視窗起訖以實際取到的最舊／最新批次為準，latest_batch 為實際最新批。仍少於6批才失敗並沿用舊序列標 stale，不補零。tests/test_gdelt_event_intensity.py 覆蓋最新兩批404與大量缺檔。collect_gdelt_events.py（六小時原始封存抽樣）只抓清單所列最新批，未改。
