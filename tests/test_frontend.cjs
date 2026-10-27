@@ -63,6 +63,21 @@ assert.equal(w.pizzaHourlyChart({name:'y'},'red'),'');
 w.renderPizzaShops([{...shop,is_open:true,busyness:30,status:'quiet'}]);
 assert.ok(d.querySelector('#pizza-hourly-legend').textContent.includes('週二'));
 assert.equal(d.querySelectorAll('#pizza-shops-grid .pizza-hourly').length,1);}
+// Air activity: notices vs usual per region; missing stays missing, zero stays zero, closure wins the summary.
+{const w=d.defaultView,sum=()=>d.querySelector('#air-summary').textContent,rows=()=>d.querySelector('#air-regions').textContent;
+const regions=[{key:'taiwan',name:'台海',factors:{notam_danger:20,notam_baseline:20.1,avi_count:0}},
+ {key:'korea',name:'朝鮮半島',factors:{avi_count:1}},
+ {key:'mideast',name:'美伊 / 中東',factors:{notam_danger:12,notam_baseline:0,avi_count:null}}];
+w.renderAirActivity({regions,notams:{korea:{stale:true,observed_at:new Date().toISOString()}},aviation:{summary:{total:444}}});
+assert.ok(sum().includes('美伊 / 中東的危險公告明顯多於平常'));assert.ok(sum().includes('444'));
+assert.ok(rows().includes('跟平常差不多'));assert.ok(rows().includes('無新鮮完整資料'));assert.ok(rows().includes('資料較舊'));
+assert.ok(rows().includes('0 架'));assert.ok(!rows().includes('null'));
+w.renderAirActivity({regions:[{...regions[0],factors:{...regions[0].factors,notam_closure:true}}],notams:{}});
+assert.ok(sum().includes('有領空關閉公告'));
+w.renderAirActivity({regions:[regions[1]],notams:{}});assert.ok(sum().includes('資料不足'));
+w.renderAirActivity({});assert.ok(sum().includes('暫停判讀'));assert.equal(d.querySelector('#air-regions').textContent,'');
+assert.equal(w.airCompare(3,0),'up');assert.equal(w.airCompare(2,0),'same');assert.equal(w.airCompare(0,6),'down');assert.equal(w.airCompare(null,5),null);
+assert.ok(d.querySelector('#air-card #avi-list'),'aircraft list lives inside the air card');}
 assert.equal(d.querySelector('#observation-overview'),null);
 assert.ok(!d.body.textContent.includes('分項觀察'));
 assert.ok(!d.querySelector('#ticker').textContent.includes('披薩指數'));
