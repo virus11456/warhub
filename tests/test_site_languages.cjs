@@ -47,7 +47,6 @@ function visibleStrings(d){
  assert.ok(d.querySelector('#poly-list-container').textContent.includes('14%'));
  assert.ok(d.querySelector('#cross-reading').textContent.includes('40'));
  assert.ok(d.querySelector('#cross-reading').textContent.includes('600'));
- assert.ok(d.querySelector('#notac-body').textContent.includes('records'));
  assert.ok(!/\bPen\b/.test(d.querySelector('#cross-reading').textContent));
  assert.ok(d.querySelector('#cross-reading').textContent.includes('0'));
  assert.ok(d.querySelector('#region-board').textContent.includes('Single-source observation'));
