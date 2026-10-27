@@ -105,3 +105,5 @@ Kalshi後續本機工作：refresh已實作跨輪冷卻及原時間保留、獨�
 2026-10-08 GDELT 新聞強度備援：DOC API 對共用 IP 限流，新增 fetch_gdelt_events 由 Events export 檔計算地區衝突事件報導佔比，DOC 新鮮時仍優先；不同定義另存 gdelt_events、計分基礎鍵分開。每輪最多9請求、40秒，同輪收集無新排程或通知。詳見 warhub-osint。
 
 2026-10-08 首頁精簡（僅顯示層）：WPI／披薩／酒吧實驗區改回預設收合；移除 WPI 右欄「未驗證組合假說」與重複的地區迷你列表、地區看板下的7天風險趨勢圖、獨立的「領空公告觀察」區段。NOTAM 仍照常收集並計入地區分數，地區卡片保留「領空」列；history.json 保留不刪。戰略物資、避險群聚預設收合，折疊狀態 key 改為 warhub_fold_v2（使用者先前的展開設定重置一次）。
+
+2026-10-27 首頁改版（僅顯示層）：披薩與酒吧人流為網站主要特色，#pizza-card 移到首頁第一屏、預設展開（折疊 key warhub_fold_v3，DEFAULT_FOLD 移除披薩）；WPI 單獨放在預設收合的實驗區。新增 renderPizzaRadar 一句話摘要：以店家 recorded_at 的華府時間說明快照，不用瀏覽者現在時間推論打烊；無即時人流不寫成異常或安全，酒吧僅美東下班時段查詢。tests/test_frontend.cjs 驗證位置、收合與摘要文字。

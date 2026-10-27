@@ -1369,6 +1369,13 @@
 @media (min-width:1280px){
   #region-board{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))!important}
 }
+
+.pizza-radar-summary{display:flex;flex-direction:column;gap:.25rem;margin:.6rem 0 .8rem;padding:.7rem .9rem;border:1px solid var(--border);border-left:4px solid var(--text-dim);background:rgba(255,255,255,.03);font-size:.9rem;line-height:1.5}
+.pizza-radar-summary strong{font-size:1.05rem;color:var(--text)}
+.pizza-radar-summary span{color:var(--text-dim);font-size:.8rem}
+.pizza-radar-summary.hot{border-left-color:var(--accent2)} .pizza-radar-summary.hot strong{color:var(--accent2)}
+.pizza-radar-summary.ok{border-left-color:var(--accent)}
+.pizza-radar-summary:empty{display:none}
 </style>
 </head>
 <body class="theme-8bit">
@@ -1408,24 +1415,6 @@
 </div>
 
 <div class="container">
-  <details id="experimental-observations" style="margin:1.5rem 0;border:1px solid var(--border);padding:1rem">
-    <summary style="cursor:pointer;color:var(--text)">主要看板｜WPI、披薩與酒吧</summary>
-    <p style="color:var(--text-dim);line-height:1.8">以下模型未經預測能力回測，不用來觸發戰情警報。保留原有公式、數值及歷史供研究；人流不等於訂單，也不能證實軍方加班或行動。</p>
-  <!-- ══════════ 戰情摘要（指揮中心）══════════ -->
-  <div class="hero-strip">
-    <div class="hero-wpi">
-      <div class="hero-wpi-num" id="hero-wpi-num">--</div>
-      <div class="hero-wpi-meta">
-        <div class="hero-wpi-title">WPI 實驗指數</div>
-        <div class="hero-wpi-level" id="hero-wpi-level">計算中…</div>
-      </div>
-    </div>
-    <div class="hero-regions" id="hero-regions">
-      <span style="color:var(--text-dim);font-size:.75rem">⏳ 載入地區風險…</span>
-    </div>
-    <div class="hero-alert" id="hero-alert">⏳ 載入警報狀態…</div>
-  </div>
-
   <div class="card pizza-bar-card" id="pizza-card" style="margin-bottom:1.5rem">
 
     <!-- 警報橫幅 -->
@@ -1471,6 +1460,7 @@
         </div>
       </div>
 
+      <div id="pizza-radar-summary" class="pizza-radar-summary" aria-live="polite"></div>
       <!-- DEFCON 量尺 -->
       <div style="margin:.6rem 0 .8rem">
         <div style="display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim);margin-bottom:.4rem">
@@ -1554,6 +1544,24 @@
     </div>
     </details>
   </div><!-- /.pizza-bar-card -->
+  <details id="experimental-observations" style="margin:1.5rem 0;border:1px solid var(--border);padding:1rem">
+    <summary style="cursor:pointer;color:var(--text)">WPI 實驗指數（人工權重，未回測）</summary>
+    <p style="color:var(--text-dim);line-height:1.8">以下模型未經預測能力回測，不用來觸發戰情警報。保留原有公式、數值及歷史供研究；人流不等於訂單，也不能證實軍方加班或行動。</p>
+  <!-- ══════════ 戰情摘要（指揮中心）══════════ -->
+  <div class="hero-strip">
+    <div class="hero-wpi">
+      <div class="hero-wpi-num" id="hero-wpi-num">--</div>
+      <div class="hero-wpi-meta">
+        <div class="hero-wpi-title">WPI 實驗指數</div>
+        <div class="hero-wpi-level" id="hero-wpi-level">計算中…</div>
+      </div>
+    </div>
+    <div class="hero-regions" id="hero-regions">
+      <span style="color:var(--text-dim);font-size:.75rem">⏳ 載入地區風險…</span>
+    </div>
+    <div class="hero-alert" id="hero-alert">⏳ 載入警報狀態…</div>
+  </div>
+
   <div class="wpi-section">
     <div class="wpi-topbar">
       <div>
@@ -2699,6 +2707,7 @@ async function fetchRealPizzaData() {
       HTML_WPI_STATE.spikes = !!(json.pizza_events && json.pizza_events.length);
       if (Array.isArray(json.regions) && json.regions.length) {
         renderRegions(json.regions);
+        renderPizzaRadar(json);
       }
       renderHero(json);
       window.renderPizzaBacktest?.(json.pizza_backtest);
@@ -2776,7 +2785,7 @@ async function fetchRealPizzaData() {
       if (mres && mres.ok) { MD_JSON = await mres.json(); Object.values(MD_JSON.days || {}).forEach(d=>{ if(d.model_version !== 'wpi-4.0') {d.combined=null;d.poly=null;d.regions={};} }); renderMetricsHist(); }
     } catch(err) { console.warn('[WARHUBS] metrics_daily fetch error:', err.message); }
 
-      if(json.regions){renderRegions(json.regions);}
+      if(json.regions){renderRegions(json.regions);}renderPizzaRadar(json);
     })().catch(err=>console.warn('[WARHUBS] history render error:',err.message));
 
     // Footer status indicator (在頁尾顯示「上次成功更新」)
@@ -2798,6 +2807,38 @@ async function fetchRealPizzaData() {
     const status=document.getElementById('last-update-ts');
     if(status) status.textContent='⚠ 更新失敗；畫面若有資料為上次快照，請查看資料時間';
   }
+}
+
+
+// ── 人流雷達摘要：用一句話說清楚現在披薩店／酒吧的狀態（不推論軍事行動）──
+function renderPizzaRadar(json) {
+  const el = document.getElementById('pizza-radar-summary');
+  if (!el) return;
+  const shops = Array.isArray(json?.pizza) ? json.pizza : [];
+  const live = shops.filter(s => s && s.is_open && typeof s.busyness === 'number');
+  const pct = s => typeof s.percentage_of_usual === 'number' && Number.isFinite(s.percentage_of_usual) ? s.percentage_of_usual : null;
+  const busy = live.filter(s => s.spike || (pct(s) ?? 0) >= 120);
+  const top = live.map(pct).filter(v => v != null).sort((a, b) => b - a)[0];
+  const now = new Date();
+  // Explain the snapshot by its own observation time, not the viewer's clock (data can be hours old).
+  const stamps = shops.map(s => Date.parse(s?.recorded_at)).filter(Number.isFinite);
+  const obs = stamps.length ? new Date(Math.max(...stamps)) : null;
+  const dc = obs ? obs.toLocaleTimeString('zh-TW', {timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit', hour12: false}) : null;
+  const etHour = Number(now.toLocaleString('en-US', {timeZone: 'America/New_York', hour: 'numeric', hour12: false})) % 24;
+  const bars = json?.bars || {};
+  const barsList = Array.isArray(bars.bars) ? bars.bars : [];
+  let headline, tone;
+  if (!shops.length) { headline = '尚未取得披薩店資料'; tone = 'dim'; }
+  else if (!live.length) { headline = `${dc ? `華府 ${dc} 的資料：` : ''}${shops.length} 家店都沒有即時人流`; tone = 'dim'; }
+  else if (busy.length) { headline = `${busy.length} 家店人流高於平常${top != null ? `（最高為平常的 ${Math.round(top)}%）` : ''}`; tone = 'hot'; }
+  else { headline = `${live.length}/${shops.length} 家店營業中，人流在平常範圍內`; tone = 'ok'; }
+  const barText = bars.available && barsList.length
+    ? `酒吧：${barsList.length} 家有資料`
+    : (/下班/.test(bars.reason || '') ? '酒吧：只在美東下班時段查詢' : '酒吧：本輪無資料');
+  const hoursToWindow = etHour >= 16 ? 0 : 16 - etHour;
+  const next = !live.length && hoursToWindow > 0 ? ` · 約 ${hoursToWindow} 小時後（美東 16:00）進入下班時段` : '';
+  el.className = 'pizza-radar-summary ' + tone;
+  el.innerHTML = `<strong>${escapeHtml(headline)}</strong><span>${barText}${next}。人流變化不等於軍事行動，需交叉查證。</span>`;
 }
 
 // ─── 歷史趨勢 ─────────────────────────────────────────────────
@@ -4390,9 +4431,9 @@ async function fetchFirmsEvents() { /* no-op: 改由 fetchRealPizzaData 從 data
 <script>
 /* 區段折疊：點卡片標題即可收合；狀態記在 localStorage；披薩/Polymarket/進階指標預設收合 */
 (function(){
-  var KEY='warhub_fold_v2', store={}, firstVisit=true;
+  var KEY='warhub_fold_v3', store={}, firstVisit=true;
   try{ var s=localStorage.getItem(KEY); if(s){ store=JSON.parse(s)||{}; firstVisit=false; } }catch(e){}
-  var DEFAULT_FOLD=['披薩','Polymarket','WAR PRESSURE','糧食','戰略物資','避險群聚'];
+  var DEFAULT_FOLD=['Polymarket','WAR PRESSURE','糧食','戰略物資','避險群聚'];
   function persist(){ try{ localStorage.setItem(KEY,JSON.stringify(store)); }catch(e){} }
   function clean(t){ return (t||'').replace(/\s+/g,' ').trim().slice(0,26); }
   function caret(f){ var c=document.createElement('span'); c.className='fold-caret'; c.textContent=f?'\u25B8':'\u25BE'; return c; }

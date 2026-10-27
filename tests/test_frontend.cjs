@@ -31,13 +31,24 @@ const {JSDOM,VirtualConsole}=require('jsdom');const fs=require('fs');const asser
  }
 assert.equal(d.querySelector('#source-health'),null);
 const experimental=d.querySelector('#experimental-observations');
-assert.ok(experimental && !experimental.open); // experimental WPI/pizza block collapsed by default
-assert.equal(experimental.parentElement.firstElementChild,experimental);
+assert.ok(experimental && !experimental.open); // experimental WPI block collapsed by default
 assert.equal(experimental.parentElement.className,'container');
-for(const selector of ['#pizza-card','.hero-strip','.wpi-section']) {
+// Pizza & bars are the lead feature: first on the page, outside the collapsed WPI block.
+const pizzaCard=d.querySelector('#pizza-card');
+assert.equal(pizzaCard.parentElement.firstElementChild,pizzaCard);
+assert.ok(!experimental.contains(pizzaCard));
+for(const selector of ['.hero-strip','.wpi-section']) {
   assert.equal(d.querySelectorAll(selector).length,1);
   assert.ok(experimental.contains(d.querySelector(selector)));
 }
+// Radar summary: closed shops are explained, never shown as an anomaly or as safety.
+d.defaultView.renderPizzaRadar({pizza:[{name:'a',is_open:false,busyness:null},{name:'b',is_open:false,busyness:null}],bars:{available:false,reason:'非下班時段'}});
+assert.ok(d.querySelector('#pizza-radar-summary').textContent.includes('2 家店都沒有即時人流'));
+assert.ok(!d.querySelector('#pizza-radar-summary').textContent.includes('打烊'));
+assert.ok(d.querySelector('#pizza-radar-summary').textContent.includes('只在美東下班時段'));
+d.defaultView.renderPizzaRadar({pizza:[{name:'a',is_open:true,busyness:80,percentage_of_usual:180,spike:true},{name:'b',is_open:true,busyness:30,percentage_of_usual:90}],bars:{}});
+assert.ok(d.querySelector('#pizza-radar-summary').textContent.includes('1 家店人流高於平常（最高為平常的 180%）'));
+assert.ok(d.querySelector('#pizza-radar-summary').classList.contains('hot'));
 assert.equal(d.querySelector('#observation-overview'),null);
 assert.ok(!d.body.textContent.includes('分項觀察'));
 assert.ok(!d.querySelector('#ticker').textContent.includes('披薩指數'));
