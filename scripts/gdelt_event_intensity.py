@@ -9,6 +9,7 @@ import re
 from datetime import datetime, timedelta, timezone
 
 BATCHES = 8                 # 2 hours of 15-minute export files per collection
+BATCH_EXTRA = 4             # older batches tried when the newest are not yet downloadable
 BASELINE_HOURS = 48
 MIN_BASELINE_SAMPLES = 12
 MIN_BASELINE_SPAN_HOURS = 24

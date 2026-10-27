@@ -36,3 +36,5 @@ research/pizza-reviews.json 保存版本化重大行動定義與逐事件審核�
 私有GitHub原始封存連結不再出現在公開披薩回測UI；保留原觀測時間與公開證據連結，後端archive欄位與歷史檔不刪除。
 
 2026-10-27店家24小時長條圖：`pizza_hourly`（由`transform_pizza_shops`呼叫，同一次PizzINT請求，不增加請求或排程）另存兩欄。`hourly_24h`為上游`sparkline_24h`最近24筆`{at: 原recorded_at, v}`，v只收0–100，None＝無資料，0是有效空店，不互補。`usual_week`為`baseline_popular_times`轉成`'0'`(週日)…`'6'`(週六)各24格（索引＝美東小時），無效日鍵／小時／數值丟棄成None；週日＝0依店家平日／週末型態判斷，上游改格式時先比對辦公區店家（如We, The Pizza）平日高、週末低再調整。舊`sparkline`保留相容。前端`pizzaHourlyChart`以快照最新觀測時間的美東日期與星期：灰柱＝該星期平常值，亮柱＝同一美東日期的實測，虛線框＝資料時間所在小時；昨日點不畫，圖例只在格子上方顯示一次。這是Google平常人潮與實測對照，不代表訂單量。測試：tests/test_pizza_hourly.py、tests/test_frontend.cjs。
+
+2026-10-27 PizzINT 上游停更：dashboard-data 每家店 data_source='none'、current_popularity 與 sparkline_24h 全為 null（24小時內0筆實測），屬上游無資料，非本站解析錯誤。前端 renderPizzaRadar 在全部店家 data_source==='none' 時顯示「來源 PizzINT 目前沒有提供即時人流（上游暫停，不是店家打烊）」，不當作打烊或零。Nighthawk Brewery & Pizza 已不在上游清單，從 SHOPS_TO_DISPLAY 與前端 PIZZA_SHOPS_DATA 移除；歷史快照不改。以 BestTime 為披薩店備援會耗用付費額度，需使用者另行同意。

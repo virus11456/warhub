@@ -46,6 +46,9 @@ d.defaultView.renderPizzaRadar({pizza:[{name:'a',is_open:false,busyness:null},{n
 assert.ok(d.querySelector('#pizza-radar-summary').textContent.includes('2 家店都沒有即時人流'));
 assert.ok(!d.querySelector('#pizza-radar-summary').textContent.includes('打烊'));
 assert.ok(d.querySelector('#pizza-radar-summary').textContent.includes('只在美東下班時段'));
+// Upstream reports no live source at all: say so instead of implying the shops are closed.
+d.defaultView.renderPizzaRadar({pizza:[{name:'a',is_open:null,busyness:null,data_source:'none'},{name:'b',is_open:null,busyness:null,data_source:'none'}],bars:{}});
+assert.ok(d.querySelector('#pizza-radar-summary').textContent.includes('上游暫停，不是店家打烊'));
 d.defaultView.renderPizzaRadar({pizza:[{name:'a',is_open:true,busyness:80,percentage_of_usual:180,spike:true},{name:'b',is_open:true,busyness:30,percentage_of_usual:90}],bars:{}});
 assert.ok(d.querySelector('#pizza-radar-summary').textContent.includes('1 家店人流高於平常（最高為平常的 180%）'));
 assert.ok(d.querySelector('#pizza-radar-summary').classList.contains('hot'));
