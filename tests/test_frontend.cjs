@@ -119,7 +119,8 @@ if(mode==='valid'){
  w.renderRegions(cases);
  const board=d.querySelector('#region-board');
  assert.ok(board.textContent.includes('單一來源觀測'));
- assert.ok(board.textContent.includes('領空 · 資料有限，非整體風險'));
+ assert.ok(!board.textContent.includes('資料有限'),'caveat shown once under the board, not on every card');
+ assert.ok(board.parentElement.textContent.includes('資料有限，不是整體風險'));
  assert.ok(board.textContent.includes('尚無有效計分資料'));
  assert.ok(!board.textContent.includes('INSUFFICIENT_DATA'));
  assert.ok(!board.textContent.includes('CRITICAL'));

@@ -50,7 +50,7 @@ function visibleStrings(d){
  assert.ok(!/\bPen\b/.test(d.querySelector('#cross-reading').textContent));
  assert.ok(d.querySelector('#cross-reading').textContent.includes('0'));
  assert.ok(d.querySelector('#region-board').textContent.includes('Single-source observation'));
- assert.ok(d.querySelector('#region-board').textContent.includes('Limited data; not overall risk'));
+ assert.ok(d.querySelector('#region-board').parentElement.textContent.includes('limited data, not overall risk'));
  const missing=visibleStrings(d).filter(s=>/[\u3400-\u9fff]/.test(s));
  assert.deepEqual(missing,[],'dashboard untranslated UI text');
  data.news[0].title='更新中文標題';data.news[0].title_zh='更新中文標題';data.news[0].title_en='Updated English headline';
