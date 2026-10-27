@@ -213,6 +213,37 @@ async def fetch_pizzint(session: aiohttp.ClientSession) -> dict:
         return {}
 
 
+def _popularity(value):
+    """0-100 整數；None / 非數值 / 超出範圍 → None（0 是有效值，代表空店）"""
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return None
+    return int(round(value)) if 0 <= value <= 100 else None
+
+
+def pizza_hourly(src: dict) -> tuple[list[dict], dict | None]:
+    """
+    每家店的 24 小時長條圖資料：
+    - hourly_24h：最近 24 筆每小時實測 [{at: 原觀測時間, v: 0-100 或 None=無資料}]
+    - usual_week：Google「平常人潮」，鍵 '0'(週日)…'6'(週六)，值為 24 格（索引 = 美東小時，None = 無資料）
+    """
+    hourly = []
+    for point in (src.get("sparkline_24h") or [])[-24:]:
+        if isinstance(point, dict) and point.get("recorded_at"):
+            hourly.append({"at": point["recorded_at"], "v": _popularity(point.get("current_popularity"))})
+    usual = {}
+    for day, rows in (src.get("baseline_popular_times") or {}).items():
+        if str(day) not in {"0", "1", "2", "3", "4", "5", "6"} or not isinstance(rows, list):
+            continue
+        hours = [None] * 24
+        for row in rows:
+            hour = row.get("hour") if isinstance(row, dict) else None
+            if isinstance(hour, int) and not isinstance(hour, bool) and 0 <= hour <= 23:
+                hours[hour] = _popularity(row.get("popularity"))
+        if any(v is not None for v in hours):
+            usual[str(day)] = hours
+    return hourly, (usual or None)
+
+
 def transform_pizza_shops(pizzint_payload: dict) -> list[dict]:
     """把 pizzint.watch 的 shop list 轉成我們前端要的格式"""
     raw_shops = pizzint_payload.get("data", []) or []
@@ -259,6 +290,7 @@ def transform_pizza_shops(pizzint_payload: dict) -> list[dict]:
             (int(p["current_popularity"]) if p.get("current_popularity") is not None else None)
             for p in (src.get("sparkline_24h") or [])
         ][-24:]
+        hourly_24h, usual_week = pizza_hourly(src)
 
         shops.append({
             "name":      display_name,
@@ -270,6 +302,8 @@ def transform_pizza_shops(pizzint_payload: dict) -> list[dict]:
             "spike_magnitude": src.get("spike_magnitude"),
             "percentage_of_usual": pct_usual,
             "sparkline": sparkline,
+            "hourly_24h": hourly_24h,
+            "usual_week": usual_week,
             "is_closed_now": bool(src.get("is_closed_now")),
             "place_id":  src.get("place_id"),
             "address":   src.get("address"),

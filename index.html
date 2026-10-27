@@ -1515,6 +1515,7 @@
     <!-- 披薩店監控（全寬） -->
     <div>
       <div class="section-title" style="font-size:.68rem"><svg class="px-ic"><use href="#ic-pizza"/></svg> 披薩店監控</div>
+      <div id="pizza-hourly-legend" hidden style="font-size:.75rem;color:var(--text-dim);margin:0 0 .4rem"></div>
       <div class="pizza-tracker-grid" id="pizza-shops-grid">
         <div style="grid-column:1/-1;text-align:center;padding:.8rem;font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim)">載入中…</div>
       </div>
@@ -2303,6 +2304,7 @@ function evaluatePizzaStatus(shops) {
 // ─── 渲染披薩店格子 ──────────────────────────────────────────
 function renderPizzaShops(shops) {
   const grid = document.getElementById('pizza-shops-grid');
+  shops.forEach(shop => { shop._chartDay = null; });
   grid.innerHTML = shops.map(shop => {
     const isClosed   = shop.is_open === false || shop.status === 'closed';
     const isAnomaly  = !isClosed && shop.status === "spike";
@@ -2349,13 +2351,20 @@ function renderPizzaShops(shops) {
         <div style="height:3px;background:var(--bg);border:1px solid var(--border);overflow:hidden;">
           <div style="height:100%;width:${isClosed ? 0 : (shop.busyness ?? 0)}%;background:${barColor};transition:width 1s;"></div>
         </div>
-        ${sparklineSvg(shop.sparkline, barColor)}
+        ${pizzaHourlyChart(shop, isClosed ? 'var(--accent)' : barColor) || sparklineSvg(shop.sparkline, barColor)}
         <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:rgba(255,255,255,0.25);margin-top:0.2rem;text-align:right;">
           ${isClosed ? '目前未營業' : '<span style=\"font-weight:700;\">' + devStr + '</span>'}
         </div>
       </div>
     </div>`;
   }).join('');
+  // 圖例只顯示一次（每張卡都有同樣的長條圖）
+  const legend = document.getElementById('pizza-hourly-legend');
+  const day = (shops.find(x => x._chartDay) || {})._chartDay;
+  if (legend) {
+    legend.hidden = !day;
+    legend.innerHTML = day ? '<span>每小時人潮</span> · <span>華府時間</span> · <span>灰色是平常</span> <span>' + day + '</span> · <span>亮色是今天實測</span> · <span>虛線框是資料時間</span>' : '';
+  }
 }
 
 // ─── 渲染警報橫幅 ─────────────────────────────────────────────
@@ -2677,6 +2686,9 @@ async function fetchRealPizzaData() {
         shop.percentage_of_usual = incoming.percentage_of_usual;
         shop.spike_magnitude     = incoming.spike ? incoming.spike_magnitude : null;
         shop.sparkline           = incoming.sparkline || null;
+        shop.hourly_24h          = Array.isArray(incoming.hourly_24h) ? incoming.hourly_24h : null;
+        shop.usual_week          = incoming.usual_week || null;
+        shop.recorded_at         = incoming.recorded_at || null;
       });
 
       const status = evaluatePizzaStatus(PIZZA_SHOPS_DATA);
@@ -3141,6 +3153,45 @@ function applyPizzintIntel(json) {
     if (cross.length) evLines.push(`<div style="color:var(--text-dim)">▶ 交叉參照：${cross.join(' · ')}</div>`);
     bulletsEl.innerHTML = evLines.join('');
   }
+}
+
+// ─── 披薩店 24 小時長條圖：灰 = Google 平常人潮，亮 = 今天實測（皆為華府時間）───
+const ET_PARTS = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', weekday: 'short', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', hourCycle: 'h23' });
+const PIZZA_WEEKDAYS = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
+const ET_WEEKDAY = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+function etParts(ts) {
+  const t = Date.parse(ts);
+  if (!isFinite(t)) return null;
+  const p = Object.fromEntries(ET_PARTS.formatToParts(new Date(t)).map(x => [x.type, x.value]));
+  return { day: ET_WEEKDAY[p.weekday], date: `${p.year}-${p.month}-${p.day}`, hour: Number(p.hour) % 24 };
+}
+function pizzaHourlyChart(shop, color) {
+  const live = (shop.hourly_24h || []).map(r => ({ ...etParts(r && r.at), v: r && r.v })).filter(r => r.date);
+  const stamps = [shop.recorded_at, ...(shop.hourly_24h || []).map(r => r && r.at)].filter(t => isFinite(Date.parse(t)));
+  if (!stamps.length) return '';
+  const now = etParts(stamps.reduce((a, b) => Date.parse(a) >= Date.parse(b) ? a : b));
+  const usual = (shop.usual_week || {})[String(now.day)] || [];
+  const today = {};
+  live.forEach(r => { if (r.date === now.date && r.v != null) today[r.hour] = Math.max(0, Math.min(100, r.v)); });
+  const hasUsual = usual.some(v => v != null);
+  if (!hasUsual && !Object.keys(today).length) return '';
+  const first = Math.min(6, ...Object.keys(today).map(Number));
+  const hours = []; for (let h = first; h <= 23; h++) hours.push(h);
+  const W = 180, H = 44, slot = W / hours.length, top = 4;
+  const y = v => H - (v / 100) * (H - top);
+  const bars = hours.map((h, i) => {
+    const x = i * slot, u = usual[h], m = today[h];
+    let out = u != null ? `<rect x="${(x + 0.5).toFixed(1)}" y="${y(u).toFixed(1)}" width="${(slot - 1).toFixed(1)}" height="${(H - y(u)).toFixed(1)}" fill="rgba(255,255,255,0.16)"/>` : '';
+    if (m != null) out += `<rect x="${(x + slot * 0.22).toFixed(1)}" y="${Math.min(y(m), H - 1).toFixed(1)}" width="${(slot * 0.56).toFixed(1)}" height="${Math.max(H - y(m), 1).toFixed(1)}" fill="${color}"/>`;
+    if (h === now.hour) out += `<rect x="${x.toFixed(1)}" y="0" width="${slot.toFixed(1)}" height="${H}" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="0.8" stroke-dasharray="2 2"/>`;
+    return out;
+  }).join('');
+  const tick = h => `<span style="position:absolute;left:${(((h - first) + 0.5) / hours.length * 100).toFixed(1)}%;transform:translateX(-50%)">${h}</span>`;
+  shop._chartDay = PIZZA_WEEKDAYS[now.day];
+  return `<div class="pizza-hourly" style="margin-top:.4rem">
+    <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true" style="width:100%;height:44px;display:block;border-bottom:1px solid var(--border)">${bars}</svg>
+    <div style="position:relative;height:12px;font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-top:2px">${[first, 12, 18, 23].filter((h, i, a) => h >= first && a.indexOf(h) === i).map(tick).join('')}</div>
+  </div>`;
 }
 
 // ─── 迷你 sparkline SVG（披薩店 24h 趨勢）─────────────────────

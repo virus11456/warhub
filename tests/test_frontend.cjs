@@ -49,6 +49,20 @@ assert.ok(d.querySelector('#pizza-radar-summary').textContent.includes('只在�
 d.defaultView.renderPizzaRadar({pizza:[{name:'a',is_open:true,busyness:80,percentage_of_usual:180,spike:true},{name:'b',is_open:true,busyness:30,percentage_of_usual:90}],bars:{}});
 assert.ok(d.querySelector('#pizza-radar-summary').textContent.includes('1 家店人流高於平常（最高為平常的 180%）'));
 assert.ok(d.querySelector('#pizza-radar-summary').classList.contains('hot'));
+// Hourly bars: Washington weekday baseline (grey) + only today's live readings; 0 is drawn, yesterday is not.
+{const w=d.defaultView,usual=Array(24).fill(null);usual[10]=40;usual[12]=80;
+const shop={name:'x',recorded_at:'2026-10-27T16:06:00Z',usual_week:{'1':Array(24).fill(90),'2':usual},
+ hourly_24h:[{at:'2026-10-26T20:00:00Z',v:90},{at:'2026-10-27T15:09:00Z',v:0},{at:'2026-10-27T14:09:00Z',v:null}]};
+const box=d.createElement('div');box.innerHTML=w.pizzaHourlyChart(shop,'red');
+const rects=[...box.querySelectorAll('rect')];
+assert.equal(rects.filter(r=>r.getAttribute('fill')==='rgba(255,255,255,0.16)').length,2);
+const live=rects.filter(r=>r.getAttribute('fill')==='red');
+assert.equal(live.length,1);assert.equal(live[0].getAttribute('height'),'1.0');
+assert.equal(rects.filter(r=>r.getAttribute('stroke-dasharray')).length,1);
+assert.equal(w.pizzaHourlyChart({name:'y'},'red'),'');
+w.renderPizzaShops([{...shop,is_open:true,busyness:30,status:'quiet'}]);
+assert.ok(d.querySelector('#pizza-hourly-legend').textContent.includes('週二'));
+assert.equal(d.querySelectorAll('#pizza-shops-grid .pizza-hourly').length,1);}
 assert.equal(d.querySelector('#observation-overview'),null);
 assert.ok(!d.body.textContent.includes('分項觀察'));
 assert.ok(!d.querySelector('#ticker').textContent.includes('披薩指數'));
