@@ -1313,7 +1313,7 @@
   #pla-legend a, #pla-legend a:visited { color:#8de9ef; text-decoration:underline; }
   #taiwan-insight-card .ti-panel > div + div { margin-top:.55rem; }
   #taiwan-insight-card .ti-market-section { grid-column:1/-1; }
-  #taiwan-insight-card .ti-markets { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; }
+  #taiwan-insight-card .ti-markets { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:1rem; }
   #taiwan-insight-card .ti-market { min-width:0; border-top:1px solid var(--border); padding-top:.7rem; }
   #taiwan-insight-card .ti-market > div { margin-top:.4rem; }
   #taiwan-insight-card a, #taiwan-insight-card a:visited { color:var(--accent); text-decoration:underline; text-underline-offset:3px; overflow-wrap:anywhere; }
@@ -1322,6 +1322,12 @@
   #taiwan-insight-card small, #taiwan-insight-card .ti-note { color:var(--text-dim); font-size:.75rem; line-height:1.8; }
   #taiwan-insight-card .ti-note { margin:1rem 0; }
   #taiwan-insight-body > .ti-panel:first-child { margin-bottom:1rem; }
+  #taiwan-insight-body > .ti-panel + .ti-panel, #taiwan-insight-body > details { margin-top:1rem; }
+  #taiwan-insight-body > #cross-reading { padding:0; background:none; border:0; margin-top:.6rem; }
+  #taiwan-insight-card .ti-note { margin:.8rem 0 .4rem; }
+  #taiwan-insight-card .ti-conclusion { margin:0 0 .3rem; font-size:1rem; color:var(--text); line-height:1.6; }
+  #taiwan-insight-card .ti-limits > div + div { margin-top:.5rem; }
+  #taiwan-insight-card .ti-limits { font-size:.8rem; line-height:1.8; }
   #taiwan-insight-card a { text-decoration:none; }
   #taiwan-insight-card a:hover { color:var(--accent); }
   #taiwan-insight-card summary { cursor:pointer; font-size:.8rem; }
@@ -1663,6 +1669,12 @@
       <div class="section-title" style="margin:0">🌐 地區觀測指數</div>
       <div style="font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim)" id="region-board-updated">依 Polymarket 盤口 + GDELT 新聞強度 + FIRMS 火點 + 軍機活動 即時計算</div>
     </div>
+    <div id="region-board" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:.8rem;margin-top:.8rem;align-items:stretch">
+      <div style="grid-column:1/-1;text-align:center;padding:1.2rem;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 計算地區風險中…</div>
+    </div>
+    <div style="margin-top:.7rem;font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim)">
+      分數＝有資料的來源加權（市場 35、新聞 25、領空 15），缺值不補零。來源不齊時是暫定分數，資料有限，不是整體風險或開戰機率；暫定分數不寫入歷史。
+    </div>
     <!-- 🌍 全球戰爭熱點發光點陣地球（Canvas · 可旋轉/縮放 · FIRMS 火點 × 監測地區風險）-->
     <div class="warmap-wrap">
       <div class="warmap-view" id="warmap-view">
@@ -1679,12 +1691,6 @@
         <span><i class="wm-ring"></i>監測地區 · 依風險著色</span>
         <span id="warmap-count" style="margin-left:auto;color:var(--text-dim)">連接資料中…</span>
       </div>
-    </div>
-    <div id="region-board" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:.8rem;margin-top:.8rem;align-items:stretch">
-      <div style="grid-column:1/-1;text-align:center;padding:1.2rem;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 計算地區風險中…</div>
-    </div>
-    <div style="margin-top:.7rem;font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim)">
-      觀測分數依有效來源加權（市場 35、新聞 25、領空 15），缺值不補零。資料未達原模型門檻時顯示暫定分數；單一來源只代表該項觀察，不代表地區整體風險或開戰機率。暫定分數不寫入歷史、不顯示升降箭頭。
     </div>
 
   </div>
@@ -1741,6 +1747,31 @@
   .wpi-footer { display:flex; gap:.8rem; align-items:center; flex-wrap:wrap; margin-top:1rem; padding-top:.7rem; border-top:1px solid rgba(0,207,232,.1); font-family:'Share Tech Mono',monospace; font-size:.57rem; color:var(--text-dim); }
   @media(max-width:800px) { .wpi-body{ grid-template-columns:1fr; } .wpi-gauge-wrap{order:-1;} }
   </style>
+
+  <!-- ══════════ 台海：交叉洞察 + 軍事動態（緊接地區觀測）══════════ -->
+  <div class="card" id="taiwan-insight-card" style="margin-bottom:1.5rem">
+    <div class="section-title">🇹🇼 台海現在怎麼看</div>
+    <div id="taiwan-insight-body" style="line-height:1.8">等待下一輪資料產生洞察。</div>
+    <details style="margin-top:1rem"><summary>近 7 天觀測時間軸（最近 20 筆）</summary><div id="taiwan-insight-timeline"></div></details>
+  </div>
+
+  <!-- 🎖️ 台海軍事動態 -->
+  <div class="card" id="twnews-card" style="margin-bottom:1.5rem">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-bottom:.4rem">
+      <div class="section-title" style="margin:0">🎖️ 台海軍事動態</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim)"><span id="twnews-updated">新聞訊號</span></div>
+    </div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim);margin-bottom:.6rem">
+      共軍擾台・軍演・軍艦穿越台海・國防部戰報 · <strong>新聞訊號、非精確計數</strong>，供趨勢與異常觀察
+    </div>
+    <div id="pla-wrap" class="pla-wrap" style="display:none">
+      <div class="pla-summary"><div class="pla-hd">官方共機日報</div><div id="pla-latest"></div><div class="observation-caption">架次，非不同飛機數</div></div>
+      <div class="pla-chart-panel"><div class="pla-chart-heading">近 30 天已收錄日報</div><div class="fh-chart"><svg id="pla-svg" viewBox="0 0 720 170" preserveAspectRatio="xMidYMid meet"></svg></div><details class="reading-details"><summary>統計時間與圖例</summary><div id="pla-note" class="pla-legend"></div><div class="pla-legend" id="pla-legend"></div></details></div>
+    </div>
+    <div id="twnews-list">
+      <div style="padding:1rem;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 連接台海新聞流…</div>
+    </div>
+  </div>
 
   <!-- ══════════ 即時戰情快訊（GDELT 早期預警）══════════ -->
   <div class="card news-card" id="news-card" style="margin-bottom:1.5rem">
@@ -1850,31 +1881,6 @@
 
   </div>
 
-  <div class="card" id="taiwan-insight-card" style="margin-bottom:1.5rem">
-    <div class="section-title">台海交叉洞察 · 活動、報導與市場</div>
-    <p style="color:var(--text-dim);font-size:.78rem">三類觀測分開判讀，不相加成開戰機率。新聞轉載不等於獨立證據。</p>
-    <div id="taiwan-insight-body" style="line-height:1.8">等待下一輪資料產生洞察。</div>
-    <details style="margin-top:1rem"><summary>近 7 天觀測時間軸（最近 20 筆）</summary><div id="taiwan-insight-timeline"></div></details>
-  </div>
-
-  <!-- 🎖️ 台海軍事動態 -->
-  <div class="card" id="twnews-card" style="margin-bottom:1.5rem">
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-bottom:.4rem">
-      <div class="section-title" style="margin:0">🎖️ 台海軍事動態</div>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim)"><span id="twnews-updated">新聞訊號</span></div>
-    </div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim);margin-bottom:.6rem">
-      共軍擾台・軍演・軍艦穿越台海・國防部戰報 · <strong>新聞訊號、非精確計數</strong>，供趨勢與異常觀察
-    </div>
-    <div id="pla-wrap" class="pla-wrap" style="display:none">
-      <div class="pla-summary"><div class="pla-hd">官方共機日報</div><div id="pla-latest"></div><div class="observation-caption">架次，非不同飛機數</div></div>
-      <div class="pla-chart-panel"><div class="pla-chart-heading">近 30 天已收錄日報</div><div class="fh-chart"><svg id="pla-svg" viewBox="0 0 720 170" preserveAspectRatio="xMidYMid meet"></svg></div><details class="reading-details"><summary>統計時間與圖例</summary><div id="pla-note" class="pla-legend"></div><div class="pla-legend" id="pla-legend"></div></details></div>
-    </div>
-    <div id="twnews-list">
-      <div style="padding:1rem;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 連接台海新聞流…</div>
-    </div>
-  </div>
-
 <style>
 /* ── 🇨🇳 中國戰備動向監測 區塊橫幅 ── */
 .cn-banner { background:linear-gradient(180deg,rgba(255,77,94,.07),rgba(0,207,232,.04)); border:1px solid var(--border);
@@ -1973,7 +1979,7 @@
 .avi-trend.down { color:var(--accent); }
 /* 🌍 全球戰爭熱點發光點陣地球（Canvas · 可旋轉/縮放）*/
 .warmap-wrap    { margin:.9rem 0 .2rem; border:1px solid var(--border); background:#050b14; }
-.warmap-view    { position:relative; width:100%; aspect-ratio:2/1; max-height:58vh; overflow:hidden; background:radial-gradient(ellipse 92% 90% at 50% 46%, #0a1322 0%, #060b13 68%, #03060b 100%); touch-action:none; cursor:grab; user-select:none; -webkit-user-select:none; }
+.warmap-view    { position:relative; width:100%; aspect-ratio:5/2; max-height:46vh; overflow:hidden; background:radial-gradient(ellipse 92% 90% at 50% 46%, #0a1322 0%, #060b13 68%, #03060b 100%); touch-action:none; cursor:grab; user-select:none; -webkit-user-select:none; }
 .warmap-view:active { cursor:grabbing; }
 .warmap-canvas  { position:absolute; inset:0; width:100%; height:100%; display:block; }
 .warmap-ctrls   { position:absolute; bottom:10px; right:10px; display:flex; flex-direction:column; gap:5px; z-index:3; }
@@ -1984,7 +1990,7 @@
 .warmap-legend i{ display:inline-block; vertical-align:middle; margin-right:.4rem; }
 .wm-fire        { width:11px; height:11px; border-radius:50%; background:#ff3b30; box-shadow:0 0 7px #ff3b30; }
 .wm-ring        { width:13px; height:13px; border:2px solid var(--accent2); border-radius:50%; background:transparent; }
-@media (max-width:640px){ .warmap-view { aspect-ratio:4/5; max-height:82vh; } }
+@media (max-width:640px){ .warmap-view { aspect-ratio:1/1; max-height:60vh; } }
 /* 像素圖示（披薩等）：內嵌 SVG symbol，隨文字大小縮放 */
 .px-ic { width:1.05em; height:1.05em; display:inline-block; vertical-align:-0.16em; image-rendering:pixelated; }
 .px-fl { width:1.5em; height:1em; vertical-align:-0.12em; margin:0 .22em; box-shadow:0 0 0 1px rgba(255,255,255,.16); }
@@ -2986,9 +2992,8 @@ function renderRegions(regions) {
           <span style="margin-left:auto;font-family:'Orbitron',monospace;font-size:1.5rem;font-weight:900;color:${st.color}">${(observation.score == null ? '--' : Math.round(observation.score))}</span>
           <span style="font-family:'Share Tech Mono',monospace;font-size:.72rem">${trend}</span>
         </div>
-        <div style="font-family:'Orbitron',monospace;font-size:.8rem;letter-spacing:normal;color:${st.color};margin-bottom:.55rem">${observation.score == null ? '尚無有效計分資料' : observation.provisional ? (observation.count === 1 ? '單一來源觀測' : '暫定觀測') : '多來源觀測'} · ${observation.count}/3 來源</div>
+        <div style="font-family:'Orbitron',monospace;font-size:.8rem;letter-spacing:normal;color:${st.color};margin-bottom:.6rem">${observation.score == null ? '尚無有效計分資料' : observation.provisional ? (observation.count === 1 ? '單一來源觀測' : '暫定觀測') : '多來源觀測'} · ${observation.count}/3 來源</div>
         <div class="kalshi-region-reference" data-kalshi-region="${escapeHtml(r.key)}"></div>
-        <div class="region-score-basis" style="font-size:.75rem;color:var(--text-dim);margin-bottom:.6rem">${observation.basis || '等待有效來源'}${observation.provisional ? ' · 資料有限，非整體風險' : ''}</div>
         <div style="display:flex;flex-direction:column;gap:.34rem;font-family:'Share Tech Mono',monospace">
           ${factorRow('市場盤口', f.poly)}
           ${factorRow(f.gdelt_source === 'events' ? '新聞事件' : '新聞強度', f.gdelt, gdeltDelta)}
@@ -3624,13 +3629,13 @@ function renderTaiwanInsight(json) {
   const count=value=>Number.isInteger(value)&&value>=0 ? String(value) : '缺資料';
   const link=(url,text)=>{try{const u=new URL(url);if(u.protocol!=='https:'||u.username)return escapeHtml(text);return `<a href="${escapeHtml(u.href)}" target="_blank" rel="noopener">${escapeHtml(text)}</a>`;}catch{return escapeHtml(text);}};
   const label={missing:'缺少官方日報',stale:'日報較舊，暫不判讀',baseline_pending:'基準資料累積中',elevated:'共機架次高於近期比較門檻',within_baseline:'共機架次未超過近期比較門檻'};
-  let activity=`<strong>實際活動｜${escapeHtml(label[a.status]||'資料不足')}</strong>`;
-  if(latest) activity+=`<div>${link(latest.source_url,(latest.date||'日期缺資料')+' 官方日報')}：共機 ${count(latest.aircraft)} 架次、共艦 ${count(latest.ships)} 艘、公務船 ${count(latest.government_ships)} 艘。統計截止 ${escapeHtml(fmt(latest.period_end))}；非目前即時數量，共艦與公務船分列。</div>`;
-  if(latest)activity+=`<div>此前 28 天已收錄 ${count(a.baseline_days)} 日；共機中位數 ${Number.isFinite(a.median)&&a.median>=0?escapeHtml(a.median):'缺資料'} 架次。至少 14 日才比較，不代表作戰意圖。</div>`;
+  // 官方數字放在收合說明內：同一數字在下方「台海軍事動態」圖表已顯示，不重複列出
+  let official=`<div><strong>${escapeHtml(label[a.status]||'資料不足')}</strong></div>`;
+  if(latest) official+=`<div>${link(latest.source_url,(latest.date||'日期缺資料')+' 官方日報')}：共機 ${count(latest.aircraft)} 架次、共艦 ${count(latest.ships)} 艘、公務船 ${count(latest.government_ships)} 艘。統計截止 ${escapeHtml(fmt(latest.period_end))}；非目前即時數量，共艦與公務船分列。</div>`
+    +`<div>以此前 28 天共機紀錄的第 90 百分位作比較門檻。</div><div>此前 28 天已收錄 ${count(a.baseline_days)} 日；共機中位數 ${Number.isFinite(a.median)&&a.median>=0?escapeHtml(a.median):'缺資料'} 架次。至少 14 日才比較，不代表作戰意圖。</div>`;
   const newsStatus={available:'本輪已取得可用樣本',partial:'本輪樣本部分可用或含沿用資料',stale:'本輪沿用舊樣本，未確認新資料',unavailable:'本輪未取得有效樣本，不代表沒有新聞'};
   const inputStatus=n.input_status||(json.source_health||{}).tw_news?.status;
-  activity=activity.replace('<div>此前 28 天','<details class="reading-details"><summary>官方數字怎麼比較？</summary><div>以此前 28 天共機紀錄的第 90 百分位作比較門檻。此前 28 天')+(latest?'</details>':'');
-  const news=`<strong>新聞｜${inputStatus==='available'?'本輪有新樣本':'本輪取樣不完整'}</strong><div>${escapeHtml(newsStatus[inputStatus]||'本輪取得狀態未記錄')}。</div><details class="reading-details"><summary>已保存新聞與取樣限制</summary><div>已保存的近 24 小時樣本：${count(n.sample_24h)} 則、${count(n.publishers_24h)} 個發布來源名稱。這是有限樣本，不代表完整新聞量，也不能判定熱度升降。</div><div>最近已保存新聞的發稿時間（台北）：${escapeHtml(fmt(n.latest_at))}；不是事件發生時間。</div></details>`;
+  const limits=`<div>${escapeHtml(newsStatus[inputStatus]||'本輪取得狀態未記錄')}。</div><div>已保存的近 24 小時樣本：${count(n.sample_24h)} 則、${count(n.publishers_24h)} 個發布來源名稱。這是有限樣本，不代表完整新聞量，也不能判定熱度升降。</div><div>最近已保存新聞的發稿時間（台北）：${escapeHtml(fmt(n.latest_at))}；不是事件發生時間。</div><div>官方活動、新聞與市場三類觀測分開判讀，不相加成開戰機率；新聞轉載不等於獨立證據。市場數字只對應各自題目與期限。</div>`;
   const markets=(Array.isArray(v.markets)?v.markets:[]).filter(m=>m&&typeof m==='object').map(m=>{
     const price=Number.isFinite(m.yes_percent)&&m.yes_percent>=0&&m.yes_percent<=100 ? `${m.yes_percent}%` : '缺資料';
     const end=typeof m.end_date==='string'?Date.parse(m.end_date):NaN;
@@ -3642,7 +3647,7 @@ function renderTaiwanInsight(json) {
     return `<div class="ti-market">${link('https://polymarket.com/market/'+encodeURIComponent(m.slug),chineseTitle(m.question_zh,m.question))}<div>YES 報價 ${price} · ${comparison}</div><div class="ti-note">${expired?'歷史快照報價':'報價快照時間'}（台北）${escapeHtml(fmt(v.as_of))}</div><details class="reading-details"><summary>時間與比較依據</summary>${comparable?`<div>比較基準時間（台北）${escapeHtml(fmt(m.comparison_at))}</div>`:''}<div>到期時間（台北）${escapeHtml(fmt(m.end_date))}；不同截止日不直接比較。</div></details></div>`;
   }).join('')||'<div>目前沒有有效的台海市場題目。</div>';
   const conclusion=a.status==='elevated'?'共機活動偏高，值得持續關注；這不是開戰判定。':a.status==='within_baseline'?'共機活動未超過比較門檻；不能因此判定安全或不會開戰。':'官方活動資料尚不足，暫時不能判讀變化。';
-  el.innerHTML=`<section class="ti-panel"><strong>現在怎麼看？</strong><p>${escapeHtml(conclusion)}</p><p class="ti-note">本區用來觀察台海變化，不是全球戰爭機率。市場數字只對應各自題目與期限；新聞取樣不完整時，不判定關注度升降。</p></section><div class="ti-grid"><section class="ti-panel">${activity}</section><section class="ti-panel">${news}</section><section class="ti-panel ti-market-section"><strong>市場｜各題價格怎麼變？</strong><div class="ti-markets">${markets}</div></section></div><p class="ti-note">洞察資料時間 ${escapeHtml(fmt(v.as_of))}（台北）。這些觀測時間與定義不同；目前不自動判定互相證實或即將升級。</p>`;
+  el.innerHTML=`<section class="ti-panel"><p class="ti-conclusion">${escapeHtml(conclusion)}</p><details class="reading-details"><summary>官方數字怎麼比較？</summary>${official}</details></section><section class="ti-panel ti-market-section"><strong>市場｜各題價格怎麼變？</strong><div class="ti-markets">${markets}</div></section><p class="ti-note">洞察資料時間 ${escapeHtml(fmt(v.as_of))}（台北）。這些觀測時間與定義不同；目前不自動判定互相證實或即將升級。</p><details class="reading-details ti-limits"><summary>新聞取樣與資料限制</summary>${limits}</details>`;
   const context=window.WarhubCrossContext?.build(json);
   if(context?.fresh){
     const box=document.createElement('section');box.className='ti-panel';box.id='cross-reading';
