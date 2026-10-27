@@ -1972,16 +1972,21 @@ async def fetch_pizza_besttime(session: aiohttp.ClientSession, pizzint_payload: 
         return {}
     results = await asyncio.gather(*(besttime_live(session, key, PIZZA_BESTTIME_VENUES[n]) for n in wanted))
     at = datetime.now(timezone.utc).isoformat()
-    out = {}
+    out, reasons = {}, {}
     for name, r in zip(wanted, results):
         live = r.get("live_busyness")
-        if not r.get("live_available") or not isinstance(live, (int, float)) or isinstance(live, bool) or not 0 <= live <= 200:
-            continue
-        if not _same_venue(by_name[name].get("address"), PIZZA_BESTTIME_VENUES[name]["address"], r):
+        if r.get("error"):
+            reasons[name] = f"http_{r['http_status']}" if r.get("http_status") else r.get("failure_type") or "request_failed"
+        elif not r.get("live_available") or not isinstance(live, (int, float)) or isinstance(live, bool) or not 0 <= live <= 200:
+            reasons[name] = "no_live_value"
+        elif not _same_venue(by_name[name].get("address"), PIZZA_BESTTIME_VENUES[name]["address"], r):
             log.warning(f"BestTime pizza {name}: venue location mismatch, ignored")
-            continue
-        out[name] = {"live_busyness": int(round(live)), "forecasted": r.get("forecasted"), "recorded_at": at}
-    log.info(f"Pizza BestTime fallback: {len(out)}/{len(wanted)} shops with live data")
+            reasons[name] = "venue_mismatch"
+        else:
+            out[name] = {"live_busyness": int(round(live)), "forecasted": r.get("forecasted"), "recorded_at": at}
+            reasons[name] = "used"
+    log.info(f"Pizza BestTime fallback: {len(out)}/{len(wanted)} shops with live data; reasons={reasons}")
+    out["_status"] = {"queried_at": at, "reasons": reasons}
     return out
 
 
@@ -2547,6 +2552,7 @@ async def main():
         "english_translation_cache": english_cache,
         "score":         score,
         "pizza":         pizza_shops,
+        "pizza_backup":  pizza_fallback.get("_status"),
         "pizza_index":   pizza_index,
         "pizza_events":  pizzint_data.get("events") or [],
         "defcon_level":  defcon_level,

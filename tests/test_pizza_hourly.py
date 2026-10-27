@@ -84,18 +84,30 @@ class PizzaBestTimeTests(unittest.IsolatedAsyncioTestCase):
         out, session = await self.run_fb(live())
         self.assertEqual(session.calls, ['We, The Pizza'])          # live shop and explicitly closed shop not queried
         self.assertEqual(out['We, The Pizza']['live_busyness'], 55)
+        self.assertEqual(out['_status']['reasons'], {'We, The Pizza': 'used'})
         out, session = await self.run_fb(live(), hour=13)
         self.assertEqual((out, session.calls), ({}, []))
         out, session = await self.run_fb(live(), key='')
         self.assertEqual((out, session.calls), ({}, []))
 
     async def test_wrong_venue_or_no_live_value_is_ignored(self):
-        self.assertEqual((await self.run_fb(live(lat=38.95, lng=-77.2)))[0], {})
+        out = (await self.run_fb(live(lat=38.95, lng=-77.2)))[0]
+        self.assertNotIn('We, The Pizza', out)
+        self.assertEqual(out['_status']['reasons'], {'We, The Pizza': 'venue_mismatch'})
         no_live = live(); no_live['analysis']['venue_live_busyness_available'] = False
-        self.assertEqual((await self.run_fb(no_live))[0], {})
+        out = (await self.run_fb(no_live))[0]
+        self.assertEqual((list(out), out['_status']['reasons']['We, The Pizza']), (['_status'], 'no_live_value'))
         # Without coordinates the street number and name must match.
         self.assertIn('We, The Pizza', (await self.run_fb(live(lat=None, address='2100 Crystal Dr, Arlington')))[0])
-        self.assertEqual((await self.run_fb(live(lat=None, address='1800 Wilson Blvd, Arlington')))[0], {})
+        self.assertNotIn('We, The Pizza', (await self.run_fb(live(lat=None, address='1800 Wilson Blvd, Arlington')))[0])
+
+    async def test_http_failure_reason_is_recorded(self):
+        class Failed(FakeSession):
+            def post(self, url, params=None, **kw):
+                self.calls.append(params['venue_name']); return FakeResp({}, status=403)
+        with patch.dict('os.environ', {'BESTTIME_API_KEY': 'k'}), patch.object(collector, 'besttime_et_hour', return_value=18):
+            out = await collector.fetch_pizza_besttime(Failed({}), self.payload)
+        self.assertEqual(out['_status']['reasons'], {'We, The Pizza': 'http_403'})
 
     def test_backup_fills_only_missing_values_and_is_labelled(self):
         fb = {'We, The Pizza': {'live_busyness': 0, 'forecasted': 40, 'recorded_at': 't'},
