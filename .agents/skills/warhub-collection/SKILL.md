@@ -107,3 +107,5 @@ Kalshi後續本機工作：refresh已實作跨輪冷卻及原時間保留、獨�
 2026-10-08 首頁精簡（僅顯示層）：WPI／披薩／酒吧實驗區改回預設收合；移除 WPI 右欄「未驗證組合假說」與重複的地區迷你列表、地區看板下的7天風險趨勢圖、獨立的「領空公告觀察」區段。NOTAM 仍照常收集並計入地區分數，地區卡片保留「領空」列；history.json 保留不刪。戰略物資、避險群聚預設收合，折疊狀態 key 改為 warhub_fold_v2（使用者先前的展開設定重置一次）。
 
 2026-10-27 首頁改版（僅顯示層）：披薩與酒吧人流為網站主要特色，#pizza-card 移到首頁第一屏、預設展開（折疊 key warhub_fold_v3，DEFAULT_FOLD 移除披薩）；WPI 單獨放在預設收合的實驗區。新增 renderPizzaRadar 一句話摘要：以店家 recorded_at 的華府時間說明快照，不用瀏覽者現在時間推論打烊；無即時人流不寫成異常或安全，酒吧僅美東下班時段查詢。tests/test_frontend.cjs 驗證位置、收合與摘要文字。
+
+2026-10-28 資料來源中斷通知（使用者要求）：alerts.run_notifications 依 source_health 追蹤 WATCHED_SOURCES（pizza、gdelt、notams、polymarket、aviation、firms、news、tw_news；酒吧非下班時段本來就不查故不列）。status 為 unavailable／stale 視為中斷，partial 不算；_notify.source_down_since 記首次觀測到中斷的時間，連續中斷達 SOURCE_OUTAGE_HOURS（預設6，GitHub Variables 可改）才發一次「資料來源中斷」，同一次中斷不重複；恢復時發一次「資料來源恢復」並清除紀錄。只送 TELEGRAM_CHAT_ID 個人 chat，不送公開頻道、不送 Discord；送達失敗不記 source_alerted，下一輪重試。本輪 source_health 缺該來源時沿用舊紀錄不判斷；digest_only（保存快照摘要）不動此狀態。只在一般非 quiet 收集輪判斷，所以中斷時間是以實際收集輪計，非精確時刻。ALERT_SOURCE_OUTAGE=false 可關閉。tests/test_source_outage.py 以假時鐘／假發送驗證，不得以真推播測試。

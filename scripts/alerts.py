@@ -44,6 +44,10 @@ ALERT_PIZZA         = _on("ALERT_PIZZA", True)               # 披薩爆量
 ALERT_HOTSPOT       = _on("ALERT_HOTSPOT", True)             # 火點激增
 HOTSPOT_SURGE_RATIO = float(os.environ.get("HOTSPOT_SURGE_RATIO", "") or 1.4)
 HOTSPOT_SURGE_MIN   = _int("HOTSPOT_SURGE_MIN", 12)          # 至少幾處才視為激增
+ALERT_SOURCE_OUTAGE = _on("ALERT_SOURCE_OUTAGE", True)       # 資料來源中斷（只送站長個人）
+SOURCE_OUTAGE_HOURS = max(1, _int("SOURCE_OUTAGE_HOURS", 6))  # 連續中斷多久才通知
+# 站長在意的主要來源（source_health 鍵）；酒吧非下班時段本來就不查，不列入
+WATCHED_SOURCES = ("pizza", "gdelt", "notams", "polymarket", "aviation", "firms", "news", "tw_news")
 
 LEVEL_EMOJI = {"NORMAL": "🟢", "ELEVATED": "🟡", "HIGH": "🟠", "CRITICAL": "🔴"}
 LEVEL_ORDER = ["LOW", "MODERATE", "ELEVATED", "HIGH", "CRITICAL"]
@@ -304,12 +308,65 @@ async def send_discord(session, text, level="NORMAL"):
         return ok
 
 
+def _iso(value):
+    try:
+        t = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+        return t if t.tzinfo else None
+    except ValueError:
+        return None
+
+
+def source_outages(health: dict, prev_notify: dict, now: datetime) -> tuple[dict, list, list]:
+    """
+    依 source_health 追蹤主要來源連續中斷（unavailable／stale）。
+    回傳 (down_since, 要通知中斷的來源, 要通知恢復的來源)；通知是否送達由呼叫端決定是否記帳。
+    """
+    prev_since = prev_notify.get("source_down_since") or {}
+    alerted = prev_notify.get("source_alerted") or {}
+    down_since, newly_down, recovered = {}, [], []
+    for key in WATCHED_SOURCES:
+        row = (health or {}).get(key)
+        if not isinstance(row, dict):
+            if key in prev_since:
+                down_since[key] = prev_since[key]  # 本輪沒有該來源的健康資訊：不判斷，也不清除舊紀錄
+            continue
+        label = row.get("label") or key
+        if row.get("status") in ("unavailable", "stale"):
+            since = prev_since.get(key) if _iso(prev_since.get(key)) else now.isoformat()
+            down_since[key] = since
+            hours = (now - _iso(since)).total_seconds() / 3600
+            if hours >= SOURCE_OUTAGE_HOURS and alerted.get(key) != since:
+                newly_down.append({"key": key, "label": label, "since": since, "hours": hours,
+                                   "note": row.get("note") or ""})
+        elif alerted.get(key):
+            since = _iso(alerted[key])
+            recovered.append({"key": key, "label": label,
+                              "hours": (now - since).total_seconds() / 3600 if since else None})
+    return down_since, newly_down, recovered
+
+
+def build_outage_alert(newly_down: list, recovered: list) -> str:
+    lines = []
+    if newly_down:
+        lines.append("⚠️ WARHUBS 資料來源中斷")
+        for item in newly_down:
+            note = f"（{item['note']}）" if item["note"] else ""
+            lines.append(f"• {item['label']}：已約 {int(item['hours'])} 小時沒有有效資料{note}")
+    if recovered:
+        lines.append("✅ WARHUBS 資料來源恢復")
+        for item in recovered:
+            took = f"（中斷約 {int(item['hours'])} 小時）" if item["hours"] is not None else ""
+            lines.append(f"• {item['label']}{took}")
+    lines.append("此通知只送站長，不會發到公開頻道。")
+    return "\n".join(lines)
+
+
 def _target_key(kind, target):
     # Public data must not disclose private chat IDs or webhook credentials.
     return hashlib.sha256(f"{kind}:{target}".encode()).hexdigest()
 
 
-async def _send_all(messages, level="NORMAL", tg_chats=None, completed=None, pacer=None):
+async def _send_all(messages, level="NORMAL", tg_chats=None, completed=None, pacer=None, discord=True):
     """Return acknowledged results per destination; skip previously acknowledged targets."""
     if not messages:
         return {}
@@ -319,7 +376,7 @@ async def _send_all(messages, level="NORMAL", tg_chats=None, completed=None, pac
         tg_chats if tg_chats is not None else [TELEGRAM_CHAT_ID]) if c))
     targets = [(_target_key("telegram", c), "telegram", c)
                for c in chats if TELEGRAM_BOT_TOKEN]
-    if DISCORD_WEBHOOK:
+    if DISCORD_WEBHOOK and discord:
         targets.append((_target_key("discord", DISCORD_WEBHOOK), "discord", DISCORD_WEBHOOK))
     results = {key: True for key, _, _ in targets if completed.get(key)}
     pending = [t for t in targets if not completed.get(t[0])]
@@ -373,7 +430,8 @@ async def run_notifications(data: dict, prev_notify: dict | None = None,
 
     if digest_only:
         # A saved-snapshot digest must not consume or replay event edges.
-        for key in ("level", "pizza_extreme", "hotspots", "hotspot_counter_version"):
+        for key in ("level", "pizza_extreme", "hotspots", "hotspot_counter_version",
+                    "source_down_since", "source_alerted"):
             if key in prev_notify:
                 new_notify[key] = prev_notify[key]
             else:
@@ -412,6 +470,23 @@ async def run_notifications(data: dict, prev_notify: dict | None = None,
             and hs_cnt >= prev_hs * HOTSPOT_SURGE_RATIO:
         alert_msgs.append(build_hotspot_alert(data, hs_cnt, prev_hs))
 
+    # 3) 資料來源中斷／恢復：只送站長個人 chat，不送公開頻道與 Discord
+    outage = {}
+    if not digest_only:
+        down_since, newly_down, recovered = source_outages(data.get("source_health"), prev_notify, now)
+        alerted = {k: v for k, v in (prev_notify.get("source_alerted") or {}).items() if k in down_since}
+        if ALERT_SOURCE_OUTAGE and (newly_down or recovered):
+            outage = await _send_all([build_outage_alert(newly_down, recovered)], new_level,
+                                     tg_chats=personal, pacer=pacer, discord=False)
+            if outage and all(outage.values()):
+                alerted.update({item["key"]: item["since"] for item in newly_down})
+            else:
+                # 沒送達：保留舊的已通知紀錄，恢復訊息下輪再試
+                alerted.update({item["key"]: (prev_notify.get("source_alerted") or {})[item["key"]]
+                                for item in recovered})
+        new_notify["source_down_since"] = down_since
+        new_notify["source_alerted"] = alerted
+
     # 異常警報：個人＋公開頻道都推；定時摘要：依頻道 scope
     alerts = await _send_all(alert_msgs, new_level, tg_chats=both, pacer=pacer)
     receipts = (prev_notify.get("digest_receipts", {})
@@ -429,5 +504,6 @@ async def run_notifications(data: dict, prev_notify: dict | None = None,
         new_notify["digest_attempt_bucket"] = bucket
     new_notify["telegram_retry_at"] = pacer.retry_at
     new_notify["delivery_version"] = 1
-    new_notify["delivery"] = {"checked_at": now.isoformat(), "alerts": alerts, "digest": digest}
+    new_notify["delivery"] = {"checked_at": now.isoformat(), "alerts": alerts, "digest": digest,
+                              **({"source_outage": outage} if outage else {})}
     return new_notify

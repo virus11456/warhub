@@ -94,6 +94,8 @@ jobs:
           ALERT_HOTSPOT: ${{ vars.ALERT_HOTSPOT }}
           HOTSPOT_SURGE_RATIO: ${{ vars.HOTSPOT_SURGE_RATIO }}
           HOTSPOT_SURGE_MIN: ${{ vars.HOTSPOT_SURGE_MIN }}
+          ALERT_SOURCE_OUTAGE: ${{ vars.ALERT_SOURCE_OUTAGE }}
+          SOURCE_OUTAGE_HOURS: ${{ vars.SOURCE_OUTAGE_HOURS }}
         run: python scripts/fetch_data.py
 
       - name: Sample and preserve GDELT events at most every six hours
