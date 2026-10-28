@@ -1419,6 +1419,10 @@
 #china-watch.cn-banner{background:none;border:0;border-left:3px solid var(--border);padding:.2rem 0 .2rem .8rem;margin:.4rem 0 .8rem}
 #china-watch .cn-banner-t{font-size:.9rem;letter-spacing:1px;color:var(--text)}
 #china-watch .cn-banner-s{font-size:.75rem;margin-top:.25rem}
+.ti-trend{margin:.5rem 0 .3rem;padding:.5rem .6rem;border:1px solid var(--border);background:rgba(255,255,255,.02)}
+.ti-trend svg{display:block;width:100%;height:64px}
+.ti-trend-hd,.ti-trend-ft{display:flex;justify-content:space-between;gap:.5rem;flex-wrap:wrap;font-size:.75rem;color:var(--text-dim)}
+.ti-trend-hd span:last-child{font-weight:700}
 .pz-sub{font-size:.75rem;color:var(--text-dim);line-height:1.5}
 .pz-level{text-align:right;flex-shrink:0}
 .pz-level-lbl{font-size:.7rem;color:var(--text-dim)}
@@ -2917,6 +2921,33 @@ function renderNuclearSeismic(ns) {
     `<div style="margin-top:.3rem;font-size:.6rem;color:rgba(255,255,255,.25)">篩選：試驗場 150km 內；淺層地震也可能為自然成因，不能據此認定核試 · 資料：USGS</div>`;
 }
 
+// ─── 市場題目近 30 天走勢（每日一筆 YES 價格；缺日不補，不畫成 0）─────────
+function marketHistoryChart(rows) {
+  const pts = (Array.isArray(rows) ? rows : []).map(r => ({ t: Date.parse(r && r.at), p: r && r.p }))
+    .filter(r => Number.isFinite(r.t) && typeof r.p === 'number' && r.p >= 0 && r.p <= 100).sort((a, b) => a.t - b.t);
+  if (pts.length < 2) return '';
+  const W = 300, H = 64, pad = 4;
+  const lo = Math.min(...pts.map(r => r.p)), hi = Math.max(...pts.map(r => r.p));
+  const span = Math.max(hi - lo, 2), base = Math.max(0, lo - span * 0.25), top = Math.min(100, hi + span * 0.25);
+  const t0 = pts[0].t, t1 = pts[pts.length - 1].t;
+  const x = t => pad + (t - t0) / Math.max(t1 - t0, 1) * (W - pad * 2);
+  const y = p => pad + (1 - (p - base) / Math.max(top - base, 1)) * (H - pad * 2);
+  const line = pts.map(r => `${x(r.t).toFixed(1)},${y(r.p).toFixed(1)}`).join(' ');
+  const first = pts[0], last = pts[pts.length - 1], diff = +(last.p - first.p).toFixed(1);
+  const days = Math.round((t1 - t0) / 86400000);
+  const color = diff > 0 ? 'var(--accent2)' : diff < 0 ? 'var(--accent)' : 'var(--text-dim)';
+  const fmtP = p => `${+p.toFixed(1)}%`;
+  return `<div class="ti-trend">
+    <div class="ti-trend-hd"><span>近 ${days} 天走勢</span><span style="color:${color}">${diff > 0 ? '+' : ''}${diff} 個百分點</span></div>
+    <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="近 ${days} 天 YES 價格由 ${fmtP(first.p)} 到 ${fmtP(last.p)}">
+      <polygon points="${x(t0).toFixed(1)},${H - pad} ${line} ${x(t1).toFixed(1)},${H - pad}" fill="${color}" opacity=".12"/>
+      <polyline points="${line}" fill="none" stroke="${color}" stroke-width="1.6" vector-effect="non-scaling-stroke"/>
+      <circle cx="${x(t1).toFixed(1)}" cy="${y(last.p).toFixed(1)}" r="2.6" fill="${color}"/>
+    </svg>
+    <div class="ti-trend-ft"><span>${escapeHtml(new Date(t0).toLocaleDateString('zh-TW', {month: 'numeric', day: 'numeric'}))} ${fmtP(first.p)}</span><span>最低 ${fmtP(lo)} · 最高 ${fmtP(hi)}</span><span>現在 ${fmtP(last.p)}</span></div>
+  </div>`;
+}
+
 // ─── 披薩店 24 小時長條圖：灰 = Google 平常人潮，亮 = 今天實測（皆為華府時間）───
 const ET_PARTS = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', weekday: 'short', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', hourCycle: 'h23' });
 const PIZZA_WEEKDAYS = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
@@ -3393,7 +3424,7 @@ function renderTaiwanInsight(json) {
     const hours=(at-comparisonAt)/3600000;
     const comparable=price!=='缺資料'&&!expired&&Number.isFinite(end)&&Number.isFinite(m.delta_pp)&&Math.abs(m.delta_pp)<=100&&Number.isFinite(comparisonAt)&&hours>=20&&hours<=28;
     const comparison=expired?'題目已到期，暫停比較':!Number.isFinite(end)?'截止時間缺資料，暫停比較':price==='缺資料'?'報價缺資料，暫停比較':comparable?`較約 ${hours.toFixed(1)} 小時前 ${m.delta_pp>0?'+':''}${m.delta_pp} 個百分點`:'同題比較資料累積中或缺少可核對時間';
-    return `<div class="ti-market">${link('https://polymarket.com/market/'+encodeURIComponent(m.slug),chineseTitle(m.question_zh,m.question))}<div>YES 報價 ${price} · ${comparison}</div><div class="ti-note">${expired?'歷史快照報價':'報價快照時間'}（台北）${escapeHtml(fmt(v.as_of))}</div><details class="reading-details"><summary>時間與比較依據</summary>${comparable?`<div>比較基準時間（台北）${escapeHtml(fmt(m.comparison_at))}</div>`:''}<div>到期時間（台北）${escapeHtml(fmt(m.end_date))}；不同截止日不直接比較。</div></details></div>`;
+    return `<div class="ti-market">${link('https://polymarket.com/market/'+encodeURIComponent(m.slug),chineseTitle(m.question_zh,m.question))}<div>YES 報價 ${price} · ${comparison}</div>${marketHistoryChart(m.history_30d)}<div class="ti-note">${expired?'歷史快照報價':'報價快照時間'}（台北）${escapeHtml(fmt(v.as_of))}</div><details class="reading-details"><summary>時間與比較依據</summary>${comparable?`<div>比較基準時間（台北）${escapeHtml(fmt(m.comparison_at))}</div>`:''}<div>到期時間（台北）${escapeHtml(fmt(m.end_date))}；不同截止日不直接比較。</div></details></div>`;
   }).join('')||'<div>目前沒有有效的台海市場題目。</div>';
   const conclusion=a.status==='elevated'?'共機活動偏高，值得持續關注；這不是開戰判定。':a.status==='within_baseline'?'共機活動未超過比較門檻；不能因此判定安全或不會開戰。':'官方活動資料尚不足，暫時不能判讀變化。';
   el.innerHTML=`<section class="ti-panel"><p class="ti-conclusion">${escapeHtml(conclusion)}</p><details class="reading-details"><summary>官方數字怎麼比較？</summary>${official}</details></section><section class="ti-panel ti-market-section"><strong>市場｜各題價格怎麼變？</strong><div class="ti-markets">${markets}</div></section><p class="ti-note">洞察資料時間 ${escapeHtml(fmt(v.as_of))}（台北）。這些觀測時間與定義不同；目前不自動判定互相證實或即將升級。</p><details class="reading-details ti-limits"><summary>新聞取樣與資料限制</summary>${limits}</details>`;

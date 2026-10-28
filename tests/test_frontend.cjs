@@ -192,6 +192,15 @@ if(mode==='valid'){
   assert.ok(d.querySelector('#taiwan-insight-body').textContent.includes('有限樣本'));
   assert.ok(d.querySelector('#taiwan-insight-body .ti-market-section .ti-markets'));
   assert.ok(d.querySelector('#taiwan-insight-body').textContent.includes('2030'));
+  // No history → no chart; a 30-day history → line, change and range; malformed points are dropped, not zeroed.
+  assert.equal(d.querySelector('#taiwan-insight-body .ti-trend'),null);
+  w.renderTaiwanInsight({taiwan_insight:{...insight,markets:[{...insight.markets[0],history_30d:[{at:'2026-09-29T00:00:00Z',p:12.5},{at:'bad',p:50},{at:'2026-10-10T00:00:00Z',p:-3},{at:'2026-10-15T00:00:00Z',p:8},{at:'2026-10-28T00:00:00Z',p:9.5}]}]}});
+  {const tr=d.querySelector('#taiwan-insight-body .ti-trend');assert.ok(tr);const t=tr.textContent.replace(/\s+/g,' ');
+   assert.ok(t.includes('近 29 天走勢'),t);assert.ok(t.includes('-3 個百分點'),t);assert.ok(t.includes('最低 8% · 最高 12.5%'),t);assert.ok(t.includes('現在 9.5%'),t);
+   assert.equal(tr.querySelector('polyline').getAttribute('points').split(' ').length,3);}
+  w.renderTaiwanInsight({taiwan_insight:{...insight,markets:[{...insight.markets[0],history_30d:[{at:'2026-10-28T00:00:00Z',p:9.5}]}]}});
+  assert.equal(d.querySelector('#taiwan-insight-body .ti-trend'),null);
+  w.renderTaiwanInsight({taiwan_insight:insight});
 
   // Missing fields must not invent zero, dates, or a comparable market change.
   const ti=()=>d.querySelector('#taiwan-insight-body').textContent;

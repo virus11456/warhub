@@ -135,3 +135,4 @@ class HealthTests(unittest.TestCase):
     def test_digest_says_not_set_up(self):
         import alerts
         self.assertIn('尚未在 BestTime 建檔', alerts._fmt_pizza_shops([{}], {'status': 'not_configured'}))
+
