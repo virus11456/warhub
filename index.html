@@ -1383,6 +1383,13 @@
   #pizza-shops-grid .shop-status{flex-wrap:wrap;row-gap:.15rem}
   #pizza-shops-grid .pizza-hourly svg{height:36px!important}
 }
+.bg-section-head{margin:2.2rem 0 .9rem;padding-top:1.2rem;border-top:1px solid var(--border)}
+.bg-section-head h2{margin:0;font-size:1.05rem;color:var(--text);letter-spacing:.5px}
+.bg-section-head p{margin:.35rem 0 0;font-size:.8rem;color:var(--text-dim);line-height:1.6}
+/* In the background group the China block is a quiet sub-heading, not an alarm banner. */
+#china-watch.cn-banner{background:none;border:0;border-left:3px solid var(--border);padding:.2rem 0 .2rem .8rem;margin:.4rem 0 .8rem}
+#china-watch .cn-banner-t{font-size:.9rem;letter-spacing:1px;color:var(--text)}
+#china-watch .cn-banner-s{font-size:.75rem;margin-top:.25rem}
 .pizza-src{margin-top:.15rem;font-size:.75rem;color:var(--accent3);font-weight:400}
 .pizza-radar-summary{display:flex;flex-direction:column;gap:.25rem;margin:.6rem 0 .8rem;padding:.7rem .9rem;border:1px solid var(--border);border-left:4px solid var(--text-dim);background:rgba(255,255,255,.03);font-size:.9rem;line-height:1.5}
 .pizza-radar-summary strong{font-size:1.05rem;color:var(--text)}
@@ -1838,6 +1845,11 @@
     </div>
   </div>
 
+  <!-- ══════════ 市場與背景指標（以下為長期／間接訊號，預設收合）══════════ -->
+  <div class="bg-section-head" id="background-indicators">
+    <h2>📚 市場與背景指標</h2>
+    <p>預測市場、中國進口、熱點與避險等長期或間接訊號。點標題展開。</p>
+  </div>
   <!-- ══════════ POLYMARKET 獨立卡片 ══════════ -->
   <div id="poly-card" class="card poly-card" style="margin-bottom:1.5rem">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;flex-wrap:wrap;gap:.5rem">
