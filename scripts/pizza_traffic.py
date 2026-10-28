@@ -118,8 +118,8 @@ def build_shops(live: dict, venues: dict, previous_shops, now: datetime, queried
             pct = magnitude = None
             closed = result.get("open") in (False, "Closed", "closed")
             is_open = False if closed else None
-            status = ("closed" if closed else "waiting" if not queried
-                      else "setup_needed" if not stored.get("venue_id") else "unavailable")
+            status = ("closed" if closed else "setup_needed" if not stored.get("venue_id")
+                      else "waiting" if not queried else "unavailable")
         shops.append({
             "name": name,
             "busyness": value,

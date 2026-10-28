@@ -135,6 +135,8 @@ def _fmt_aviation(aviation, health=None):
 
 def _fmt_pizza_shops(shops, health=None):
     shops = [shop for shop in (shops or []) if isinstance(shop, dict)]
+    if (health or {}).get("status") == "not_configured":
+        return "   店家人流：尚未在 BestTime 建檔，暫無資料"
     problem = _source_problem({}, health)
     if problem:
         return "   店家人流：" + problem
