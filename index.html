@@ -33,21 +33,21 @@
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=IBM+Plex+Sans:wght@300;400;500&family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #060a10;
-    --bg2: #0a1018;
-    --bg3: #0e1620;
-    --accent:  #00cfe8;   /* 單一結構主色（青）＝正常/低風險 */
-    --accent1: #00cfe8;
-    --accent4: #00cfe8;
-    --accent2: #ff4d5e;   /* 語意：危險/高風險 */
-    --accent3: #f5a623;   /* 語意：警戒/升高 */
-    --crit:    #ff2d6f;   /* 語意：一觸即發（最高階，紅粉）*/
-    --text: #c9d6e2;
-    --text-primary: #e4eef7;
-    --text-dim: #66788a;
-    --border: #17232f;
-    --glow: 0 0 12px rgba(0,207,232,0.22);
-    --glow-red: 0 0 12px rgba(255,77,94,0.35);
+    --bg: #0b0f14;
+    --bg2: #10151c;
+    --bg3: #151c25;
+    --accent:  #7eb0e0;   /* 結構主色（霧藍）＝正常/低風險；不用螢光青 */
+    --accent1: #7eb0e0;
+    --accent4: #7eb0e0;
+    --accent2: #ef5b57;   /* 語意：危險/高風險 */
+    --accent3: #e3a83f;   /* 語意：警戒/升高 */
+    --crit:    #f2557f;   /* 語意：一觸即發（最高階，紅粉）*/
+    --text: #d3dbe4;
+    --text-primary: #eef2f6;
+    --text-dim: #8b98a8;
+    --border: #253140;
+    --glow: 0 0 10px rgba(126,176,224,0.12);
+    --glow-red: 0 0 12px rgba(239,91,87,0.35);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -78,7 +78,7 @@
 
   /* Header */
   header {
-    background: linear-gradient(180deg, rgba(0,207,232,0.05) 0%, transparent 100%);
+    background: linear-gradient(180deg, rgba(126,176,224,0.05) 0%, transparent 100%);
     border-bottom: 1px solid var(--accent);
     padding: 0 2rem;
     position: sticky;
@@ -136,8 +136,8 @@
   }
   .nav-guides { color: var(--accent); border: 1px solid var(--accent); }
   .nav-guides:hover { background: var(--accent); color: #04121a; box-shadow: var(--glow); }
-  .nav-tg { color: #29abe2; border: 1px solid #29abe2; }
-  .nav-tg:hover { background: #29abe2; color: #04121a; box-shadow: 0 0 12px rgba(41,171,226,.4); }
+  .nav-tg { color: #5aa0dc; border: 1px solid #5aa0dc; }
+  .nav-tg:hover { background: #5aa0dc; color: #04121a; box-shadow: 0 0 12px rgba(90,160,220,.4); }
   .network-links {
     display: inline-flex;
     align-items: center;
@@ -168,19 +168,19 @@
   /* Telegram 訂閱 CTA */
   .tg-cta {
     display: flex; align-items: center; gap: .8rem; text-decoration: none;
-    background: linear-gradient(135deg, rgba(41,171,226,.16), rgba(0,207,232,.06));
-    border: 1px solid #29abe2; border-radius: 6px;
+    background: linear-gradient(135deg, rgba(90,160,220,.16), rgba(126,176,224,.06));
+    border: 1px solid #5aa0dc; border-radius: 6px;
     padding: .7rem .9rem; margin-bottom: .8rem; transition: all .15s;
   }
-  .tg-cta:hover { background: linear-gradient(135deg, rgba(41,171,226,.28), rgba(0,207,232,.12)); box-shadow: 0 0 14px rgba(41,171,226,.3); }
+  .tg-cta:hover { background: linear-gradient(135deg, rgba(90,160,220,.28), rgba(126,176,224,.12)); box-shadow: 0 0 14px rgba(90,160,220,.3); }
   .tg-cta-ic { font-size: 1.5rem; flex: none; }
   .tg-cta-txt { display: flex; flex-direction: column; line-height: 1.35; min-width: 0; }
   .tg-cta-txt b { font-family: 'Orbitron', monospace; font-size: .8rem; color: var(--text-primary); letter-spacing: .5px; }
   .tg-cta-txt small { font-family: 'Share Tech Mono', monospace; font-size: .62rem; color: var(--text-dim); }
   .tg-cta-go { margin-left: auto; flex: none; font-family: 'Orbitron', monospace; font-size: .7rem; font-weight: 700;
-    color: #04121a; background: #29abe2; border-radius: 4px; padding: 5px 12px; white-space: nowrap; }
+    color: #04121a; background: #5aa0dc; border-radius: 4px; padding: 5px 12px; white-space: nowrap; }
   .tg-cta-top { margin: 0 0 1.3rem; padding: .9rem 1.1rem; border-width: 2px;
-    box-shadow: 0 0 18px rgba(41,171,226,.18); }
+    box-shadow: 0 0 18px rgba(90,160,220,.18); }
   .tg-cta-top .tg-cta-txt b { font-size: .92rem; }
   .tg-cta-top .tg-cta-ic { font-size: 1.8rem; }
   @media (max-width: 480px) {
@@ -281,7 +281,7 @@
     font-weight: 900;
     line-height: 1;
     color: var(--accent3);
-    text-shadow: 0 0 30px rgba(245,166,35,0.5);
+    text-shadow: 0 0 30px rgba(227,168,63,0.5);
     animation: flicker 8s infinite;
   }
 
@@ -304,8 +304,8 @@
   }
 
   @keyframes card-danger-pulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(255,77,94,0); border-color: var(--border); }
-    50%       { box-shadow: 0 0 25px 4px rgba(255,77,94,0.25); border-color: rgba(255,77,94,0.5); }
+    0%, 100% { box-shadow: 0 0 0 0 rgba(239,91,87,0); border-color: var(--border); }
+    50%       { box-shadow: 0 0 25px 4px rgba(239,91,87,0.25); border-color: rgba(239,91,87,0.5); }
   }
 
   .pizza-card.anomaly {
@@ -367,10 +367,10 @@
     opacity: 0.8;
   }
 
-  .meter-fill.red { background: linear-gradient(90deg, #440000, var(--accent2)); box-shadow: 0 0 8px rgba(255,77,94,0.5); }
-  .meter-fill.orange { background: linear-gradient(90deg, #442200, var(--accent3)); box-shadow: 0 0 8px rgba(245,166,35,0.5); }
-  .meter-fill.blue { background: linear-gradient(90deg, #001144, var(--accent4)); box-shadow: 0 0 8px rgba(0,207,232,0.5); }
-  .meter-fill.green { background: linear-gradient(90deg, #001122, var(--accent)); box-shadow: 0 0 8px rgba(0,207,232,0.5); }
+  .meter-fill.red { background: linear-gradient(90deg, #440000, var(--accent2)); box-shadow: 0 0 8px rgba(239,91,87,0.5); }
+  .meter-fill.orange { background: linear-gradient(90deg, #442200, var(--accent3)); box-shadow: 0 0 8px rgba(227,168,63,0.5); }
+  .meter-fill.blue { background: linear-gradient(90deg, #001144, var(--accent4)); box-shadow: 0 0 8px rgba(126,176,224,0.5); }
+  .meter-fill.green { background: linear-gradient(90deg, #001122, var(--accent)); box-shadow: 0 0 8px rgba(126,176,224,0.5); }
 
   .meter-pct {
     font-family: 'Orbitron', monospace;
@@ -458,7 +458,7 @@
 
   .pizza-emoji {
     font-size: 2.5rem;
-    filter: drop-shadow(0 0 10px rgba(245,166,35,0.6));
+    filter: drop-shadow(0 0 10px rgba(227,168,63,0.6));
     animation: pizza-spin 3s ease-in-out infinite;
   }
 
@@ -476,7 +476,7 @@
     font-size: 2.5rem;
     font-weight: 900;
     color: var(--accent3);
-    text-shadow: 0 0 20px rgba(245,166,35,0.5);
+    text-shadow: 0 0 20px rgba(227,168,63,0.5);
   }
 
   .pizza-level-label {
@@ -487,8 +487,8 @@
   }
 
   .pizza-alert-box {
-    background: rgba(245,166,35,0.05);
-    border: 1px solid rgba(245,166,35,0.3);
+    background: rgba(227,168,63,0.05);
+    border: 1px solid rgba(227,168,63,0.3);
     padding: 0.8rem 1rem;
     margin: 1rem 0;
     font-family: 'Share Tech Mono', monospace;
@@ -713,10 +713,10 @@
     border: 1px solid;
   }
 
-  .risk-pill.critical { color: var(--accent2); border-color: var(--accent2); background: rgba(255,77,94,0.1); }
-  .risk-pill.high { color: var(--accent3); border-color: var(--accent3); background: rgba(245,166,35,0.1); }
-  .risk-pill.medium { color: var(--accent4); border-color: var(--accent4); background: rgba(0,207,232,0.1); }
-  .risk-pill.elevated { color: var(--accent); border-color: var(--accent); background: rgba(0,207,232,0.1); }
+  .risk-pill.critical { color: var(--accent2); border-color: var(--accent2); background: rgba(239,91,87,0.1); }
+  .risk-pill.high { color: var(--accent3); border-color: var(--accent3); background: rgba(227,168,63,0.1); }
+  .risk-pill.medium { color: var(--accent4); border-color: var(--accent4); background: rgba(126,176,224,0.1); }
+  .risk-pill.elevated { color: var(--accent); border-color: var(--accent); background: rgba(126,176,224,0.1); }
 
   /* Signal card */
   .signal-card { border-top: 2px solid var(--accent); }
@@ -828,7 +828,7 @@
     height: 100%;
     display: flex;
     align-items: center;
-    background: rgba(255,77,94,0.1);
+    background: rgba(239,91,87,0.1);
   }
 
   .ticker-scroll {
@@ -1073,8 +1073,8 @@
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
     background-image:
-      linear-gradient(rgba(0,207,232,0.02) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,207,232,0.02) 1px, transparent 1px);
+      linear-gradient(rgba(126,176,224,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(126,176,224,0.02) 1px, transparent 1px);
     background-size: 40px 40px;
     pointer-events: none;
     z-index: 0;
@@ -1194,13 +1194,13 @@
   .card::before { border-top-color: var(--accent); border-left-color: var(--accent); opacity: .45; }
   .bg-grid {
     background-image:
-      linear-gradient(rgba(0,207,232,.018) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,207,232,.018) 1px, transparent 1px);
+      linear-gradient(rgba(126,176,224,.018) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(126,176,224,.018) 1px, transparent 1px);
   }
   header { border-bottom-color: var(--accent); }
 
   /* INTEL FEED 標籤改中性，不再紅底 */
-  .ticker-label { color: var(--accent); background: rgba(0,207,232,.08); }
+  .ticker-label { color: var(--accent); background: rgba(126,176,224,.08); }
 
   /* 卡片間距與內距微調，資訊更透氣 */
   .card { padding: 1.3rem 1.4rem; }
@@ -1251,9 +1251,9 @@
 
   /* ══════════ 🎮 8-BIT 像素風主題（可切換）══════════ */
   body.theme-8bit {
-    --accent:#2ce8ff; --accent1:#2ce8ff; --accent4:#2ce8ff;
-    --accent2:#ff3b5c; --accent3:#ffcc00; --crit:#ff3bd0;
-    --border:#37506a;
+    --accent:#7eb0e0; --accent1:#7eb0e0; --accent4:#7eb0e0;
+    --accent2:#ef5b57; --accent3:#e3a83f; --crit:#f2557f;
+    --border:#2f3d4e;
     line-height:1.85;
   }
   /* 像素字型只套在數字/標題/徽章（中文缺像素字型會 fallback，這樣最可讀）*/
@@ -1330,7 +1330,7 @@
   #taiwan-insight-card .ti-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; }
   #taiwan-insight-card .ti-panel { min-width:0; padding:1rem; background:rgba(255,255,255,.025); border:1px solid var(--border); font-size:.82rem; line-height:1.85; }
   #taiwan-insight-card .ti-panel strong { display:block; color:var(--accent); font-size:.85rem; margin-bottom:.55rem; }
-  #pla-legend a, #pla-legend a:visited { color:#8de9ef; text-decoration:underline; }
+  #pla-legend a, #pla-legend a:visited { color:#a9c8e8; text-decoration:underline; }
   #taiwan-insight-card .ti-panel > div + div { margin-top:.55rem; }
   #taiwan-insight-card .ti-market-section { grid-column:1/-1; }
   #taiwan-insight-card .ti-markets { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:1rem; }
@@ -1405,7 +1405,7 @@
 #prep-guides-card .prep-lead{margin:.2rem 0 .8rem;font-size:.9rem;color:var(--text-dim)}
 #prep-guides-card .prep-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.7rem}
 #prep-guides-card .prep-item{display:flex;gap:.6rem;align-items:flex-start;padding:.8rem;border:1px solid var(--border);background:rgba(255,255,255,.03);color:var(--text);text-decoration:none;min-width:0}
-#prep-guides-card .prep-item:hover,#prep-guides-card .prep-item:focus-visible{border-color:var(--accent);background:rgba(0,207,232,.06)}
+#prep-guides-card .prep-item:hover,#prep-guides-card .prep-item:focus-visible{border-color:var(--accent);background:rgba(126,176,224,.06)}
 #prep-guides-card .prep-ic{font-size:1.4rem;line-height:1}
 #prep-guides-card .prep-item b{display:block;font-size:.9rem;font-weight:600}
 #prep-guides-card .prep-item small{display:block;margin-top:.2rem;font-size:.75rem;color:var(--text-dim);line-height:1.5}
@@ -1442,7 +1442,7 @@
 </style>
 </head>
 <body class="theme-8bit">
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="ic-swords" viewBox="0 0 9 9"><path fill="#c2cad4" d="M0 0h1v1h-1zM8 0h1v1h-1zM1 1h1v1h-1zM7 1h1v1h-1zM2 2h1v1h-1zM6 2h1v1h-1zM3 3h1v1h-1zM5 3h1v1h-1zM4 4h1v1h-1zM3 5h1v1h-1zM5 5h1v1h-1zM4 6h1v2h-1z"/><path fill="#d3a94a" d="M2 6h1v1h-1zM6 6h1v1h-1zM1 7h1v1h-1zM7 7h1v1h-1zM0 8h1v1h-1zM4 8h1v1h-1zM8 8h1v1h-1z"/></symbol><symbol id="ic-fire" viewBox="0 0 9 9"><path fill="#ff3b30" d="M4 0h1v1h-1zM3 1h1v2h-1zM2 3h1v2h-1zM1 5h1v3h-1zM7 6h1v2h-1zM2 8h1v1h-1zM6 8h1v1h-1z"/><path fill="#ff7a18" d="M4 1h1v3h-1zM5 2h1v1h-1zM3 3h1v3h-1zM6 3h1v5h-1zM2 5h1v3h-1zM7 5h1v1h-1zM3 7h1v2h-1zM5 7h1v2h-1zM4 8h1v1h-1z"/><path fill="#ffd21e" d="M5 3h1v4h-1zM4 4h1v4h-1zM3 6h1v1h-1z"/></symbol><symbol id="ic-beer" viewBox="0 0 9 9"><path fill="#fff2c4" d="M1 0h5v2h-5zM0 1h1v1h-1zM6 1h1v1h-1z"/><path fill="#c9782e" d="M0 2h1v7h-1zM6 2h1v7h-1zM7 3h2v1h-2zM7 4h1v3h-1zM8 6h1v1h-1zM1 8h5v1h-5z"/><path fill="#f4b73d" d="M1 2h5v6h-5z"/></symbol><symbol id="ic-plane" viewBox="0 0 9 9"><path fill="#c2cad4" d="M4 0h1v8h-1zM0 3h4v1h-4zM5 3h4v1h-4zM3 6h1v1h-1zM5 6h1v1h-1z"/><path fill="#7f8b98" d="M1 4h3v1h-3zM5 4h3v1h-3zM2 7h1v1h-1zM6 7h1v1h-1z"/></symbol><symbol id="ic-money" viewBox="0 0 9 9"><path fill="#c9782e" d="M3 0h2v1h-2zM2 1h1v1h-1zM5 1h1v1h-1z"/><path fill="#d3a94a" d="M3 2h2v2h-2zM2 3h1v2h-1zM5 3h1v2h-1zM1 4h1v3h-1zM6 4h1v3h-1zM2 6h1v2h-1zM5 6h1v2h-1zM3 7h2v2h-2z"/><path fill="#46c76a" d="M3 4h2v3h-2zM2 5h1v1h-1zM5 5h1v1h-1z"/></symbol><symbol id="ic-chart" viewBox="0 0 9 9"><path fill="#7f8b98" d="M0 0h1v8h-1zM1 7h8v1h-8z"/><path fill="#46c76a" d="M5 1h1v6h-1zM4 6h1v1h-1z"/><path fill="#f4b73d" d="M3 2h1v5h-1zM7 4h1v3h-1z"/><path fill="#2fd0e0" d="M2 4h1v3h-1z"/></symbol><symbol id="ic-news" viewBox="0 0 9 9"><path fill="#dcddd2" d="M0 0h9v1h-9zM0 1h1v8h-1zM8 1h1v3h-1zM8 5h1v2h-1zM1 8h8v1h-8z"/><path fill="#ff3b30" d="M1 1h4v1h-4z"/><path fill="#7f8b98" d="M5 1h3v1h-3zM1 2h1v6h-1zM3 2h2v6h-2zM6 2h2v6h-2zM2 4h1v1h-1zM5 4h1v4h-1zM8 4h1v1h-1zM2 7h1v1h-1zM8 7h1v1h-1z"/></symbol><symbol id="ic-sat" viewBox="0 0 9 9"><path fill="#ffd21e" d="M0 0h1v4h-1zM8 0h1v4h-1zM1 1h1v2h-1zM7 1h1v2h-1z"/><path fill="#c2cad4" d="M2 0h1v1h-1zM6 0h1v1h-1zM3 1h3v2h-3zM2 3h1v1h-1zM4 3h1v2h-1zM6 3h1v1h-1zM3 4h1v1h-1zM5 4h1v1h-1z"/><path fill="#7f8b98" d="M2 5h1v1h-1zM6 5h1v1h-1zM1 6h1v1h-1zM7 6h1v1h-1z"/></symbol><symbol id="ic-radiation" viewBox="0 0 9 9"><path fill="#ffd21e" d="M0 0h9v1h-9zM0 1h3v1h-3zM6 1h3v1h-3zM0 2h2v2h-2zM7 2h2v2h-2zM2 3h1v1h-1zM6 3h1v1h-1zM0 4h1v1h-1zM3 4h3v3h-3zM8 4h1v1h-1zM0 6h1v3h-1zM8 6h1v3h-1zM1 7h3v2h-3zM5 7h3v2h-3zM4 8h1v1h-1z"/><path fill="#12161c" d="M3 1h3v3h-3zM2 2h1v1h-1zM6 2h1v1h-1zM1 4h2v3h-2zM6 4h2v3h-2zM0 5h1v1h-1zM8 5h1v1h-1zM4 7h1v1h-1z"/></symbol><symbol id="ic-book" viewBox="0 0 9 9"><path fill="#3f8fd0" d="M1 1h3v1h-3zM5 1h3v1h-3zM0 2h1v5h-1zM4 2h1v5h-1zM8 2h1v5h-1zM1 7h3v1h-3zM5 7h3v1h-3z"/><path fill="#dcddd2" d="M1 2h3v5h-3zM5 2h3v5h-3z"/></symbol><symbol id="ic-clock" viewBox="0 0 9 9"><path fill="#7f8b98" d="M2 0h5v1h-5zM1 1h1v1h-1zM7 1h1v1h-1zM0 2h1v5h-1zM8 2h1v4h-1zM1 7h1v1h-1zM7 7h1v1h-1zM2 8h5v1h-5z"/><path fill="#dcddd2" d="M2 1h5v1h-5zM1 2h2v5h-2zM6 2h2v5h-2zM3 5h3v3h-3zM8 6h1v1h-1zM2 7h1v1h-1zM6 7h1v1h-1z"/><path fill="#12161c" d="M4 2h1v3h-1zM3 4h1v1h-1zM5 4h1v1h-1z"/></symbol><symbol id="ic-abacus" viewBox="0 0 9 9"><path fill="#c9782e" d="M0 0h9v1h-9zM0 1h1v8h-1zM8 1h1v8h-1zM1 3h7v1h-7zM1 6h7v1h-7zM1 8h7v1h-7z"/><path fill="#2fd0e0" d="M2 1h1v2h-1zM6 1h1v2h-1zM4 4h1v2h-1zM2 7h1v1h-1zM6 7h1v1h-1z"/><path fill="#f4b73d" d="M4 1h1v2h-1zM2 4h1v2h-1zM6 4h1v2h-1zM4 7h1v1h-1z"/></symbol><symbol id="ic-globe" viewBox="0 0 9 9"><path fill="#3f8fd0" d="M2 0h5v1h-5zM1 1h1v2h-1zM4 1h2v3h-2zM7 1h1v2h-1zM0 2h1v5h-1zM6 2h1v1h-1zM8 2h1v5h-1zM2 3h2v2h-2zM1 4h1v1h-1zM6 4h1v5h-1zM3 5h3v1h-3zM7 5h1v3h-1zM1 6h2v2h-2zM5 6h1v1h-1zM3 7h1v2h-1zM2 8h1v1h-1zM4 8h2v1h-2z"/><path fill="#46c76a" d="M2 1h2v2h-2zM6 1h1v1h-1zM1 3h1v1h-1zM6 3h2v1h-2zM4 4h2v1h-2zM7 4h1v1h-1zM1 5h2v1h-2zM3 6h2v1h-2zM4 7h2v1h-2z"/></symbol><symbol id="ic-globe2" viewBox="0 0 9 9"><path fill="#2fd0e0" d="M2 0h5v1h-5zM1 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM7 1h1v1h-1zM0 2h1v5h-1zM2 2h1v5h-1zM4 2h1v5h-1zM6 2h1v5h-1zM8 2h1v5h-1zM1 3h1v1h-1zM3 3h1v1h-1zM5 3h1v1h-1zM7 3h1v1h-1zM1 5h1v1h-1zM3 5h1v1h-1zM5 5h1v1h-1zM7 5h1v1h-1zM1 7h1v1h-1zM3 7h1v2h-1zM5 7h1v2h-1zM7 7h1v1h-1zM2 8h1v1h-1zM4 8h1v1h-1zM6 8h1v1h-1z"/><path fill="#3f8fd0" d="M2 1h1v1h-1zM4 1h1v1h-1zM6 1h1v1h-1zM1 2h1v1h-1zM3 2h1v1h-1zM5 2h1v1h-1zM7 2h1v1h-1zM1 4h1v1h-1zM3 4h1v1h-1zM5 4h1v1h-1zM7 4h1v1h-1zM1 6h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM7 6h1v1h-1zM2 7h1v1h-1zM4 7h1v1h-1zM6 7h1v1h-1z"/></symbol><symbol id="ic-bolt" viewBox="0 0 9 9"><path fill="#ffd21e" d="M4 0h2v1h-2zM3 1h2v1h-2zM2 2h2v2h-2zM1 3h1v1h-1zM4 3h2v1h-2zM3 4h2v1h-2zM2 5h2v1h-2zM1 6h2v1h-2zM0 7h2v1h-2z"/></symbol><symbol id="ic-target" viewBox="0 0 9 9"><path fill="#ff3b30" d="M2 0h5v1h-5zM1 1h1v1h-1zM7 1h1v1h-1zM0 2h1v5h-1zM2 2h5v1h-5zM8 2h1v5h-1zM2 3h1v4h-1zM6 3h1v4h-1zM4 4h1v1h-1zM3 6h3v1h-3zM1 7h1v1h-1zM7 7h1v1h-1zM2 8h5v1h-5z"/><path fill="#eef2f5" d="M2 1h5v1h-5zM1 2h1v5h-1zM7 2h1v5h-1zM3 3h3v1h-3zM3 4h1v2h-1zM5 4h1v2h-1zM4 5h1v1h-1zM2 7h5v1h-5z"/></symbol><symbol id="ic-shield" viewBox="0 0 9 9"><path fill="#3f8fd0" d="M1 0h7v1h-7zM1 1h1v4h-1zM7 1h1v4h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path fill="#2fd0e0" d="M2 1h5v4h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/></symbol><symbol id="ic-fuel" viewBox="0 0 9 9"><path fill="#ff3b30" d="M0 0h6v1h-6zM0 1h1v7h-1zM2 1h2v7h-2zM5 1h1v7h-1zM1 3h1v1h-1zM4 3h1v1h-1zM6 3h1v2h-1zM1 6h1v2h-1zM4 6h1v2h-1z"/><path fill="#7f8b98" d="M7 0h1v2h-1zM6 1h1v2h-1zM7 3h1v2h-1z"/></symbol><symbol id="ic-volcano" viewBox="0 0 9 9"><path fill="#ff3b30" d="M3 0h1v1h-1zM5 0h1v1h-1zM2 1h1v1h-1zM6 1h1v1h-1z"/><path fill="#ff7a18" d="M4 1h1v4h-1zM3 2h1v1h-1zM5 2h1v1h-1zM3 5h1v1h-1zM5 5h1v1h-1zM4 6h1v1h-1z"/><path fill="#7f8b98" d="M3 3h1v2h-1zM5 3h1v2h-1zM2 4h1v5h-1zM6 4h1v5h-1zM4 5h1v1h-1zM1 6h1v3h-1zM3 6h1v3h-1zM5 6h1v3h-1zM7 6h1v3h-1zM4 7h1v2h-1zM0 8h1v1h-1zM8 8h1v1h-1z"/></symbol><symbol id="ic-snow" viewBox="0 0 9 9"><path fill="#2fd0e0" d="M4 0h1v5h-1zM2 1h1v1h-1zM6 1h1v1h-1zM3 2h1v2h-1zM5 2h1v2h-1zM1 3h2v1h-2zM6 3h2v1h-2zM1 5h3v1h-3zM5 5h3v1h-3zM3 6h3v1h-3zM2 7h1v1h-1zM4 7h1v2h-1zM6 7h1v1h-1z"/></symbol><symbol id="ic-wave" viewBox="0 0 9 9"><path fill="#2fd0e0" d="M3 1h2v1h-2zM2 2h1v1h-1zM5 2h1v1h-1zM7 2h1v1h-1zM1 3h1v1h-1zM6 3h1v1h-1zM8 3h1v1h-1zM0 4h1v1h-1zM2 6h1v1h-1zM4 6h2v1h-2zM7 6h1v1h-1zM1 7h1v1h-1zM3 7h1v1h-1zM6 7h1v1h-1zM8 7h1v1h-1z"/><path fill="#3f8fd0" d="M3 2h2v1h-2zM2 3h1v1h-1zM5 3h1v1h-1zM7 3h1v2h-1zM1 4h1v1h-1zM6 4h1v1h-1zM2 7h1v2h-1zM4 7h2v2h-2zM7 7h1v2h-1zM0 8h2v1h-2zM3 8h1v1h-1zM6 8h1v1h-1zM8 8h1v1h-1z"/></symbol><symbol id="ic-gamepad" viewBox="0 0 9 9"><path fill="#7f8b98" d="M1 1h7v1h-7zM0 2h2v1h-2zM4 2h1v4h-1zM7 2h2v5h-2zM0 3h1v4h-1zM2 3h2v1h-2zM1 4h1v3h-1zM2 5h2v1h-2zM5 5h2v1h-2z"/><path fill="#2fd0e0" d="M2 2h1v1h-1zM1 3h1v1h-1zM2 4h1v1h-1z"/><path fill="#ff3b30" d="M6 2h1v2h-1z"/></symbol><symbol id="ic-mouse" viewBox="0 0 7 7"><path fill="#7f8b98" d="M2 0h3v1h-3zM1 1h1v5h-1zM3 1h2v1h-2zM6 1h1v1h-1zM3 2h1v5h-1zM5 2h1v4h-1zM2 3h1v4h-1zM4 3h1v4h-1z"/><path fill="#2fd0e0" d="M2 1h1v2h-1zM5 1h1v1h-1z"/></symbol><symbol id="ic-phone" viewBox="0 0 7 7"><path fill="#7f8b98" d="M1 0h5v1h-5zM1 1h1v6h-1zM5 1h1v6h-1zM2 6h3v1h-3z"/><path fill="#2fd0e0" d="M2 1h3v5h-3z"/></symbol><symbol id="ic-trendup" viewBox="0 0 9 9"><path fill="#7f8b98" d="M0 0h1v8h-1zM1 7h8v1h-8z"/><path fill="#46c76a" d="M7 0h1v1h-1zM6 1h1v1h-1zM8 1h1v1h-1zM5 2h1v2h-1zM3 3h1v1h-1zM2 4h1v1h-1zM4 4h1v1h-1zM1 5h1v1h-1zM3 5h1v1h-1zM2 6h1v1h-1z"/></symbol><symbol id="ic-warn" viewBox="0 0 9 9"><path fill="#ffd21e" d="M4 0h1v2h-1zM3 1h1v8h-1zM5 1h1v8h-1zM2 3h1v6h-1zM6 3h1v6h-1zM1 5h1v4h-1zM7 5h1v4h-1zM4 6h1v1h-1zM0 7h1v2h-1zM8 7h1v2h-1zM4 8h1v1h-1z"/><path fill="#12161c" d="M4 2h1v4h-1z"/></symbol><symbol id="ic-siren" viewBox="0 0 9 9"><path fill="#eef2f5" d="M3 0h3v1h-3zM2 1h1v1h-1zM6 1h1v1h-1zM1 2h1v1h-1zM7 2h1v1h-1z"/><path fill="#ff3b30" d="M3 1h3v5h-3zM2 2h1v4h-1zM6 2h1v4h-1zM1 3h1v2h-1zM7 3h1v2h-1z"/><path fill="#7f8b98" d="M2 6h5v2h-5zM1 7h1v1h-1zM7 7h1v1h-1z"/></symbol><symbol id="ic-check" viewBox="0 0 9 9"><path fill="#46c76a" d="M7 0h1v2h-1zM6 1h1v2h-1zM5 2h1v2h-1zM0 3h1v2h-1zM4 3h1v2h-1zM1 4h1v2h-1zM3 4h1v2h-1zM2 5h1v2h-1z"/></symbol><symbol id="ic-checkbox" viewBox="0 0 9 9"><path fill="#46c76a" d="M1 0h7v1h-7zM0 1h1v7h-1zM7 1h2v2h-2zM6 3h1v1h-1zM8 3h1v5h-1zM1 8h7v1h-7z"/><path fill="#eef2f5" d="M6 1h1v2h-1zM5 2h1v4h-1zM1 3h1v2h-1zM2 4h1v2h-1zM4 4h1v3h-1zM3 5h1v2h-1z"/></symbol><symbol id="ic-noentry" viewBox="0 0 9 9"><path fill="#ff3b30" d="M2 0h5v3h-5zM1 1h1v2h-1zM7 1h1v2h-1zM0 2h1v5h-1zM8 2h1v5h-1zM1 5h7v3h-7zM2 8h5v1h-5z"/><path fill="#eef2f5" d="M1 3h7v2h-7z"/></symbol><symbol id="ic-sqblack" viewBox="0 0 7 7"><path fill="#2a2f38" d="M0 0h7v7h-7z"/></symbol><symbol id="ic-sqred" viewBox="0 0 7 7"><path fill="#ff3b30" d="M0 0h7v7h-7z"/></symbol><symbol id="ic-fl_ru" viewBox="0 0 12 8"><path fill="#eef2f5" d="M0 0h12v2h-12z"/><path fill="#3f8fd0" d="M0 2h12v2h-12z"/><path fill="#ff3b30" d="M0 4h12v4h-12z"/></symbol><symbol id="ic-fl_ua" viewBox="0 0 12 8"><path fill="#3f8fd0" d="M0 0h12v4h-12z"/><path fill="#ffd21e" d="M0 4h12v4h-12z"/></symbol><symbol id="ic-fl_ir" viewBox="0 0 12 8"><path fill="#46c76a" d="M0 0h12v2h-12z"/><path fill="#eef2f5" d="M0 2h12v2h-12z"/><path fill="#ff3b30" d="M0 4h12v4h-12z"/></symbol><symbol id="ic-fl_sy" viewBox="0 0 12 8"><path fill="#ff3b30" d="M0 0h12v2h-12z"/><path fill="#eef2f5" d="M0 2h12v2h-12z"/><path fill="#12161c" d="M0 4h5v4h-5zM7 4h5v4h-5zM5 5h2v3h-2z"/><path fill="#46c76a" d="M5 4h2v1h-2z"/></symbol><symbol id="ic-fl_iq" viewBox="0 0 12 8"><path fill="#ff3b30" d="M0 0h12v2h-12z"/><path fill="#eef2f5" d="M0 2h12v2h-12z"/><path fill="#12161c" d="M0 4h5v4h-5zM6 4h6v4h-6zM5 5h1v3h-1z"/><path fill="#46c76a" d="M5 4h1v1h-1z"/></symbol><symbol id="ic-fl_ye" viewBox="0 0 12 8"><path fill="#ff3b30" d="M0 0h12v2h-12z"/><path fill="#eef2f5" d="M0 2h12v2h-12z"/><path fill="#12161c" d="M0 4h12v4h-12z"/></symbol><symbol id="ic-fl_cn" viewBox="0 0 12 8"><path fill="#ff3b30" d="M0 0h12v1h-12zM0 1h2v7h-2zM3 1h1v7h-1zM5 1h7v7h-7zM2 2h1v1h-1zM4 3h1v5h-1zM2 4h1v4h-1z"/><path fill="#ffd21e" d="M2 1h1v1h-1zM4 1h1v2h-1zM2 3h1v1h-1z"/></symbol><symbol id="ic-fl_us" viewBox="0 0 12 8"><path fill="#3f8fd0" d="M0 0h5v4h-5z"/><path fill="#ff3b30" d="M5 0h7v1h-7zM5 2h7v1h-7zM0 4h12v1h-12zM0 6h12v1h-12z"/><path fill="#eef2f5" d="M5 1h7v1h-7zM5 3h7v1h-7zM0 5h12v1h-12zM0 7h12v1h-12z"/></symbol><symbol id="ic-fl_il" viewBox="0 0 12 8"><path fill="#eef2f5" d="M0 0h12v1h-12zM0 2h12v1h-12zM0 3h5v3h-5zM6 3h6v1h-6zM5 4h1v2h-1zM7 4h5v2h-5zM6 5h1v1h-1zM0 7h12v1h-12z"/><path fill="#3f8fd0" d="M0 1h12v1h-12zM5 3h1v1h-1zM6 4h1v1h-1zM0 6h12v1h-12z"/></symbol><symbol id="ic-fl_tw" viewBox="0 0 12 8"><path fill="#3f8fd0" d="M0 0h6v1h-6zM0 1h2v3h-2zM3 1h3v1h-3zM2 2h1v2h-1zM4 2h2v2h-2zM3 3h1v1h-1z"/><path fill="#ff3b30" d="M6 0h6v8h-6zM0 4h6v4h-6z"/><path fill="#eef2f5" d="M2 1h1v1h-1zM3 2h1v1h-1z"/></symbol><symbol id="ic-fl_kp" viewBox="0 0 12 8"><path fill="#3f8fd0" d="M0 0h12v2h-12zM0 6h12v2h-12z"/><path fill="#ff3b30" d="M0 2h12v1h-12zM0 3h3v3h-3zM4 3h8v3h-8zM3 4h1v2h-1z"/><path fill="#eef2f5" d="M3 3h1v1h-1z"/></symbol><symbol id="ic-fl_kr" viewBox="0 0 12 8"><path fill="#eef2f5" d="M0 0h12v3h-12zM0 3h5v5h-5zM7 3h5v5h-5zM5 5h2v3h-2z"/><path fill="#ff3b30" d="M5 3h2v1h-2z"/><path fill="#3f8fd0" d="M5 4h2v1h-2z"/></symbol><symbol id="ic-fl_lb" viewBox="0 0 12 8"><path fill="#ff3b30" d="M0 0h12v2h-12zM0 4h6v4h-6zM7 4h5v4h-5zM6 5h1v3h-1z"/><path fill="#eef2f5" d="M0 2h12v1h-12zM0 3h5v1h-5zM6 3h6v1h-6z"/><path fill="#46c76a" d="M5 3h1v1h-1zM6 4h1v1h-1z"/></symbol><symbol id="ic-fl_in" viewBox="0 0 12 8"><path fill="#ff8f1c" d="M0 0h12v2h-12z"/><path fill="#eef2f5" d="M0 2h12v1h-12zM0 3h5v1h-5zM7 3h5v1h-5z"/><path fill="#3f8fd0" d="M5 3h2v1h-2z"/><path fill="#46c76a" d="M0 4h12v4h-12z"/></symbol><symbol id="ic-fl_pk" viewBox="0 0 12 8"><path fill="#eef2f5" d="M0 0h4v8h-4zM9 2h1v1h-1zM8 3h1v1h-1zM7 4h1v1h-1z"/><path fill="#46c76a" d="M4 0h8v2h-8zM4 2h5v1h-5zM10 2h2v6h-2zM4 3h4v1h-4zM9 3h1v5h-1zM4 4h3v4h-3zM8 4h1v4h-1zM7 5h1v3h-1z"/></symbol><symbol id="ic-pizza" viewBox="0 0 9 9"><path fill="#c9782e" d="M1 0h7v2h-7zM0 1h1v1h-1zM8 1h1v1h-1z"/><path fill="#f4b73d" d="M1 2h7v1h-7zM1 3h1v1h-1zM3 3h3v2h-3zM7 3h1v1h-1zM2 4h1v2h-1zM6 4h1v2h-1zM3 5h1v3h-1zM5 5h1v3h-1zM4 6h1v3h-1z"/><path fill="#e23b2a" d="M2 3h1v1h-1zM6 3h1v1h-1zM4 5h1v1h-1z"/></symbol><symbol id="ic-wheat" viewBox="0 0 9 9"><path fill="#ffd21e" d="M4 0h1v1h-1zM4 2h1v1h-1zM4 4h1v1h-1z"/><path fill="#f5a623" d="M3 1h1v5h-1zM5 1h1v5h-1z"/><path fill="#35e08a" d="M4 3h1v1h-1zM4 5h1v4h-1zM2 6h1v1h-1zM6 6h1v1h-1z"/></symbol><symbol id="ic-gear" viewBox="0 0 9 9"><path fill="#c2cad4" d="M4 0h1v1h-1zM1 1h1v1h-1zM7 1h1v1h-1zM3 2h3v2h-3zM2 3h1v3h-1zM6 3h1v3h-1zM0 4h1v1h-1zM3 4h1v3h-1zM5 4h1v3h-1zM8 4h1v1h-1zM4 5h1v2h-1zM1 7h1v1h-1zM7 7h1v1h-1zM4 8h1v1h-1z"/><path fill="#00cfe8" d="M4 4h1v1h-1z"/></symbol><symbol id="ic-medal" viewBox="0 0 9 9"><path fill="#ff3b30" d="M3 0h1v2h-1z"/><path fill="#7fb2ff" d="M5 0h1v2h-1z"/><path fill="#f5a623" d="M4 2h1v2h-1zM3 3h1v4h-1zM5 3h1v4h-1zM2 4h1v1h-1zM6 4h1v1h-1zM4 5h1v1h-1z"/><path fill="#ffd21e" d="M4 4h1v1h-1z"/></symbol><symbol id="ic-backpack" viewBox="0 0 9 9"><path fill="#7f8b98" d="M3 0h3v1h-3zM2 1h1v1h-1zM6 1h1v1h-1z"/><path fill="#e2553a" d="M1 2h7v2h-7zM1 4h1v2h-1zM7 4h1v2h-1zM1 6h7v2h-7zM2 8h1v1h-1zM6 8h1v1h-1z"/><path fill="#ff7a18" d="M2 4h5v2h-5z"/><path fill="#12161c" d="M4 4h1v1h-1z"/></symbol><symbol id="ic-can" viewBox="0 0 9 9"><path fill="#c2cad4" d="M1 0h7v1h-7zM1 8h7v1h-7z"/><path fill="#e2553a" d="M1 1h7v2h-7zM1 6h7v2h-7z"/><path fill="#f4b73d" d="M1 3h7v3h-7z"/><path fill="#eef2f5" d="M3 4h3v1h-3z"/></symbol><symbol id="ic-radio" viewBox="0 0 9 9"><path fill="#c2cad4" d="M6 0h1v1h-1zM5 1h1v1h-1z"/><path fill="#c9782e" d="M0 2h9v1h-9zM0 3h1v3h-1zM4 3h1v3h-1zM8 3h1v3h-1zM5 5h3v1h-3zM0 6h9v1h-9zM1 7h1v1h-1zM7 7h1v1h-1z"/><path fill="#7f8b98" d="M1 3h3v3h-3z"/><path fill="#2fd0e0" d="M5 3h3v2h-3z"/></symbol></defs></svg>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="ic-swords" viewBox="0 0 9 9"><path fill="#c2cad4" d="M0 0h1v1h-1zM8 0h1v1h-1zM1 1h1v1h-1zM7 1h1v1h-1zM2 2h1v1h-1zM6 2h1v1h-1zM3 3h1v1h-1zM5 3h1v1h-1zM4 4h1v1h-1zM3 5h1v1h-1zM5 5h1v1h-1zM4 6h1v2h-1z"/><path fill="#d3a94a" d="M2 6h1v1h-1zM6 6h1v1h-1zM1 7h1v1h-1zM7 7h1v1h-1zM0 8h1v1h-1zM4 8h1v1h-1zM8 8h1v1h-1z"/></symbol><symbol id="ic-fire" viewBox="0 0 9 9"><path fill="#ff3b30" d="M4 0h1v1h-1zM3 1h1v2h-1zM2 3h1v2h-1zM1 5h1v3h-1zM7 6h1v2h-1zM2 8h1v1h-1zM6 8h1v1h-1z"/><path fill="#ff7a18" d="M4 1h1v3h-1zM5 2h1v1h-1zM3 3h1v3h-1zM6 3h1v5h-1zM2 5h1v3h-1zM7 5h1v1h-1zM3 7h1v2h-1zM5 7h1v2h-1zM4 8h1v1h-1z"/><path fill="#ffd21e" d="M5 3h1v4h-1zM4 4h1v4h-1zM3 6h1v1h-1z"/></symbol><symbol id="ic-beer" viewBox="0 0 9 9"><path fill="#fff2c4" d="M1 0h5v2h-5zM0 1h1v1h-1zM6 1h1v1h-1z"/><path fill="#c9782e" d="M0 2h1v7h-1zM6 2h1v7h-1zM7 3h2v1h-2zM7 4h1v3h-1zM8 6h1v1h-1zM1 8h5v1h-5z"/><path fill="#f4b73d" d="M1 2h5v6h-5z"/></symbol><symbol id="ic-plane" viewBox="0 0 9 9"><path fill="#c2cad4" d="M4 0h1v8h-1zM0 3h4v1h-4zM5 3h4v1h-4zM3 6h1v1h-1zM5 6h1v1h-1z"/><path fill="#7f8b98" d="M1 4h3v1h-3zM5 4h3v1h-3zM2 7h1v1h-1zM6 7h1v1h-1z"/></symbol><symbol id="ic-money" viewBox="0 0 9 9"><path fill="#c9782e" d="M3 0h2v1h-2zM2 1h1v1h-1zM5 1h1v1h-1z"/><path fill="#d3a94a" d="M3 2h2v2h-2zM2 3h1v2h-1zM5 3h1v2h-1zM1 4h1v3h-1zM6 4h1v3h-1zM2 6h1v2h-1zM5 6h1v2h-1zM3 7h2v2h-2z"/><path fill="#46c76a" d="M3 4h2v3h-2zM2 5h1v1h-1zM5 5h1v1h-1z"/></symbol><symbol id="ic-chart" viewBox="0 0 9 9"><path fill="#7f8b98" d="M0 0h1v8h-1zM1 7h8v1h-8z"/><path fill="#46c76a" d="M5 1h1v6h-1zM4 6h1v1h-1z"/><path fill="#f4b73d" d="M3 2h1v5h-1zM7 4h1v3h-1z"/><path fill="#7eb0e0" d="M2 4h1v3h-1z"/></symbol><symbol id="ic-news" viewBox="0 0 9 9"><path fill="#dcddd2" d="M0 0h9v1h-9zM0 1h1v8h-1zM8 1h1v3h-1zM8 5h1v2h-1zM1 8h8v1h-8z"/><path fill="#ff3b30" d="M1 1h4v1h-4z"/><path fill="#7f8b98" d="M5 1h3v1h-3zM1 2h1v6h-1zM3 2h2v6h-2zM6 2h2v6h-2zM2 4h1v1h-1zM5 4h1v4h-1zM8 4h1v1h-1zM2 7h1v1h-1zM8 7h1v1h-1z"/></symbol><symbol id="ic-sat" viewBox="0 0 9 9"><path fill="#ffd21e" d="M0 0h1v4h-1zM8 0h1v4h-1zM1 1h1v2h-1zM7 1h1v2h-1z"/><path fill="#c2cad4" d="M2 0h1v1h-1zM6 0h1v1h-1zM3 1h3v2h-3zM2 3h1v1h-1zM4 3h1v2h-1zM6 3h1v1h-1zM3 4h1v1h-1zM5 4h1v1h-1z"/><path fill="#7f8b98" d="M2 5h1v1h-1zM6 5h1v1h-1zM1 6h1v1h-1zM7 6h1v1h-1z"/></symbol><symbol id="ic-radiation" viewBox="0 0 9 9"><path fill="#ffd21e" d="M0 0h9v1h-9zM0 1h3v1h-3zM6 1h3v1h-3zM0 2h2v2h-2zM7 2h2v2h-2zM2 3h1v1h-1zM6 3h1v1h-1zM0 4h1v1h-1zM3 4h3v3h-3zM8 4h1v1h-1zM0 6h1v3h-1zM8 6h1v3h-1zM1 7h3v2h-3zM5 7h3v2h-3zM4 8h1v1h-1z"/><path fill="#12161c" d="M3 1h3v3h-3zM2 2h1v1h-1zM6 2h1v1h-1zM1 4h2v3h-2zM6 4h2v3h-2zM0 5h1v1h-1zM8 5h1v1h-1zM4 7h1v1h-1z"/></symbol><symbol id="ic-book" viewBox="0 0 9 9"><path fill="#3f8fd0" d="M1 1h3v1h-3zM5 1h3v1h-3zM0 2h1v5h-1zM4 2h1v5h-1zM8 2h1v5h-1zM1 7h3v1h-3zM5 7h3v1h-3z"/><path fill="#dcddd2" d="M1 2h3v5h-3zM5 2h3v5h-3z"/></symbol><symbol id="ic-clock" viewBox="0 0 9 9"><path fill="#7f8b98" d="M2 0h5v1h-5zM1 1h1v1h-1zM7 1h1v1h-1zM0 2h1v5h-1zM8 2h1v4h-1zM1 7h1v1h-1zM7 7h1v1h-1zM2 8h5v1h-5z"/><path fill="#dcddd2" d="M2 1h5v1h-5zM1 2h2v5h-2zM6 2h2v5h-2zM3 5h3v3h-3zM8 6h1v1h-1zM2 7h1v1h-1zM6 7h1v1h-1z"/><path fill="#12161c" d="M4 2h1v3h-1zM3 4h1v1h-1zM5 4h1v1h-1z"/></symbol><symbol id="ic-abacus" viewBox="0 0 9 9"><path fill="#c9782e" d="M0 0h9v1h-9zM0 1h1v8h-1zM8 1h1v8h-1zM1 3h7v1h-7zM1 6h7v1h-7zM1 8h7v1h-7z"/><path fill="#7eb0e0" d="M2 1h1v2h-1zM6 1h1v2h-1zM4 4h1v2h-1zM2 7h1v1h-1zM6 7h1v1h-1z"/><path fill="#f4b73d" d="M4 1h1v2h-1zM2 4h1v2h-1zM6 4h1v2h-1zM4 7h1v1h-1z"/></symbol><symbol id="ic-globe" viewBox="0 0 9 9"><path fill="#3f8fd0" d="M2 0h5v1h-5zM1 1h1v2h-1zM4 1h2v3h-2zM7 1h1v2h-1zM0 2h1v5h-1zM6 2h1v1h-1zM8 2h1v5h-1zM2 3h2v2h-2zM1 4h1v1h-1zM6 4h1v5h-1zM3 5h3v1h-3zM7 5h1v3h-1zM1 6h2v2h-2zM5 6h1v1h-1zM3 7h1v2h-1zM2 8h1v1h-1zM4 8h2v1h-2z"/><path fill="#46c76a" d="M2 1h2v2h-2zM6 1h1v1h-1zM1 3h1v1h-1zM6 3h2v1h-2zM4 4h2v1h-2zM7 4h1v1h-1zM1 5h2v1h-2zM3 6h2v1h-2zM4 7h2v1h-2z"/></symbol><symbol id="ic-globe2" viewBox="0 0 9 9"><path fill="#7eb0e0" d="M2 0h5v1h-5zM1 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM7 1h1v1h-1zM0 2h1v5h-1zM2 2h1v5h-1zM4 2h1v5h-1zM6 2h1v5h-1zM8 2h1v5h-1zM1 3h1v1h-1zM3 3h1v1h-1zM5 3h1v1h-1zM7 3h1v1h-1zM1 5h1v1h-1zM3 5h1v1h-1zM5 5h1v1h-1zM7 5h1v1h-1zM1 7h1v1h-1zM3 7h1v2h-1zM5 7h1v2h-1zM7 7h1v1h-1zM2 8h1v1h-1zM4 8h1v1h-1zM6 8h1v1h-1z"/><path fill="#3f8fd0" d="M2 1h1v1h-1zM4 1h1v1h-1zM6 1h1v1h-1zM1 2h1v1h-1zM3 2h1v1h-1zM5 2h1v1h-1zM7 2h1v1h-1zM1 4h1v1h-1zM3 4h1v1h-1zM5 4h1v1h-1zM7 4h1v1h-1zM1 6h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM7 6h1v1h-1zM2 7h1v1h-1zM4 7h1v1h-1zM6 7h1v1h-1z"/></symbol><symbol id="ic-bolt" viewBox="0 0 9 9"><path fill="#ffd21e" d="M4 0h2v1h-2zM3 1h2v1h-2zM2 2h2v2h-2zM1 3h1v1h-1zM4 3h2v1h-2zM3 4h2v1h-2zM2 5h2v1h-2zM1 6h2v1h-2zM0 7h2v1h-2z"/></symbol><symbol id="ic-target" viewBox="0 0 9 9"><path fill="#ff3b30" d="M2 0h5v1h-5zM1 1h1v1h-1zM7 1h1v1h-1zM0 2h1v5h-1zM2 2h5v1h-5zM8 2h1v5h-1zM2 3h1v4h-1zM6 3h1v4h-1zM4 4h1v1h-1zM3 6h3v1h-3zM1 7h1v1h-1zM7 7h1v1h-1zM2 8h5v1h-5z"/><path fill="#eef2f5" d="M2 1h5v1h-5zM1 2h1v5h-1zM7 2h1v5h-1zM3 3h3v1h-3zM3 4h1v2h-1zM5 4h1v2h-1zM4 5h1v1h-1zM2 7h5v1h-5z"/></symbol><symbol id="ic-shield" viewBox="0 0 9 9"><path fill="#3f8fd0" d="M1 0h7v1h-7zM1 1h1v4h-1zM7 1h1v4h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path fill="#7eb0e0" d="M2 1h5v4h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/></symbol><symbol id="ic-fuel" viewBox="0 0 9 9"><path fill="#ff3b30" d="M0 0h6v1h-6zM0 1h1v7h-1zM2 1h2v7h-2zM5 1h1v7h-1zM1 3h1v1h-1zM4 3h1v1h-1zM6 3h1v2h-1zM1 6h1v2h-1zM4 6h1v2h-1z"/><path fill="#7f8b98" d="M7 0h1v2h-1zM6 1h1v2h-1zM7 3h1v2h-1z"/></symbol><symbol id="ic-volcano" viewBox="0 0 9 9"><path fill="#ff3b30" d="M3 0h1v1h-1zM5 0h1v1h-1zM2 1h1v1h-1zM6 1h1v1h-1z"/><path fill="#ff7a18" d="M4 1h1v4h-1zM3 2h1v1h-1zM5 2h1v1h-1zM3 5h1v1h-1zM5 5h1v1h-1zM4 6h1v1h-1z"/><path fill="#7f8b98" d="M3 3h1v2h-1zM5 3h1v2h-1zM2 4h1v5h-1zM6 4h1v5h-1zM4 5h1v1h-1zM1 6h1v3h-1zM3 6h1v3h-1zM5 6h1v3h-1zM7 6h1v3h-1zM4 7h1v2h-1zM0 8h1v1h-1zM8 8h1v1h-1z"/></symbol><symbol id="ic-snow" viewBox="0 0 9 9"><path fill="#7eb0e0" d="M4 0h1v5h-1zM2 1h1v1h-1zM6 1h1v1h-1zM3 2h1v2h-1zM5 2h1v2h-1zM1 3h2v1h-2zM6 3h2v1h-2zM1 5h3v1h-3zM5 5h3v1h-3zM3 6h3v1h-3zM2 7h1v1h-1zM4 7h1v2h-1zM6 7h1v1h-1z"/></symbol><symbol id="ic-wave" viewBox="0 0 9 9"><path fill="#7eb0e0" d="M3 1h2v1h-2zM2 2h1v1h-1zM5 2h1v1h-1zM7 2h1v1h-1zM1 3h1v1h-1zM6 3h1v1h-1zM8 3h1v1h-1zM0 4h1v1h-1zM2 6h1v1h-1zM4 6h2v1h-2zM7 6h1v1h-1zM1 7h1v1h-1zM3 7h1v1h-1zM6 7h1v1h-1zM8 7h1v1h-1z"/><path fill="#3f8fd0" d="M3 2h2v1h-2zM2 3h1v1h-1zM5 3h1v1h-1zM7 3h1v2h-1zM1 4h1v1h-1zM6 4h1v1h-1zM2 7h1v2h-1zM4 7h2v2h-2zM7 7h1v2h-1zM0 8h2v1h-2zM3 8h1v1h-1zM6 8h1v1h-1zM8 8h1v1h-1z"/></symbol><symbol id="ic-gamepad" viewBox="0 0 9 9"><path fill="#7f8b98" d="M1 1h7v1h-7zM0 2h2v1h-2zM4 2h1v4h-1zM7 2h2v5h-2zM0 3h1v4h-1zM2 3h2v1h-2zM1 4h1v3h-1zM2 5h2v1h-2zM5 5h2v1h-2z"/><path fill="#7eb0e0" d="M2 2h1v1h-1zM1 3h1v1h-1zM2 4h1v1h-1z"/><path fill="#ff3b30" d="M6 2h1v2h-1z"/></symbol><symbol id="ic-mouse" viewBox="0 0 7 7"><path fill="#7f8b98" d="M2 0h3v1h-3zM1 1h1v5h-1zM3 1h2v1h-2zM6 1h1v1h-1zM3 2h1v5h-1zM5 2h1v4h-1zM2 3h1v4h-1zM4 3h1v4h-1z"/><path fill="#7eb0e0" d="M2 1h1v2h-1zM5 1h1v1h-1z"/></symbol><symbol id="ic-phone" viewBox="0 0 7 7"><path fill="#7f8b98" d="M1 0h5v1h-5zM1 1h1v6h-1zM5 1h1v6h-1zM2 6h3v1h-3z"/><path fill="#7eb0e0" d="M2 1h3v5h-3z"/></symbol><symbol id="ic-trendup" viewBox="0 0 9 9"><path fill="#7f8b98" d="M0 0h1v8h-1zM1 7h8v1h-8z"/><path fill="#46c76a" d="M7 0h1v1h-1zM6 1h1v1h-1zM8 1h1v1h-1zM5 2h1v2h-1zM3 3h1v1h-1zM2 4h1v1h-1zM4 4h1v1h-1zM1 5h1v1h-1zM3 5h1v1h-1zM2 6h1v1h-1z"/></symbol><symbol id="ic-warn" viewBox="0 0 9 9"><path fill="#ffd21e" d="M4 0h1v2h-1zM3 1h1v8h-1zM5 1h1v8h-1zM2 3h1v6h-1zM6 3h1v6h-1zM1 5h1v4h-1zM7 5h1v4h-1zM4 6h1v1h-1zM0 7h1v2h-1zM8 7h1v2h-1zM4 8h1v1h-1z"/><path fill="#12161c" d="M4 2h1v4h-1z"/></symbol><symbol id="ic-siren" viewBox="0 0 9 9"><path fill="#eef2f5" d="M3 0h3v1h-3zM2 1h1v1h-1zM6 1h1v1h-1zM1 2h1v1h-1zM7 2h1v1h-1z"/><path fill="#ff3b30" d="M3 1h3v5h-3zM2 2h1v4h-1zM6 2h1v4h-1zM1 3h1v2h-1zM7 3h1v2h-1z"/><path fill="#7f8b98" d="M2 6h5v2h-5zM1 7h1v1h-1zM7 7h1v1h-1z"/></symbol><symbol id="ic-check" viewBox="0 0 9 9"><path fill="#46c76a" d="M7 0h1v2h-1zM6 1h1v2h-1zM5 2h1v2h-1zM0 3h1v2h-1zM4 3h1v2h-1zM1 4h1v2h-1zM3 4h1v2h-1zM2 5h1v2h-1z"/></symbol><symbol id="ic-checkbox" viewBox="0 0 9 9"><path fill="#46c76a" d="M1 0h7v1h-7zM0 1h1v7h-1zM7 1h2v2h-2zM6 3h1v1h-1zM8 3h1v5h-1zM1 8h7v1h-7z"/><path fill="#eef2f5" d="M6 1h1v2h-1zM5 2h1v4h-1zM1 3h1v2h-1zM2 4h1v2h-1zM4 4h1v3h-1zM3 5h1v2h-1z"/></symbol><symbol id="ic-noentry" viewBox="0 0 9 9"><path fill="#ff3b30" d="M2 0h5v3h-5zM1 1h1v2h-1zM7 1h1v2h-1zM0 2h1v5h-1zM8 2h1v5h-1zM1 5h7v3h-7zM2 8h5v1h-5z"/><path fill="#eef2f5" d="M1 3h7v2h-7z"/></symbol><symbol id="ic-sqblack" viewBox="0 0 7 7"><path fill="#2a2f38" d="M0 0h7v7h-7z"/></symbol><symbol id="ic-sqred" viewBox="0 0 7 7"><path fill="#ff3b30" d="M0 0h7v7h-7z"/></symbol><symbol id="ic-fl_ru" viewBox="0 0 12 8"><path fill="#eef2f5" d="M0 0h12v2h-12z"/><path fill="#3f8fd0" d="M0 2h12v2h-12z"/><path fill="#ff3b30" d="M0 4h12v4h-12z"/></symbol><symbol id="ic-fl_ua" viewBox="0 0 12 8"><path fill="#3f8fd0" d="M0 0h12v4h-12z"/><path fill="#ffd21e" d="M0 4h12v4h-12z"/></symbol><symbol id="ic-fl_ir" viewBox="0 0 12 8"><path fill="#46c76a" d="M0 0h12v2h-12z"/><path fill="#eef2f5" d="M0 2h12v2h-12z"/><path fill="#ff3b30" d="M0 4h12v4h-12z"/></symbol><symbol id="ic-fl_sy" viewBox="0 0 12 8"><path fill="#ff3b30" d="M0 0h12v2h-12z"/><path fill="#eef2f5" d="M0 2h12v2h-12z"/><path fill="#12161c" d="M0 4h5v4h-5zM7 4h5v4h-5zM5 5h2v3h-2z"/><path fill="#46c76a" d="M5 4h2v1h-2z"/></symbol><symbol id="ic-fl_iq" viewBox="0 0 12 8"><path fill="#ff3b30" d="M0 0h12v2h-12z"/><path fill="#eef2f5" d="M0 2h12v2h-12z"/><path fill="#12161c" d="M0 4h5v4h-5zM6 4h6v4h-6zM5 5h1v3h-1z"/><path fill="#46c76a" d="M5 4h1v1h-1z"/></symbol><symbol id="ic-fl_ye" viewBox="0 0 12 8"><path fill="#ff3b30" d="M0 0h12v2h-12z"/><path fill="#eef2f5" d="M0 2h12v2h-12z"/><path fill="#12161c" d="M0 4h12v4h-12z"/></symbol><symbol id="ic-fl_cn" viewBox="0 0 12 8"><path fill="#ff3b30" d="M0 0h12v1h-12zM0 1h2v7h-2zM3 1h1v7h-1zM5 1h7v7h-7zM2 2h1v1h-1zM4 3h1v5h-1zM2 4h1v4h-1z"/><path fill="#ffd21e" d="M2 1h1v1h-1zM4 1h1v2h-1zM2 3h1v1h-1z"/></symbol><symbol id="ic-fl_us" viewBox="0 0 12 8"><path fill="#3f8fd0" d="M0 0h5v4h-5z"/><path fill="#ff3b30" d="M5 0h7v1h-7zM5 2h7v1h-7zM0 4h12v1h-12zM0 6h12v1h-12z"/><path fill="#eef2f5" d="M5 1h7v1h-7zM5 3h7v1h-7zM0 5h12v1h-12zM0 7h12v1h-12z"/></symbol><symbol id="ic-fl_il" viewBox="0 0 12 8"><path fill="#eef2f5" d="M0 0h12v1h-12zM0 2h12v1h-12zM0 3h5v3h-5zM6 3h6v1h-6zM5 4h1v2h-1zM7 4h5v2h-5zM6 5h1v1h-1zM0 7h12v1h-12z"/><path fill="#3f8fd0" d="M0 1h12v1h-12zM5 3h1v1h-1zM6 4h1v1h-1zM0 6h12v1h-12z"/></symbol><symbol id="ic-fl_tw" viewBox="0 0 12 8"><path fill="#3f8fd0" d="M0 0h6v1h-6zM0 1h2v3h-2zM3 1h3v1h-3zM2 2h1v2h-1zM4 2h2v2h-2zM3 3h1v1h-1z"/><path fill="#ff3b30" d="M6 0h6v8h-6zM0 4h6v4h-6z"/><path fill="#eef2f5" d="M2 1h1v1h-1zM3 2h1v1h-1z"/></symbol><symbol id="ic-fl_kp" viewBox="0 0 12 8"><path fill="#3f8fd0" d="M0 0h12v2h-12zM0 6h12v2h-12z"/><path fill="#ff3b30" d="M0 2h12v1h-12zM0 3h3v3h-3zM4 3h8v3h-8zM3 4h1v2h-1z"/><path fill="#eef2f5" d="M3 3h1v1h-1z"/></symbol><symbol id="ic-fl_kr" viewBox="0 0 12 8"><path fill="#eef2f5" d="M0 0h12v3h-12zM0 3h5v5h-5zM7 3h5v5h-5zM5 5h2v3h-2z"/><path fill="#ff3b30" d="M5 3h2v1h-2z"/><path fill="#3f8fd0" d="M5 4h2v1h-2z"/></symbol><symbol id="ic-fl_lb" viewBox="0 0 12 8"><path fill="#ff3b30" d="M0 0h12v2h-12zM0 4h6v4h-6zM7 4h5v4h-5zM6 5h1v3h-1z"/><path fill="#eef2f5" d="M0 2h12v1h-12zM0 3h5v1h-5zM6 3h6v1h-6z"/><path fill="#46c76a" d="M5 3h1v1h-1zM6 4h1v1h-1z"/></symbol><symbol id="ic-fl_in" viewBox="0 0 12 8"><path fill="#ff8f1c" d="M0 0h12v2h-12z"/><path fill="#eef2f5" d="M0 2h12v1h-12zM0 3h5v1h-5zM7 3h5v1h-5z"/><path fill="#3f8fd0" d="M5 3h2v1h-2z"/><path fill="#46c76a" d="M0 4h12v4h-12z"/></symbol><symbol id="ic-fl_pk" viewBox="0 0 12 8"><path fill="#eef2f5" d="M0 0h4v8h-4zM9 2h1v1h-1zM8 3h1v1h-1zM7 4h1v1h-1z"/><path fill="#46c76a" d="M4 0h8v2h-8zM4 2h5v1h-5zM10 2h2v6h-2zM4 3h4v1h-4zM9 3h1v5h-1zM4 4h3v4h-3zM8 4h1v4h-1zM7 5h1v3h-1z"/></symbol><symbol id="ic-pizza" viewBox="0 0 9 9"><path fill="#c9782e" d="M1 0h7v2h-7zM0 1h1v1h-1zM8 1h1v1h-1z"/><path fill="#f4b73d" d="M1 2h7v1h-7zM1 3h1v1h-1zM3 3h3v2h-3zM7 3h1v1h-1zM2 4h1v2h-1zM6 4h1v2h-1zM3 5h1v3h-1zM5 5h1v3h-1zM4 6h1v3h-1z"/><path fill="#e23b2a" d="M2 3h1v1h-1zM6 3h1v1h-1zM4 5h1v1h-1z"/></symbol><symbol id="ic-wheat" viewBox="0 0 9 9"><path fill="#ffd21e" d="M4 0h1v1h-1zM4 2h1v1h-1zM4 4h1v1h-1z"/><path fill="#e3a83f" d="M3 1h1v5h-1zM5 1h1v5h-1z"/><path fill="#4cc38a" d="M4 3h1v1h-1zM4 5h1v4h-1zM2 6h1v1h-1zM6 6h1v1h-1z"/></symbol><symbol id="ic-gear" viewBox="0 0 9 9"><path fill="#c2cad4" d="M4 0h1v1h-1zM1 1h1v1h-1zM7 1h1v1h-1zM3 2h3v2h-3zM2 3h1v3h-1zM6 3h1v3h-1zM0 4h1v1h-1zM3 4h1v3h-1zM5 4h1v3h-1zM8 4h1v1h-1zM4 5h1v2h-1zM1 7h1v1h-1zM7 7h1v1h-1zM4 8h1v1h-1z"/><path fill="#7eb0e0" d="M4 4h1v1h-1z"/></symbol><symbol id="ic-medal" viewBox="0 0 9 9"><path fill="#ff3b30" d="M3 0h1v2h-1z"/><path fill="#7fb2ff" d="M5 0h1v2h-1z"/><path fill="#e3a83f" d="M4 2h1v2h-1zM3 3h1v4h-1zM5 3h1v4h-1zM2 4h1v1h-1zM6 4h1v1h-1zM4 5h1v1h-1z"/><path fill="#ffd21e" d="M4 4h1v1h-1z"/></symbol><symbol id="ic-backpack" viewBox="0 0 9 9"><path fill="#7f8b98" d="M3 0h3v1h-3zM2 1h1v1h-1zM6 1h1v1h-1z"/><path fill="#e2553a" d="M1 2h7v2h-7zM1 4h1v2h-1zM7 4h1v2h-1zM1 6h7v2h-7zM2 8h1v1h-1zM6 8h1v1h-1z"/><path fill="#ff7a18" d="M2 4h5v2h-5z"/><path fill="#12161c" d="M4 4h1v1h-1z"/></symbol><symbol id="ic-can" viewBox="0 0 9 9"><path fill="#c2cad4" d="M1 0h7v1h-7zM1 8h7v1h-7z"/><path fill="#e2553a" d="M1 1h7v2h-7zM1 6h7v2h-7z"/><path fill="#f4b73d" d="M1 3h7v3h-7z"/><path fill="#eef2f5" d="M3 4h3v1h-3z"/></symbol><symbol id="ic-radio" viewBox="0 0 9 9"><path fill="#c2cad4" d="M6 0h1v1h-1zM5 1h1v1h-1z"/><path fill="#c9782e" d="M0 2h9v1h-9zM0 3h1v3h-1zM4 3h1v3h-1zM8 3h1v3h-1zM5 5h3v1h-3zM0 6h9v1h-9zM1 7h1v1h-1zM7 7h1v1h-1z"/><path fill="#7f8b98" d="M1 3h3v3h-3z"/><path fill="#7eb0e0" d="M5 3h3v2h-3z"/></symbol></defs></svg>
 
 <div class="bg-grid"></div>
 
@@ -1665,22 +1665,22 @@
   <style>
   .wpi-section {
     background: linear-gradient(135deg,rgba(10,18,30,.97),rgba(5,12,22,.99));
-    border: 1px solid rgba(0,207,232,.2); border-top: 2px solid rgba(0,207,232,.5);
+    border: 1px solid rgba(126,176,224,.2); border-top: 2px solid rgba(126,176,224,.5);
     padding: 1.2rem 1.5rem 1rem; margin-bottom: 1.5rem; position: relative; overflow: hidden;
   }
   .wpi-section::before {
     content:''; position:absolute; inset:0;
-    background:radial-gradient(ellipse at 50% -20%,rgba(0,207,232,.06) 0%,transparent 70%);
+    background:radial-gradient(ellipse at 50% -20%,rgba(126,176,224,.06) 0%,transparent 70%);
     pointer-events:none;
   }
-  .wpi-topbar { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.2rem; padding-bottom:.8rem; border-bottom:1px solid rgba(0,207,232,.15); }
+  .wpi-topbar { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.2rem; padding-bottom:.8rem; border-bottom:1px solid rgba(126,176,224,.15); }
   .wpi-title  { font-family:'Orbitron',monospace; font-size:1rem; font-weight:900; color:var(--accent); letter-spacing:3px; }
   .wpi-ver    { font-size:.62rem; color:var(--text-dim); letter-spacing:2px; margin-left:.5rem; }
   .wpi-subtitle { font-family:'Share Tech Mono',monospace; font-size:.68rem; color:var(--text-dim); margin-top:.25rem; letter-spacing:1px; }
   .wpi-badge  { font-family:'Orbitron',monospace; font-size:.7rem; font-weight:700; padding:.4rem .9rem; border:1px solid; letter-spacing:2px; animation:wpi-blink 2s ease-in-out infinite; }
-  .wpi-badge.low      { color:var(--accent); border-color:var(--accent); background:rgba(0,207,232,.06); }
-  .wpi-badge.medium   { color:var(--accent3); border-color:var(--accent3); background:rgba(245,166,35,.06); }
-  .wpi-badge.high     { color:var(--accent2); border-color:var(--accent2); background:rgba(255,77,94,.08); }
+  .wpi-badge.low      { color:var(--accent); border-color:var(--accent); background:rgba(126,176,224,.06); }
+  .wpi-badge.medium   { color:var(--accent3); border-color:var(--accent3); background:rgba(227,168,63,.06); }
+  .wpi-badge.high     { color:var(--accent2); border-color:var(--accent2); background:rgba(239,91,87,.08); }
   .wpi-badge.critical { color:var(--crit); border-color:var(--crit); background:rgba(255,0,255,.08); }
   @keyframes wpi-blink { 0%,100%{opacity:1} 50%{opacity:.6} }
 
@@ -1702,14 +1702,14 @@
   .wpi-gauge-wrap { display:flex; flex-direction:column; align-items:center; min-width:0; }
   .wpi-arc { width:300px; max-width:100%; height:auto; aspect-ratio:300/175; }
   .wpi-center { text-align:center; margin-top:-.8rem; }
-  .wpi-num { font-family:'Orbitron',monospace; font-size:3rem; font-weight:900; line-height:1; background:linear-gradient(135deg,#fff,var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; filter:drop-shadow(0 0 12px rgba(0,207,232,.4)); }
+  .wpi-num { font-family:'Orbitron',monospace; font-size:3rem; font-weight:900; line-height:1; background:linear-gradient(135deg,#fff,var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; filter:drop-shadow(0 0 12px rgba(126,176,224,.4)); }
   .wpi-num-lbl { font-family:'Share Tech Mono',monospace; font-size:.68rem; color:var(--text-dim); margin-top:.1rem; }
   .wpi-level { font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700; letter-spacing:3px; margin-top:.35rem; color:var(--accent3); }
   .wpi-scale { display:flex; justify-content:space-between; width:300px; max-width:100%; margin-top:.4rem; font-family:'Share Tech Mono',monospace; font-size:.6rem; text-align:center; line-height:1.3; }
   .wpi-formula { box-sizing:border-box; width:100%; max-width:320px; white-space:normal; overflow-wrap:anywhere; line-height:1.7; text-align:center; margin-top:.6rem; font-family:'Share Tech Mono',monospace; font-size:.64rem; color:var(--text-dim); background:rgba(0,0,0,.3); padding:.3rem .6rem; border:1px solid rgba(255,255,255,.07); }
   .wpi-formula em { color:var(--accent); font-style:normal; }
 
-  .wpi-footer { display:flex; gap:.8rem; align-items:center; flex-wrap:wrap; margin-top:1rem; padding-top:.7rem; border-top:1px solid rgba(0,207,232,.1); font-family:'Share Tech Mono',monospace; font-size:.57rem; color:var(--text-dim); }
+  .wpi-footer { display:flex; gap:.8rem; align-items:center; flex-wrap:wrap; margin-top:1rem; padding-top:.7rem; border-top:1px solid rgba(126,176,224,.1); font-family:'Share Tech Mono',monospace; font-size:.57rem; color:var(--text-dim); }
   @media(max-width:800px) { .wpi-body{ grid-template-columns:1fr; } .wpi-gauge-wrap{order:-1;} }
   </style>
 
@@ -1834,10 +1834,10 @@
     <div class="avi-counter">
       <div class="avi-box"><div class="avi-box-val" id="avi-tankers" style="color:var(--accent)">--</div><div class="avi-box-lbl">加油機</div><div class="avi-tr" id="avi-tankers-tr"></div></div>
       <div class="avi-box"><div class="avi-box-val" id="avi-awacs"   style="color:var(--accent3)">--</div><div class="avi-box-lbl">預警機</div><div class="avi-tr" id="avi-awacs-tr"></div></div>
-      <div class="avi-box"><div class="avi-box-val" id="avi-c4isr"   style="color:#35e08a">--</div><div class="avi-box-lbl">偵察機</div><div class="avi-tr" id="avi-c4isr-tr"></div></div>
+      <div class="avi-box"><div class="avi-box-val" id="avi-c4isr"   style="color:#4cc38a">--</div><div class="avi-box-lbl">偵察機</div><div class="avi-tr" id="avi-c4isr-tr"></div></div>
       <div class="avi-box"><div class="avi-box-val" id="avi-uav"     style="color:var(--accent)">--</div><div class="avi-box-lbl">偵察無人機</div><div class="avi-tr" id="avi-uav-tr"></div></div>
     </div>
-    <div style="margin-bottom:.8rem;padding:.5rem .6rem;background:rgba(0,207,232,.06);border:1px solid rgba(0,207,232,.2);font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim)">
+    <div style="margin-bottom:.8rem;padding:.5rem .6rem;background:rgba(126,176,224,.06);border:1px solid rgba(126,176,224,.2);font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim)">
       關注機型佔目前可見軍機 <strong style="color:var(--accent2);font-size:.82rem" id="avi-anomaly">--%</strong> &nbsp;·&nbsp; 目前可見：<span id="avi-baseline">--</span> 架
     </div>
     <details class="reading-details"><summary>可見關注機型清單</summary>
@@ -1848,7 +1848,7 @@
       <span><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:3px"></i>加油機</span>
       <span><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent3);margin-right:3px"></i>預警機</span>
       <span><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#a374ff;margin-right:3px"></i>無人機</span>
-      <span><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#35e08a;margin-right:3px"></i>偵察機</span>
+      <span><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#4cc38a;margin-right:3px"></i>偵察機</span>
       <span><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#6b7a8c;margin-right:3px"></i>運輸機</span>
     </div>
     <div style="margin-top:.5rem;text-align:right">
@@ -1893,21 +1893,21 @@
         <span id="poly-updated-time">上次更新：載入中…</span>
       </div>
     </div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim);margin-bottom:.8rem;padding:.5rem .7rem;background:rgba(0,207,232,.05);border-left:2px solid var(--accent4)">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim);margin-bottom:.8rem;padding:.5rem .7rem;background:rgba(126,176,224,.05);border-left:2px solid var(--accent4)">
       市場價格代表參與者對特定事件的定價；本站未驗證其預測準確率。不同到期日及事件定義不可直接比較。
     </div>
     <section id="kalshi-market-container" aria-live="polite">Kalshi 資料載入中…</section>
     <div class="poly-grid" id="poly-list-container">
       <div style="grid-column:1/-1;text-align:center;padding:1.4rem;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">載入即時 Polymarket 戰爭預測市場…</div>
     </div>
-    <div style="margin-top:.8rem;padding:.6rem .8rem;background:rgba(0,207,232,.04);border:1px solid rgba(0,207,232,.15);font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim)">
+    <div style="margin-top:.8rem;padding:.6rem .8rem;background:rgba(126,176,224,.04);border:1px solid rgba(126,176,224,.15);font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim)">
       ⚠️ 僅供資訊參考，不構成投資建議。機率隨事件發展即時變動。
     </div>
   </div><!-- /.poly-card -->
 
 <style>
 /* ── 🇨🇳 中國戰備動向監測 區塊橫幅 ── */
-.cn-banner { background:linear-gradient(180deg,rgba(255,77,94,.07),rgba(0,207,232,.04)); border:1px solid var(--border);
+.cn-banner { background:linear-gradient(180deg,rgba(239,91,87,.07),rgba(126,176,224,.04)); border:1px solid var(--border);
   border-left:3px solid var(--accent2); border-radius:4px; padding:.9rem 1.2rem; margin:0 0 1rem; }
 .cn-banner-t { font-family:'Orbitron',monospace; font-size:1.05rem; font-weight:900; letter-spacing:2px; color:var(--text-primary); }
 .cn-banner-s { font-family:'Share Tech Mono',monospace; font-size:.66rem; color:var(--text-dim); margin-top:.35rem; line-height:1.6; }
@@ -1929,7 +1929,7 @@
 .strat-flag.partial { color:#04121a; background:#8fa6b8; }
 
 /* ── 📈 共軍每日架次趨勢 ── */
-.pla-wrap { margin-bottom:.8rem; padding:.7rem .8rem; background:rgba(255,77,94,.04); border:1px solid rgba(255,77,94,.15); border-radius:4px; }
+.pla-wrap { margin-bottom:.8rem; padding:.7rem .8rem; background:rgba(239,91,87,.04); border:1px solid rgba(239,91,87,.15); border-radius:4px; }
 .pla-hd { font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700; letter-spacing:.5px; color:var(--text); margin-bottom:.4rem; }
 .pla-hd b { font-family:'Share Tech Mono',monospace; }
 .pla-legend { font-family:'Share Tech Mono',monospace; font-size:.6rem; color:var(--text-dim); margin-top:.35rem; line-height:1.5; }
@@ -1994,7 +1994,7 @@
 .avi-dot.tanker { background:var(--accent); box-shadow:0 0 5px var(--accent); }
 .avi-dot.awacs  { background:var(--accent3); box-shadow:0 0 5px var(--accent3); animation:blink-dot 1.2s infinite; }
 .avi-dot.uav    { background:#a374ff; box-shadow:0 0 5px #a374ff; }
-.avi-dot.c4isr  { background:#35e08a; box-shadow:0 0 5px #35e08a; }
+.avi-dot.c4isr  { background:#4cc38a; box-shadow:0 0 5px #4cc38a; }
 .avi-dot.transport { background:#6b7a8c; }
 .avi-dot.fighter { background:var(--accent2); box-shadow:0 0 5px var(--accent2); }
 .avi-dot.other  { background:#44525f; }
@@ -2041,17 +2041,17 @@
 .fin-ticker { font-family:'Orbitron',monospace; font-size:.62rem; color:var(--text-dim); letter-spacing:2px; margin-bottom:.2rem; }
 .fin-price  { font-family:'Orbitron',monospace; font-size:1.05rem; font-weight:700; line-height:1; }
 .fin-change { font-family:'Share Tech Mono',monospace; font-size:.68rem; margin-top:.2rem; }
-.fin-change.up   { color:#35e08a; }
+.fin-change.up   { color:#4cc38a; }
 .fin-change.down { color:#ff626f; }
 .fin-ma     { font-family:'Share Tech Mono',monospace; font-size:.6rem; color:var(--text-dim); margin-top:.15rem; }
-.fin-premium { margin-top:.7rem; padding:.55rem .65rem; background:rgba(245,166,35,.05); border:1px solid rgba(245,166,35,.2); font-family:'Share Tech Mono',monospace; font-size:.68rem; color:var(--text-dim); line-height:1.6; }
+.fin-premium { margin-top:.7rem; padding:.55rem .65rem; background:rgba(227,168,63,.05); border:1px solid rgba(227,168,63,.2); font-family:'Share Tech Mono',monospace; font-size:.68rem; color:var(--text-dim); line-height:1.6; }
 .fin-stocks  { display:flex; flex-direction:column; gap:.3rem; margin-top:.7rem; }
 .fin-stock-row { display:grid; grid-template-columns:55px 1fr auto auto; align-items:center; gap:.5rem; padding:.4rem .5rem; background:var(--bg3); border:1px solid var(--border); font-family:'Share Tech Mono',monospace; font-size:.68rem; }
 .fin-sym  { color:var(--accent); font-weight:700; }
 .fin-name { color:var(--text-dim); font-size:.62rem; }
 .fin-px   { text-align:right; }
 .fin-chg  { text-align:right; font-size:.66rem; }
-.fin-chg.up   { color:#35e08a; }
+.fin-chg.up   { color:#4cc38a; }
 .fin-chg.down { color:#ff626f; }
 /* RWD */
 .osint-adv-grid > :last-child:nth-child(odd) { grid-column:1/-1; }
@@ -2088,10 +2088,10 @@
       <div style="text-align:center;padding:1rem;font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim)">⏳ 連接 NASA FIRMS…</div>
     </div>
     <div class="event-tags">
-      <span class="event-tag" style="color:var(--accent2);border-color:var(--accent2);background:rgba(255,77,94,.08)">熱異常無法判定武器類型</span>
-      <span class="event-tag" style="color:var(--accent3);border-color:var(--accent3);background:rgba(245,166,35,.08)">可能包含野火</span>
-      <span class="event-tag" style="color:var(--accent);border-color:var(--accent);background:rgba(0,207,232,.08)">可能包含工業熱源</span>
-      <span class="event-tag" style="color:var(--accent);border-color:var(--accent);background:rgba(0,207,232,.08)">需其他來源交叉核對</span>
+      <span class="event-tag" style="color:var(--accent2);border-color:var(--accent2);background:rgba(239,91,87,.08)">熱異常無法判定武器類型</span>
+      <span class="event-tag" style="color:var(--accent3);border-color:var(--accent3);background:rgba(227,168,63,.08)">可能包含野火</span>
+      <span class="event-tag" style="color:var(--accent);border-color:var(--accent);background:rgba(126,176,224,.08)">可能包含工業熱源</span>
+      <span class="event-tag" style="color:var(--accent);border-color:var(--accent);background:rgba(126,176,224,.08)">需其他來源交叉核對</span>
     </div>
     <div style="margin-top:.6rem;text-align:right">
       <a href="https://firms.modaps.eosdis.nasa.gov/map/" target="_blank" rel="noopener" style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--accent)">NASA FIRMS 即時地圖 ↗</a>
@@ -2290,7 +2290,7 @@ function renderPizzaShops(shops, fallbackAt) {
       ? `現在 ${shop.busyness}%${typeof shop.usual_now === 'number' ? ` · 平常 ${shop.usual_now}%` : ''}${pct != null ? ` · 為平常的 ${pct}%` : ''}`
       : '';
     const barColor = hot ? color : 'var(--accent)';
-    return `<div class="pizza-shop" style="${hot ? 'border-color:rgba(255,77,94,0.4);' : ''}">
+    return `<div class="pizza-shop" style="${hot ? 'border-color:rgba(239,91,87,0.4);' : ''}">
       <div class="shop-name"><svg class="px-ic"><use href="#ic-pizza"/></svg> ${escapeHtml(shop.name)}</div>
       <div class="shop-status"><span style="color:${color};font-size:.75rem;font-weight:700">${label}</span></div>
       ${pizzaHourlyChart(shop, barColor, fallbackAt)}
@@ -2957,7 +2957,7 @@ function pizzaHourlyChart(shop, color, fallbackAt) {
 }
 
 // ─── INTEL FEED 跑馬燈：用 data.json 即時資料重建 ─────────────
-const NEWS_TOPIC_COLOR = { '俄烏':'#ff4d5e','中東':'#f5a623','台海':'#00cfe8','朝鮮':'#a374ff','南海':'#35e08a','白宮':'#7fb2ff','中國':'#ff7a7a','全球':'#8fa6b8','共軍機艦':'#ff4d5e','軍演':'#f5a623','海峽航行':'#00cfe8','國防部':'#7fb2ff' };
+const NEWS_TOPIC_COLOR = { '俄烏':'#ef5b57','中東':'#e3a83f','台海':'#7eb0e0','朝鮮':'#a374ff','南海':'#4cc38a','白宮':'#7fb2ff','中國':'#ff7a7a','全球':'#8fa6b8','共軍機艦':'#ef5b57','軍演':'#e3a83f','海峽航行':'#7eb0e0','國防部':'#7fb2ff' };
 function newsAgo(ts){
   if(!ts) return '';
   const m=(Date.now()-Date.parse(ts))/60000;
@@ -2986,7 +2986,7 @@ function renderFood(json){
   } else {
   el.innerHTML=f.items.map(function(it){
     var y=it.comparison_status==='comparable'&&!f.stale?it.yoy_pct:null;
-    var col=(y==null)?'var(--text-dim)':(y>=15?'#ff4d5e':(y>0?'#f5a623':(y<0?'#35e08a':'var(--text-dim)')));
+    var col=(y==null)?'var(--text-dim)':(y>=15?'#ef5b57':(y>0?'#e3a83f':(y<0?'#4cc38a':'var(--text-dim)')));
     var arr=(y==null)?'':(y>0?'▲':(y<0?'▼':''));
     var w=it.wan_ton==null?'--':it.wan_ton>=100?Math.round(it.wan_ton).toLocaleString():it.wan_ton;
     return '<div class="food-row"><div class="food-name">'+escapeHtml(it.name)+'</div>'
@@ -3019,7 +3019,7 @@ function renderFood(json){
   var sub=document.getElementById('food-sub');
   if(sub && f.breadth_up>=2){
     sub.innerHTML=sub.innerHTML.split(' · <strong')[0]
-      +' · <strong style="color:#ff4d5e">\u26A0 '+f.breadth_up+'/3 項主糧年增≥15%（進口增加，原因待查）</strong>';
+      +' · <strong style="color:#ef5b57">\u26A0 '+f.breadth_up+'/3 項主糧年增≥15%（進口增加，原因待查）</strong>';
   }
 }
 // ── 🌾 糧食月度趨勢圖（1/3/5 年）──
@@ -3175,7 +3175,7 @@ function drawUsdaHist(){
   var leg=document.getElementById('uh-legend');
   if(data.length<2){ svg.innerHTML='<text x="360" y="120" text-anchor="middle" class="fh-svg-axis">資料累積中…</text>'; if(leg) leg.textContent=''; return; }
   var series = UH_STATE.view==='flow'
-    ? [{k:'outs', c:'var(--accent3)', lbl:'已訂未運（下單未提）'}, {k:'exp', c:'#35e08a', lbl:'累計已裝運（實際提貨）'}]
+    ? [{k:'outs', c:'var(--accent3)', lbl:'已訂未運（下單未提）'}, {k:'exp', c:'#4cc38a', lbl:'累計已裝運（實際提貨）'}]
     : [{k:'commit', c:'var(--accent)', lbl:'累計承諾（下單總量）'}];
   var vals=[]; data.forEach(function(d){ series.forEach(function(s){ var v=d[s.k]; if(v!=null&&!isNaN(v)) vals.push(v); }); });
   var maxV=Math.max.apply(null, vals.concat([1]))*1.12;
@@ -3334,7 +3334,7 @@ function renderStrat(json){
   el.innerHTML=s.items.map(function(it){
     var y=it.comparison_status==='comparable'&&!s.stale?it.yoy_pct:null;
     var partial=!!it.incomplete || it.anomaly==='partial';
-    var col=partial?'var(--text-dim)':((y==null)?'var(--text-dim)':(y>0?'#ff4d5e':(y<0?'#35e08a':'var(--text-dim)')));
+    var col=partial?'var(--text-dim)':((y==null)?'var(--text-dim)':(y>0?'#ef5b57':(y<0?'#4cc38a':'var(--text-dim)')));
     var arr=(y==null)?'':(y>0?'▲':(y<0?'▼':''));
     var reference=it.wan_ton==null ? history.find(d=>d.schema_version===2 && d.ym<s.ref_month && Number.isFinite(d[it.cmd]) && d[it.cmd]>0) : null;
     var w=it.wan_ton==null?'待回報':it.wan_ton>=100?Math.round(it.wan_ton).toLocaleString():it.wan_ton;
@@ -3610,7 +3610,7 @@ function renderPla(json){
     var by=Y(v), h=Math.max(0,y0-by), cx=CX(i);
     var tip='<b>'+d.date+'</b><br>共機 '+v+' 架次'+(d.ships!=null?('　共艦 '+d.ships+' 艘'):'')+(hi?'<br>⚠ 異常偏高（≥中位數1.5倍）':'');
     p.push('<rect x="'+(cx-bw/2).toFixed(1)+'" y="'+by.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+h.toFixed(1)
-      +'" fill="'+(hi?'#ff4d5e':'var(--accent)')+'" opacity="'+(hi?'.95':'.7')+'"></rect>');
+      +'" fill="'+(hi?'#ef5b57':'var(--accent)')+'" opacity="'+(hi?'.95':'.7')+'"></rect>');
     if(v===0)p.push('<circle class="pla-zero" cx="'+cx+'" cy="'+y0+'" r="2.5" fill="var(--accent)"/>');
     // 透明全高感應區，滑鼠移到整欄任一處都能看到當日數據
     plaHit.push('<rect x="'+(cx-slot/2).toFixed(1)+'" y="'+padT+'" width="'+slot.toFixed(1)+'" height="'+(y0-padT).toFixed(1)
@@ -3623,7 +3623,7 @@ function renderPla(json){
   svg.innerHTML=p.join('');
   var lt=document.getElementById('pla-latest');
   if(lt && latest){ var el=(base>0 && latest.aircraft>=base*1.5 && latest.aircraft>=25);
-    lt.innerHTML='<div class="pla-date">'+escapeHtml(latest.date)+'</div><div class="pla-latest-value"><b style="color:'+(el?'#ff4d5e':'var(--accent)')+'">'+latest.aircraft+'</b><span>架次</span></div>'+(el?'<div class="pla-elevated">相對偏高</div>':''); }
+    lt.innerHTML='<div class="pla-date">'+escapeHtml(latest.date)+'</div><div class="pla-latest-value"><b style="color:'+(el?'#ef5b57':'var(--accent)')+'">'+latest.aircraft+'</b><span>架次</span></div>'+(el?'<div class="pla-elevated">相對偏高</div>':''); }
   var lg=document.getElementById('pla-legend');
   if(lg){ lg.textContent='官方日報 · 缺日留空 · 紅柱僅為已收錄日報的相對高值，不代表戰爭機率。 '; var source=document.createElement('a'); if(/^https:\/\/air\.mnd\.gov\.tw\//.test(latest.source_url||'')){source.href=latest.source_url; source.target='_blank'; source.rel='noopener noreferrer'; source.textContent='查看最新官方日報'; lg.appendChild(source);} }
 }
@@ -3930,7 +3930,7 @@ const WARMAP_REGION_GEO = {
   southsea: [114, 13,   '南海'],
 };
 function warmapRegionColor(level){
-  return ({ CRITICAL:'#ff2d55', HIGH:'#ff4d5e', ELEVATED:'#f5a623', WATCH:'#00cfe8' })[level] || '#00cfe8';
+  return ({ CRITICAL:'#ff2d55', HIGH:'#ef5b57', ELEVATED:'#e3a83f', WATCH:'#7eb0e0' })[level] || '#7eb0e0';
 }
 // 全球戰爭熱點發光點陣地球（Canvas · 可旋轉/縮放 · 自動慢轉，離開視窗/reduced-motion 時停轉省電）
 const WarGlobe = (function(){
