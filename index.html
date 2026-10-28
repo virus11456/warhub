@@ -1399,6 +1399,16 @@
   #pizza-shops-grid .shop-status{flex-wrap:wrap;row-gap:.15rem}
   #pizza-shops-grid .pizza-hourly svg{height:36px!important}
 }
+#prep-guides-card .prep-lead{margin:.2rem 0 .8rem;font-size:.9rem;color:var(--text-dim)}
+#prep-guides-card .prep-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.7rem}
+#prep-guides-card .prep-item{display:flex;gap:.6rem;align-items:flex-start;padding:.8rem;border:1px solid var(--border);background:rgba(255,255,255,.03);color:var(--text);text-decoration:none;min-width:0}
+#prep-guides-card .prep-item:hover,#prep-guides-card .prep-item:focus-visible{border-color:var(--accent);background:rgba(0,207,232,.06)}
+#prep-guides-card .prep-ic{font-size:1.4rem;line-height:1}
+#prep-guides-card .prep-item b{display:block;font-size:.9rem;font-weight:600}
+#prep-guides-card .prep-item small{display:block;margin-top:.2rem;font-size:.75rem;color:var(--text-dim);line-height:1.5}
+#prep-guides-card .prep-all{display:inline-block;margin-top:.8rem;font-size:.85rem;color:var(--accent)}
+@media (max-width:900px){#prep-guides-card .prep-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:420px){#prep-guides-card .prep-grid{grid-template-columns:1fr}}
 .bg-section-head{margin:2.2rem 0 .9rem;padding-top:1.2rem;border-top:1px solid var(--border)}
 .bg-section-head h2{margin:0;font-size:1.05rem;color:var(--text);letter-spacing:.5px}
 .bg-section-head p{margin:.35rem 0 0;font-size:.8rem;color:var(--text-dim);line-height:1.6}
@@ -1802,6 +1812,19 @@
     <div id="twnews-list">
       <div style="padding:1rem;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 連接台海新聞流…</div>
     </div>
+  </div>
+
+  <!-- ══════════ 🛡️ 台灣民眾準備指南（導向避難指南）══════════ -->
+  <div class="card" id="prep-guides-card" style="margin-bottom:1.5rem">
+    <div class="section-title">🛡️ 台灣民眾準備指南</div>
+    <p class="prep-lead">看完台海動態，先把家裡準備好。以下是最常用的四篇：</p>
+    <div class="prep-grid">
+      <a class="prep-item" href="guides/air-raid.html"><span class="prep-ic">🚨</span><span><b>空襲警報響起怎麼辦</b><small>警報種類、黃金幾分鐘與避難動作</small></span></a>
+      <a class="prep-item" href="guides/emergency-bag.html"><span class="prep-ic">🎒</span><span><b>緊急避難包清單</b><small>72 小時該裝什麼、放哪裡</small></span></a>
+      <a class="prep-item" href="guides/home-stockpile.html"><span class="prep-ic">🥫</span><span><b>居家儲備兩週</b><small>水、糧、藥、能源要存多少</small></span></a>
+      <a class="prep-item" href="guides/comms-blackout.html"><span class="prep-ic">📻</span><span><b>斷網斷訊怎麼辦</b><small>如何取得資訊與聯絡家人</small></span></a>
+    </div>
+    <a class="prep-all" href="guides/">看全部避難指南 →</a>
   </div>
 
   <!-- ══════════ ✈️ 空中動態：領空公告（NOTAM）＋ 軍機（ADS-B）══════════ -->
