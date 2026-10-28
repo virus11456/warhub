@@ -16,6 +16,27 @@ const ALLOW = new Set([
   'pla_adiz.json', 'food_history.json', 'strat_history.json',
 ]);
 
+// Server-only bookkeeping the page never reads. Dropping it cuts data.json from
+// ~1.4 MB to ~0.4 MB per visit; the full snapshot stays in the repository.
+const DROP_TOP = ['translation_cache', 'trade_api', 'trade_availability', 'gdelt_events_sampling', '_notify'];
+export function slim(payload) {
+  if (!payload || typeof payload !== 'object') return payload;
+  const out = { ...payload };
+  for (const key of DROP_TOP) delete out[key];
+  if (out.notams && typeof out.notams === 'object') {
+    out.notams = Object.fromEntries(Object.entries(out.notams).map(([k, v]) => {
+      if (!v || typeof v !== 'object') return [k, v];
+      const { sync_state, ...rest } = v;
+      return [k, rest];
+    }));
+  }
+  if (out.taiwan_insight && typeof out.taiwan_insight === 'object') {
+    const { market_observations, ...rest } = out.taiwan_insight;
+    out.taiwan_insight = rest;
+  }
+  return out;
+}
+
 export default async function handler(req, res) {
   const f = String((req.query && req.query.f) || 'data.json');
   if (!ALLOW.has(f)) { res.status(400).json({ error: 'file not allowed' }); return; }
@@ -44,7 +65,7 @@ export default async function handler(req, res) {
     }
     const payload = await gh.json();
     if (f === "data.json" && (!payload || !payload.updated_at)) throw new Error("invalid data snapshot");
-    const body = JSON.stringify(payload);
+    const body = JSON.stringify(f === 'data.json' ? slim(payload) : payload);
     res.setHeader("X-Warhub-Source", "github");
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     // CDN 快取 60 秒（避免每次請求都打 GitHub API），過期後背景更新
