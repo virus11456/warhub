@@ -53,6 +53,7 @@ WIKI_PV_API     = "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-artic
 # FAA NOTAM Search — 衝突區 FIR 領空限制/關閉（非官方端點，免金鑰）
 NOTAM_API       = "https://notams.aim.faa.gov/notamSearch/search"
 # BestTime.app Live Foot Traffic — Pentagon 周邊酒吧即時繁忙度（需 BESTTIME_API_KEY）
+POLYMARKET_HISTORY_API = "https://clob.polymarket.com/prices-history"
 BESTTIME_API    = "https://besttime.app/api/v1/forecasts/live"
 # 歷史趨勢檔（供前端畫趨勢箭頭；保留 7 天）
 HISTORY_FILE    = Path(__file__).resolve().parent.parent / "data" / "history.json"
@@ -178,6 +179,45 @@ NUCLEAR_TEST_SITES = [
 ]
 
 
+def _yes_token(market: dict):
+    """CLOB token id of the YES outcome (needed for price history); None when the pairing is unclear."""
+    try:
+        tokens = json.loads(market.get("clobTokenIds") or "[]")
+        outcomes = json.loads(market.get("outcomes") or "[]")
+        i = [str(o).strip().lower() for o in outcomes].index("yes")
+        return str(tokens[i]) if len(tokens) == len(outcomes) else None
+    except (TypeError, ValueError, IndexError):
+        return None
+
+
+async def fetch_market_history(session: aiohttp.ClientSession, polymarket: list[dict]) -> None:
+    """
+    近 30 天每日 YES 價格（Polymarket CLOB prices-history，免費、免金鑰），只抓台海卡片會顯示的前 3 題。
+    寫入 market["history_30d"] = [{at, p(0-100)}]；失敗時不寫，前端只顯示目前報價。
+    """
+    from taiwan_insights import taiwan_markets
+    ids = {m["id"] for m in taiwan_markets(polymarket, datetime.now(timezone.utc))[:3]}
+    async def one(market):
+        try:
+            async with session.get(POLYMARKET_HISTORY_API, params={"market": market["yes_token"], "interval": "1m", "fidelity": 1440},
+                                   timeout=aiohttp.ClientTimeout(total=15), headers={"User-Agent": USER_AGENT}) as resp:
+                if resp.status != 200:
+                    log.warning(f"Polymarket history {market['slug']} HTTP {resp.status}")
+                    return
+                rows = (await resp.json()).get("history") or []
+        except Exception as e:
+            log.warning(f"Polymarket history {market.get('slug')} failed: {type(e).__name__}")
+            return
+        points = []
+        for row in rows:
+            t, p = row.get("t") if isinstance(row, dict) else None, row.get("p") if isinstance(row, dict) else None
+            if isinstance(t, (int, float)) and isinstance(p, (int, float)) and not isinstance(p, bool) and 0 <= p <= 1:
+                points.append({"at": datetime.fromtimestamp(t, timezone.utc).isoformat(), "p": round(p * 100, 2)})
+        if len(points) >= 2:
+            market["history_30d"] = points[-31:]
+    await asyncio.gather(*(one(m) for m in polymarket if m.get("id") in ids and m.get("yes_token")))
+
+
 # ─────────────────────────────────────────────────────────────
 # Polymarket data
 # ─────────────────────────────────────────────────────────────
@@ -273,6 +313,7 @@ async def fetch_polymarket(session: aiohttp.ClientSession) -> list[dict]:
                 "category":   m.get("category") or "geopolitics",
                 "slug":       m.get("slug"),
                 "end_date":   m.get("endDate"),
+                "yes_token":  _yes_token(m),
             }
             risk = selected_market_risk(candidate)
             if risk is not None:
@@ -2284,6 +2325,7 @@ async def main():
             gdelt_task, news_task, seismic_task, wiki_task, notam_task, bars_task
         )
         gdelt_events = await gdelt_events_task
+        await measured("market_history", fetch_market_history(session, polymarket))
         kalshi = await measured("kalshi", fetch_kalshi(session, previous.get("kalshi")))
         news_sampling = news["sampling"]
         news = news["headlines"]

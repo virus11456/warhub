@@ -29,6 +29,30 @@ def market_key(row):
     return json.dumps([row['id'], row['question'], row['end_date']], ensure_ascii=False)
 
 
+def taiwan_markets(polymarket, now, limit=8):
+    """Open Taiwan markets with a usable price, largest volume first (shared with the history fetch)."""
+    out = []
+    for market in polymarket or []:
+        end = timestamp(market.get('end_date'))
+        if (market.get('stale') or not market.get('id') or not market.get('slug') or
+                not re.search(r'\b(taiwan|taipei)\b', market.get('question', ''), re.I) or
+                end is None or end <= now or market_risk({**market, "end_date": None}) is None):
+            continue
+        out.append({k: market.get(k) for k in
+            ('id', 'question', 'question_zh', 'end_date', 'yes_price', 'volume', 'slug')})
+    out.sort(key=lambda m: -(m['volume'] if number(m['volume']) else 0))
+    return out[:limit]
+
+
+def valid_history(rows):
+    """[{at, p}] with p a 0-100 YES price; anything malformed is dropped, never zero-filled."""
+    if not isinstance(rows, list):
+        return None
+    out = [{'at': r['at'], 'p': r['p']} for r in rows if isinstance(r, dict) and timestamp(r.get('at'))
+           and number(r.get('p')) and 0 <= r['p'] <= 100]
+    return out if len(out) >= 2 else None
+
+
 def build(snapshot, previous=None):
     now = timestamp(snapshot.get('updated_at'))
     if now is None:
@@ -40,17 +64,8 @@ def build(snapshot, previous=None):
         at = timestamp(row.get('at')) if isinstance(row, dict) else None
         if at and cutoff <= at < now and isinstance(row.get('markets'), list):
             observations.append(row)
-    current_markets = []
-    for market in snapshot.get('polymarket') or []:
-        end = timestamp(market.get('end_date'))
-        if (market.get('stale') or not market.get('id') or not market.get('slug') or
-                not re.search(r'\b(taiwan|taipei)\b', market.get('question', ''), re.I) or
-                end is None or end <= now or market_risk({**market, "end_date": None}) is None):
-            continue
-        current_markets.append({k: market.get(k) for k in
-            ('id', 'question', 'question_zh', 'end_date', 'yes_price', 'volume', 'slug')})
-    current_markets.sort(key=lambda m: -(m['volume'] if number(m['volume']) else 0))
-    current_markets = current_markets[:8]
+    current_markets = taiwan_markets(snapshot.get('polymarket'), now)
+    histories = {m.get('id'): m.get('history_30d') for m in snapshot.get('polymarket') or [] if isinstance(m, dict)}
     observations.append({'at': now.isoformat(), 'markets': current_markets})
     observations = sorted({row['at']: row for row in observations}.values(), key=lambda r: r['at'])[-100:]
     market_views = []
@@ -67,6 +82,7 @@ def build(snapshot, previous=None):
                     candidates.append((distance, at, old))
         best = min(candidates, key=lambda x: x[0]) if candidates else None
         market_views.append({**market, 'yes_percent': round(market['yes_price'] * 100, 2),
+            'history_30d': valid_history(histories.get(market['id'])),
             'delta_pp': round((market['yes_price'] - best[2]['yes_price']) * 100, 2) if best else None,
             'comparison_at': best[1].isoformat() if best else None,
             'comparison_hours': round((now - best[1]).total_seconds() / 3600, 1) if best else None})

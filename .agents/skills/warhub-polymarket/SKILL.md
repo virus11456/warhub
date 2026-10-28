@@ -22,3 +22,5 @@ Kalshi共用篩選準備：scripts/market_selection.py::selected_market_risk抽�
 
 
 2026-09-22後續：Kalshi現已透過獨立fetch_kalshi及網站區塊接線；使用者允許的外交／制裁／軍事政策背景題走明確series範圍，不改Polymarket原篩選。Kalshi不塞入polymarket陣列或market_average；同題價差仍須審核事件／期限／條款，不自動平均。詳見warhub-kalshi最新文件。
+
+2026-10-28 台海市場 30 天走勢（使用者要求）：fetch_polymarket 另存 yes_token（clobTokenIds 依 outcomes 的 Yes 位置對應；配對不明則 None）。fetch_market_history 只為 taiwan_insights.taiwan_markets 選出的前 3 題呼叫 `https://clob.polymarket.com/prices-history?market=<yes_token>&interval=1m&fidelity=1440`（免費、免金鑰，每輪最多 3 次；需帶 User-Agent，否則 403），寫入 polymarket[].history_30d=[{at, p(0–100)}]，越界或格式錯的點丟棄，不補 0；失敗不寫，前端只顯示目前報價。taiwan_insight.markets[].history_30d 經 valid_history 篩選（少於 2 點為 None）。前端 marketHistoryChart 畫折線、首尾日期與價格、最低／最高與期間變化（百分點）；缺日不補。驗證：tests/test_market_history.py、tests/test_frontend.cjs。
