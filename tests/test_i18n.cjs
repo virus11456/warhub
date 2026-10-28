@@ -48,9 +48,17 @@ test('inline emphasis keeps English words separated and restores Chinese',async(
  w.WarhubI18n.select('en');await tick();assert.equal(p.textContent,'First check safety then call for help');
  w.WarhubI18n.select('zh-TW');await tick();assert.equal(p.textContent,'先確認安全再求救');dom.window.close();
 });
-test('failed catalogue load keeps Chinese rather than claiming English mode',()=>{
- const dom=create({});dom.window.WarhubI18n.select('en');
- assert.equal(dom.window.document.documentElement.lang,'zh-TW');assert.equal(dom.window.document.querySelector('[data-language="en"]').disabled,true);dom.window.close();
+test('catalogue loads only on first switch; a failed load keeps Chinese',async()=>{
+ const dom=create({}),w=dom.window,d=w.document;delete w.WARHUB_EN;
+ assert.equal(d.querySelector('script[src^="/locales/en.js"]'),null,'not loaded for Chinese readers');
+ w.WarhubI18n.select('en');
+ const tag=d.querySelector('script[src^="/locales/en.js"]');assert.ok(tag,'requested on switch');
+ assert.equal(d.documentElement.lang,'zh-TW');assert.equal(d.querySelector('[data-language="en"]').getAttribute('aria-busy'),'true');
+ tag.dispatchEvent(new w.Event('error'));await tick();
+ assert.equal(d.documentElement.lang,'zh-TW');assert.ok(d.querySelector('[data-language="en"]').title.includes('載入失敗'));
+ w.WarhubI18n.select('en');const retry=[...d.querySelectorAll('script[src^="/locales/en.js"]')].pop();
+ w.WARHUB_EN={'先':'First'};retry.dispatchEvent(new w.Event('load'));await tick();
+ assert.equal(d.documentElement.lang,'en');assert.equal(d.querySelector('[data-language="en"]').hasAttribute('aria-busy'),false);dom.window.close();
 });
 test('relative ages preserve counts and use singular English only for one',()=>{
  const dom=create(catalog),w=dom.window;w.WarhubI18n.select('en');
