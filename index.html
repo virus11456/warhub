@@ -1360,8 +1360,9 @@
 
 </style>
 <link rel="stylesheet" href="/i18n.css?v=20260916b">
-<script src="/i18n.js?v=20261028b" defer></script>
+<script src="/i18n.js?v=20261028c" defer></script>
 <script src="/cross-context.js"></script>
+<script src="/three-scenes.js?v=20261028a" defer></script>
 <script src="/kalshi-markets.js?v=20260923a" defer></script>
 <link rel="stylesheet" href="/kalshi-markets.css?v=20260923a">
 
@@ -1440,6 +1441,22 @@
 .pz-bars-hd{font-size:.8rem;font-weight:700;color:var(--text);margin-bottom:.3rem}
 .pz-bars-line{font-size:.9rem;color:var(--text)}
 .pz-note{margin:.4rem 0 0;font-size:.75rem;color:var(--text-dim);line-height:1.6}
+.pz-3d{display:grid;grid-template-columns:minmax(150px,200px) 1fr;gap:.2rem .8rem;margin:0 0 .9rem;padding:.6rem .8rem;border:1px solid var(--border);background:rgba(255,255,255,.02)}
+.pz-3d-stats{display:flex;flex-direction:column;gap:.5rem;justify-content:center}
+.pz-3d-stat{display:flex;flex-direction:column;padding:.35rem .6rem;border-left:3px solid var(--accent3)}
+.pz-3d-bar{border-left-color:var(--accent4)}
+.pz-3d-k{font-size:.75rem;color:var(--text-dim)}
+.pz-3d-stat b{font-family:'Orbitron',monospace;font-size:1.5rem;line-height:1.2;color:var(--text)}
+.pz-3d-why{font-size:.72rem;color:var(--text-dim);line-height:1.5}
+.pz-3d-stage{position:relative;min-height:250px}
+.pz-3d-stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.pz-3d-legend{grid-column:1/-1;font-size:.72rem;color:var(--text-dim);line-height:1.6}
+.pz-3d-legend i{display:inline-block;width:.7em;height:.7em;margin:0 .25em 0 .5em;vertical-align:-.05em}
+.pz-3d-legend i:first-child{margin-left:0}
+.pz-k-pizza{background:var(--accent3)}.pz-k-bar{background:var(--accent4)}.pz-k-off{background:#4a5462}
+.pz-3d.no-gl{grid-template-columns:1fr}.pz-3d.no-gl .pz-3d-stage,.pz-3d.no-gl .pz-3d-legend{display:none}
+.pz-3d.no-gl .pz-3d-stats{flex-direction:row;flex-wrap:wrap}
+@media (max-width:640px){.pz-3d{grid-template-columns:1fr}.pz-3d-stats{flex-direction:row;flex-wrap:wrap}.pz-3d-stat{flex:1 1 40%}.pz-3d-why{flex-basis:100%}.pz-3d-stage{min-height:200px}}
 .pz-lore{margin-top:.8rem}
 .pz-lore summary{cursor:pointer;font-size:.8rem;color:var(--text-dim)}
 .pz-why{font-size:.68rem;color:var(--text-dim);margin-top:.2rem}
@@ -1503,6 +1520,16 @@
         </div>
       </div>
       <div id="pizza-radar-summary" class="pizza-radar-summary" aria-live="polite"></div>
+    </div>
+
+    <div class="pz-3d" id="pz-3d">
+      <div class="pz-3d-stats">
+        <div class="pz-3d-stat pz-3d-pizza"><span class="pz-3d-k">🍕 披薩店營業中</span><b id="pz-3d-pizza">--</b></div>
+        <div class="pz-3d-stat pz-3d-bar"><span class="pz-3d-k">🍺 酒吧營業中</span><b id="pz-3d-bars">--</b></div>
+        <div class="pz-3d-why" id="pz-3d-why"></div>
+      </div>
+      <div class="pz-3d-stage"><canvas id="pz-3d-canvas" aria-hidden="true"></canvas></div>
+      <div class="pz-3d-legend"><i class="pz-k-pizza"></i>披薩店 <i class="pz-k-bar"></i>酒吧 <i class="pz-k-off"></i>未營業／無資料 · 中央為五角大廈，柱高＝即時人流，位置為示意</div>
     </div>
 
     <div id="pizza-hourly-legend" hidden class="pz-legend"></div>
@@ -2017,6 +2044,7 @@
 .warmap-view    { position:relative; width:100%; aspect-ratio:5/2; max-height:46vh; overflow:hidden; background:radial-gradient(ellipse 92% 90% at 50% 46%, #0a1322 0%, #060b13 68%, #03060b 100%); touch-action:none; cursor:grab; user-select:none; -webkit-user-select:none; }
 .warmap-view:active { cursor:grabbing; }
 .warmap-canvas  { position:absolute; inset:0; width:100%; height:100%; display:block; }
+.warmap-gl { pointer-events:none; }
 .warmap-ctrls   { position:absolute; bottom:10px; right:10px; display:flex; flex-direction:column; gap:5px; z-index:3; }
 .warmap-ctrls button { width:38px; height:38px; font-size:1.15rem; font-family:'Orbitron',monospace; font-weight:700; background:rgba(7,13,21,.82); color:var(--accent); border:1px solid var(--accent); cursor:pointer; line-height:1; display:flex; align-items:center; justify-content:center; }
 .warmap-ctrls button:hover { background:var(--accent); color:#04121a; }
@@ -2340,12 +2368,90 @@ function renderPizzaLevel(json) {
   if (ix) ix.textContent = typeof sum.index === 'number' ? `異常指數 ${Math.round(sum.index)} / 100` : '異常指數：資料不足';
 }
 
+// 營業狀態：有即時人流＝營業中；BestTime 明確回報 Closed＝未營業；其餘（未建檔、非查詢時段、查詢失敗）＝未知
+function pizzaOpenStates(json) {
+  const states = {}, count = { pizza: { open: 0, total: 0 }, bars: { open: 0, total: 0 }, unknown: 0 };
+  const pizzaNames = (window.WarhubThree?.VENUES || []).filter(v => v.kind === 'pizza').map(v => v.name);
+  const shops = Array.isArray(json?.pizza) ? json.pizza : [];
+  for (const name of pizzaNames.length ? pizzaNames : shops.map(s => s.name)) {
+    const s = shops.find(x => x.name === name) || {};
+    const st = s.is_open === true ? 'open' : s.is_open === false ? 'closed' : 'unknown';
+    states[name] = { state: st, level: typeof s.busyness === 'number' ? s.busyness : null };
+  }
+  const bars = Array.isArray(json?.bars?.bars) ? json.bars.bars : [];
+  const barNames = (window.WarhubThree?.VENUES || []).filter(v => v.kind === 'bar').map(v => v.name);
+  for (const name of barNames.length ? barNames : bars.map(b => b.name)) {
+    const b = bars.find(x => x.name === name) || {};
+    const live = b.live_available && typeof b.live_busyness === 'number';
+    const st = live || b.open === true || b.open === 'Open' ? 'open'
+      : b.open === false || /^closed$/i.test(b.open || '') ? 'closed' : 'unknown';
+    states[name] = { state: st, level: live ? b.live_busyness : null, bar: true };
+  }
+  for (const [name, v] of Object.entries(states)) {
+    const c = v.bar ? count.bars : count.pizza;
+    c.total++; if (v.state === 'open') c.open++; else if (v.state === 'unknown') count.unknown++;
+  }
+  return { states, count };
+}
+
+let PIZZA_3D = null;
+function renderPizza3D(json) {
+  const { states, count } = pizzaOpenStates(json);
+  const box = document.getElementById('pz-3d'); if (!box) return;
+  const set = (id, c) => { const el = document.getElementById(id); if (el) el.textContent = c.total ? `${c.open} / ${c.total}` : '--'; };
+  set('pz-3d-pizza', count.pizza); set('pz-3d-bars', count.bars);
+  const why = document.getElementById('pz-3d-why');
+  if (why) {
+    const st = json?.pizza_summary?.state;
+    why.textContent = !count.unknown ? '' : st === 'setup_needed' ? `${count.unknown} 家狀態未知：尚未在 BestTime 建檔`
+      : st === 'off_hours' || json?.bars?.off_hours ? `${count.unknown} 家狀態未知：非查詢時段（美東 16–24 時）`
+      : `${count.unknown} 家狀態未知：本輪沒有即時資料`;
+  }
+  if (PIZZA_3D) PIZZA_3D.states = states;
+  else PIZZA_3D = { states, scene: null };
+  if (PIZZA_3D.scene) PIZZA_3D.scene.update(states);
+  startPizza3D(box);
+}
+function startPizza3D(box) {
+  const T = window.WarhubThree, canvas = document.getElementById('pz-3d-canvas');
+  if (PIZZA_3D.started || !canvas) return;
+  if (!T || !T.webglOK()) { if (T) box.classList.add('no-gl'); return; }
+  PIZZA_3D.started = true;
+  const reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  let inView = false, raf = null, last = 0;
+  const frame = ts => {
+    raf = null;
+    const sc = PIZZA_3D.scene; if (!sc) return;
+    sc.render(reduced ? 0 : Math.min(0.05, (ts - (last || ts)) / 1000) * 0.18); last = ts;
+    if (!reduced && inView && !document.hidden) raf = requestAnimationFrame(frame);
+  };
+  const kick = () => { if (!raf) { last = 0; raf = requestAnimationFrame(frame); } };
+  const size = () => {
+    const sc = PIZZA_3D.scene, st = canvas.parentElement; if (!sc || !st.clientWidth) return;
+    sc.resize(st.clientWidth, st.clientHeight, Math.min(2, window.devicePixelRatio || 1)); kick();
+  };
+  const begin = () => T.load().then(THREE => {
+    PIZZA_3D.scene = T.pentagon(THREE, canvas);
+    PIZZA_3D.scene.update(PIZZA_3D.states);
+    size();
+    if ('ResizeObserver' in window) new ResizeObserver(size).observe(canvas.parentElement);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden && inView) kick(); });
+  }).catch(() => box.classList.add('no-gl'));
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(es => {
+      inView = es[0].isIntersecting;
+      if (inView) { if (!PIZZA_3D.loading) { PIZZA_3D.loading = true; begin(); } else kick(); }
+    }, { rootMargin: '200px' }).observe(box);
+  } else { inView = true; begin(); }
+}
+
 function renderPizzaBlock(json) {
   const shops = Array.isArray(json?.pizza) ? json.pizza : [];
   renderPizzaShops(shops, json?.updated_at);
   renderPizzaLevel(json);
   renderPizzaBars(json);
   renderPizzaRadar(json);
+  renderPizza3D(json);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -3981,6 +4087,7 @@ const WarGlobe = (function(){
   let regions=[], hotspots=[];
   let dragging=false, lastX=0, lastY=0, pts=new Map(), pinchD=0;
   let raf=null, inView=true, hidden=false;
+  let glCanvas=null, gl3d=null;   // three.js 地球本體（載入成功才啟用，失敗沿用 2D）
   const reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
   function resize(){
@@ -3990,7 +4097,20 @@ const WarGlobe = (function(){
     cv.width = Math.round(W*DPR); cv.height = Math.round(H*DPR);
     ctx.setTransform(DPR,0,0,DPR,0,0);
     cx = W/2; cy = H/2; baseR = 0.46*Math.min(W,H);
+    if(gl3d) gl3d.resize(W, H, baseR, DPR);
     draw();
+  }
+  // 地球進入畫面時才下載 three.js；沒有 WebGL 或下載失敗就維持 2D 畫法
+  function startThree(){
+    const T=window.WarhubThree;
+    if(glCanvas || !T || !T.webglOK()) return;
+    glCanvas=document.createElement('canvas');
+    glCanvas.className='warmap-canvas warmap-gl'; glCanvas.setAttribute('aria-hidden','true');
+    T.load().then(THREE=>{
+      gl3d=T.globe(THREE, glCanvas, {ocean:WGLOBE_OCEAN, oceanPalette:WGLOBE_OCPAL, land:WGLOBE_PTS, landPalette:WGLOBE_LC});
+      view.insertBefore(glCanvas, cv);
+      gl3d.resize(W, H, baseR, DPR); draw();
+    }).catch(()=>{ gl3d=null; glCanvas.remove(); });
   }
   function proj(lon,lat){
     const λ=lon*DEG, φ=lat*DEG, dλ=λ-lam0, R=baseR*zoom;
@@ -4001,9 +4121,14 @@ const WarGlobe = (function(){
     if(!ctx) return;
     const R = baseR*zoom;
     ctx.clearRect(0,0,W,H);
-    let g=ctx.createRadialGradient(cx,cy,R*0.92,cx,cy,R*1.34);
+    let g=ctx.createRadialGradient(cx,cy,R*(gl3d?1:0.92),cx,cy,R*1.34);
     g.addColorStop(0,'rgba(40,120,220,0)'); g.addColorStop(0.5,'rgba(46,120,230,0.20)'); g.addColorStop(1,'rgba(40,110,220,0)');
     ctx.fillStyle=g; ctx.beginPath(); ctx.arc(cx,cy,R*1.34,0,7); ctx.fill();
+    if(gl3d) gl3d.render(lam0, phi0, zoom);
+    else drawFlatBody(R);
+    drawOverlay();
+  }
+  function drawFlatBody(R){
     let g2=ctx.createRadialGradient(cx-R*0.32,cy-R*0.32,R*0.15,cx,cy,R);
     g2.addColorStop(0,'#2a6aa5'); g2.addColorStop(0.6,'#164a7d'); g2.addColorStop(1,'#0a2a4d');
     ctx.fillStyle=g2; ctx.beginPath(); ctx.arc(cx,cy,R,0,7); ctx.fill();
@@ -4027,6 +4152,8 @@ const WarGlobe = (function(){
       const s=px*(0.6+0.42*p.c);
       ctx.fillRect((p.x-s/2)|0, (p.y-s/2)|0, Math.ceil(s), Math.ceil(s));
     }
+  }
+  function drawOverlay(){
     const pulse=0.55+0.45*Math.sin(t*0.05);
     for(const h of hotspots){ const p=proj(h.lon,h.lat); if(p.c<0.05) continue;
       const r=(2.4+Math.min(6, Math.sqrt(Math.abs(h.frp)||0)/3))*(0.6+0.4*p.c);
@@ -4106,8 +4233,8 @@ const WarGlobe = (function(){
     document.addEventListener('warhub-language-change', draw);
     document.addEventListener('visibilitychange', ()=>{ hidden=document.hidden; if(!hidden) kick(); });
     if('IntersectionObserver' in window){
-      new IntersectionObserver(es=>{ inView=es[0].isIntersecting; if(inView) kick(); }, {threshold:0.01}).observe(view);
-    }
+      new IntersectionObserver(es=>{ inView=es[0].isIntersecting; if(inView){ startThree(); kick(); } }, {threshold:0.01, rootMargin:'300px'}).observe(view);
+    } else startThree();
   }
   function init(){
     view=document.getElementById('warmap-view'); cv=document.getElementById('warmap-canvas');

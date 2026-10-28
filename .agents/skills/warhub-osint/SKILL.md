@@ -121,3 +121,5 @@ GDELT DOC API 對共用 IP（GitHub runner 及雲端主機）第一個請求即�
 2026-10-28 軍機異常基準修正（數據排查）：可見軍機數有強烈日內週期（美國白天約400–560架、夜間約120–200架），舊做法拿當下總數比「7天全部時段平均」，使每個美國下午都被算成+100%以上、WPI每天固定由約24跳到41。現改用 fetch_data.aviation_baseline：只取過去7天內、與現在UTC時刻相差±2小時的歷史讀數平均，需≥5筆且分布≥5天，否則不寫anomaly_pct（不計分，不當0）。summary.baseline_7d 現為「同時段7日平均」，另寫 baseline_samples。驗證：tests/test_aviation_baseline.py。GDELT事件檔台海單窗122篇（48小時平均約30篇）得滿分屬真實偏高，非計算錯誤；單一大新聞即可拉高，判讀時看region_articles。
 
 2026-10-28 GDELT事件檔小量平滑（數據排查：南海平常每窗約10篇、常在0–30間跳動，20篇就被打成滿分100、地區升為HIGH）：regional_metrics 分數改為 50×(本窗篇數+20)÷(預期篇數+20)，預期篇數＝48小時平均占比×本窗總篇數，上限100。大地區（數百篇）幾乎不變（烏克蘭 54.8→54.7），小地區雜訊不再衝到0或100（南海20篇對約10篇：100→67.6），真正暴增仍滿分（台海122對30篇：100）。實測0篇為低分而非0（例：預期10篇時33.3），仍是有效值、不當缺值。SMOOTHING_ARTICLES 常數可調。驗證：tests/test_gdelt_event_intensity.py。
+
+2026-10-28 地球圖改用 three.js 畫本體（只改前端）：WarGlobe 在地球接近畫面時載入 three-scenes.js 的 WarhubThree.globe（three@0.160.0，jsDelivr），以 WGLOBE_OCEAN／WGLOBE_PTS 畫立體海陸方塊與光照；投影與 2D 版相同（lam0、phi0、zoom、半徑 0.46×短邊），所以國名、戰區圈與 FIRMS 火點仍由原 2D 程式畫在上層、位置對齊。沒有 WebGL 或下載失敗自動回到 2D 畫法。資料與計分不變。

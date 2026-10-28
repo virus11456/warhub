@@ -53,3 +53,5 @@ research/pizza-reviews.json 保存版本化重大行動定義與逐事件審核�
 2026-10-28 披薩48小時卡簡化（使用者要求）：pizza-backtest.js 移除「展開事件與證據」「查看計算方法」兩個收合區與 research/pizza-reviews.json 前端讀取，四格數字改成一句：升到 DEFCON N 或更緊張共 X 次：確認有行動／核對後沒有／仍不確定／未滿48小時（起點不明>0 時另列不納入）；比例缺值顯示「準確率尚不能估計」，並保留「未核實不當成沒有行動」。後端 pizza_backtest.py 與審核檔不變。雷達摘要的上游暫停文字不寫來源名稱。WPI 覆蓋文字列出缺值因子（暫缺：披薩人流…；熱異常不計分）。
 
 2026-10-28 BestTime 409 原因確定（使用者授權執行 besttime-setup，scope=all）：10 家店全部回 HTTP 409「Your free forecast credits are used up. Choose a plan to continue using Radar.」＝帳號免費額度已用完，不是程式或建檔流程問題；建檔與即時查詢都需付費方案。errors 已寫入 data/besttime_venues.json。換方案或補額度後，重跑 besttime-setup（confirm=SPEND）即可。
+
+2026-10-28 披薩區塊 three.js 營業示意（使用者要求，只改前端、不加請求或扣點）：#pz-3d 顯示「披薩店營業中 x / 6」「酒吧營業中 y / 4」與 3D 示意圖（three-scenes.js 的 WarhubThree.pentagon，五角大廈居中，店家位置為近似座標）。前端 pizzaOpenStates：披薩 is_open=true＝營業、false＝未營業、其他＝未知；酒吧 live_available 有值或 open 為 true／'Open'＝營業，open 為 false／'Closed'＝未營業，其他（含非查詢時段 bars=[]）＝未知。柱高＝即時人流（0 是有效值），未知與未營業不補零。未知原因：pizza_summary.state 為 setup_needed→尚未建檔、off_hours 或 bars.off_hours→非查詢時段，否則本輪無即時資料。店名須與 PIZZA_VENUES／PENTAGON_BARS 一致，改名時同步 three-scenes.js VENUES。three.js 只在區塊接近畫面時從 jsDelivr 載入；無 WebGL 或載入失敗只顯示數字。驗證：tests/test_frontend.cjs。
