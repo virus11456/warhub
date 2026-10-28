@@ -1891,6 +1891,23 @@ def besttime_et_hour() -> int | None:
         return None
 
 
+async def _besttime_error_message(resp, key: str) -> str | None:
+    """BestTime 錯誤回應的說明文字（最多 200 字；不含 API key）。讀不到就回 None。"""
+    try:
+        raw = (await resp.text())[:2000]
+    except Exception:
+        return None
+    try:
+        body = json.loads(raw)
+        text = body.get("message") or body.get("status") or raw if isinstance(body, dict) else raw
+    except ValueError:
+        text = raw
+    text = " ".join(str(text).split())
+    if key:
+        text = text.replace(key, "***")
+    return text[:200] or None
+
+
 async def besttime_live(session: aiohttp.ClientSession, key: str, venue: dict) -> dict:
     """單一場地的 BestTime 即時人流；失敗或無即時值時 live_busyness=None（不代表未營業）。"""
     params = {"api_key_private": key, "venue_name": venue["name"],
@@ -1902,8 +1919,10 @@ async def besttime_live(session: aiohttp.ClientSession, key: str, venue: dict) -
             headers={"User-Agent": USER_AGENT},
         ) as resp:
             if resp.status != 200:
+                message = await _besttime_error_message(resp, key)
+                log.warning(f"BestTime {venue['name']} HTTP {resp.status}: {message}")
                 return {"name":venue["name"], "live_available":False, "live_busyness":None,
-                        "error":True, "http_status":resp.status}
+                        "error":True, "http_status":resp.status, "error_message":message}
             data = await resp.json(content_type=None)
             if not isinstance(data,dict) or not isinstance(data.get('analysis'),dict):
                 return {"name":venue["name"], "live_available":False, "live_busyness":None,
@@ -1986,7 +2005,8 @@ async def fetch_pizza_besttime(session: aiohttp.ClientSession, pizzint_payload: 
             out[name] = {"live_busyness": int(round(live)), "forecasted": r.get("forecasted"), "recorded_at": at}
             reasons[name] = "used"
     log.info(f"Pizza BestTime fallback: {len(out)}/{len(wanted)} shops with live data; reasons={reasons}")
-    out["_status"] = {"queried_at": at, "reasons": reasons}
+    messages = {name: r["error_message"] for name, r in zip(wanted, results) if r.get("error_message")}
+    out["_status"] = {"queried_at": at, "reasons": reasons, **({"messages": messages} if messages else {})}
     return out
 
 

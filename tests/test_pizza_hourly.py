@@ -1,3 +1,4 @@
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -53,6 +54,7 @@ class FakeResp:
     async def __aenter__(self): return self
     async def __aexit__(self, *a): return False
     async def json(self, content_type=None): return self.body
+    async def text(self): return self.body if isinstance(self.body, str) else json.dumps(self.body)
 
 
 class FakeSession:
@@ -108,6 +110,20 @@ class PizzaBestTimeTests(unittest.IsolatedAsyncioTestCase):
         with patch.dict('os.environ', {'BESTTIME_API_KEY': 'k'}), patch.object(collector, 'besttime_et_hour', return_value=18):
             out = await collector.fetch_pizza_besttime(Failed({}), self.payload)
         self.assertEqual(out['_status']['reasons'], {'We, The Pizza': 'http_403'})
+
+    async def test_error_message_is_kept_without_the_key(self):
+        class Conflict(FakeSession):
+            def post(self, url, params=None, **kw):
+                return FakeResp({'status': 'Error', 'message': 'Venue not forecasted yet, key k-secret'}, status=409)
+        with patch.dict('os.environ', {'BESTTIME_API_KEY': 'k-secret'}), patch.object(collector, 'besttime_et_hour', return_value=18):
+            out = await collector.fetch_pizza_besttime(Conflict({}), self.payload)
+        self.assertEqual(out['_status']['reasons'], {'We, The Pizza': 'http_409'})
+        self.assertEqual(out['_status']['messages'], {'We, The Pizza': 'Venue not forecasted yet, key ***'})
+        long = Conflict({})
+        long.post = lambda url, params=None, **kw: FakeResp('<html>' + 'x' * 500, status=409)
+        with patch.dict('os.environ', {'BESTTIME_API_KEY': 'k'}), patch.object(collector, 'besttime_et_hour', return_value=18):
+            out = await collector.fetch_pizza_besttime(long, self.payload)
+        self.assertEqual(len(out['_status']['messages']['We, The Pizza']), 200)
 
     def test_backup_fills_only_missing_values_and_is_labelled(self):
         fb = {'We, The Pizza': {'live_busyness': 0, 'forecasted': 40, 'recorded_at': 't'},
