@@ -18,3 +18,22 @@ test('preview reads deployment branch while production ignores requested ref',as
     process.env.VERCEL_ENV='production';await handler({query:{ref:'attacker-branch'}},response());assert.equal(url.searchParams.get('ref'),'main');
   }finally{if(env===undefined)delete process.env.VERCEL_ENV;else process.env.VERCEL_ENV=env;if(branch===undefined)delete process.env.VERCEL_GIT_COMMIT_REF;else process.env.VERCEL_GIT_COMMIT_REF=branch;}
 });
+
+test('data.json drops server-only bookkeeping but keeps what the page reads',async()=>{
+  const snap={updated_at:'2026-09-11T00:00:00Z',translation_cache:{a:'b'},english_translation_cache:{x:'y'},_notify:{bucket:1},trade_api:{},
+    notams:{taiwan:{danger:3,observed_at:'t',stale:false,sync_state:{records:{a:1}}},bad:null},
+    taiwan_insight:{version:1,timeline:[1],news_observations:[2],market_observations:[3]},regions:[{key:'taiwan'}]};
+  const before=JSON.stringify(snap);
+  global.fetch=async()=>({ok:true,json:async()=>JSON.parse(before)});
+  const r=response();await handler({query:{}},r);
+  assert.equal(r.code,200);
+  for(const k of ['translation_cache','_notify','trade_api'])assert.ok(!(k in r.body),k);
+  assert.deepEqual(r.body.notams.taiwan,{danger:3,observed_at:'t',stale:false});
+  assert.equal(r.body.notams.bad,null);
+  assert.deepEqual(r.body.taiwan_insight,{version:1,timeline:[1],news_observations:[2]});
+  assert.deepEqual(r.body.english_translation_cache,{x:'y'});
+  assert.deepEqual(r.body.regions,[{key:'taiwan'}]);
+  // Other allowlisted files pass through untouched.
+  global.fetch=async()=>({ok:true,json:async()=>({translation_cache:1,_notify:2})});
+  const h=response();await handler({query:{f:'history.json'}},h);assert.deepEqual(h.body,{translation_cache:1,_notify:2});
+});
