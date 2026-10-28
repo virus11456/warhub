@@ -51,3 +51,5 @@ research/pizza-reviews.json 保存版本化重大行動定義與逐事件審核�
 2026-10-28 BestTime 錯誤說明：2026-10-27 23:08 一輪披薩6店與酒吧4家全部 HTTP 409（帳號層級問題，非地址或比對）。besttime_live 在非200時讀回應的 message（或 status／原文），去空白、遮蔽 API key、截 200 字，存為 error_message 並寫 log；酒吧在 data.json.bars[].error_message，披薩在 pizza_backup.messages{店名: 說明}。不重試、不改查詢時段或次數。
 
 2026-10-28 披薩48小時卡簡化（使用者要求）：pizza-backtest.js 移除「展開事件與證據」「查看計算方法」兩個收合區與 research/pizza-reviews.json 前端讀取，四格數字改成一句：升到 DEFCON N 或更緊張共 X 次：確認有行動／核對後沒有／仍不確定／未滿48小時（起點不明>0 時另列不納入）；比例缺值顯示「準確率尚不能估計」，並保留「未核實不當成沒有行動」。後端 pizza_backtest.py 與審核檔不變。雷達摘要的上游暫停文字不寫來源名稱。WPI 覆蓋文字列出缺值因子（暫缺：披薩人流…；熱異常不計分）。
+
+2026-10-28 BestTime 409 原因確定（使用者授權執行 besttime-setup，scope=all）：10 家店全部回 HTTP 409「Your free forecast credits are used up. Choose a plan to continue using Radar.」＝帳號免費額度已用完，不是程式或建檔流程問題；建檔與即時查詢都需付費方案。errors 已寫入 data/besttime_venues.json。換方案或補額度後，重跑 besttime-setup（confirm=SPEND）即可。
