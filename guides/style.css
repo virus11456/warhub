@@ -1,9 +1,9 @@
 /* WARHUBS 避難指南 — 共用樣式（與主站一致的深色情報風） */
 :root{
-  --bg:#060a10; --bg2:#0a1018; --bg3:#0e1620;
-  --accent:#00cfe8; --accent2:#ff4d5e; --accent3:#f5a623; --crit:#ff2d6f;
-  --text:#c9d6e2; --text-primary:#e4eef7; --text-dim:#66788a;
-  --border:#17232f; --glow:0 0 12px rgba(0,207,232,.22);
+  --bg:#0b0f14; --bg2:#10151c; --bg3:#151c25;
+  --accent:#7eb0e0; --accent2:#ef5b57; --accent3:#e3a83f; --crit:#f2557f;
+  --text:#d3dbe4; --text-primary:#eef2f6; --text-dim:#8b98a8;
+  --border:#253140; --glow:0 0 12px rgba(126,176,224,.22);
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
@@ -21,7 +21,7 @@ a:hover{text-decoration:underline;}
 
 /* Header */
 header{
-  background:linear-gradient(180deg,rgba(0,207,232,.05) 0%,transparent 100%);
+  background:linear-gradient(180deg,rgba(126,176,224,.05) 0%,transparent 100%);
   border-bottom:1px solid var(--accent);
   position:sticky; top:0; z-index:100; backdrop-filter:blur(10px); padding:0 2rem;
 }
@@ -90,7 +90,7 @@ header{
   background:var(--bg2); display:table;
 }
 .article-wrap thead th{
-  background:rgba(0,207,232,.10); color:var(--accent); font-family:'Orbitron',monospace;
+  background:rgba(126,176,224,.10); color:var(--accent); font-family:'Orbitron',monospace;
   font-size:.78rem; font-weight:700; letter-spacing:.5px; text-align:left;
   padding:.6rem .8rem; border-bottom:1px solid var(--accent); white-space:nowrap;
 }
