@@ -1,5 +1,4 @@
 require('./test_kalshi_frontend.cjs');
-require('./test_pizza_backtest.cjs');
 process.chdir(require('path').resolve(__dirname,'..'));
 const {JSDOM,VirtualConsole}=require('jsdom');const fs=require('fs');const assert=require('assert');
 {
@@ -25,7 +24,6 @@ const {JSDOM,VirtualConsole}=require('jsdom');const fs=require('fs');const asser
  assert.ok(!d.body.textContent.includes('核武使用概率：5%'));
  assert.ok(!/準確率.{0,20}94%/.test(d.body.textContent));
  if(mode==='legacy'){
-  assert.ok(!d.querySelector('#pizza-shops-grid').textContent.includes('CLOSED'));
   assert.ok(!d.querySelector('#food-grid').textContent.includes('9600.3%'));
   assert.ok(!d.querySelector('#ticker').textContent.includes('綜合威脅指數'));
  }
@@ -41,17 +39,23 @@ for(const selector of ['.hero-strip','.wpi-section']) {
   assert.equal(d.querySelectorAll(selector).length,1);
   assert.ok(experimental.contains(d.querySelector(selector)));
 }
-// Radar summary: closed shops are explained, never shown as an anomaly or as safety.
-d.defaultView.renderPizzaRadar({pizza:[{name:'a',is_open:false,busyness:null},{name:'b',is_open:false,busyness:null}],bars:{available:false,reason:'非下班時段'}});
-assert.ok(d.querySelector('#pizza-radar-summary').textContent.includes('2 家店都沒有即時人流'));
-assert.ok(!d.querySelector('#pizza-radar-summary').textContent.includes('打烊'));
-assert.ok(d.querySelector('#pizza-radar-summary').textContent.includes('只在美東下班時段'));
-// Upstream reports no live source at all: say so instead of implying the shops are closed.
-d.defaultView.renderPizzaRadar({pizza:[{name:'a',is_open:null,busyness:null,data_source:'none'},{name:'b',is_open:null,busyness:null,data_source:'none'}],bars:{}});
-assert.ok(d.querySelector('#pizza-radar-summary').textContent.includes('暫停提供即時資料（不是店家打烊）'));
-d.defaultView.renderPizzaRadar({pizza:[{name:'a',is_open:true,busyness:80,percentage_of_usual:180,spike:true},{name:'b',is_open:true,busyness:30,percentage_of_usual:90}],bars:{}});
-assert.ok(d.querySelector('#pizza-radar-summary').textContent.includes('1 家店人流高於平常（最高為平常的 180%）'));
-assert.ok(d.querySelector('#pizza-radar-summary').classList.contains('hot'));
+// Radar summary: setup, off-hours, no-live and hot states are told apart; nothing implies closed shops or safety.
+{const R=j=>{d.defaultView.renderPizzaRadar(j);return d.querySelector('#pizza-radar-summary');};
+const two=[{name:'a',busyness:null},{name:'b',busyness:null}];
+assert.ok(R({pizza:two,pizza_summary:{state:'setup_needed'}}).textContent.includes('尚未在 BestTime 建檔'));
+assert.ok(R({pizza:two,pizza_summary:{state:'off_hours'}}).textContent.includes('只在美東 16–24 時查詢'));
+const none=R({pizza:two,pizza_summary:{state:'no_live',queried_at:'2026-10-29T00:10:00Z'}}).textContent;
+assert.ok(none.includes('2 家店都沒有即時人流')&&none.includes('20:10')&&none.includes('不等於店家打烊'));
+assert.ok(!/PizzINT|pizzint/i.test(d.querySelector('#pizza-card').textContent));
+const hot=R({pizza:[{name:'a',busyness:80,percentage_of_usual:180,status:'spike'},{name:'b',busyness:30,percentage_of_usual:90,status:'normal'}],pizza_summary:{state:'ok'}});
+assert.ok(hot.textContent.includes('1 家店人流高於平常（最高為平常的 180%）'));assert.ok(hot.classList.contains('hot'));}
+// Level, index and bars: a missing index is not shown as 0.
+{const w=d.defaultView;w.renderPizzaBlock({pizza:[],pizza_summary:{level:'busy',index:0},bars:{available:true,emptiness:30,avg_delta:-30,open_count:3,total:4}});
+assert.equal(d.querySelector('#pizza-level').textContent,'偏忙');assert.ok(d.querySelector('#pizza-index').textContent.includes('異常指數 0 / 100'));
+assert.ok(d.querySelector('#pizza-bars-line').textContent.startsWith('異常冷清（比平常 -30%，3/4'));
+w.renderPizzaBlock({pizza:[],pizza_summary:{level:null,index:null},bars:{available:false,reason:'非下班時段'}});
+assert.equal(d.querySelector('#pizza-level').textContent,'--');assert.ok(d.querySelector('#pizza-index').textContent.includes('資料不足'));
+assert.ok(d.querySelector('#pizza-bars-line').textContent.includes('等待查詢時段'));}
 // Hourly bars: Washington weekday baseline (grey) + only today's live readings; 0 is drawn, yesterday is not.
 {const w=d.defaultView,usual=Array(24).fill(null);usual[10]=40;usual[12]=80;
 const shop={name:'x',recorded_at:'2026-10-27T16:06:00Z',usual_week:{'1':Array(24).fill(90),'2':usual},
@@ -63,11 +67,13 @@ const live=rects.filter(r=>r.getAttribute('fill')==='red');
 assert.equal(live.length,1);assert.equal(live[0].getAttribute('height'),'1.0');
 assert.equal(rects.filter(r=>r.getAttribute('stroke-dasharray')).length,1);
 assert.equal(w.pizzaHourlyChart({name:'y'},'red'),'');
+// Before any live reading the usual curve still draws for the snapshot's day.
+{const b2=d.createElement('div');b2.innerHTML=w.pizzaHourlyChart({name:'z',usual_week:{'2':usual}},'red','2026-10-27T16:06:00Z');assert.equal(b2.querySelectorAll('rect[fill="red"]').length,0);assert.equal(b2.querySelectorAll('rect[fill="rgba(255,255,255,0.16)"]').length,2);}
 w.renderPizzaShops([{...shop,is_open:true,busyness:30,status:'quiet'}]);
 assert.ok(d.querySelector('#pizza-hourly-legend').textContent.includes('週二'));
 assert.equal(d.querySelectorAll('#pizza-shops-grid .pizza-hourly').length,1);}
-d.defaultView.renderPizzaShops([{name:'b',is_open:true,busyness:30,status:'quiet',data_source:'besttime'},{name:'c',is_open:true,busyness:30,status:'quiet',data_source:'google'}]);
-assert.equal(d.querySelectorAll('#pizza-shops-grid .pizza-src').length,1,'backup source is labelled only on backup values');
+d.defaultView.renderPizzaShops([{name:'b',busyness:45,usual_now:30,percentage_of_usual:150,status:'busy'},{name:'c',busyness:null,status:'setup_needed'},{name:'<i>',busyness:0,usual_now:20,percentage_of_usual:0,status:'quiet'}]);
+{const t=d.querySelector('#pizza-shops-grid').textContent;assert.ok(t.includes('現在 45% · 平常 30% · 為平常的 150%'));assert.ok(t.includes('尚未建檔'));assert.ok(t.includes('現在 0%'));assert.equal(d.querySelector('#pizza-shops-grid i'),null);}
 
 // Air activity: notices vs usual per region; missing stays missing, zero stays zero, closure wins the summary.
 {const w=d.defaultView,sum=()=>d.querySelector('#air-summary').textContent,rows=()=>d.querySelector('#air-regions').textContent;

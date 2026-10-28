@@ -1,7 +1,7 @@
 """Public source status. Fetch time is not a claim about observation freshness."""
 from datetime import datetime, timezone
 
-LABELS = {'kalshi':'Kalshi', 'pizza':'PizzINT', 'polymarket':'Polymarket', 'aviation':'ADS-B', 'firms':'NASA FIRMS',
+LABELS = {'kalshi':'Kalshi', 'pizza':'BestTime 披薩', 'polymarket':'Polymarket', 'aviation':'ADS-B', 'firms':'NASA FIRMS',
           'gdelt':'GDELT', 'notams':'FAA NOTAM', 'wikipedia':'Wikipedia', 'news':'Google News',
           'tw_news':'台海新聞', 'nuclear_seismic':'USGS', 'eonet':'NASA EONET', 'finance':'Yahoo Finance',
           'food':'Comtrade 糧食', 'strat':'Comtrade 物資', 'usda':'USDA ESR', 'bars':'BestTime', 'fred':'FRED'}
@@ -85,11 +85,17 @@ def source_health(data):
             note = '選定地緣政治系列；僅參考、不計入分數；取得時間不是報價發生時間'
             observed = None
         if key == 'pizza':
-            n = sum(1 for s in v or [] if s.get('busyness') is not None and s.get('is_open'))
-            status = 'available' if n else 'unavailable'
-            b = sum(1 for s in v or [] if s.get('busyness') is not None and s.get('is_open') and s.get('data_source') == 'besttime')
-            note = f'{n} 店有即時人流' + (f'（{b} 店為 BestTime 備援）' if b else '') + '；未觀測不等同已打烊'
-            observed = (data.get('defcon_details') or {}).get('at_time')
+            summary = data.get('pizza_summary') or {}
+            state = summary.get('state')
+            n = summary.get('live_count') or 0
+            if state == 'setup_needed':
+                status, note = 'unavailable', '尚未建檔（需手動執行 BestTime 建檔）'
+            elif state == 'off_hours':
+                status, note = 'waiting', '非下班時段（僅美東 16–24 時查詢）'
+            else:
+                status = 'available' if n else 'unavailable'
+                note = f'{n}/{summary.get("total") or len(v or [])} 店有即時人流；未觀測不等同已打烊'
+            observed = summary.get('queried_at') if n else None
         if key == 'news' and isinstance(data.get('news_sampling'), dict):
             samples = data['news_sampling'].get('by_region') or {}
             fresh = sum(r.get('status') == 'available' for r in samples.values() if isinstance(r, dict))

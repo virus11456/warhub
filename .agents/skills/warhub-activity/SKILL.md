@@ -1,25 +1,29 @@
 ---
 name: warhub-activity
-description: "Maintain WARHUB PizzINT and BestTime foot-traffic collectors. Use for missing shop data, closed-versus-unavailable states, live baselines and paid-query cadence."
+description: "Maintain WARHUB pizza-shop and bar foot-traffic collectors (own BestTime account). Use for missing shop data, setup/forecast state, closed-versus-unavailable states, usual-week baselines and paid-query cadence."
 ---
 
 # WARHUB 披薩與酒吧人流
 
-讀 `scripts/fetch_data.py` 的 `fetch_pizzint`、`transform_pizza_shops`、`fetch_pizza_besttime`、`fetch_bars` 及 `scripts/data_quality.py`。執行與封存規則見 [抓取與封存](../warhub-collection/SKILL.md)。
+讀 `scripts/fetch_data.py` 的 `fetch_pizza`、`fetch_bars`、`besttime_live`，`scripts/pizza_traffic.py`（純函式，不發請求），`scripts/besttime_setup.py`（手動建檔）及 `scripts/data_quality.py`。執行與封存規則見 [抓取與封存](../warhub-collection/SKILL.md)。
 
 | 入口 | 來源 | 輸出 |
 |---|---|---|
-| `fetch_pizzint` | `https://www.pizzint.watch/api/dashboard-data` | 原始店家經轉換產生 `data.json.pizza`、`pizza_index` 等，供 WPI 與店家卡 |
+| `fetch_pizza` | BestTime `/api/v1/forecasts/live`（與酒吧共用 `besttime_live`），只查 `data/besttime_venues.json` 已有 venue_id 的店 | `data.json.pizza`、`pizza_summary`、`pizza_index`（WPI z）、`pizza_events` |
 | `fetch_bars` | BestTime `/api/v1/forecasts/live` | `data.json.bars`；需 `BESTTIME_API_KEY` |
-| `fetch_pizza_besttime` | BestTime `/api/v1/forecasts/live`（與酒吧共用 `besttime_live`） | 只補 PizzINT 缺即時值的披薩店；寫入 `data.json.pizza[].data_source='besttime'` |
+| `besttime_setup.py`（非排程） | BestTime `POST /api/v1/forecasts`，每店成功 2／失敗 1 credit | `data/besttime_venues.json`：披薩店 venue_id＋usual_week、酒吧 venue_id、errors |
 
-PizzINT 每輪快來源；以 `SHOPS_TO_DISPLAY` 精確對應上游名稱。先檢查店家是否存在，再判斷目前人流、營業狀態和可比較基準。店家清單有資料不表示即時人流可用。`current_popularity=None` 不得填零；沒有任何有效即時店家時，披薩指數不能當有效零分。
+2026-10-28 起披薩人流只用自有 BestTime 帳號（使用者決定），已移除 PizzINT 來源、DEFCON、48小時回測卡與 pizza_backtest；research/ 與 archives/ 舊資料保留不改。網頁不顯示 PizzINT 名稱。下方較早日期的 PizzINT 筆記僅為歷史紀錄。
 
-BestTime 目前僅美東 `America/New_York` 16:00–24:00 查詢，時區含夏令時間；非時段不查詢，以免浪費額度。需檢查回應 analysis 結構、即時可用旗標與 baseline；未設定 key、API 失敗、未營業、非查詢時段要分開呈現。不記錄包含 private key 的完整請求 URL。
+店家清單在 `pizza_traffic.PIZZA_VENUES`（顯示名 → BestTime 查詢名稱＋地址）。平常人流 usual_week 只在建檔時取得並存檔（BestTime 週一=0、每日 6AM–5AM；轉成週日=0、索引＝華府時鐘小時，18–23 格屬隔天），排程不重查週預測；重建檔才會更新。即時值僅美東 `America/New_York` 16:00–24:00、且已建檔的店查詢，每店每輪 1 credit；未建檔不查，以免付費拿 409／404。hourly_24h 由前一份 data.json 的同店紀錄累積，只留 24 小時內自己的讀數。
 
-Google Maps Popular Times／BestTime 是店家人流訊號，無法直接證實外送訂單、軍方加班或軍事行動；酒吧冷清與披薩忙碌可能有共同原因，不能宣稱已驗證交叉預警能力。
+狀態要分開：`setup_needed`（未建檔）、`waiting`（非查詢時段）、`unavailable`（查詢失敗，保留 error_message）、`closed`（BestTime 明確 Closed）、有值時 `quiet`／`normal`／`busy`／`spike`。busy 需 ≥150% 且比平常 +20；spike 需 ≥200% 且 +30（≥250% 且 +40 為 EXTREME，供 alerts）；低於平常 60% 為 quiet。0 是有效空店。區塊等級：任一 spike 或 ≥2 家 busy＝爆單，1 家 busy＝偏忙，其餘正常。異常指數＝可比店家 max(0, 百分比−100) 平均（上限 100），少於 2 家可比時為 None，不當 0。
 
-離線測試在 `tests/test_integrity.py`。需覆蓋不存在店家、缺即時值、有效零、結構錯誤及無 baseline。線上檢查可能耗用 BestTime credit，先用既有快照定位，只在需要時做有限請求。勿以測試本 skill 為由觸發 Telegram。
+建檔須使用者同意花 credit：手動執行 `.github/workflows/besttime-setup.yml`，confirm 輸入 SPEND 才扣點，否則只列出店家與最多花費；預設只建尚未有 venue_id 的店，redo 才重建。排程更新從不建檔。
+
+Google Maps Popular Times／BestTime 是店家人流訊號，無法直接證實外送訂單、軍方加班或軍事行動；酒吧冷清與披薩忙碌可能有共同原因，不能宣稱已驗證交叉預警能力。不記錄包含 private key 的完整請求 URL。
+
+離線測試在 `tests/test_pizza_traffic.py` 與 `tests/test_integrity.py`。需覆蓋週預測轉換、未建檔／非時段／失敗／打烊分流、有效零、24 小時累積、只查已建檔店，以及建檔目標篩選。線上檢查可能耗用 BestTime credit，先用既有快照定位，只在需要時做有限請求。勿以測試本 skill 為由觸發 Telegram。
 
 WPI v4.0 的人工權重公式與歷史維持原樣，calculate_wpi 標記 experimental=true；舊 WPI／披薩／酒吧放在預設收合實驗區。alerts.run_notifications 對 experimental=true 或缺旗標的舊快照停用 WPI 升級與披薩異常警報（環境開關也不覆蓋此限制），保留更新摘要及獨立熱異常觀測。摘要標示實驗，不顯示 DEFCON。不得宣稱人流證實加班、獨立驗證或已回測；不改抓取頻率、不刪歷史。tests/test_alert_delivery.py 以 mock 驗證停止警報且摘要／熱異常仍有效，前端測試驗證實驗區收合。
 

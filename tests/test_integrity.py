@@ -85,8 +85,10 @@ class Integrity(unittest.TestCase):
         r=next(r for r in regions if r['key']=='ukraine')
         self.assertEqual(r['factors']['firms_hotspots'],100);self.assertEqual(r['factors']['avi_count'],90)
     def test_unknown_pizza_not_closed(self):
-        shops=f.transform_pizza_shops({})
-        self.assertTrue(all(s['busyness'] is None and s['status']=='unavailable' for s in shops))
+        from datetime import datetime, timezone
+        import pizza_traffic as pt
+        shops=pt.build_shops({},{},None,datetime.now(timezone.utc),True)
+        self.assertTrue(all(s['busyness'] is None and s['is_open'] is None and s['status']=='setup_needed' for s in shops))
     def test_null_digest(self):
         d={'score':sc.calculate_wpi(None,[]),'regions':f.build_region_risks([],{}, {},{})}
         self.assertIn('資料不足',alerts.build_digest(d))
@@ -134,7 +136,7 @@ class Pipeline(unittest.IsolatedAsyncioTestCase):
     async def test_full_pipeline_with_missing_sources(self):
         from contextlib import ExitStack
         from unittest.mock import AsyncMock
-        funcs=['kalshi','pizzint','aviation','firms','gdelt','food_imports','usda_esr','nuclear_seismic','wikipedia_anxiety','notams','bars','strategic_imports','pla_sorties','finance','fred']
+        funcs=['kalshi','pizza','aviation','firms','gdelt','food_imports','usda_esr','nuclear_seismic','wikipedia_anxiety','notams','bars','strategic_imports','pla_sorties','finance','fred']
         lists=['polymarket','eonet','gnews','food_history','strategic_history','tw_military_news']
         with tempfile.TemporaryDirectory() as td, ExitStack() as stack:
             stack.enter_context(patch.dict('os.environ',{'WARHUB_NO_NOTIFY':'1'}))
@@ -145,6 +147,7 @@ class Pipeline(unittest.IsolatedAsyncioTestCase):
                 value=[] if name in lists else {}
                 if name=='aviation':value={'error':'missing'}
                 if name=='gnews':value={'headlines':[], 'sampling':{'version':1,'by_region':{}}}
+                if name=='pizza':value={'shops':[],'events':[],'summary':{'state':'setup_needed','index':None,'level':None,'live_count':0,'total':6}}
                 stack.enter_context(patch.object(f,'fetch_'+name,AsyncMock(return_value=value)))
             await f.main()
             data=json.loads(f.DATA_FILE.read_text())
@@ -157,7 +160,7 @@ class Pipeline(unittest.IsolatedAsyncioTestCase):
         from contextlib import ExitStack
         from unittest.mock import AsyncMock
         import copy
-        funcs=['kalshi','pizzint','aviation','firms','gdelt','nuclear_seismic','wikipedia_anxiety','notams','bars','pla_sorties','finance']
+        funcs=['kalshi','pizza','aviation','firms','gdelt','nuclear_seismic','wikipedia_anxiety','notams','bars','pla_sorties','finance']
         lists=['polymarket','eonet','gnews','tw_military_news']
         previous={'food': {'schema_version':2, 'updated_at':'2026-09-01T00:00:00+00:00', 'items':[{'wan_ton':12}]},
                   'usda':None, 'strat':{}, 'fred':{}, 'food_hist':[{'month':'2026-07'}], 'strat_hist':[]}
@@ -175,6 +178,7 @@ class Pipeline(unittest.IsolatedAsyncioTestCase):
                 value=[] if name in lists else {}
                 if name=='aviation':value={'error':'missing'}
                 if name=='gnews':value={'headlines':[], 'sampling':{'version':1,'by_region':{}}}
+                if name=='pizza':value={'shops':[],'events':[],'summary':{'state':'setup_needed','index':None,'level':None,'live_count':0,'total':6}}
                 stack.enter_context(patch.object(f,'fetch_'+name,AsyncMock(return_value=value)))
             await f.main()
             data=json.loads(f.DATA_FILE.read_text())
