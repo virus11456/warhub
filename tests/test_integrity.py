@@ -153,7 +153,7 @@ class Pipeline(unittest.IsolatedAsyncioTestCase):
             data=json.loads(f.DATA_FILE.read_text())
             self.assertEqual(data['news_sampling']['version'], 1)
             self.assertIsNone(data['score']['combined_score'])
-            self.assertEqual(data['source_health']['pizza']['status'],'unavailable')
+            self.assertEqual(data['source_health']['pizza']['status'],'not_configured')
             self.assertNotIn('_notify',data)
 
     async def test_fast_pipeline_preserves_slow_data_without_querying_it(self):

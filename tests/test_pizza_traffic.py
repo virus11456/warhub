@@ -60,6 +60,7 @@ class ShopTests(unittest.TestCase):
     def test_missing_setup_off_hours_and_failure_are_distinct(self):
         none = pt.build_shops({}, {}, None, NOW, True)
         self.assertTrue(all(s['status'] == 'setup_needed' for s in none))
+        self.assertTrue(all(s['status'] == 'setup_needed' for s in pt.build_shops({}, {}, None, NOW, False)))
         waiting = pt.build_shops({}, venues(NAME), None, NOW, False)
         self.assertEqual(waiting[0]['status'], 'waiting')
         failed = pt.build_shops({NAME: {'error': True, 'error_message': 'quota'}}, venues(NAME), None, NOW, True)
@@ -121,3 +122,16 @@ class SetupTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class HealthTests(unittest.TestCase):
+    def test_setup_needed_is_not_an_outage(self):
+        from data_quality import source_health
+        h = source_health({'pizza': [], 'pizza_summary': {'state': 'setup_needed'}})['pizza']
+        self.assertEqual(h['status'], 'not_configured')
+        h = source_health({'pizza': [{}], 'pizza_summary': {'state': 'no_live', 'live_count': 0, 'total': 6}})['pizza']
+        self.assertEqual(h['status'], 'unavailable')
+
+    def test_digest_says_not_set_up(self):
+        import alerts
+        self.assertIn('尚未在 BestTime 建檔', alerts._fmt_pizza_shops([{}], {'status': 'not_configured'}))
