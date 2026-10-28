@@ -189,3 +189,16 @@ class Pipeline(unittest.IsolatedAsyncioTestCase):
             self.assertNotIn('food_imports',data['collection']['duration_seconds'])
             self.assertNotIn('_notify',data)
 
+
+
+class RegionNoMarketTests(unittest.TestCase):
+    def test_region_without_any_market_scores_from_news_and_airspace(self):
+        events = {'regions': {'korea': {'stale': False, 'score': 30.0, 'delta_pct': -40}}}
+        notams = {'korea': {'stale': False, 'danger': 3, 'closure': False, 'relative': {'score': 50.0, 'baseline_danger': 3}}}
+        korea = next(r for r in f.build_region_risks([], {}, {}, {}, notams, events) if r['key'] == 'korea')
+        self.assertTrue(korea['factors']['no_market'])
+        self.assertEqual(korea['score'], 37.5)                      # (30*.25 + 50*.15) / .40
+        self.assertEqual(korea['coverage'], 0.4)
+        # One source alone is still not enough to score.
+        only_news = next(r for r in f.build_region_risks([], {}, {}, {}, {}, events) if r['key'] == 'korea')
+        self.assertIsNone(only_news['score'])

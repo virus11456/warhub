@@ -1977,7 +1977,13 @@ def build_region_risks(polymarket: list[dict], gdelt: dict,
         # Broad ADS-B areas overlap (Taiwan/Korea/South China Sea). Counts are context only.
         if avi_by_region is not None and not aviation.get("error"):
             factors["avi_count"] = sum(avi_by_region.get(r, 0) for r in cfg["avi_regions"])
-        score, coverage = aggregate(factors, {"poly": .35, "gdelt": .25, "notam": .15, "firms": .12, "avi": .13}, min_coverage=.60, min_factors=2)
+        if poly_score is None and top_q is None:
+            # No prediction market exists for this region at all (e.g. North Korea), so the 60% bar
+            # could never be met. Score it from news + airspace only, both required, and say so.
+            factors["no_market"] = True
+            score, coverage = aggregate(factors, {"gdelt": .25, "notam": .15}, min_coverage=.40, min_factors=2)
+        else:
+            score, coverage = aggregate(factors, {"poly": .35, "gdelt": .25, "notam": .15, "firms": .12, "avi": .13}, min_coverage=.60, min_factors=2)
 
         if score is None: level = "INSUFFICIENT_DATA"
         elif score >= 65:  level = "CRITICAL"

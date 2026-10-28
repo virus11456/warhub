@@ -1419,6 +1419,13 @@
 #china-watch.cn-banner{background:none;border:0;border-left:3px solid var(--border);padding:.2rem 0 .2rem .8rem;margin:.4rem 0 .8rem}
 #china-watch .cn-banner-t{font-size:.9rem;letter-spacing:1px;color:var(--text)}
 #china-watch .cn-banner-s{font-size:.75rem;margin-top:.25rem}
+/* Phones: long headline lists show four items first; the rest open on request. */
+.clamp-more{display:none}
+@media (max-width:640px){
+  .clamp-list:not(.expanded) > *:nth-child(n+5){display:none}
+  .clamp-more{display:block;width:100%;min-height:44px;margin-top:.5rem;border:1px solid var(--border);background:var(--bg3);color:var(--text);font:inherit;font-size:.85rem;cursor:pointer}
+  .clamp-more[hidden]{display:none}
+}
 .ti-trend{margin:.5rem 0 .3rem;padding:.5rem .6rem;border:1px solid var(--border);background:rgba(255,255,255,.02)}
 .ti-trend svg{display:block;width:100%;height:64px}
 .ti-trend-hd,.ti-trend-ft{display:flex;justify-content:space-between;gap:.5rem;flex-wrap:wrap;font-size:.75rem;color:var(--text-dim)}
@@ -1737,7 +1744,7 @@
       <div class="pla-summary"><div class="pla-hd">官方共機日報</div><div id="pla-latest"></div><div class="observation-caption">架次，非不同飛機數</div></div>
       <div class="pla-chart-panel"><div class="pla-chart-heading">近 30 天已收錄日報</div><div class="fh-chart"><svg id="pla-svg" viewBox="0 0 720 170" preserveAspectRatio="xMidYMid meet"></svg></div><details class="reading-details"><summary>統計時間與圖例</summary><div id="pla-note" class="pla-legend"></div><div class="pla-legend" id="pla-legend"></div></details></div>
     </div>
-    <div id="twnews-list">
+    <div id="twnews-list" class="clamp-list">
       <div style="padding:1rem;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 連接台海新聞流…</div>
     </div>
   </div>
@@ -1878,7 +1885,7 @@
     <details class="reading-details" style="margin-bottom:.5rem"><summary>來源與篩選方式</summary><p>
       Google News 全球監測 · 篩選白宮／中國／戰爭升級相關頭條，依時間排序；可切換中英文標題，譯文須對照原文 · 供事件追蹤與原文查核，未驗證其預測能力（點擊看原文）
     </p></details>
-    <div id="news-list">
+    <div id="news-list" class="clamp-list">
       <div style="padding:1rem;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 連接 GDELT 新聞流…</div>
     </div>
   </div>
@@ -2838,7 +2845,7 @@ function renderRegions(regions) {
           <span style="margin-left:auto;font-family:'Orbitron',monospace;font-size:1.5rem;font-weight:900;color:${st.color}">${(observation.score == null ? '--' : Math.round(observation.score))}</span>
           <span style="font-family:'Share Tech Mono',monospace;font-size:.72rem">${trend}</span>
         </div>
-        <div style="font-family:'Orbitron',monospace;font-size:.8rem;letter-spacing:normal;color:${st.color};margin-bottom:.6rem">${observation.score == null ? '尚無有效計分資料' : observation.provisional ? (observation.count === 1 ? '單一來源觀測' : '暫定觀測') : '多來源觀測'} · ${observation.count}/3 來源</div>
+        <div style="font-family:'Orbitron',monospace;font-size:.8rem;letter-spacing:normal;color:${st.color};margin-bottom:.6rem">${observation.score == null ? '尚無有效計分資料' : observation.provisional ? (observation.count === 1 ? '單一來源觀測' : '暫定觀測') : '多來源觀測'} · ${observation.count}/${r.factors?.no_market ? 2 : 3} 來源${r.factors?.no_market ? ' · 無市場題目' : ''}</div>
         <div class="kalshi-region-reference" data-kalshi-region="${escapeHtml(r.key)}"></div>
         <div style="display:flex;flex-direction:column;gap:.34rem;font-family:'Share Tech Mono',monospace">
           ${factorRow('市場盤口', f.poly)}
@@ -4343,6 +4350,26 @@ async function fetchFirmsEvents() { /* no-op: 改由 fetchRealPizzaData 從 data
     persist();
   }
   if(document.readyState!=='loading') init(); else document.addEventListener('DOMContentLoaded', init);
+})();
+</script>
+<script>
+/* 手機長列表：先顯示 4 則，按鈕展開其餘；列表每次重繪後重算剩餘則數（電腦版按鈕隱藏、全部顯示）。 */
+(function(){
+  function setup(list){
+    var btn=document.createElement('button');btn.type='button';btn.className='clamp-more';
+    list.insertAdjacentElement('afterend',btn);
+    function sync(){
+      var rest=list.children.length-4, open=list.classList.contains('expanded');
+      btn.hidden=rest<=0;
+      if(rest>0)btn.textContent=open?'收合':'顯示全部（共 '+list.children.length+' 則）';
+      btn.setAttribute('aria-expanded',String(open));
+    }
+    btn.addEventListener('click',function(){list.classList.toggle('expanded');sync();});
+    new MutationObserver(sync).observe(list,{childList:true});
+    sync();
+  }
+  function init(){document.querySelectorAll('.clamp-list').forEach(setup);}
+  if(document.readyState!=='loading')init();else document.addEventListener('DOMContentLoaded',init);
 })();
 </script>
 <div id="chart-tip"></div>
