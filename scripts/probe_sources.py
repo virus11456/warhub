@@ -31,7 +31,6 @@ async def main():
                         elif name=='finance': result['count']=len(value)
                         elif name=='fred': result['series']=list(value)
                         elif name=='bars': result['live_count']=value.get('open_count',0); result['reason']=value.get('reason')
-                        elif name=='pizzint': result['shops']=len(value.get('data',[]));result['live_count']=sum(s.get('current_popularity') is not None for s in value.get('data',[]))
                     report['sources'][name]=result
                 except Exception as e:
                     report['sources'][name]={'status':'unavailable','failure_type':type(e).__name__}
@@ -59,7 +58,7 @@ async def main():
                         except (ValueError,AttributeError):v['has_notam_list']=False
                         report['sources']['notam']=v
                 except Exception as e: report['sources']['notam']={'failure_type':type(e).__name__}
-            await asyncio.gather(one('polymarket',f.fetch_polymarket),one('pizzint',f.fetch_pizzint),one('usda',f.fetch_usda_esr),one('bars',f.fetch_bars),one('fred',f.fetch_fred),one('finance',f.fetch_finance),gdelt(),notam())
+            await asyncio.gather(one('polymarket',f.fetch_polymarket),one('usda',f.fetch_usda_esr),one('bars',f.fetch_bars),one('fred',f.fetch_fred),one('finance',f.fetch_finance),gdelt(),notam())
     report['configured']={name:bool(os.environ.get(name,'')) for name in ['USDA_FAS_API_KEY','BESTTIME_API_KEY','FRED_API_KEY']}
     output=Path('probe-report.json');output.write_text(json.dumps(report,ensure_ascii=False,indent=2))
     print(json.dumps(report,ensure_ascii=False,indent=2))

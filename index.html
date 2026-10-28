@@ -955,7 +955,7 @@
     /* Pizza */
     .pizza-emoji   { font-size: 2rem; }
     .pizza-level-num { font-size: 1.3rem; }
-    /* 手機：PizzINT 卡片標題列改直排，DEFCON 區塊移到標題下方整寬顯示，避免跑版 */
+    /* 手機：披薩卡片標題列改直排，等級區塊移到標題下方，避免跑版 */
     .pbi-title-row { flex-direction: column; gap: .3rem; }
     .pbi-title-row > div:last-child { text-align: left !important; }
     .pizza-level-label { letter-spacing: .5px; }
@@ -1362,8 +1362,6 @@
 <script src="/locales/en.js?v=20260917a" defer></script>
 <script src="/i18n.js?v=20260916a" defer></script>
 <script src="/cross-context.js"></script>
-<link rel="stylesheet" href="/pizza-backtest.css">
-<script src="/pizza-backtest.js?v=20260923a" defer></script>
 <script src="/kalshi-markets.js?v=20260923a" defer></script>
 <link rel="stylesheet" href="/kalshi-markets.css?v=20260923a">
 
@@ -1395,6 +1393,7 @@
   #region-board{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))!important}
 }
 
+#pizza-shops-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
 /* Phones: two pizza cards per row so all six fit on about one screen. */
 @media (max-width:640px){
   #pizza-shops-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:.45rem}
@@ -1420,7 +1419,20 @@
 #china-watch.cn-banner{background:none;border:0;border-left:3px solid var(--border);padding:.2rem 0 .2rem .8rem;margin:.4rem 0 .8rem}
 #china-watch .cn-banner-t{font-size:.9rem;letter-spacing:1px;color:var(--text)}
 #china-watch .cn-banner-s{font-size:.75rem;margin-top:.25rem}
-.pizza-src{margin-top:.15rem;font-size:.75rem;color:var(--accent3);font-weight:400}
+.pz-sub{font-size:.75rem;color:var(--text-dim);line-height:1.5}
+.pz-level{text-align:right;flex-shrink:0}
+.pz-level-lbl{font-size:.7rem;color:var(--text-dim)}
+.pz-level-val{font-family:'Orbitron',monospace;font-size:1.5rem;font-weight:700;line-height:1.2;color:var(--text-dim)}
+.pz-level-sub{font-size:.72rem;color:var(--text-dim)}
+.pz-legend{font-size:.75rem;color:var(--text-dim);margin:0 0 .4rem}
+.pz-bars{margin-top:1rem;padding:.7rem .9rem;border:1px solid var(--border);border-left:3px solid var(--accent4);background:rgba(255,255,255,.02)}
+.pz-bars-hd{font-size:.8rem;font-weight:700;color:var(--text);margin-bottom:.3rem}
+.pz-bars-line{font-size:.9rem;color:var(--text)}
+.pz-note{margin:.4rem 0 0;font-size:.75rem;color:var(--text-dim);line-height:1.6}
+.pz-lore{margin-top:.8rem}
+.pz-lore summary{cursor:pointer;font-size:.8rem;color:var(--text-dim)}
+.pz-why{font-size:.68rem;color:var(--text-dim);margin-top:.2rem}
+@media (max-width:640px){.pz-level{text-align:left}}
 .pizza-radar-summary{display:flex;flex-direction:column;gap:.25rem;margin:.6rem 0 .8rem;padding:.7rem .9rem;border:1px solid var(--border);border-left:4px solid var(--text-dim);background:rgba(255,255,255,.03);font-size:.9rem;line-height:1.5}
 .pizza-radar-summary strong{font-size:1.05rem;color:var(--text)}
 .pizza-radar-summary span{color:var(--text-dim);font-size:.8rem}
@@ -1467,132 +1479,40 @@
 
 <div class="container">
   <div class="card pizza-bar-card" id="pizza-card" style="margin-bottom:1.5rem">
-
-    <!-- 警報橫幅 -->
-    <div id="pizza-war-alert" style="display:none;position:relative;overflow:hidden;margin:-1.2rem -1.2rem 1.2rem;padding:1.2rem 1.5rem;background:linear-gradient(135deg,rgba(255,77,94,.15),rgba(255,68,0,.1));border-bottom:1px solid rgba(255,77,94,.4)">
-      <div style="position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,77,94,.1),transparent);animation:scan 3s linear infinite"></div>
-      <div class="alert-hdr" style="display:flex;align-items:center;gap:.7rem;margin-bottom:.7rem;flex-wrap:wrap">
-        <div style="font-family:'Orbitron',monospace;font-size:.7rem;font-weight:700;color:var(--accent2);letter-spacing:3px">人流異常｜實驗觀察</div>
-        <div class="alert-hdr-sub" style="font-family:'Orbitron',monospace;font-size:.7rem;letter-spacing:2px;color:var(--accent2)">PIZZINT ANOMALY DETECTED</div>
-        <div style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)" id="alert-timestamp">--:--:-- UTC</div>
-      </div>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:.82rem;color:var(--accent2);line-height:1.6;margin-bottom:.8rem" id="alert-main-text">
-        <svg class="px-ic"><use href="#ic-pizza"/></svg> PizzINT 人流異常 — 尚無已驗證的軍事行動預測能力，需交叉查證
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.8rem">
-        <div style="background:rgba(255,77,94,.1);border:1px solid rgba(255,77,94,.3);padding:.6rem;border-radius:4px">
-          <div style="font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim);margin-bottom:.3rem">觸發店家</div>
-          <div style="font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:700;color:var(--accent2)" id="triggered-shops">--</div>
-        </div>
-        <div style="background:rgba(255,77,94,.1);border:1px solid rgba(255,77,94,.3);padding:.6rem;border-radius:4px">
-          <div style="font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim);margin-bottom:.3rem">異常等級</div>
-          <div style="font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:700;color:var(--accent3)" id="alert-magnitude">--</div>
-        </div>
-      </div>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim);line-height:1.8" id="alert-bullets">
-        <div>▶ 等待 pizzint.watch spike 事件…</div>
-      </div>
-      <div style="margin-top:.8rem;padding:.5rem .8rem;background:rgba(0,0,0,.3);font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim)">
-        ⚠ 偽陽性風險：財年截止、演習、重大體育賽事皆可能觸發。請交叉驗證右方地區風險看板與 GDELT 新聞強度。資料來源：pizzint.watch
-      </div>
-    </div>
-
-    <!-- 頭部：標題 + DEFCON 量尺 -->
     <div class="pbi-header">
       <div class="pbi-title-row">
         <div>
-          <div class="section-title" style="margin:0 0 .2rem"><svg class="px-ic"><use href="#ic-pizza"/></svg> 五角大廈披薩指數 Pentagon Pizza Index (PizzINT)</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim)">KGB 代號 PIZZINT · Google Maps Popular Times · 每小時更新 · Pentagon / 白宮 / CIA HQ 3英里</div>
+          <div class="section-title" style="margin:0 0 .2rem"><svg class="px-ic"><use href="#ic-pizza"/></svg> 五角大廈披薩指數</div>
+          <div class="pz-sub">五角大廈周邊 6 家披薩店的 Google 熱門時段人流（自有 BestTime 帳號）· 即時值只在美東 16–24 時查詢</div>
         </div>
-        <div style="text-align:right;flex-shrink:0">
-          <div style="font-family:'Orbitron',monospace;font-size:.62rem;color:var(--text-dim);letter-spacing:2px">披薩戰備等級 PIZZA DEFCON</div>
-          <div class="pizza-level-num" id="pizza-level-num" style="font-size:1.6rem;line-height:1">--</div>
-          <div class="pizza-level-label" id="pizza-level-label">--</div>
+        <div class="pz-level" aria-live="polite">
+          <div class="pz-level-lbl">披薩人流</div>
+          <div class="pz-level-val" id="pizza-level">--</div>
+          <div class="pz-level-sub" id="pizza-index">--</div>
         </div>
       </div>
-
       <div id="pizza-radar-summary" class="pizza-radar-summary" aria-live="polite"></div>
-      <!-- DEFCON 量尺 -->
-      <div style="margin:.6rem 0 .8rem">
-        <div style="display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim);margin-bottom:.4rem">
-          <span>異常指數</span>
-          <span id="pizza-gauge-pct" style="font-weight:700">--%</span>
-        </div>
-        <div style="height:10px;background:var(--bg3);border:1px solid var(--border);position:relative;border-radius:2px">
-          <div id="pizza-gauge-fill" style="height:100%;width:0%;background:linear-gradient(90deg,#004400,var(--accent3));border-radius:2px;transition:width .8s ease;position:relative">
-            <div style="position:absolute;right:0;top:0;bottom:0;width:4px;background:white;opacity:.9;border-radius:0 2px 2px 0"></div>
-          </div>
-          <div style="position:absolute;left:40%;top:0;bottom:0;width:1px;background:rgba(245,166,35,.5)"></div>
-          <div style="position:absolute;left:70%;top:0;bottom:0;width:1px;background:rgba(255,77,94,.5)"></div>
-        </div>
-        <div class="pizza-zones" style="position:relative;height:20px;font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim);margin-top:.2rem">
-          <span style="position:absolute;left:0">5 正常</span>
-          <span style="position:absolute;left:38%">4 偏高</span>
-          <span style="position:absolute;left:68%">3 警戒</span>
-          <span style="position:absolute;right:0">1 危機</span>
-        </div>
-      </div>
-
-      <!-- 說明 -->
-      <div style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim);line-height:1.6;margin-bottom:.6rem">
-        冷戰時 KGB 監視五角大廈深夜外送作為早期預警。<strong style="color:var(--accent4)">PizzINT</strong>：觀察 Pentagon 周邊餐廳人流變化，無法直接確認外送訂單、軍方加班或行動規劃。
-      </div>
-
-      <!-- 🍺 加班指數（PizzINT × 酒吧反向 交叉判讀）-->
-      <div style="margin:.2rem 0 .4rem;padding:.7rem .8rem;background:rgba(0,207,232,.04);border:1px solid var(--border);border-left:3px solid var(--accent4)">
-        <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.5rem">
-          <span style="font-family:'Orbitron',monospace;font-size:.68rem;letter-spacing:2px;color:var(--accent4)">🍺 周邊人流實驗指數</span>
-          <span style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim)">PizzINT × 酒吧人流 · 未驗證假說</span>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.5rem">
-          <div style="background:var(--bg3);border:1px solid var(--border);padding:.5rem .6rem">
-            <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);margin-bottom:.2rem"><svg class="px-ic"><use href="#ic-pizza"/></svg> 披薩需求</div>
-            <div style="font-family:'Orbitron',monospace;font-size:.95rem;font-weight:700;color:var(--accent3)" id="overtime-pizza">--</div>
-          </div>
-          <div style="background:var(--bg3);border:1px solid var(--border);padding:.5rem .6rem">
-            <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);margin-bottom:.2rem">🍺 酒吧人流（反向）</div>
-            <div style="font-family:'Orbitron',monospace;font-size:.72rem;font-weight:700;color:var(--text-dim)" id="overtime-bar">待接資料源</div>
-          </div>
-        </div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text-dim);line-height:1.6" id="overtime-note">
-          判讀邏輯：披薩<strong style="color:var(--accent3)">爆單</strong> ＋ 酒吧下班後<strong style="color:var(--accent4)">異常冷清</strong>，僅是兩項人流觀測同時變動，不能證實軍方加班或行動。兩訊號仍可能受共同因素影響，降低偽陽性的效果尚未回測。
-        </div>
-        <div id="overtime-footnote" style="margin-top:.45rem;font-family:'Share Tech Mono',monospace;font-size:.6rem;color:rgba(255,255,255,.28)">
-          🍺 酒吧即時人流由 BestTime 提供，僅美東傍晚下班時段（16–24 時）查詢。非該時段或未營業時顯示待接/無資料。
-        </div>
-      </div>
     </div>
 
-    <!-- 披薩店監控（全寬） -->
-    <div>
-      <div class="section-title" style="font-size:.68rem"><svg class="px-ic"><use href="#ic-pizza"/></svg> 披薩店監控</div>
-      <div id="pizza-hourly-legend" hidden style="font-size:.75rem;color:var(--text-dim);margin:0 0 .4rem"></div>
-      <div class="pizza-tracker-grid" id="pizza-shops-grid">
-        <div style="grid-column:1/-1;text-align:center;padding:.8rem;font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim)">載入中…</div>
-      </div>
+    <div id="pizza-hourly-legend" hidden class="pz-legend"></div>
+    <div class="pizza-tracker-grid" id="pizza-shops-grid">
+      <div style="grid-column:1/-1;text-align:center;padding:.8rem;font-size:.75rem;color:var(--text-dim)">載入中…</div>
     </div>
 
-    <!-- 分隔線 -->
-    <div style="margin:.8rem 0;border-top:1px solid var(--border)"></div>
+    <div class="pz-bars">
+      <div class="pz-bars-hd">🍺 酒吧對照（反向訊號）</div>
+      <div id="pizza-bars-line" class="pz-bars-line">--</div>
+      <p class="pz-note">判讀：披薩店偏忙、同時附近酒吧下班後冷清，只代表兩項人流同向；可能是加班，也可能是天氣、球賽或假日，不能證實軍事行動。</p>
+    </div>
 
-    <section id="pizza-backtest" class="pizza-study" aria-label="PizzINT 48h"></section>
-    <details>
-    <summary>歷史軼聞（未納入回測）</summary>
-    <!-- 歷史事件橫向捲動 chips -->
-    <div class="section-title" style="font-size:.68rem;margin-bottom:.4rem">🕐 歷史 PizzINT 事件</div>
+    <details class="pz-lore">
+    <summary>歷史傳聞（未經驗證，不計分）</summary>
     <div class="ph-scroll">
       <div class="ph-chip"><div class="ph-chip-year">1983</div><div class="ph-chip-event">格瑞那達入侵前夕</div><div class="ph-chip-tag"><svg class="px-ic"><use href="#ic-pizza"/></svg> 激增</div></div>
       <div class="ph-chip"><div class="ph-chip-year">1990</div><div class="ph-chip-event">CIA 單夜訂 21 個披薩</div><div class="ph-chip-tag"><svg class="px-ic"><use href="#ic-pizza"/></svg>×21</div></div>
       <div class="ph-chip"><div class="ph-chip-year">1991</div><div class="ph-chip-event">沙漠風暴 101 筆外送</div><div class="ph-chip-tag"><svg class="px-ic"><use href="#ic-pizza"/></svg>×101</div></div>
-      <div class="ph-chip"><div class="ph-chip-year">2003</div><div class="ph-chip-event">伊拉克戰爭前</div><div class="ph-chip-tag"><svg class="px-ic"><use href="#ic-pizza"/></svg> 確認</div></div>
-      <div class="ph-chip"><div class="ph-chip-year">2011</div><div class="ph-chip-event">擊斃賓拉登當夜</div><div class="ph-chip-tag"><svg class="px-ic"><use href="#ic-pizza"/></svg><svg class="px-ic"><use href="#ic-pizza"/></svg><svg class="px-ic"><use href="#ic-pizza"/></svg></div></div>
-      <div class="ph-chip"><div class="ph-chip-year">2024-04-13</div><div class="ph-chip-event">伊朗無人機攻以</div><div class="ph-chip-tag"><svg class="px-ic"><use href="#ic-pizza"/></svg> 峰值</div></div>
-      <div class="ph-chip"><div class="ph-chip-year">2025-06-12</div><div class="ph-chip-event">以色列炸伊朗前 1h</div><div class="ph-chip-tag"><svg class="px-ic"><use href="#ic-pizza"/></svg> 確認</div></div>
-      <div class="ph-chip"><div class="ph-chip-year">2025-06-22</div><div class="ph-chip-event">川普宣布打擊伊朗</div><div class="ph-chip-tag"><svg class="px-ic"><use href="#ic-pizza"/></svg> 確認</div></div>
-      <div class="ph-chip"><div class="ph-chip-year">2026-01-02</div><div class="ph-chip-event">美軍馬杜羅行動前夜</div><div class="ph-chip-tag"><svg class="px-ic"><use href="#ic-pizza"/></svg> 確認</div></div>
-    </div>
-<div style="margin-top:.6rem;text-align:right">
-      <a href="https://www.pizzint.watch" target="_blank" rel="noopener" style="font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--accent4)">→ pizzint.watch ↗</a>
+      <div class="ph-chip"><div class="ph-chip-year">2003</div><div class="ph-chip-event">伊拉克戰爭前</div><div class="ph-chip-tag"><svg class="px-ic"><use href="#ic-pizza"/></svg> 傳聞</div></div>
+      <div class="ph-chip"><div class="ph-chip-year">2011</div><div class="ph-chip-event">擊斃賓拉登當夜</div><div class="ph-chip-tag"><svg class="px-ic"><use href="#ic-pizza"/></svg> 傳聞</div></div>
     </div>
     </details>
   </div><!-- /.pizza-bar-card -->
@@ -1642,7 +1562,7 @@
           <div class="wpi-f-desc" id="html-wpi-g-desc">全球新聞衝突報導強度</div>
         </div>
         <div class="wpi-factor">
-          <div class="wpi-f-hdr"><span class="wpi-f-icon"><svg class="px-ic"><use href="#ic-pizza"/></svg></span><span class="wpi-f-name">PizzINT <em>Z</em></span><span class="wpi-f-wt">×14%</span></div>
+          <div class="wpi-f-hdr"><span class="wpi-f-icon"><svg class="px-ic"><use href="#ic-pizza"/></svg></span><span class="wpi-f-name">披薩人流 <em>Z</em></span><span class="wpi-f-wt">×14%</span></div>
           <div class="wpi-f-bar-wrap"><div class="wpi-f-bar"><div class="wpi-f-fill" id="html-wpi-z-fill" style="width:0%"></div></div><div class="wpi-f-val" id="html-wpi-z-val">--</div></div>
           <div class="wpi-f-desc" id="html-wpi-z-desc">Pentagon Pizza 指數</div>
         </div>
@@ -1691,7 +1611,7 @@
     <div class="wpi-footer">
       <span id="html-wpi-updated">⟳ 計算中…</span>
       <span>·</span>
-      <span>Polymarket 28% · Aviation 18% · GDELT 10% · PizzINT 14% · FIRMS 10% · Sentiment 12% · Wiki焦慮 8%</span>
+      <span>Polymarket 28% · Aviation 18% · GDELT 10% · 披薩人流 14% · FIRMS 10% · Sentiment 12% · Wiki焦慮 8%</span>
       <span>·</span>
       <span style="color:rgba(255,255,255,.25)">僅供參考，非投資建議</span>
     </div>
@@ -2286,7 +2206,7 @@
     </details>
   </section>
   <footer>
-    <div class="footer-meta">WARHUBS // 戰情觀測站 &nbsp;|&nbsp; 資料來源：Polymarket · pizzint.watch · adsb.fi · NASA FIRMS / EONET · GDELT · USGS · Wikipedia &nbsp;|&nbsp; <a href="#disclaimer">免責聲明</a> &nbsp;|&nbsp; <span id="last-update-ts" style="color:var(--text-dim)">⏳ 等待後端資料…</span></div>
+    <div class="footer-meta">WARHUBS // 戰情觀測站 &nbsp;|&nbsp; 資料來源：Polymarket · BestTime · adsb.fi · NASA FIRMS / EONET · GDELT · USGS · Wikipedia &nbsp;|&nbsp; <a href="#disclaimer">免責聲明</a> &nbsp;|&nbsp; <span id="last-update-ts" style="color:var(--text-dim)">⏳ 等待後端資料…</span></div>
     <nav class="network-links" aria-label="SIMPLES 工具網">
       <a href="https://hypeboss.cc/" target="_blank" rel="noopener">HypeBoss 加密工具</a>
       <a href="https://stocktools.cc/" target="_blank" rel="noopener">Stocktools</a>
@@ -2346,214 +2266,75 @@ document.querySelectorAll('.meter-fill').forEach(bar => {
 
 
 // ═══════════════════════════════════════════════════════════════
-// 🍕 PIZZA ANOMALY ALERT ENGINE
+// 🍕 披薩人流（自有 BestTime 帳號；後端 scripts/pizza_traffic.py 判定狀態）
 // ═══════════════════════════════════════════════════════════════
-
-// 披薩店資料 — 含「基準值」與「當前值」
-// busyness = 當前 Google Popular Times 百分比 (0-100)
-// baseline = 同時段正常水準（用於計算偏差率）
-// dist = 距離五角大廈距離
-// 名稱必須與 scripts/fetch_data.py 的 SHOPS_TO_DISPLAY 完全相符
-// 資料來源：https://www.pizzint.watch/api/dashboard-data
-const PIZZA_SHOPS_DATA = [
-  { name: "We, The Pizza",                     busyness: null, baseline: 45, icon: "🍕", is_open: null, status: "unavailable" },
-  { name: "Pizzato Pizza",                     busyness: null, baseline: 40, icon: "🍕", is_open: null, status: "unavailable" },
-  { name: "Papa Johns Pizza",                  busyness: null, baseline: 38, icon: "🍕", is_open: null, status: "unavailable" },
-  { name: "Domino's Pizza (Pentagon Closest)", busyness: null, baseline: 35, icon: "🍕", is_open: null, status: "unavailable" },
-  { name: "Extreme Pizza",                     busyness: null, baseline: 30, icon: "🍕", is_open: null, status: "unavailable" },
-  { name: "District Pizza Palace",             busyness: null, baseline: 32, icon: "🍕", is_open: null, status: "unavailable" },
-];
-
-// 異常閾值設定
-const THRESHOLD = {
-  ELEVATED:  40,   // busyness > 40 → 偏高
-  HIGH:      60,   // busyness > 60 → 組合三
-  ANOMALY:   70,   // busyness > 70 → 異常（觸發戰爭警報）
+const PIZZA_STATUS_TEXT = {
+  spike:  ['🚨 爆單', 'var(--accent2)'], busy: ['偏忙', 'var(--accent3)'],
+  normal: ['正常', 'var(--accent)'],      quiet: ['比平常冷清', 'var(--accent)'],
+  closed: ['未營業', 'var(--text-dim)'],   waiting: ['等待查詢時段', 'var(--text-dim)'],
+  setup_needed: ['尚未建檔', 'var(--text-dim)'], unavailable: ['查詢失敗', 'var(--text-dim)'],
 };
+const PIZZA_LEVEL_TEXT = { spike: ['爆單', 'var(--accent2)'], busy: ['偏忙', 'var(--accent3)'], normal: ['正常', 'var(--accent)'] };
 
-// 多少家店異常才觸發紅色警報
-const ANOMALY_SHOPS_REQUIRED = 2;
-
-
-// ─── 評估當前披薩狀態 ────────────────────────────────────────
-function evaluatePizzaStatus(shops) {
-  const anomalyShops = shops.filter(s => s.status === "spike");
-  const highShops    = shops.filter(s => s.busyness >= THRESHOLD.HIGH && s.busyness < THRESHOLD.ANOMALY);
-  const avg          = shops.reduce((a,s) => a + s.busyness, 0) / shops.length;
-
-  let level, levelZh, gaugeColor;
-  if (anomalyShops.length >= ANOMALY_SHOPS_REQUIRED) {
-    level = 'ANOMALY'; levelZh = '⚠ 戰爭預警'; gaugeColor = '#ff2200';
-  } else if (anomalyShops.length === 1 || highShops.length >= 2) {
-    level = 'HIGH'; levelZh = '⚠ 組合三'; gaugeColor = '#ff8800';
-  } else if (avg >= THRESHOLD.ELEVATED) {
-    level = 'ELEVATED'; levelZh = '▲ 偏高'; gaugeColor = 'var(--accent3)';
-  } else {
-    level = 'NORMAL'; levelZh = '● 正常'; gaugeColor = 'var(--accent)';
-  }
-
-  return { level, levelZh, gaugeColor, anomalyShops, highShops, avg };
-}
-
-// ─── 渲染披薩店格子 ──────────────────────────────────────────
-function renderPizzaShops(shops) {
+function renderPizzaShops(shops, fallbackAt) {
   const grid = document.getElementById('pizza-shops-grid');
+  if (!grid) return;
+  if (!shops.length) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:.8rem;font-size:.75rem;color:var(--text-dim)">尚未取得披薩店資料</div>'; return; }
   shops.forEach(shop => { shop._chartDay = null; });
   grid.innerHTML = shops.map(shop => {
-    const isClosed   = shop.is_open === false || shop.status === 'closed';
-    const isAnomaly  = !isClosed && shop.status === "spike";
-    const isHigh     = !isClosed && shop.busyness >= THRESHOLD.HIGH && !isAnomaly;
-    // 優先用 pizzint 的「相對平時 %」（100 = 正常），否則退回本地 baseline 估算
-    let devStr;
-    if (shop.percentage_of_usual != null && shop.percentage_of_usual > 0) {
-      const dev = Math.round(shop.percentage_of_usual - 100);
-      devStr = `較平時 ${dev > 0 ? '+' : ''}${dev}%`;
-    } else {
-      devStr = '無可比較的基準';
-    }
-
-    let dotCls, statusColor, statusText;
-    if (shop.status === 'unavailable' || shop.busyness == null && !isClosed) {
-      dotCls='normal'; statusColor='var(--text-dim)'; statusText='無即時資料';
-    } else if (isClosed) {
-      dotCls = 'normal'; statusColor = 'rgba(255,255,255,0.25)';
-      statusText = '⬛ CLOSED';
-    } else if (shop.spike_magnitude) {
-      dotCls = 'high'; statusColor = 'var(--accent2)';
-      statusText = `🚨 ${shop.spike_magnitude} SPIKE (${shop.busyness}%)`;
-    } else if (isAnomaly) {
-      dotCls = 'high'; statusColor = 'var(--accent2)';
-      statusText = `🚨 ANOMALY (${shop.busyness}%)`;
-    } else if (isHigh) {
-      dotCls = 'medium'; statusColor = 'var(--accent3)';
-      statusText = `⚠ ELEVATED (${shop.busyness}%)`;
-    } else {
-      dotCls = 'normal'; statusColor = 'var(--accent)';
-      statusText = `✓ NORMAL (${shop.busyness}%)`;
-    }
-
-    // Mini bar
-    const barColor = isClosed ? 'rgba(255,255,255,0.1)' : isAnomaly ? 'var(--accent2)' : isHigh ? 'var(--accent3)' : 'var(--accent)';
-
-    return `<div class="pizza-shop" style="${isClosed ? 'opacity:0.7;' : isAnomaly ? 'border-color:rgba(255,77,94,0.4);background:rgba(255,30,0,0.05);' : ''}">
-      <div class="shop-name" style="${isClosed ? 'color:rgba(255,255,255,0.4);' : ''}"><svg class="px-ic"><use href="#ic-pizza"/></svg> ${shop.name}</div>
-      <div class="shop-status">
-        <div class="status-dot ${dotCls}"></div>
-        <span style="color:${statusColor};font-size:0.65rem;">${statusText}</span>
-      </div>
-      <div style="margin-top:0.4rem;">
-        <div style="height:3px;background:var(--bg);border:1px solid var(--border);overflow:hidden;">
-          <div style="height:100%;width:${isClosed ? 0 : (shop.busyness ?? 0)}%;background:${barColor};transition:width 1s;"></div>
-        </div>
-        ${pizzaHourlyChart(shop, isClosed ? 'var(--accent)' : barColor) || sparklineSvg(shop.sparkline, barColor)}
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:rgba(255,255,255,0.25);margin-top:0.2rem;text-align:right;">
-          ${isClosed ? '目前未營業' : '<span style=\"font-weight:700;\">' + devStr + '</span>'}${shop.data_source === 'besttime' && shop.busyness != null ? '<div class=\"pizza-src\">來源：BestTime 備援</div>' : ''}
-        </div>
-      </div>
+    const [label, color] = PIZZA_STATUS_TEXT[shop.status] || PIZZA_STATUS_TEXT.unavailable;
+    const live = typeof shop.busyness === 'number';
+    const hot = shop.status === 'spike' || shop.status === 'busy';
+    const pct = typeof shop.percentage_of_usual === 'number' ? Math.round(shop.percentage_of_usual) : null;
+    const reading = live
+      ? `現在 ${shop.busyness}%${typeof shop.usual_now === 'number' ? ` · 平常 ${shop.usual_now}%` : ''}${pct != null ? ` · 為平常的 ${pct}%` : ''}`
+      : '';
+    const barColor = hot ? color : 'var(--accent)';
+    return `<div class="pizza-shop" style="${hot ? 'border-color:rgba(255,77,94,0.4);' : ''}">
+      <div class="shop-name"><svg class="px-ic"><use href="#ic-pizza"/></svg> ${escapeHtml(shop.name)}</div>
+      <div class="shop-status"><span style="color:${color};font-size:.75rem;font-weight:700">${label}</span></div>
+      ${pizzaHourlyChart(shop, barColor, fallbackAt)}
+      <div class="pz-why">${reading}</div>
     </div>`;
   }).join('');
-  // 圖例只顯示一次（每張卡都有同樣的長條圖）
   const legend = document.getElementById('pizza-hourly-legend');
   const day = (shops.find(x => x._chartDay) || {})._chartDay;
   if (legend) {
     legend.hidden = !day;
-    legend.innerHTML = day ? '<span>每小時人潮</span> · <span>華府時間</span> · <span>灰色是平常</span> <span>' + day + '</span> · <span>亮色是今天實測</span> · <span>虛線框是資料時間</span>' : '';
+    legend.innerHTML = day ? '<span>每小時人潮</span> · <span>華府時間</span> · <span>灰色是平常</span> <span>' + day + '</span> · <span>亮色是實測</span> · <span>虛線框是資料時間</span>' : '';
   }
 }
 
-// ─── 渲染警報橫幅 ─────────────────────────────────────────────
-function renderWarAlert(status, shops) {
-  const alertEl  = document.getElementById('pizza-war-alert');
-  const cardEl   = document.getElementById('pizza-card');
-  const normalHd = document.getElementById('pizza-normal-header');
-  const levelLbl = document.getElementById('alert-level-label');
-  const mainTxt  = document.getElementById('alert-main-text');
-  const shopsCnt = document.getElementById('alert-shops-count');
-  const bullets  = document.getElementById('alert-bullets');
-  const gaugeEl  = document.getElementById('pizza-gauge-fill');
-  const gaugePct = document.getElementById('pizza-gauge-pct');
-  const levelNum = document.getElementById('pizza-level-num');
-
-  const gaugeVal = Math.round(status.avg);
-  if (gaugeEl) gaugeEl.style.width = gaugeVal + '%';
-  if (gaugePct) {
-    gaugePct.textContent = gaugeVal + '%';
-    gaugePct.style.color = status.gaugeColor;
+function renderPizzaBars(json) {
+  const el = document.getElementById('pizza-bars-line');
+  if (!el) return;
+  const b = json?.bars || {};
+  if (!b.available) {
+    el.textContent = /下班/.test(b.reason || '') ? '等待查詢時段（美東 16–24 時）' : '本輪沒有酒吧即時資料';
+    el.style.color = 'var(--text-dim)';
+    return;
   }
-
-  if (levelNum) {
-    levelNum.textContent = status.levelZh;
-    levelNum.style.color = status.gaugeColor;
-  }
-
-  const levelLabelEl = document.getElementById('pizza-level-label');
-  if (levelLabelEl) {
-    levelLabelEl.textContent = status.level;
-    levelLabelEl.style.color = status.gaugeColor;
-  }
-
-  const badgeEl = null; // 整體狀態由後端模型統一呈現，不能用餐廳人流判定。
-
-  if (status.level === 'ANOMALY') {
-    // 顯示戰爭警報
-    if (alertEl) alertEl.style.display = 'block';
-    if (cardEl)  cardEl.classList.add('anomaly');
-
-    const anomCount = status.anomalyShops.length;
-
-    if (levelLbl) levelLbl.textContent = `CRITICAL ANOMALY — ${anomCount} 家店觸發`;
-    if (mainTxt)  mainTxt.innerHTML = `<svg class="px-ic"><use href="#ic-pizza"/></svg> 披薩人流<strong style="color:var(--accent2)">嚴重偏離基準</strong> — 原因待核對；尚未驗證軍事行動預測能力`;
-    if (shopsCnt) shopsCnt.textContent = `${anomCount} / ${shops.length}`;
-
-    // 動態 bullet 列表（離線 fallback；有後端資料時由 applyPizzintIntel 覆蓋）
-    const topShop = [...shops].sort((a,b) => b.busyness - a.busyness)[0];
-    const topDev  = Math.round(((topShop.busyness - topShop.baseline) / topShop.baseline) * 100);
-    if (bullets) bullets.innerHTML = `
-      <div style="color:var(--accent2);">▶ ${topShop.name} 繁忙度較基準高出 <strong>+${topDev}%</strong></div>
-      <div style="color:var(--accent3);">▶ ${anomCount} 家店同時出現深夜異常高峰，原因待查，不能推論軍事活動</div>
-      <div style="color:var(--text-dim);">▶ 建議同步觀察：右方地區風險看板與 GDELT 新聞強度</div>`;
-
-    // 更新 header 警戒狀態
-    if (badgeEl) {
-      badgeEl.style.borderColor = 'var(--accent2)';
-      badgeEl.style.color = 'var(--accent2)';
-      badgeEl.innerHTML = '<svg class="px-ic"><use href="#ic-pizza"/></svg> 披薩異常 PIZZA ANOMALY';
-    }
-
-  } else if (status.level === 'HIGH') {
-    if (alertEl) alertEl.style.display = 'block';
-    if (cardEl)  cardEl.classList.remove('anomaly');
-    if (levelLbl) levelLbl.textContent = 'HIGH ACTIVITY';
-    if (mainTxt)  mainTxt.innerHTML = `<svg class="px-ic"><use href="#ic-pizza"/></svg> 披薩指數<strong style="color:var(--accent3)">偏高</strong> — 多店人流高於比較基準；不代表已取得外送訂單或軍方活動資料`;
-    if (shopsCnt) shopsCnt.textContent = `${status.highShops.length + status.anomalyShops.length} / ${shops.length}`;
-    if (bullets) bullets.innerHTML = `
-      <div style="color:var(--accent3);">▶ 高活躍度店家：${status.highShops.concat(status.anomalyShops).map(s=>s.name).join('、')}</div>
-      <div style="color:var(--text-dim);">▶ 當前水準：偏高，但尚未達到 ANOMALY 閾值（需 ≥${THRESHOLD.ANOMALY}%）</div>
-      <div style="color:var(--text-dim);">▶ 建議持續觀察，若再有 1 家店升至異常，將升為戰爭警報</div>`;
-
-    if (badgeEl) {
-      badgeEl.style.borderColor = 'var(--accent3)';
-      badgeEl.style.color = 'var(--accent3)';
-      badgeEl.textContent = '威脅 組合三';
-    }
-
-  } else {
-    // 正常狀態 — 隱藏警報，header 徽章同步顯示目前等級
-    if (alertEl) alertEl.style.display = 'none';
-    if (cardEl)  cardEl.classList.remove('anomaly');
-    if (badgeEl) {
-      badgeEl.style.borderColor = status.gaugeColor;
-      badgeEl.style.color = status.gaugeColor;
-      badgeEl.textContent = `威脅等級 ${status.level}`;
-    }
-  }
+  const empt = b.emptiness ?? 0, delta = b.avg_delta ?? 0;
+  const s = empt >= 25 ? ['異常冷清', 'var(--accent2)'] : empt >= 12 ? ['偏冷清', 'var(--accent3)']
+    : delta > 10 ? ['比平常熱鬧', 'var(--accent)'] : ['正常', 'var(--accent)'];
+  el.textContent = `${s[0]}（比平常 ${delta >= 0 ? '+' : ''}${delta}%，${b.open_count}/${b.total} 家有即時資料）`;
+  el.style.color = s[1];
 }
 
-// ─── 主初始化 ─────────────────────────────────────────────────
-function initPizzaSystem() {
-  const status = evaluatePizzaStatus(PIZZA_SHOPS_DATA);
-  renderPizzaShops(PIZZA_SHOPS_DATA);
-  renderWarAlert(status, PIZZA_SHOPS_DATA);
+function renderPizzaLevel(json) {
+  const sum = json?.pizza_summary || {};
+  const lv = document.getElementById('pizza-level'), ix = document.getElementById('pizza-index');
+  const [t, c] = PIZZA_LEVEL_TEXT[sum.level] || ['--', 'var(--text-dim)'];
+  if (lv) { lv.textContent = t; lv.style.color = c; }
+  if (ix) ix.textContent = typeof sum.index === 'number' ? `異常指數 ${Math.round(sum.index)} / 100` : '異常指數：資料不足';
+}
+
+function renderPizzaBlock(json) {
+  const shops = Array.isArray(json?.pizza) ? json.pizza : [];
+  renderPizzaShops(shops, json?.updated_at);
+  renderPizzaLevel(json);
+  renderPizzaBars(json);
+  renderPizzaRadar(json);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -2563,7 +2344,7 @@ function initPizzaSystem() {
 const HTML_WPI_WEIGHTS = { p:0.28, a:0.18, g:0.10, z:0.14, f:0.10, s:0.12, w:0.08 };
 
 // WPI has one authority: the versioned backend score used by history and notifications.
-const HTML_WPI_STATE = {poly:[], avi:{}, firms:{}, finance:{assets:[]}, pizza:[], gdelt:null, pizzint:null, wiki:null, spikes:false};
+const HTML_WPI_STATE = {poly:[], avi:{}, firms:{}, finance:{assets:[]}, pizza:[], gdelt:null, wiki:null, spikes:false};
 let BACKEND_SCORE = null;
 let OBSERVED_DATA = null;
 document.addEventListener("warhub-i18n-ready",()=>{if(OBSERVED_DATA)window.WarhubI18n.registerData(OBSERVED_DATA);});
@@ -2756,7 +2537,7 @@ async function fetchRealPizzaData() {
     const live=document.querySelector('.live-lbl');
     if(live)live.textContent=age >= 0 && age < 6*3600000 ? (backupSnapshot?'備份資料快照':'定期資料快照') : '資料已過期';
     if(json.score?.model_version !== 'wpi-4.0') {
-      json.polymarket=[]; json.pizza_index=null; json.defcon_level=null;
+      json.polymarket=[]; json.pizza_index=null;
       const list=document.getElementById('poly-list-container');if(list)list.textContent='舊版盤口尚未核驗，等待新版資料。';
       const poly=document.getElementById('poly-updated-time');if(poly)poly.textContent='等待新版市場篩選資料';
     }
@@ -2764,6 +2545,7 @@ async function fetchRealPizzaData() {
 
     if(json.score?.model_version !== 'wpi-4.0' || !(age>=0 && age<6*3600000)) {
       json.pizza=(json.pizza||[]).map(s=>({...s,busyness:null,is_open:null,status:'unavailable',spike:false,percentage_of_usual:null}));
+      json.pizza_summary={...(json.pizza_summary||{}),level:null,index:null};
     }
     for(const source of ['food','strat']) {
       if(json[source]?.schema_version !== 2) {
@@ -2771,29 +2553,9 @@ async function fetchRealPizzaData() {
       }
     }
 
-    // 用後端資料覆蓋 PIZZA_SHOPS_DATA（保留 icon 等前端專屬欄位）
     try {
-      const byName = Object.fromEntries((json.pizza || []).map(s => [s.name, s]));
-      PIZZA_SHOPS_DATA.forEach(shop => {
-        const incoming = byName[shop.name];
-        if (!incoming) return;
-        shop.busyness = incoming.busyness ?? null;
-        shop.is_open  = incoming.is_open ?? null;
-        shop.status   = incoming.status  ?? (incoming.is_open ? 'open' : 'closed');
-        if (incoming.baseline) shop.baseline = incoming.baseline;
-        shop.percentage_of_usual = incoming.percentage_of_usual;
-        shop.spike_magnitude     = incoming.spike ? incoming.spike_magnitude : null;
-        shop.sparkline           = incoming.sparkline || null;
-        shop.hourly_24h          = Array.isArray(incoming.hourly_24h) ? incoming.hourly_24h : null;
-        shop.usual_week          = incoming.usual_week || null;
-        shop.recorded_at         = incoming.recorded_at || null;
-        shop.data_source         = incoming.data_source || null;
-      });
-
-      const status = evaluatePizzaStatus(PIZZA_SHOPS_DATA);
-      renderPizzaShops(PIZZA_SHOPS_DATA);
-      renderWarAlert(status, PIZZA_SHOPS_DATA);
-      HTML_WPI_STATE.pizza = PIZZA_SHOPS_DATA.map(s => ({ busyness: s.busyness }));
+      renderPizzaBlock(json);
+      HTML_WPI_STATE.pizza = (json.pizza || []).map(s => ({ busyness: s.busyness }));
     } catch(err) { console.warn('[WARHUBS] pizza render error:', err.message); }
 
     // 同步渲染 Polymarket 卡片（使用後端已篩選好的戰爭/衝突相關市場）
@@ -2810,28 +2572,18 @@ async function fetchRealPizzaData() {
       }
     } catch(err) { console.warn('[WARHUBS] polymarket render error:', err.message); }
 
-    // 地區風險看板 + WPI 新因子 + 核試監測 + PizzINT 深度情報
+    // 地區風險看板 + WPI 新因子 + 核試監測
     try {
       if (json.gdelt && Object.keys(json.gdelt).length) HTML_WPI_STATE.gdelt = json.gdelt;
-      if (json.defcon_details?.smoothed_index != null) HTML_WPI_STATE.pizzint = json.defcon_details.smoothed_index;
       if (json.wikipedia?.score != null) HTML_WPI_STATE.wiki = json.wikipedia.score;
       HTML_WPI_STATE.spikes = !!(json.pizza_events && json.pizza_events.length);
       if (Array.isArray(json.regions) && json.regions.length) {
         renderRegions(json.regions);
-        renderPizzaRadar(json);
       }
       renderHero(json);
-      window.renderPizzaBacktest?.(json.pizza_backtest);
       window.renderKalshiMarkets?.(json.kalshi);
       try { renderWarMap(json); } catch(e){ console.warn('[WARHUBS] renderWarMap error:', e.message); }
       if (json.nuclear_seismic) renderNuclearSeismic(json.nuclear_seismic);
-      applyPizzintIntel(json);
-      if(json.pizza_index == null) {
-        for(const id of ['pizza-gauge-pct','pizza-level-num','pizza-level-label','overtime-pizza']) {
-          const el=document.getElementById(id); if(el)el.textContent='無即時人流資料';
-        }
-        const fill=document.getElementById('pizza-gauge-fill');if(fill)fill.style.width='0%';
-      }
     } catch(err) { console.warn('[WARHUBS] intel render error:', err.message); }
 
     // 用即時資料重建 INTEL FEED 跑馬燈
@@ -2927,31 +2679,23 @@ function renderPizzaRadar(json) {
   const el = document.getElementById('pizza-radar-summary');
   if (!el) return;
   const shops = Array.isArray(json?.pizza) ? json.pizza : [];
-  const live = shops.filter(s => s && s.is_open && typeof s.busyness === 'number');
-  const pct = s => typeof s.percentage_of_usual === 'number' && Number.isFinite(s.percentage_of_usual) ? s.percentage_of_usual : null;
-  const busy = live.filter(s => s.spike || (pct(s) ?? 0) >= 120);
-  const top = live.map(pct).filter(v => v != null).sort((a, b) => b - a)[0];
-  const now = new Date();
-  // Explain the snapshot by its own observation time, not the viewer's clock (data can be hours old).
-  const stamps = shops.map(s => Date.parse(s?.recorded_at)).filter(Number.isFinite);
-  const obs = stamps.length ? new Date(Math.max(...stamps)) : null;
-  const dc = obs ? obs.toLocaleTimeString('zh-TW', {timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit', hour12: false}) : null;
-  const etHour = Number(now.toLocaleString('en-US', {timeZone: 'America/New_York', hour: 'numeric', hour12: false})) % 24;
-  const bars = json?.bars || {};
-  const barsList = Array.isArray(bars.bars) ? bars.bars : [];
-  let headline, tone;
-  if (!shops.length) { headline = '尚未取得披薩店資料'; tone = 'dim'; }
-  else if (!live.length && shops.every(s => s && s.data_source === 'none')) { headline = '披薩人流來源目前暫停提供即時資料（不是店家打烊）'; tone = 'dim'; }
-  else if (!live.length) { headline = `${dc ? `華府 ${dc} 的資料：` : ''}${shops.length} 家店都沒有即時人流`; tone = 'dim'; }
-  else if (busy.length) { headline = `${busy.length} 家店人流高於平常${top != null ? `（最高為平常的 ${Math.round(top)}%）` : ''}`; tone = 'hot'; }
-  else { headline = `${live.length}/${shops.length} 家店營業中，人流在平常範圍內`; tone = 'ok'; }
-  const barText = bars.available && barsList.length
-    ? `酒吧：${barsList.length} 家有資料`
-    : (/下班/.test(bars.reason || '') ? '酒吧：只在美東下班時段查詢' : '酒吧：本輪無資料');
-  const hoursToWindow = etHour >= 16 ? 0 : 16 - etHour;
-  const next = !live.length && hoursToWindow > 0 ? ` · 約 ${hoursToWindow} 小時後（美東 16:00）進入下班時段` : '';
+  const sum = json?.pizza_summary || {};
+  const live = shops.filter(s => s && typeof s.busyness === 'number');
+  const hot = live.filter(s => s.status === 'spike' || s.status === 'busy');
+  const top = hot.map(s => s.percentage_of_usual).filter(v => typeof v === 'number').sort((a, b) => b - a)[0];
+  const at = Date.parse(sum.queried_at);
+  const dc = Number.isFinite(at) ? new Date(at).toLocaleTimeString('zh-TW', {timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit', hour12: false}) : null;
+  const etHour = Number(new Date().toLocaleString('en-US', {timeZone: 'America/New_York', hour: 'numeric', hour12: false})) % 24;
+  const wait = etHour >= 16 ? '' : `約 ${16 - etHour} 小時後（美東 16:00）開始查詢`;
+  let headline, detail, tone = 'dim';
+  if (!shops.length) { headline = '尚未取得披薩店資料'; detail = ''; }
+  else if (sum.state === 'setup_needed') { headline = '披薩店尚未在 BestTime 建檔，還沒有人流資料'; detail = '建檔完成後，每天美東 16–24 時會自動更新。'; }
+  else if (sum.state === 'off_hours') { headline = '現在不是查詢時段'; detail = `即時人流只在美東 16–24 時查詢${wait ? '；' + wait : ''}。灰色長條是平常人流。`; }
+  else if (!live.length) { headline = `華府 ${dc || '--'} 查詢：${shops.length} 家店都沒有即時人流`; detail = '沒有即時值不等於店家打烊。'; }
+  else if (hot.length) { headline = `${hot.length} 家店人流高於平常${top != null ? `（最高為平常的 ${Math.round(top)}%）` : ''}`; detail = `華府 ${dc || '--'} 的資料。`; tone = 'hot'; }
+  else { headline = `${live.length}/${shops.length} 家店有即時人流，都在平常範圍內`; detail = `華府 ${dc || '--'} 的資料。`; tone = 'ok'; }
   el.className = 'pizza-radar-summary ' + tone;
-  el.innerHTML = `<strong>${escapeHtml(headline)}</strong><span>${barText}${next}。人流變化不等於軍事行動，需交叉查證。</span>`;
+  el.innerHTML = `<strong>${escapeHtml(headline)}</strong><span>${escapeHtml(detail)}人流變化不等於軍事行動，需交叉查證。</span>`;
 }
 
 // ─── 歷史趨勢 ─────────────────────────────────────────────────
@@ -3010,7 +2754,7 @@ function renderHero(json) {
     }).join('');
   }
 
-  // 當前最重要警報（優先序：pizzint spike > CRITICAL/HIGH 地區 > wiki 焦慮激增 > 無警報）
+  // 當前最重要警報（優先序：披薩爆單 > CRITICAL/HIGH 地區 > wiki 焦慮激增 > 無警報）
   const alertEl = document.getElementById('hero-alert');
   if (!alertEl) return;
   const upd = json.updated_at ? new Date(json.updated_at).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }) : '--';
@@ -3018,7 +2762,7 @@ function renderHero(json) {
   const ev = (json.pizza_events || [])[0];
   const hotRegion = (json.regions || []).find(r => r.level === 'CRITICAL' || r.level === 'HIGH');
   if (ev) {
-    line = `🚨 PizzINT ${escapeHtml(ev.spike_magnitude || 'SPIKE')}：${escapeHtml(ev.place_name || '')} 達平時 ${Math.round(ev.percentage_of_usual || 0)}%`;
+    line = `🚨 披薩爆單：${escapeHtml(ev.place_name || '')} 為平常的 ${Math.round(ev.percentage_of_usual || 0)}%`;
     color = 'var(--accent2)';
   } else if (hotRegion) {
     line = `⚠️ ${hotRegion.flag} ${escapeHtml(hotRegion.name)} 風險 ${Math.round(hotRegion.score)} 分 [${hotRegion.level}]`;
@@ -3173,133 +2917,6 @@ function renderNuclearSeismic(ns) {
     `<div style="margin-top:.3rem;font-size:.6rem;color:rgba(255,255,255,.25)">篩選：試驗場 150km 內；淺層地震也可能為自然成因，不能據此認定核試 · 資料：USGS</div>`;
 }
 
-// ─── PizzINT 深度情報：後端 DEFCON 演算法 + spike 事件 ────────
-function applyPizzintIntel(json) {
-  const dd = json.defcon_details;
-  if (dd?.smoothed_index != null) {
-    const idx = Math.round(dd.smoothed_index);
-    const gaugeEl  = document.getElementById('pizza-gauge-fill');
-    const gaugePct = document.getElementById('pizza-gauge-pct');
-    const levelNum = document.getElementById('pizza-level-num');
-    const levelLbl = document.getElementById('pizza-level-label');
-    const lv = json.defcon_level;
-    const color = lv <= 2 ? '#ff2200' : lv === 3 ? '#ff8800' : lv === 4 ? 'var(--accent3)' : 'var(--accent)';
-    if (gaugeEl)  gaugeEl.style.width = idx + '%';
-    if (gaugePct) { gaugePct.textContent = idx + '%'; gaugePct.style.color = color; }
-    if (levelNum && lv != null) { levelNum.textContent = `DEFCON ${lv}`; levelNum.style.color = color; }
-    if (levelLbl) {
-      levelLbl.textContent = `指數 ${idx} · 強度 ${dd.intensity_score ?? '--'} · 廣度 ${dd.breadth_score ?? '--'}`;
-      levelLbl.style.color = color;
-    }
-
-    // 加班指數：披薩需求（真實，由 DEFCON 演算）；酒吧待接資料源
-    const otPizza = document.getElementById('overtime-pizza');
-    if (otPizza) {
-      const spike = !!(json.pizza_events && json.pizza_events.length);
-      const demand = spike ? { t: '🚨 爆單', c: 'var(--crit)' }
-        : lv <= 2 ? { t: '極高', c: '#ff2200' }
-        : lv === 3 ? { t: '偏高', c: 'var(--accent2)' }
-        : lv === 4 ? { t: '正常', c: 'var(--accent3)' }
-        : { t: '偏低', c: 'var(--accent)' };
-      otPizza.textContent = `${demand.t}（DEFCON ${lv ?? '--'}）`;
-      otPizza.style.color = demand.c;
-    }
-
-    // 酒吧人流（反向）：由 BestTime 即時資料驅動
-    // 冷清度分級（前端統一常數：卡片與交叉判讀共用，避免各處門檻不一）
-    const EMPT_CRIT = 25;   // 異常冷清 → 加班強訊號
-    const EMPT_WARN = 12;   // 偏冷清 → 加班弱訊號
-    const otBar = document.getElementById('overtime-bar');
-    const b = json.bars;
-    if (otBar) {
-      if (!b || !b.available) {
-        const reason = b?.reason || '';
-        otBar.textContent = reason.includes('BESTTIME') ? '待接資料源'
-          : reason.includes('非下班') ? '非下班時段'
-          : '無即時資料';
-        otBar.style.color = 'var(--text-dim)';
-        otBar.style.fontSize = '.72rem';
-      } else {
-        const empt = b.emptiness ?? 0;   // 比平時安靜多少（%）
-        const delta = b.avg_delta ?? 0;
-        const deltaTxt = `${delta >= 0 ? '+' : ''}${delta}%`;
-        // 異常冷清 = 加班訊號（紅）；正常/熱鬧 = 綠
-        const s = empt >= EMPT_CRIT ? { t: `🚨 異常冷清 ${deltaTxt}`, c: 'var(--crit)' }
-          : empt >= EMPT_WARN ? { t: `偏冷清 ${deltaTxt}`, c: 'var(--accent2)' }
-          : delta > 10 ? { t: `熱鬧 ${deltaTxt}`, c: 'var(--accent)' }
-          : { t: `正常 ${deltaTxt}`, c: 'var(--accent3)' };
-        otBar.innerHTML = `${s.t} <span style="font-size:.66rem;color:var(--text-dim)">（${b.open_count}/${b.total} 開）</span>`;
-        otBar.style.color = s.c;
-        otBar.style.fontSize = '.82rem';
-      }
-    }
-
-    // 加班交叉判讀：披薩爆單 + 酒吧異常冷清（分級：強確認／兩項觀測同向／未觸發）
-    const otNote = document.getElementById('overtime-note');
-    if (otNote && b && b.available) {
-      const spike = !!(json.pizza_events && json.pizza_events.length);
-      const pizzaHot = spike || lv <= 3;
-      const empt = b.emptiness ?? 0;
-      if (pizzaHot && empt >= EMPT_CRIT) {
-        otNote.innerHTML = `🚨 <strong style="color:var(--crit)">兩項實驗觀測同向</strong>：披薩需求${spike ? '爆單' : '偏高'} ＋ 酒吧異常冷清（比平時安靜 ${empt}%）— 兩項人流觀測同向，仍可能受共同因素影響；不能證實軍方加班，誤報率尚未回測。`;
-      } else if (pizzaHot && empt >= EMPT_WARN) {
-        otNote.innerHTML = `⚠️ <strong style="color:var(--accent2)">兩項觀測同向</strong>：披薩${spike ? '爆單' : '偏高'} ＋ 酒吧偏冷清（比平時安靜 ${empt}%）— 兩項人流觀測同向，原因未定；不能證實軍方加班。`;
-      } else {
-        otNote.innerHTML = `判讀邏輯：披薩<strong style="color:var(--accent3)">爆單</strong> ＋ 酒吧下班後<strong style="color:var(--accent4)">異常冷清</strong>；原因待查，不推定軍方加班。目前：披薩${pizzaHot ? '偏高' : '正常'}、酒吧${empt >= EMPT_WARN ? '偏冷清' : '正常'} — 未同時觸發。`;
-      }
-    }
-  }
-
-  // ── 警報橫幅：完全由 pizzint.watch 官方 spike 事件驅動 ──
-  // 沒有 spike 事件時隱藏（此函式在真實資料路徑最後執行，覆蓋 renderWarAlert 的判斷）
-  const alertEl = document.getElementById('pizza-war-alert');
-  const events = [...(json.pizza_events || [])]
-    .sort((a, b) => (b.percentage_of_usual || 0) - (a.percentage_of_usual || 0));
-
-  if (!events.length) {
-    if (alertEl) alertEl.style.display = 'none';
-    document.getElementById('pizza-card')?.classList.remove('anomaly');
-    return;
-  }
-
-  const top = events[0];
-  const mag = top.spike_magnitude || 'SPIKE';
-  const magColor = mag === 'EXTREME' ? 'var(--crit)' : mag === 'HIGH' ? 'var(--accent2)' : 'var(--accent3)';
-
-  if (alertEl) alertEl.style.display = 'block';
-  document.getElementById('pizza-card')?.classList.add('anomaly');
-
-  const mainTxt = document.getElementById('alert-main-text');
-  if (mainTxt) mainTxt.innerHTML = `<svg class="px-ic"><use href="#ic-pizza"/></svg> pizzint.watch 偵測到 <strong style="color:${magColor}">${escapeHtml(mag)}</strong> 異常 — ${escapeHtml(top.place_name || '')} 繁忙度達平時 <strong>${Math.round(top.percentage_of_usual || 0)}%</strong>（${top.minutes_ago ?? '--'} 分鐘前）`;
-
-  const trigEl = document.getElementById('triggered-shops');
-  if (trigEl) trigEl.textContent = `${events.length} / ${json.pizza?.length ?? '--'}`;
-
-  const magEl = document.getElementById('alert-magnitude');
-  if (magEl) { magEl.textContent = mag; magEl.style.color = magColor; }
-
-  // 逐一列出真實 spike 事件 + 交叉驗證線索（用我們自己算的地區風險/新聞強度）
-  const bulletsEl = document.getElementById('alert-bullets');
-  if (bulletsEl) {
-    const evLines = events.slice(0, 4).map(e => {
-      const pct = Math.round(e.percentage_of_usual || 0);
-      const dev = pct - 100;
-      const c = (e.spike_magnitude === 'EXTREME') ? 'var(--crit)' : 'var(--accent2)';
-      return `<div style="color:${c}">▶ ${escapeHtml(e.place_name || '?')} 達平時 ${pct}%（較基準 ${dev >= 0 ? '+' : ''}${dev}%${e.minutes_ago != null ? `，${e.minutes_ago} 分前` : ''}）</div>`;
-    });
-    const mideast = (json.regions || []).find(r => r.key === 'mideast');
-    const gAvg = json.gdelt ? (() => {
-      const v = Object.values(json.gdelt).map(x => x.latest || 0);
-      return v.length ? (v.reduce((s, x) => s + x, 0) / v.length).toFixed(2) : null;
-    })() : null;
-    const cross = [];
-    if (mideast) cross.push(`中東地區風險 ${Math.round(mideast.score)} 分 [${mideast.level}]`);
-    if (gAvg) cross.push(`全球新聞衝突強度 ${gAvg}%`);
-    if (cross.length) evLines.push(`<div style="color:var(--text-dim)">▶ 交叉參照：${cross.join(' · ')}</div>`);
-    bulletsEl.innerHTML = evLines.join('');
-  }
-}
-
 // ─── 披薩店 24 小時長條圖：灰 = Google 平常人潮，亮 = 今天實測（皆為華府時間）───
 const ET_PARTS = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', weekday: 'short', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', hourCycle: 'h23' });
 const PIZZA_WEEKDAYS = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
@@ -3310,9 +2927,9 @@ function etParts(ts) {
   const p = Object.fromEntries(ET_PARTS.formatToParts(new Date(t)).map(x => [x.type, x.value]));
   return { day: ET_WEEKDAY[p.weekday], date: `${p.year}-${p.month}-${p.day}`, hour: Number(p.hour) % 24 };
 }
-function pizzaHourlyChart(shop, color) {
+function pizzaHourlyChart(shop, color, fallbackAt) {
   const live = (shop.hourly_24h || []).map(r => ({ ...etParts(r && r.at), v: r && r.v })).filter(r => r.date);
-  const stamps = [shop.recorded_at, ...(shop.hourly_24h || []).map(r => r && r.at)].filter(t => isFinite(Date.parse(t)));
+  const stamps = [shop.recorded_at, ...(shop.hourly_24h || []).map(r => r && r.at), fallbackAt].filter(t => isFinite(Date.parse(t)));
   if (!stamps.length) return '';
   const now = etParts(stamps.reduce((a, b) => Date.parse(a) >= Date.parse(b) ? a : b));
   const usual = (shop.usual_week || {})[String(now.day)] || [];
@@ -3337,20 +2954,6 @@ function pizzaHourlyChart(shop, color) {
     <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true" style="width:100%;height:44px;display:block;border-bottom:1px solid var(--border)">${bars}</svg>
     <div style="position:relative;height:12px;font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-top:2px">${[first, 12, 18, 23].filter((h, i, a) => h >= first && a.indexOf(h) === i).map(tick).join('')}</div>
   </div>`;
-}
-
-// ─── 迷你 sparkline SVG（披薩店 24h 趨勢）─────────────────────
-function sparklineSvg(points, color) {
-  const vals = (points || []).map(v => v == null ? null : Math.max(0, Math.min(100, v)));
-  if (vals.filter(v => v != null).length < 2) return '';
-  const W = 100, H = 20, n = vals.length;
-  const pts = [];
-  vals.forEach((v, i) => {
-    if (v != null) pts.push(`${((i / (n - 1)) * W).toFixed(1)},${(H - 2 - (v / 100) * (H - 4)).toFixed(1)}`);
-  });
-  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:20px;display:block;margin-top:.3rem;opacity:.85">
-    <polyline points="${pts.join(' ')}" fill="none" stroke="${color}" stroke-width="1.5"/>
-  </svg>`;
 }
 
 // ─── INTEL FEED 跑馬燈：用 data.json 即時資料重建 ─────────────
@@ -4166,7 +3769,7 @@ function escapeHtml(s) {
 }
 
 // 啟動
-initPizzaSystem();
+renderPizzaBlock({});
 fetchRealPizzaData();                            // 立即抓一次
 setInterval(fetchRealPizzaData, 5 * 60 * 1000);  // 之後每 5 分鐘抓
 

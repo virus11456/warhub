@@ -4,9 +4,8 @@ WarHub - 靜態網站資料抓取器
 由 GitHub Actions 每 15 分鐘執行，輸出 data/data.json 供前端讀取。
 
 資料來源：
-- Pizza 指數: pizzint.watch 公開 API（/api/dashboard-data）
+- Pizza 指數: 自有 BestTime 帳號（Google 熱門時段；見 scripts/pizza_traffic.py）
   ─ Pentagon 周邊披薩店即時繁忙度、24h sparkline、DEFCON 等級
-  ─ Credit: https://www.pizzint.watch/
 - Polymarket: gamma-api.polymarket.com 公開 API
   ─ 戰爭/衝突相關預測市場
 - AVI 軍機追蹤: api.adsb.lol/v2/mil
@@ -35,7 +34,6 @@ except ImportError:  # Python < 3.9
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 log = logging.getLogger("warhub")
 
-PIZZINT_API     = "https://www.pizzint.watch/api/dashboard-data"
 POLYMARKET_API  = "https://gamma-api.polymarket.com/markets"
 # Public ADS-B "/mil" feeds — try in order, both return identical schema
 ADSB_MIL_FEEDS  = [
@@ -67,17 +65,6 @@ PLA_HISTORY_FILE = DATA_DIR / "pla_adiz.json"
 # 全指標每日快照長期封存（每日一筆、保留 ~2 年，供未來畫各指標長期趨勢）
 METRICS_DAILY_FILE = DATA_DIR / "metrics_daily.json"
 USER_AGENT      = "WarHub/1.0 (+https://github.com/virus11456/warhub)"
-
-# index.html 上要顯示哪幾家店（pizzint.watch 列了 14 家，我們挑 6 家披薩店）
-# 名稱必須與 pizzint.watch API 回傳的 name 完全相符（用於比對）
-SHOPS_TO_DISPLAY = [
-    "We, The Pizza",
-    "Pizzato Pizza",
-    "Papa Johns Pizza",
-    "Domino's Pizza (Pentagon Closest)",
-    "Extreme Pizza",
-    "District Pizza Palace",
-]  # Nighthawk Brewery & Pizza：2026-10 起 PizzINT 已不再追蹤，移除以免永遠顯示無資料
 
 WAR_KEYWORDS = [
     "war", "strike", "airstrike", "attack", "invasion", "invade",
@@ -181,19 +168,6 @@ PENTAGON_BARS = [
 # 只在美東傍晚下班時段查詢（省 API credit、也是訊號最關鍵的時段）
 BAR_QUERY_ET_HOURS = range(16, 24)  # 16:00–23:59 ET
 
-# PizzINT 沒有即時人流時的 BestTime 備援（同樣只在美東下班時段查、只查缺即時值的店）。
-# 地址由 PizzINT 提供的 Google Maps 座標反查；BestTime 回傳的場地座標須在 PizzINT 座標
-# PIZZA_BESTTIME_MAX_KM 內才採用，避免把同名的其他分店當成同一家。
-PIZZA_BESTTIME_VENUES = {
-    "We, The Pizza":                     {"name": "We, The Pizza",         "address": "2100 Crystal Dr, Arlington, VA 22202"},
-    "Pizzato Pizza":                     {"name": "Pizzato Pizza",         "address": "2632 N Pershing Dr, Arlington, VA 22201"},
-    "Papa Johns Pizza":                  {"name": "Papa Johns Pizza",      "address": "3400 Columbia Pike, Arlington, VA 22204"},
-    "Domino's Pizza (Pentagon Closest)": {"name": "Domino's Pizza",        "address": "2602 Columbia Pike, Arlington, VA 22204"},
-    "Extreme Pizza":                     {"name": "Extreme Pizza",         "address": "550 14th Rd S, Arlington, VA 22202"},
-    "District Pizza Palace":             {"name": "District Pizza Palace", "address": "2325 S Eads St, Arlington, VA 22202"},
-}
-PIZZA_BESTTIME_MAX_KM = 0.4
-
 # 核試驗場座標（USGS 地震監測用）
 NUCLEAR_TEST_SITES = [
     {"key": "punggye",  "name": "豐溪里（北韓）",     "lat": 41.28,  "lon": 129.09},
@@ -202,135 +176,6 @@ NUCLEAR_TEST_SITES = [
     {"key": "nevada",   "name": "內華達 NNSS（美國）", "lat": 37.12,  "lon": -116.05},
     {"key": "semnan",   "name": "塞姆南（伊朗疑似）", "lat": 35.20,  "lon": 53.90},
 ]
-
-
-# ─────────────────────────────────────────────────────────────
-# Pizza data — pizzint.watch
-# ─────────────────────────────────────────────────────────────
-async def fetch_pizzint(session: aiohttp.ClientSession) -> dict:
-    """
-    從 pizzint.watch 抓取 Pentagon Pizza Index 即時資料。
-    回傳完整的 dashboard payload（含每家店狀態、overall_index、DEFCON）。
-    """
-    try:
-        async with session.get(
-            PIZZINT_API,
-            timeout=aiohttp.ClientTimeout(total=15),
-            headers={"User-Agent": USER_AGENT, "Accept": "application/json"},
-        ) as resp:
-            resp.raise_for_status()
-            return await resp.json()
-    except Exception as e:
-        log.error(f"pizzint.watch fetch failed: {e}")
-        return {}
-
-
-def _popularity(value):
-    """0-100 整數；None / 非數值 / 超出範圍 → None（0 是有效值，代表空店）"""
-    if isinstance(value, bool) or not isinstance(value, (int, float)):
-        return None
-    return int(round(value)) if 0 <= value <= 100 else None
-
-
-def pizza_hourly(src: dict) -> tuple[list[dict], dict | None]:
-    """
-    每家店的 24 小時長條圖資料：
-    - hourly_24h：最近 24 筆每小時實測 [{at: 原觀測時間, v: 0-100 或 None=無資料}]
-    - usual_week：Google「平常人潮」，鍵 '0'(週日)…'6'(週六)，值為 24 格（索引 = 美東小時，None = 無資料）
-    """
-    hourly = []
-    for point in (src.get("sparkline_24h") or [])[-24:]:
-        if isinstance(point, dict) and point.get("recorded_at"):
-            hourly.append({"at": point["recorded_at"], "v": _popularity(point.get("current_popularity"))})
-    usual = {}
-    for day, rows in (src.get("baseline_popular_times") or {}).items():
-        if str(day) not in {"0", "1", "2", "3", "4", "5", "6"} or not isinstance(rows, list):
-            continue
-        hours = [None] * 24
-        for row in rows:
-            hour = row.get("hour") if isinstance(row, dict) else None
-            if isinstance(hour, int) and not isinstance(hour, bool) and 0 <= hour <= 23:
-                hours[hour] = _popularity(row.get("popularity"))
-        if any(v is not None for v in hours):
-            usual[str(day)] = hours
-    return hourly, (usual or None)
-
-
-def transform_pizza_shops(pizzint_payload: dict, fallback: dict | None = None) -> list[dict]:
-    """把 pizzint.watch 的 shop list 轉成我們前端要的格式；fallback＝BestTime 備援（只補 PizzINT 缺的即時值）"""
-    fallback = fallback or {}
-    raw_shops = pizzint_payload.get("data", []) or []
-    by_name = {s.get("name"): s for s in raw_shops}
-
-    shops = []
-    for display_name in SHOPS_TO_DISPLAY:
-        src = by_name.get(display_name)
-        if not src:
-            log.warning(f"Shop not found in pizzint API: {display_name}")
-            shops.append({
-                "name":      display_name,
-                "busyness":  None,
-                "is_open":   None,
-                "status":    "unavailable",
-                "baseline":  None,
-                "spike":     False,
-                "place_id":  None,
-                "address":   None,
-            })
-            continue
-
-        cur_pop = src.get("current_popularity")  # 0-100 or None
-        pct_usual = src.get("percentage_of_usual")  # deviation %
-        backup = fallback.get(display_name) if cur_pop is None and not src.get("is_closed_now") else None
-        if backup:
-            cur_pop = backup["live_busyness"]
-            usual = backup.get("forecasted")
-            pct_usual = (round(cur_pop / usual * 100) if isinstance(usual, (int, float)) and not isinstance(usual, bool) and usual > 0 else None)
-        is_open = False if src.get("is_closed_now") else (True if cur_pop is not None else None)
-        busyness = int(cur_pop) if cur_pop is not None else None
-
-        # status: closed / quiet / normal / busy / spike
-        if is_open is None:
-            status = "unavailable"
-        elif not is_open:
-            status = "closed"
-        elif src.get("is_spike"):
-            status = "spike"
-        elif busyness >= 70:
-            status = "busy"
-        elif busyness >= 40:
-            status = "normal"
-        else:
-            status = "quiet"
-
-        # 24h sparkline：壓縮成純數值序列（null = 該小時無資料/打烊）
-        sparkline = [
-            (int(p["current_popularity"]) if p.get("current_popularity") is not None else None)
-            for p in (src.get("sparkline_24h") or [])
-        ][-24:]
-        hourly_24h, usual_week = pizza_hourly(src)
-        if backup:
-            hourly_24h = (hourly_24h + [{"at": backup["recorded_at"], "v": busyness, "source": "besttime"}])[-24:]
-
-        shops.append({
-            "name":      display_name,
-            "busyness":  busyness,
-            "is_open":   is_open,
-            "status":    status,
-            "baseline":  None,
-            "spike":     bool(src.get("is_spike")),
-            "spike_magnitude": src.get("spike_magnitude"),
-            "percentage_of_usual": pct_usual,
-            "sparkline": sparkline,
-            "hourly_24h": hourly_24h,
-            "usual_week": usual_week,
-            "is_closed_now": bool(src.get("is_closed_now")),
-            "place_id":  src.get("place_id"),
-            "address":   src.get("address"),
-            "data_source": "besttime" if backup else src.get("data_source"),
-            "recorded_at": backup["recorded_at"] if backup else src.get("recorded_at"),
-        })
-    return shops
 
 
 # ─────────────────────────────────────────────────────────────
@@ -1947,67 +1792,31 @@ async def besttime_live(session: aiohttp.ClientSession, key: str, venue: dict) -
                 "forecasted": None, "delta": None, "open": None, "error": True}
 
 
-def _maps_coords(url) -> tuple[float, float] | None:
-    m = re.search(r"!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)", url or "") or re.search(r"@(-?\d+\.\d+),(-?\d+\.\d+)", url or "")
-    return (float(m.group(1)), float(m.group(2))) if m else None
-
-
-def _km(a, b) -> float:
-    import math
-    lat1, lon1, lat2, lon2 = map(math.radians, (*a, *b))
-    h = math.sin((lat2 - lat1) / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin((lon2 - lon1) / 2) ** 2
-    return 6371 * 2 * math.asin(math.sqrt(h))
-
-
-def _same_venue(maps_url, our_address, result) -> bool:
-    """BestTime 找到的場地是否就是 PizzINT 那家：有座標比距離；沒座標則比門牌與街名。"""
-    expected = _maps_coords(maps_url)
-    try:
-        got = (float(result["venue_lat"]), float(result["venue_lng"]))
-    except (KeyError, TypeError, ValueError):
-        got = None
-    if expected and got:
-        return _km(expected, got) <= PIZZA_BESTTIME_MAX_KM
-    returned = (result.get("venue_address") or "").lower()
-    number, street = our_address.split(",")[0].split(" ", 1)
-    word = max(street.split(), key=len).lower()
-    return bool(returned) and re.search(rf"\b{re.escape(number)}\b", returned) is not None and word in returned
-
-
-async def fetch_pizza_besttime(session: aiohttp.ClientSession, pizzint_payload: dict) -> dict:
+async def fetch_pizza(session: aiohttp.ClientSession, previous_shops) -> dict:
     """
-    PizzINT 缺即時人流時，以 BestTime 補查（僅美東 16–24 時、僅缺值且非明確打烊的店）。
-    回傳 {店名: {live_busyness, forecasted, recorded_at, ...}}；只收座標吻合且有即時值的結果。
+    五角大廈周邊披薩店人流：只用自有 BestTime 帳號。
+    即時值僅在美東 16–24 時、且已由 besttime_setup.py 建檔（有 venue_id）的店查詢，每店每輪 1 credit；
+    平常人流取自建檔時存下的每週預測（data/besttime_venues.json），本函式不建檔、不另扣點。
     """
+    from pizza_traffic import PIZZA_VENUES, build_shops, load_venues, spike_events, summarize
+    venues = load_venues()
     key = os.environ.get("BESTTIME_API_KEY", "").strip()
     et_hour = besttime_et_hour()
-    if not key or et_hour is None or et_hour not in BAR_QUERY_ET_HOURS:
-        return {}
-    by_name = {s.get("name"): s for s in (pizzint_payload.get("data") or []) if isinstance(s, dict)}
-    wanted = [n for n in SHOPS_TO_DISPLAY
-              if n in by_name and n in PIZZA_BESTTIME_VENUES
-              and by_name[n].get("current_popularity") is None and not by_name[n].get("is_closed_now")]
-    if not wanted:
-        return {}
-    results = await asyncio.gather(*(besttime_live(session, key, PIZZA_BESTTIME_VENUES[n]) for n in wanted))
-    at = datetime.now(timezone.utc).isoformat()
-    out, reasons = {}, {}
-    for name, r in zip(wanted, results):
-        live = r.get("live_busyness")
-        if r.get("error"):
-            reasons[name] = f"http_{r['http_status']}" if r.get("http_status") else r.get("failure_type") or "request_failed"
-        elif not r.get("live_available") or not isinstance(live, (int, float)) or isinstance(live, bool) or not 0 <= live <= 200:
-            reasons[name] = "no_live_value"
-        elif not _same_venue(by_name[name].get("address"), PIZZA_BESTTIME_VENUES[name]["address"], r):
-            log.warning(f"BestTime pizza {name}: venue location mismatch, ignored")
-            reasons[name] = "venue_mismatch"
-        else:
-            out[name] = {"live_busyness": int(round(live)), "forecasted": r.get("forecasted"), "recorded_at": at}
-            reasons[name] = "used"
-    log.info(f"Pizza BestTime fallback: {len(out)}/{len(wanted)} shops with live data; reasons={reasons}")
-    messages = {name: r["error_message"] for name, r in zip(wanted, results) if r.get("error_message")}
-    out["_status"] = {"queried_at": at, "reasons": reasons, **({"messages": messages} if messages else {})}
-    return out
+    queried = bool(key) and et_hour is not None and et_hour in BAR_QUERY_ET_HOURS
+    ready = [n for n in PIZZA_VENUES if ((venues.get("venues") or {}).get(n) or {}).get("venue_id")]
+    live = {}
+    if queried and ready:
+        results = await asyncio.gather(*(besttime_live(session, key, PIZZA_VENUES[n]) for n in ready))
+        live = dict(zip(ready, results))
+    now = datetime.now(timezone.utc)
+    shops = build_shops(live, venues, previous_shops, now, queried)
+    summary = summarize(shops, venues, queried, now)
+    messages = {n: r["error_message"] for n, r in live.items() if r.get("error_message")}
+    if messages:
+        summary["messages"] = messages
+    log.info(f"Pizza BestTime: state={summary['state']} live={summary['live_count']}/{summary['total']} "
+             f"ready={len(ready)} level={summary['level']} index={summary['index']}")
+    return {"shops": shops, "summary": summary, "events": spike_events(shops)}
 
 
 async def fetch_bars(session: aiohttp.ClientSession) -> dict:
@@ -2262,7 +2071,7 @@ async def fetch_finance(session: aiohttp.ClientSession) -> dict:
     return out
 
 
-def update_daily_metrics(score: dict, pizza_index, defcon_level, firms: dict,
+def update_daily_metrics(score: dict, pizza_index, pizza_level, firms: dict,
                          aviation: dict | None, wiki_score, nuclear_seismic: dict | None,
                          regions: list[dict], finance: dict | None = None,
                          fred: dict | None = None) -> None:
@@ -2294,7 +2103,7 @@ def update_daily_metrics(score: dict, pizza_index, defcon_level, firms: dict,
         "poly":     score.get("polymarket_score"),
         "level":    score.get("alert_level"),
         "pizza":    pizza_index,
-        "defcon":   defcon_level,
+        "pizza_level": pizza_level,
         "wiki":     wiki_score,
         "firms":    (firms or {}).get("total_24h"),
         "avi_total": s.get("total"),
@@ -2430,7 +2239,7 @@ async def main():
     async with aiohttp.ClientSession() as session:
         trade_api = setup_comtrade(session, previous.get("trade_api"))
         trade_catalog = setup_trade_availability(session, previous.get("trade_availability"))
-        pizzint_task  = asyncio.create_task(measured("pizzint", fetch_pizzint(session)))
+        pizza_task    = asyncio.create_task(measured("pizza", fetch_pizza(session, previous.get("pizza"))))
         poly_task     = asyncio.create_task(measured("polymarket", fetch_polymarket(session)))
         aviation_task = asyncio.create_task(measured("aviation", fetch_aviation(session)))
         firms_task    = asyncio.create_task(measured("firms", fetch_firms(session)))
@@ -2444,13 +2253,12 @@ async def main():
         wiki_task     = asyncio.create_task(measured("wikipedia_anxiety", fetch_wikipedia_anxiety(session)))
         notam_task    = asyncio.create_task(measured("notams", fetch_notams(session)))
         bars_task     = asyncio.create_task(measured("bars", fetch_bars(session)))
-        (pizzint_data, polymarket, aviation, firms, eonet,
+        (pizza, polymarket, aviation, firms, eonet,
          gdelt, news, nuclear_seismic, wikipedia, notams, bars) = await asyncio.gather(
-            pizzint_task, poly_task, aviation_task, firms_task, eonet_task,
+            pizza_task, poly_task, aviation_task, firms_task, eonet_task,
             gdelt_task, news_task, seismic_task, wiki_task, notam_task, bars_task
         )
         gdelt_events = await gdelt_events_task
-        pizza_fallback = await measured("pizza_besttime", fetch_pizza_besttime(session, pizzint_data))
         kalshi = await measured("kalshi", fetch_kalshi(session, previous.get("kalshi")))
         news_sampling = news["sampling"]
         news = news["headlines"]
@@ -2494,13 +2302,9 @@ async def main():
 
         english_cache = await english_titles(session, [*news, *tw_news], previous)
 
-    pizza_shops  = transform_pizza_shops(pizzint_data, pizza_fallback)
-    pizza_index  = (pizzint_data.get("defcon_details") or {}).get("smoothed_index")
-    if pizza_index is None:
-        pizza_index = pizzint_data.get("overall_index")
-    if not any(s.get("current_popularity") is not None for s in pizzint_data.get("data", [])):
-        pizza_index = None
-    defcon_level = pizzint_data.get("defcon_level")
+    pizza_shops  = pizza["shops"]
+    pizza_index  = pizza["summary"]["index"]
+    pizza_level  = pizza["summary"]["level"]
     # Use a genuine past 7-day baseline; require history spanning at least 6 days.
     try:
         from datetime import timedelta
@@ -2558,7 +2362,7 @@ async def main():
         aviation["trends"] = compute_avi_trends(history)
     # 全指標每日長期封存（每日一筆、保留 ~2 年）
     metrics_daily = update_daily_metrics(
-        score, pizza_index, defcon_level, firms, aviation,
+        score, pizza_index, pizza_level, firms, aviation,
         (wikipedia or {}).get("score"), nuclear_seismic, regions, finance, fred)
 
     output = {
@@ -2572,11 +2376,9 @@ async def main():
         "english_translation_cache": english_cache,
         "score":         score,
         "pizza":         pizza_shops,
-        "pizza_backup":  pizza_fallback.get("_status"),
+        "pizza_summary": pizza["summary"],
         "pizza_index":   pizza_index,
-        "pizza_events":  pizzint_data.get("events") or [],
-        "defcon_level":  defcon_level,
-        "defcon_details": pizzint_data.get("defcon_details"),
+        "pizza_events":  pizza["events"],
         "polymarket":    polymarket,
         "kalshi":        kalshi,
         "finance":       finance,
@@ -2602,7 +2404,7 @@ async def main():
         "bars":          bars,
         "regions":       regions,
         "sources": {
-            "pizza":      "https://www.pizzint.watch/",
+            "pizza":      "https://besttime.app/",
             "polymarket": "https://gamma-api.polymarket.com/",
             "aviation":   "https://api.adsb.lol/v2/mil",
             "firms":      "https://firms.modaps.eosdis.nasa.gov/",
@@ -2626,9 +2428,6 @@ async def main():
     from data_quality import source_health
     output["source_health"] = source_health(output)
 
-    from pizza_backtest import build as build_pizza_backtest
-    output["pizza_backtest"] = build_pizza_backtest(output)
-
     # 推播：更新完成後按時段去重回報 + 異常（未設定 Secrets 則自動跳過）；狀態寫回 _notify
     try:
         if os.environ.get("WARHUB_NO_NOTIFY") == "1":
@@ -2648,7 +2447,7 @@ async def main():
 
     open_count = sum(1 for s in pizza_shops if s["is_open"])
     log.info(f"Wrote {DATA_FILE.name} - "
-             f"pizza_index={pizza_index}, defcon={defcon_level}, "
+             f"pizza_index={pizza_index}, pizza_level={pizza_level}, "
              f"open_shops={open_count}/{len(pizza_shops)}, "
              f"combined={score['combined_score']} [{score['alert_level']}]")
 
