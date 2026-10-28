@@ -14,6 +14,9 @@ BASELINE_HOURS = 48
 MIN_BASELINE_SAMPLES = 12
 MIN_BASELINE_SPAN_HOURS = 24
 MIN_BASELINE_REGION_ARTICLES = 30
+# Pseudo-count added to both sides of the ratio. Low-volume regions (South China Sea, Korea:
+# often 0-30 articles a window) otherwise swing to 0 or 100 on noise; large regions barely move.
+SMOOTHING_ARTICLES = 20
 STALE_HOURS = 6
 CONFLICT_QUAD_CLASSES = {'3', '4'}   # verbal / material conflict
 
@@ -132,8 +135,11 @@ def regional_metrics(series, now, fresh):
             row['avg48h'] = round(avg, 3)
             if avg > 0:
                 row['delta_pct'] = round((share - avg) / avg * 100, 1)
-                # Baseline level = 50, double the usual share = 100; a measured zero stays 0.
-                score = min(100.0, 50 * share / avg)
+                # Baseline level = 50, double the usual volume = 100, smoothed so a handful of
+                # articles cannot max out or zero a sparse region. A measured zero still scores low, not missing.
+                expected = avg / 100 * latest['total_articles']
+                observed = latest['region_articles'][key]
+                score = min(100.0, 50 * (observed + SMOOTHING_ARTICLES) / (expected + SMOOTHING_ARTICLES))
                 row['score'] = round(score, 1) if math.isfinite(score) else None
             else:
                 row['reason'] = 'baseline_too_sparse'

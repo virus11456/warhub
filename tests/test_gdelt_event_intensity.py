@@ -65,12 +65,23 @@ class MetricsTests(unittest.TestCase):
     def test_score_relative_to_own_baseline_and_valid_zero(self):
         rows = series(14)
         self.assertEqual(gei.regional_metrics(rows, NOW, fresh=True)['ukraine']['score'], 50.0)
-        rows[-1] = {**rows[-1], 'region_articles': {**rows[-1]['region_articles'], 'ukraine': 0, 'mideast': 30}}
+        rows[-1] = {**rows[-1], 'region_articles': {**rows[-1]['region_articles'], 'ukraine': 0, 'mideast': 80}}
         out = gei.regional_metrics(rows, NOW, fresh=True)
-        self.assertEqual(out['ukraine']['score'], 0.0)        # measured zero stays zero
+        self.assertEqual(out['ukraine']['score'], 33.3)       # measured zero is a low reading, not missing
         self.assertEqual(out['ukraine']['delta_pct'], -100.0)
         self.assertEqual(out['mideast']['score'], 100.0)       # capped
         self.assertFalse(out['ukraine']['stale'])
+
+    def test_sparse_noise_does_not_max_out_but_a_real_surge_does(self):
+        # South China Sea on 2026-10-28: ~10 articles a window, then 20 -> was scored 100 (HIGH).
+        rows = series(14, region=10, total=50000)
+        rows[-1] = {**rows[-1], 'region_articles': {**rows[-1]['region_articles'], 'southsea': 20, 'taiwan': 60}}
+        out = gei.regional_metrics(rows, NOW, fresh=True)
+        self.assertEqual(out['southsea']['score'], 66.7)
+        self.assertEqual(out['taiwan']['score'], 100.0)          # six times usual still maxes out
+        big = series(14, region=600, total=50000)
+        big[-1] = {**big[-1], 'region_articles': {**big[-1]['region_articles'], 'ukraine': 660}}
+        self.assertAlmostEqual(gei.regional_metrics(big, NOW, fresh=True)['ukraine']['score'], 54.8, places=1)  # large regions barely change
 
     def test_sparse_region_and_failed_round_are_not_scored(self):
         rows = series(14, region=1)
