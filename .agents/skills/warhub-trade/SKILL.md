@@ -76,3 +76,5 @@ trade_api只保存模式、狀態、請求／成功次數、冷卻期限；沒�
 提交前merge_history._union_months也須保護相同月份、schema2/mirror的已知回報國範圍。任何商品失去既有回報國或有效重量時保留遠端整份月觀測，不拼加重疊總量；同範圍或擴大範圍允許數值下修及有效零。中國直報與鏡像不以國家範圍混比；新收到的部分來源仍由原始封存保留。測試tests/test_trade_history_merge.py。
 
 當期food／strat在22小時快取內重用時，cache_reused_at只記快取檢查時間，不改updated_at或資料月份；source_health須註明未重新查詢。再次進入來源抓取先清除上一輪cache_reused_at，避免失敗回退誤稱本輪快取命中。此標記不代表完整回報，也不延長快取有效期。tests/test_trade_cache_status.py以禁止網路的session驗證兩個真實入口。
+
+2026-10-28 USDA 呈現：前端只為有任一數值（week_net_kt／next_year_net_kt／outstanding_kt，0 也算有值）的品項顯示列；全缺值品項合成一句「X、Y：本期沒有美對中銷售觀測（不等於零）」。週次與標頭 week_ending 相同時不重複顯示。中國戰備動向監測（糧食、戰略物資）在首頁移到台海區段（台海新聞之後、準備指南之前），不改抓取。

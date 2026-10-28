@@ -77,3 +77,39 @@ class OutageAlertTests(unittest.IsolatedAsyncioTestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class OutageTextTests(unittest.TestCase):
+    def test_outage_line_shows_last_observation_in_taipei_time(self):
+        text = alerts.build_outage_alert([{'label': 'GDELT', 'hours': 7.2, 'note': '',
+                                           'observed_at': '2026-10-28T01:30:00+00:00'}], [])
+        self.assertIn('GDELT：已約 7 小時沒有有效資料；最後觀測 10/28 09:30（台北）', text)
+        text = alerts.build_outage_alert([{'label': 'X', 'hours': 7, 'note': 'n', 'observed_at': None}], [])
+        self.assertIn('X：已約 7 小時沒有有效資料（n）', text)
+
+
+class SourceTimeTests(unittest.TestCase):
+    def test_observed_and_fetched_times(self):
+        from data_quality import source_health
+        data = {'updated_at': '2026-10-28T11:15:00+00:00',
+                'finance': {'GC=F': {'observed_at': '2026-10-28T11:04:54+00:00'},
+                            'LMT': {'observed_at': '2026-10-27T20:00:02+00:00'}},
+                'notams': {'taiwan': {'observed_at': '2026-10-28T11:14:00+00:00'},
+                           'korea': {'observed_at': '2026-10-01T00:00:00+00:00', 'stale': True}},
+                'aviation': {'summary': {'total': 3}}, 'polymarket': [],
+                'food': {'items': [{'wan_ton': 1}], 'cache_reused_at': 'x', 'ref_month': '2026-07'},
+                'collection': {'reused_sources': ['food'], 'slow_attempted_at': '2026-10-28T10:00:00+00:00'}}
+        h = source_health(data)
+        self.assertEqual(h['finance']['observed_at'], '2026-10-27T20:00:02+00:00')  # oldest quote
+        self.assertEqual(h['notams']['observed_at'], '2026-10-28T11:14:00+00:00')   # stale region ignored
+        self.assertEqual(h['aviation']['fetched_at'], data['updated_at'])
+        self.assertIsNone(h['polymarket']['fetched_at'])                           # unavailable: no fetch claim
+        self.assertIsNone(h['food']['fetched_at'])                                 # reused, not fetched now
+        self.assertEqual(h['food']['note'].count('沿用'), 1)
+
+    def test_bars_off_hours_is_waiting_not_down(self):
+        from data_quality import source_health
+        h = source_health({'updated_at': 'now', 'bars': {'available': False, 'off_hours': True, 'reason': '非下班時段（僅美東 16–24 時查詢）'}})['bars']
+        self.assertEqual((h['status'], h['fetched_at']), ('waiting', None))
+        h = source_health({'bars': {'available': False, 'reason': 'HTTP 409'}})['bars']
+        self.assertEqual(h['status'], 'unavailable')

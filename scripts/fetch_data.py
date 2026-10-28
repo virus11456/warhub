@@ -2019,7 +2019,7 @@ async def fetch_bars(session: aiohttp.ClientSession) -> dict:
     et_hour = besttime_et_hour()
     if et_hour is not None and et_hour not in BAR_QUERY_ET_HOURS:
         return {"available": False, "reason": "非下班時段（僅美東 16–24 時查詢）",
-                "et_hour": et_hour, "bars": []}
+                "off_hours": True, "et_hour": et_hour, "bars": []}
 
     async def one(bar):
         result = await besttime_live(session, key, bar)

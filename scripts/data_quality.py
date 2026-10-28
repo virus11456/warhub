@@ -6,6 +6,20 @@ LABELS = {'kalshi':'Kalshi', 'pizza':'PizzINT', 'polymarket':'Polymarket', 'avia
           'tw_news':'台海新聞', 'nuclear_seismic':'USGS', 'eonet':'NASA EONET', 'finance':'Yahoo Finance',
           'food':'Comtrade 糧食', 'strat':'Comtrade 物資', 'usda':'USDA ESR', 'bars':'BestTime', 'fred':'FRED'}
 
+def _oldest_observed(records):
+    """Oldest observation among fresh records: the conservative age of a multi-region source."""
+    stamps = []
+    for r in records:
+        if not isinstance(r, dict) or r.get('stale') or r.get('available') is False:
+            continue
+        try:
+            at = datetime.fromisoformat(str(r.get('observed_at')).replace('Z', '+00:00'))
+            stamps.append((at if at.tzinfo else at.replace(tzinfo=timezone.utc), r['observed_at']))
+        except (ValueError, KeyError):
+            continue
+    return min(stamps)[1] if stamps else None
+
+
 def source_health(data):
     out = {}
     for key,label in LABELS.items():
@@ -55,7 +69,8 @@ def source_health(data):
                     status='available' if fresh==len(items) else 'partial' if measured else 'unavailable'
                     if measured and all(r.get('stale') for r in measured): status='stale'
                 note = '觀測期間：' + str(v.get('ref_month') or v.get('week_ending') or '未知') + '；與抓取時間不同'
-        if key in ('food', 'strat') and isinstance(v, dict) and v.get('cache_reused_at'):
+        reused = key in (data.get('collection') or {}).get('reused_sources', [])
+        if key in ('food', 'strat') and isinstance(v, dict) and v.get('cache_reused_at') and not reused:
             note += '；沿用22小時來源快取，未重新查詢，原取得時間不變'
         if key == 'fred' and isinstance(v, dict):
             records = v.get('observations') or {}
@@ -80,12 +95,19 @@ def source_health(data):
             fresh = sum(r.get('status') == 'available' for r in samples.values() if isinstance(r, dict))
             status = 'available' if fresh == 5 else 'partial' if fresh else 'stale' if v else 'unavailable'
             note = f'{fresh}/5 地區取得新資料；舊值不計分'
-        if key in (data.get('collection') or {}).get('reused_sources', []):
+        if key == 'bars' and isinstance(v, dict) and v.get('available') is False and v.get('off_hours'):
+            status = 'waiting'  # 尚未到美東 16–24 時查詢窗口：排程內等待，不是故障
+        if reused:
             note += '；本輪沿用慢資料，未重新查詢，原觀測時間不變'
             from collection_policy import elapsed_hours
             age = elapsed_hours((data.get('collection') or {}).get('slow_attempted_at'), datetime.now(timezone.utc))
             if status in ('available', 'partial') and (age is None or age >= 6):
                 status = 'stale'
-        out[key] = {'label':label, 'status':status, 'observed_at':observed, 'note':note}
+        if observed is None and isinstance(v, dict) and key in ('gdelt', 'notams', 'finance'):
+            observed = _oldest_observed(v.values())
+        fetched = None
+        if status not in ('unavailable', 'waiting') and not reused:
+            fetched = (v.get('fetched_at') if key == 'kalshi' and isinstance(v, dict) else None) or data.get('updated_at')
+        out[key] = {'label':label, 'status':status, 'observed_at':observed, 'fetched_at':fetched, 'note':note}
     return out
 

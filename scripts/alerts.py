@@ -14,7 +14,7 @@ import time
 import hashlib
 import aiohttp
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
@@ -308,6 +308,9 @@ async def send_discord(session, text, level="NORMAL"):
         return ok
 
 
+TAIPEI = timezone(timedelta(hours=8))
+
+
 def _iso(value):
     try:
         t = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
@@ -337,7 +340,7 @@ def source_outages(health: dict, prev_notify: dict, now: datetime) -> tuple[dict
             hours = (now - _iso(since)).total_seconds() / 3600
             if hours >= SOURCE_OUTAGE_HOURS and alerted.get(key) != since:
                 newly_down.append({"key": key, "label": label, "since": since, "hours": hours,
-                                   "note": row.get("note") or ""})
+                                   "note": row.get("note") or "", "observed_at": row.get("observed_at")})
         elif alerted.get(key):
             since = _iso(alerted[key])
             recovered.append({"key": key, "label": label,
@@ -351,7 +354,9 @@ def build_outage_alert(newly_down: list, recovered: list) -> str:
         lines.append("⚠️ WARHUBS 資料來源中斷")
         for item in newly_down:
             note = f"（{item['note']}）" if item["note"] else ""
-            lines.append(f"• {item['label']}：已約 {int(item['hours'])} 小時沒有有效資料{note}")
+            last = _iso(item.get("observed_at"))
+            seen = f"；最後觀測 {last.astimezone(TAIPEI):%m/%d %H:%M}（台北）" if last else ""
+            lines.append(f"• {item['label']}：已約 {int(item['hours'])} 小時沒有有效資料{seen}{note}")
     if recovered:
         lines.append("✅ WARHUBS 資料來源恢復")
         for item in recovered:

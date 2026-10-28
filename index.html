@@ -584,7 +584,11 @@
   .food-yoy { font-size:.78rem; font-weight:700; text-align:right; white-space:nowrap; }
   .usda-block { margin-top:.8rem; padding-top:.6rem; border-top:1px dashed rgba(255,255,255,.12); }
   .usda-hd { font-family:'Orbitron','Share Tech Mono',monospace; font-size:.66rem; font-weight:700; color:var(--accent1); letter-spacing:1px; margin-bottom:.4rem; }
-  .usda-row { display:grid; grid-template-columns:4.5em 1fr 1fr; gap:.5rem; align-items:baseline; padding:.4rem .2rem; border-bottom:1px solid rgba(255,255,255,.05); font-family:'Share Tech Mono',monospace; font-size:.72rem; }
+  .usda-row { display:grid; grid-template-columns:minmax(7em,1.2fr) repeat(3,1fr); gap:.5rem; align-items:baseline; padding:.4rem .2rem; border-bottom:1px solid rgba(255,255,255,.05); font-family:'Share Tech Mono',monospace; font-size:.72rem; }
+  .usda-row .u-name small { font-weight:400; color:var(--text-dim); }
+  .usda-row .u-v span { display:block; font-size:.66rem; }
+  .usda-none { padding:.4rem .2rem; font-size:.72rem; color:var(--text-dim); }
+  @media (max-width:640px){ .usda-row { grid-template-columns:repeat(3,1fr); } .usda-row .u-name { grid-column:1/-1; } }
   .usda-row:last-child { border-bottom:none; }
   .usda-row .u-name { font-weight:700; color:var(--text); }
   .usda-row .u-v { color:var(--text-dim); }
@@ -1426,7 +1430,7 @@
 </style>
 </head>
 <body class="theme-8bit">
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="ic-swords" viewBox="0 0 9 9"><path fill="#c2cad4" d="M0 0h1v1h-1zM8 0h1v1h-1zM1 1h1v1h-1zM7 1h1v1h-1zM2 2h1v1h-1zM6 2h1v1h-1zM3 3h1v1h-1zM5 3h1v1h-1zM4 4h1v1h-1zM3 5h1v1h-1zM5 5h1v1h-1zM4 6h1v2h-1z"/><path fill="#d3a94a" d="M2 6h1v1h-1zM6 6h1v1h-1zM1 7h1v1h-1zM7 7h1v1h-1zM0 8h1v1h-1zM4 8h1v1h-1zM8 8h1v1h-1z"/></symbol><symbol id="ic-fire" viewBox="0 0 9 9"><path fill="#ff3b30" d="M4 0h1v1h-1zM3 1h1v2h-1zM2 3h1v2h-1zM1 5h1v3h-1zM7 6h1v2h-1zM2 8h1v1h-1zM6 8h1v1h-1z"/><path fill="#ff7a18" d="M4 1h1v3h-1zM5 2h1v1h-1zM3 3h1v3h-1zM6 3h1v5h-1zM2 5h1v3h-1zM7 5h1v1h-1zM3 7h1v2h-1zM5 7h1v2h-1zM4 8h1v1h-1z"/><path fill="#ffd21e" d="M5 3h1v4h-1zM4 4h1v4h-1zM3 6h1v1h-1z"/></symbol><symbol id="ic-beer" viewBox="0 0 9 9"><path fill="#fff2c4" d="M1 0h5v2h-5zM0 1h1v1h-1zM6 1h1v1h-1z"/><path fill="#c9782e" d="M0 2h1v7h-1zM6 2h1v7h-1zM7 3h2v1h-2zM7 4h1v3h-1zM8 6h1v1h-1zM1 8h5v1h-5z"/><path fill="#f4b73d" d="M1 2h5v6h-5z"/></symbol><symbol id="ic-plane" viewBox="0 0 9 9"><path fill="#c2cad4" d="M4 0h1v8h-1zM0 3h4v1h-4zM5 3h4v1h-4zM3 6h1v1h-1zM5 6h1v1h-1z"/><path fill="#7f8b98" d="M1 4h3v1h-3zM5 4h3v1h-3zM2 7h1v1h-1zM6 7h1v1h-1z"/></symbol><symbol id="ic-money" viewBox="0 0 9 9"><path fill="#c9782e" d="M3 0h2v1h-2zM2 1h1v1h-1zM5 1h1v1h-1z"/><path fill="#d3a94a" d="M3 2h2v2h-2zM2 3h1v2h-1zM5 3h1v2h-1zM1 4h1v3h-1zM6 4h1v3h-1zM2 6h1v2h-1zM5 6h1v2h-1zM3 7h2v2h-2z"/><path fill="#46c76a" d="M3 4h2v3h-2zM2 5h1v1h-1zM5 5h1v1h-1z"/></symbol><symbol id="ic-chart" viewBox="0 0 9 9"><path fill="#7f8b98" d="M0 0h1v8h-1zM1 7h8v1h-8z"/><path fill="#46c76a" d="M5 1h1v6h-1zM4 6h1v1h-1z"/><path fill="#f4b73d" d="M3 2h1v5h-1zM7 4h1v3h-1z"/><path fill="#2fd0e0" d="M2 4h1v3h-1z"/></symbol><symbol id="ic-news" viewBox="0 0 9 9"><path fill="#dcddd2" d="M0 0h9v1h-9zM0 1h1v8h-1zM8 1h1v3h-1zM8 5h1v2h-1zM1 8h8v1h-8z"/><path fill="#ff3b30" d="M1 1h4v1h-4z"/><path fill="#7f8b98" d="M5 1h3v1h-3zM1 2h1v6h-1zM3 2h2v6h-2zM6 2h2v6h-2zM2 4h1v1h-1zM5 4h1v4h-1zM8 4h1v1h-1zM2 7h1v1h-1zM8 7h1v1h-1z"/></symbol><symbol id="ic-sat" viewBox="0 0 9 9"><path fill="#ffd21e" d="M0 0h1v4h-1zM8 0h1v4h-1zM1 1h1v2h-1zM7 1h1v2h-1z"/><path fill="#c2cad4" d="M2 0h1v1h-1zM6 0h1v1h-1zM3 1h3v2h-3zM2 3h1v1h-1zM4 3h1v2h-1zM6 3h1v1h-1zM3 4h1v1h-1zM5 4h1v1h-1z"/><path fill="#7f8b98" d="M2 5h1v1h-1zM6 5h1v1h-1zM1 6h1v1h-1zM7 6h1v1h-1z"/></symbol><symbol id="ic-radiation" viewBox="0 0 9 9"><path fill="#ffd21e" d="M0 0h9v1h-9zM0 1h3v1h-3zM6 1h3v1h-3zM0 2h2v2h-2zM7 2h2v2h-2zM2 3h1v1h-1zM6 3h1v1h-1zM0 4h1v1h-1zM3 4h3v3h-3zM8 4h1v1h-1zM0 6h1v3h-1zM8 6h1v3h-1zM1 7h3v2h-3zM5 7h3v2h-3zM4 8h1v1h-1z"/><path fill="#12161c" d="M3 1h3v3h-3zM2 2h1v1h-1zM6 2h1v1h-1zM1 4h2v3h-2zM6 4h2v3h-2zM0 5h1v1h-1zM8 5h1v1h-1zM4 7h1v1h-1z"/></symbol><symbol id="ic-book" viewBox="0 0 9 9"><path fill="#3f8fd0" d="M1 1h3v1h-3zM5 1h3v1h-3zM0 2h1v5h-1zM4 2h1v5h-1zM8 2h1v5h-1zM1 7h3v1h-3zM5 7h3v1h-3z"/><path fill="#dcddd2" d="M1 2h3v5h-3zM5 2h3v5h-3z"/></symbol><symbol id="ic-clock" viewBox="0 0 9 9"><path fill="#7f8b98" d="M2 0h5v1h-5zM1 1h1v1h-1zM7 1h1v1h-1zM0 2h1v5h-1zM8 2h1v4h-1zM1 7h1v1h-1zM7 7h1v1h-1zM2 8h5v1h-5z"/><path fill="#dcddd2" d="M2 1h5v1h-5zM1 2h2v5h-2zM6 2h2v5h-2zM3 5h3v3h-3zM8 6h1v1h-1zM2 7h1v1h-1zM6 7h1v1h-1z"/><path fill="#12161c" d="M4 2h1v3h-1zM3 4h1v1h-1zM5 4h1v1h-1z"/></symbol><symbol id="ic-abacus" viewBox="0 0 9 9"><path fill="#c9782e" d="M0 0h9v1h-9zM0 1h1v8h-1zM8 1h1v8h-1zM1 3h7v1h-7zM1 6h7v1h-7zM1 8h7v1h-7z"/><path fill="#2fd0e0" d="M2 1h1v2h-1zM6 1h1v2h-1zM4 4h1v2h-1zM2 7h1v1h-1zM6 7h1v1h-1z"/><path fill="#f4b73d" d="M4 1h1v2h-1zM2 4h1v2h-1zM6 4h1v2h-1zM4 7h1v1h-1z"/></symbol><symbol id="ic-globe" viewBox="0 0 9 9"><path fill="#3f8fd0" d="M2 0h5v1h-5zM1 1h1v2h-1zM4 1h2v3h-2zM7 1h1v2h-1zM0 2h1v5h-1zM6 2h1v1h-1zM8 2h1v5h-1zM2 3h2v2h-2zM1 4h1v1h-1zM6 4h1v5h-1zM3 5h3v1h-3zM7 5h1v3h-1zM1 6h2v2h-2zM5 6h1v1h-1zM3 7h1v2h-1zM2 8h1v1h-1zM4 8h2v1h-2z"/><path fill="#46c76a" d="M2 1h2v2h-2zM6 1h1v1h-1zM1 3h1v1h-1zM6 3h2v1h-2zM4 4h2v1h-2zM7 4h1v1h-1zM1 5h2v1h-2zM3 6h2v1h-2zM4 7h2v1h-2z"/></symbol><symbol id="ic-globe2" viewBox="0 0 9 9"><path fill="#2fd0e0" d="M2 0h5v1h-5zM1 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM7 1h1v1h-1zM0 2h1v5h-1zM2 2h1v5h-1zM4 2h1v5h-1zM6 2h1v5h-1zM8 2h1v5h-1zM1 3h1v1h-1zM3 3h1v1h-1zM5 3h1v1h-1zM7 3h1v1h-1zM1 5h1v1h-1zM3 5h1v1h-1zM5 5h1v1h-1zM7 5h1v1h-1zM1 7h1v1h-1zM3 7h1v2h-1zM5 7h1v2h-1zM7 7h1v1h-1zM2 8h1v1h-1zM4 8h1v1h-1zM6 8h1v1h-1z"/><path fill="#3f8fd0" d="M2 1h1v1h-1zM4 1h1v1h-1zM6 1h1v1h-1zM1 2h1v1h-1zM3 2h1v1h-1zM5 2h1v1h-1zM7 2h1v1h-1zM1 4h1v1h-1zM3 4h1v1h-1zM5 4h1v1h-1zM7 4h1v1h-1zM1 6h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM7 6h1v1h-1zM2 7h1v1h-1zM4 7h1v1h-1zM6 7h1v1h-1z"/></symbol><symbol id="ic-bolt" viewBox="0 0 9 9"><path fill="#ffd21e" d="M4 0h2v1h-2zM3 1h2v1h-2zM2 2h2v2h-2zM1 3h1v1h-1zM4 3h2v1h-2zM3 4h2v1h-2zM2 5h2v1h-2zM1 6h2v1h-2zM0 7h2v1h-2z"/></symbol><symbol id="ic-target" viewBox="0 0 9 9"><path fill="#ff3b30" d="M2 0h5v1h-5zM1 1h1v1h-1zM7 1h1v1h-1zM0 2h1v5h-1zM2 2h5v1h-5zM8 2h1v5h-1zM2 3h1v4h-1zM6 3h1v4h-1zM4 4h1v1h-1zM3 6h3v1h-3zM1 7h1v1h-1zM7 7h1v1h-1zM2 8h5v1h-5z"/><path fill="#eef2f5" d="M2 1h5v1h-5zM1 2h1v5h-1zM7 2h1v5h-1zM3 3h3v1h-3zM3 4h1v2h-1zM5 4h1v2h-1zM4 5h1v1h-1zM2 7h5v1h-5z"/></symbol><symbol id="ic-shield" viewBox="0 0 9 9"><path fill="#3f8fd0" d="M1 0h7v1h-7zM1 1h1v4h-1zM7 1h1v4h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path fill="#2fd0e0" d="M2 1h5v4h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/></symbol><symbol id="ic-fuel" viewBox="0 0 9 9"><path fill="#ff3b30" d="M0 0h6v1h-6zM0 1h1v7h-1zM2 1h2v7h-2zM5 1h1v7h-1zM1 3h1v1h-1zM4 3h1v1h-1zM6 3h1v2h-1zM1 6h1v2h-1zM4 6h1v2h-1z"/><path fill="#7f8b98" d="M7 0h1v2h-1zM6 1h1v2h-1zM7 3h1v2h-1z"/></symbol><symbol id="ic-volcano" viewBox="0 0 9 9"><path fill="#ff3b30" d="M3 0h1v1h-1zM5 0h1v1h-1zM2 1h1v1h-1zM6 1h1v1h-1z"/><path fill="#ff7a18" d="M4 1h1v4h-1zM3 2h1v1h-1zM5 2h1v1h-1zM3 5h1v1h-1zM5 5h1v1h-1zM4 6h1v1h-1z"/><path fill="#7f8b98" d="M3 3h1v2h-1zM5 3h1v2h-1zM2 4h1v5h-1zM6 4h1v5h-1zM4 5h1v1h-1zM1 6h1v3h-1zM3 6h1v3h-1zM5 6h1v3h-1zM7 6h1v3h-1zM4 7h1v2h-1zM0 8h1v1h-1zM8 8h1v1h-1z"/></symbol><symbol id="ic-snow" viewBox="0 0 9 9"><path fill="#2fd0e0" d="M4 0h1v5h-1zM2 1h1v1h-1zM6 1h1v1h-1zM3 2h1v2h-1zM5 2h1v2h-1zM1 3h2v1h-2zM6 3h2v1h-2zM1 5h3v1h-3zM5 5h3v1h-3zM3 6h3v1h-3zM2 7h1v1h-1zM4 7h1v2h-1zM6 7h1v1h-1z"/></symbol><symbol id="ic-wave" viewBox="0 0 9 9"><path fill="#2fd0e0" d="M3 1h2v1h-2zM2 2h1v1h-1zM5 2h1v1h-1zM7 2h1v1h-1zM1 3h1v1h-1zM6 3h1v1h-1zM8 3h1v1h-1zM0 4h1v1h-1zM2 6h1v1h-1zM4 6h2v1h-2zM7 6h1v1h-1zM1 7h1v1h-1zM3 7h1v1h-1zM6 7h1v1h-1zM8 7h1v1h-1z"/><path fill="#3f8fd0" d="M3 2h2v1h-2zM2 3h1v1h-1zM5 3h1v1h-1zM7 3h1v2h-1zM1 4h1v1h-1zM6 4h1v1h-1zM2 7h1v2h-1zM4 7h2v2h-2zM7 7h1v2h-1zM0 8h2v1h-2zM3 8h1v1h-1zM6 8h1v1h-1zM8 8h1v1h-1z"/></symbol><symbol id="ic-gamepad" viewBox="0 0 9 9"><path fill="#7f8b98" d="M1 1h7v1h-7zM0 2h2v1h-2zM4 2h1v4h-1zM7 2h2v5h-2zM0 3h1v4h-1zM2 3h2v1h-2zM1 4h1v3h-1zM2 5h2v1h-2zM5 5h2v1h-2z"/><path fill="#2fd0e0" d="M2 2h1v1h-1zM1 3h1v1h-1zM2 4h1v1h-1z"/><path fill="#ff3b30" d="M6 2h1v2h-1z"/></symbol><symbol id="ic-mouse" viewBox="0 0 7 7"><path fill="#7f8b98" d="M2 0h3v1h-3zM1 1h1v5h-1zM3 1h2v1h-2zM6 1h1v1h-1zM3 2h1v5h-1zM5 2h1v4h-1zM2 3h1v4h-1zM4 3h1v4h-1z"/><path fill="#2fd0e0" d="M2 1h1v2h-1zM5 1h1v1h-1z"/></symbol><symbol id="ic-phone" viewBox="0 0 7 7"><path fill="#7f8b98" d="M1 0h5v1h-5zM1 1h1v6h-1zM5 1h1v6h-1zM2 6h3v1h-3z"/><path fill="#2fd0e0" d="M2 1h3v5h-3z"/></symbol><symbol id="ic-trendup" viewBox="0 0 9 9"><path fill="#7f8b98" d="M0 0h1v8h-1zM1 7h8v1h-8z"/><path fill="#46c76a" d="M7 0h1v1h-1zM6 1h1v1h-1zM8 1h1v1h-1zM5 2h1v2h-1zM3 3h1v1h-1zM2 4h1v1h-1zM4 4h1v1h-1zM1 5h1v1h-1zM3 5h1v1h-1zM2 6h1v1h-1z"/></symbol><symbol id="ic-warn" viewBox="0 0 9 9"><path fill="#ffd21e" d="M4 0h1v2h-1zM3 1h1v8h-1zM5 1h1v8h-1zM2 3h1v6h-1zM6 3h1v6h-1zM1 5h1v4h-1zM7 5h1v4h-1zM4 6h1v1h-1zM0 7h1v2h-1zM8 7h1v2h-1zM4 8h1v1h-1z"/><path fill="#12161c" d="M4 2h1v4h-1z"/></symbol><symbol id="ic-siren" viewBox="0 0 9 9"><path fill="#eef2f5" d="M3 0h3v1h-3zM2 1h1v1h-1zM6 1h1v1h-1zM1 2h1v1h-1zM7 2h1v1h-1z"/><path fill="#ff3b30" d="M3 1h3v5h-3zM2 2h1v4h-1zM6 2h1v4h-1zM1 3h1v2h-1zM7 3h1v2h-1z"/><path fill="#7f8b98" d="M2 6h5v2h-5zM1 7h1v1h-1zM7 7h1v1h-1z"/></symbol><symbol id="ic-check" viewBox="0 0 9 9"><path fill="#46c76a" d="M7 0h1v2h-1zM6 1h1v2h-1zM5 2h1v2h-1zM0 3h1v2h-1zM4 3h1v2h-1zM1 4h1v2h-1zM3 4h1v2h-1zM2 5h1v2h-1z"/></symbol><symbol id="ic-checkbox" viewBox="0 0 9 9"><path fill="#46c76a" d="M1 0h7v1h-7zM0 1h1v7h-1zM7 1h2v2h-2zM6 3h1v1h-1zM8 3h1v5h-1zM1 8h7v1h-7z"/><path fill="#eef2f5" d="M6 1h1v2h-1zM5 2h1v4h-1zM1 3h1v2h-1zM2 4h1v2h-1zM4 4h1v3h-1zM3 5h1v2h-1z"/></symbol><symbol id="ic-noentry" viewBox="0 0 9 9"><path fill="#ff3b30" d="M2 0h5v3h-5zM1 1h1v2h-1zM7 1h1v2h-1zM0 2h1v5h-1zM8 2h1v5h-1zM1 5h7v3h-7zM2 8h5v1h-5z"/><path fill="#eef2f5" d="M1 3h7v2h-7z"/></symbol><symbol id="ic-sqblack" viewBox="0 0 7 7"><path fill="#2a2f38" d="M0 0h7v7h-7z"/></symbol><symbol id="ic-sqred" viewBox="0 0 7 7"><path fill="#ff3b30" d="M0 0h7v7h-7z"/></symbol><symbol id="ic-fl_ru" viewBox="0 0 12 8"><path fill="#eef2f5" d="M0 0h12v2h-12z"/><path fill="#3f8fd0" d="M0 2h12v2h-12z"/><path fill="#ff3b30" d="M0 4h12v4h-12z"/></symbol><symbol id="ic-fl_ua" viewBox="0 0 12 8"><path fill="#3f8fd0" d="M0 0h12v4h-12z"/><path fill="#ffd21e" d="M0 4h12v4h-12z"/></symbol><symbol id="ic-fl_ir" viewBox="0 0 12 8"><path fill="#46c76a" d="M0 0h12v2h-12z"/><path fill="#eef2f5" d="M0 2h12v2h-12z"/><path fill="#ff3b30" d="M0 4h12v4h-12z"/></symbol><symbol id="ic-fl_sy" viewBox="0 0 12 8"><path fill="#ff3b30" d="M0 0h12v2h-12z"/><path fill="#eef2f5" d="M0 2h12v2h-12z"/><path fill="#12161c" d="M0 4h5v4h-5zM7 4h5v4h-5zM5 5h2v3h-2z"/><path fill="#46c76a" d="M5 4h2v1h-2z"/></symbol><symbol id="ic-fl_iq" viewBox="0 0 12 8"><path fill="#ff3b30" d="M0 0h12v2h-12z"/><path fill="#eef2f5" d="M0 2h12v2h-12z"/><path fill="#12161c" d="M0 4h5v4h-5zM6 4h6v4h-6zM5 5h1v3h-1z"/><path fill="#46c76a" d="M5 4h1v1h-1z"/></symbol><symbol id="ic-fl_ye" viewBox="0 0 12 8"><path fill="#ff3b30" d="M0 0h12v2h-12z"/><path fill="#eef2f5" d="M0 2h12v2h-12z"/><path fill="#12161c" d="M0 4h12v4h-12z"/></symbol><symbol id="ic-fl_cn" viewBox="0 0 12 8"><path fill="#ff3b30" d="M0 0h12v1h-12zM0 1h2v7h-2zM3 1h1v7h-1zM5 1h7v7h-7zM2 2h1v1h-1zM4 3h1v5h-1zM2 4h1v4h-1z"/><path fill="#ffd21e" d="M2 1h1v1h-1zM4 1h1v2h-1zM2 3h1v1h-1z"/></symbol><symbol id="ic-fl_us" viewBox="0 0 12 8"><path fill="#3f8fd0" d="M0 0h5v4h-5z"/><path fill="#ff3b30" d="M5 0h7v1h-7zM5 2h7v1h-7zM0 4h12v1h-12zM0 6h12v1h-12z"/><path fill="#eef2f5" d="M5 1h7v1h-7zM5 3h7v1h-7zM0 5h12v1h-12zM0 7h12v1h-12z"/></symbol><symbol id="ic-fl_il" viewBox="0 0 12 8"><path fill="#eef2f5" d="M0 0h12v1h-12zM0 2h12v1h-12zM0 3h5v3h-5zM6 3h6v1h-6zM5 4h1v2h-1zM7 4h5v2h-5zM6 5h1v1h-1zM0 7h12v1h-12z"/><path fill="#3f8fd0" d="M0 1h12v1h-12zM5 3h1v1h-1zM6 4h1v1h-1zM0 6h12v1h-12z"/></symbol><symbol id="ic-fl_tw" viewBox="0 0 12 8"><path fill="#3f8fd0" d="M0 0h6v1h-6zM0 1h2v3h-2zM3 1h3v1h-3zM2 2h1v2h-1zM4 2h2v2h-2zM3 3h1v1h-1z"/><path fill="#ff3b30" d="M6 0h6v8h-6zM0 4h6v4h-6z"/><path fill="#eef2f5" d="M2 1h1v1h-1zM3 2h1v1h-1z"/></symbol><symbol id="ic-fl_kp" viewBox="0 0 12 8"><path fill="#3f8fd0" d="M0 0h12v2h-12zM0 6h12v2h-12z"/><path fill="#ff3b30" d="M0 2h12v1h-12zM0 3h3v3h-3zM4 3h8v3h-8zM3 4h1v2h-1z"/><path fill="#eef2f5" d="M3 3h1v1h-1z"/></symbol><symbol id="ic-fl_kr" viewBox="0 0 12 8"><path fill="#eef2f5" d="M0 0h12v3h-12zM0 3h5v5h-5zM7 3h5v5h-5zM5 5h2v3h-2z"/><path fill="#ff3b30" d="M5 3h2v1h-2z"/><path fill="#3f8fd0" d="M5 4h2v1h-2z"/></symbol><symbol id="ic-fl_lb" viewBox="0 0 12 8"><path fill="#ff3b30" d="M0 0h12v2h-12zM0 4h6v4h-6zM7 4h5v4h-5zM6 5h1v3h-1z"/><path fill="#eef2f5" d="M0 2h12v1h-12zM0 3h5v1h-5zM6 3h6v1h-6z"/><path fill="#46c76a" d="M5 3h1v1h-1zM6 4h1v1h-1z"/></symbol><symbol id="ic-fl_in" viewBox="0 0 12 8"><path fill="#ff8f1c" d="M0 0h12v2h-12z"/><path fill="#eef2f5" d="M0 2h12v1h-12zM0 3h5v1h-5zM7 3h5v1h-5z"/><path fill="#3f8fd0" d="M5 3h2v1h-2z"/><path fill="#46c76a" d="M0 4h12v4h-12z"/></symbol><symbol id="ic-fl_pk" viewBox="0 0 12 8"><path fill="#eef2f5" d="M0 0h4v8h-4zM9 2h1v1h-1zM8 3h1v1h-1zM7 4h1v1h-1z"/><path fill="#46c76a" d="M4 0h8v2h-8zM4 2h5v1h-5zM10 2h2v6h-2zM4 3h4v1h-4zM9 3h1v5h-1zM4 4h3v4h-3zM8 4h1v4h-1zM7 5h1v3h-1z"/></symbol><symbol id="ic-pizza" viewBox="0 0 9 9"><path fill="#c9782e" d="M1 0h7v2h-7zM0 1h1v1h-1zM8 1h1v1h-1z"/><path fill="#f4b73d" d="M1 2h7v1h-7zM1 3h1v1h-1zM3 3h3v2h-3zM7 3h1v1h-1zM2 4h1v2h-1zM6 4h1v2h-1zM3 5h1v3h-1zM5 5h1v3h-1zM4 6h1v3h-1z"/><path fill="#e23b2a" d="M2 3h1v1h-1zM6 3h1v1h-1zM4 5h1v1h-1z"/></symbol><symbol id="ic-wheat" viewBox="0 0 9 9"><path fill="#ffd21e" d="M4 0h1v1h-1zM4 2h1v1h-1zM4 4h1v1h-1z"/><path fill="#f5a623" d="M3 1h1v5h-1zM5 1h1v5h-1z"/><path fill="#35e08a" d="M4 3h1v1h-1zM4 5h1v4h-1zM2 6h1v1h-1zM6 6h1v1h-1z"/></symbol><symbol id="ic-gear" viewBox="0 0 9 9"><path fill="#c2cad4" d="M4 0h1v1h-1zM1 1h1v1h-1zM7 1h1v1h-1zM3 2h3v2h-3zM2 3h1v3h-1zM6 3h1v3h-1zM0 4h1v1h-1zM3 4h1v3h-1zM5 4h1v3h-1zM8 4h1v1h-1zM4 5h1v2h-1zM1 7h1v1h-1zM7 7h1v1h-1zM4 8h1v1h-1z"/><path fill="#00cfe8" d="M4 4h1v1h-1z"/></symbol><symbol id="ic-medal" viewBox="0 0 9 9"><path fill="#ff3b30" d="M3 0h1v2h-1z"/><path fill="#7fb2ff" d="M5 0h1v2h-1z"/><path fill="#f5a623" d="M4 2h1v2h-1zM3 3h1v4h-1zM5 3h1v4h-1zM2 4h1v1h-1zM6 4h1v1h-1zM4 5h1v1h-1z"/><path fill="#ffd21e" d="M4 4h1v1h-1z"/></symbol></defs></svg>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="ic-swords" viewBox="0 0 9 9"><path fill="#c2cad4" d="M0 0h1v1h-1zM8 0h1v1h-1zM1 1h1v1h-1zM7 1h1v1h-1zM2 2h1v1h-1zM6 2h1v1h-1zM3 3h1v1h-1zM5 3h1v1h-1zM4 4h1v1h-1zM3 5h1v1h-1zM5 5h1v1h-1zM4 6h1v2h-1z"/><path fill="#d3a94a" d="M2 6h1v1h-1zM6 6h1v1h-1zM1 7h1v1h-1zM7 7h1v1h-1zM0 8h1v1h-1zM4 8h1v1h-1zM8 8h1v1h-1z"/></symbol><symbol id="ic-fire" viewBox="0 0 9 9"><path fill="#ff3b30" d="M4 0h1v1h-1zM3 1h1v2h-1zM2 3h1v2h-1zM1 5h1v3h-1zM7 6h1v2h-1zM2 8h1v1h-1zM6 8h1v1h-1z"/><path fill="#ff7a18" d="M4 1h1v3h-1zM5 2h1v1h-1zM3 3h1v3h-1zM6 3h1v5h-1zM2 5h1v3h-1zM7 5h1v1h-1zM3 7h1v2h-1zM5 7h1v2h-1zM4 8h1v1h-1z"/><path fill="#ffd21e" d="M5 3h1v4h-1zM4 4h1v4h-1zM3 6h1v1h-1z"/></symbol><symbol id="ic-beer" viewBox="0 0 9 9"><path fill="#fff2c4" d="M1 0h5v2h-5zM0 1h1v1h-1zM6 1h1v1h-1z"/><path fill="#c9782e" d="M0 2h1v7h-1zM6 2h1v7h-1zM7 3h2v1h-2zM7 4h1v3h-1zM8 6h1v1h-1zM1 8h5v1h-5z"/><path fill="#f4b73d" d="M1 2h5v6h-5z"/></symbol><symbol id="ic-plane" viewBox="0 0 9 9"><path fill="#c2cad4" d="M4 0h1v8h-1zM0 3h4v1h-4zM5 3h4v1h-4zM3 6h1v1h-1zM5 6h1v1h-1z"/><path fill="#7f8b98" d="M1 4h3v1h-3zM5 4h3v1h-3zM2 7h1v1h-1zM6 7h1v1h-1z"/></symbol><symbol id="ic-money" viewBox="0 0 9 9"><path fill="#c9782e" d="M3 0h2v1h-2zM2 1h1v1h-1zM5 1h1v1h-1z"/><path fill="#d3a94a" d="M3 2h2v2h-2zM2 3h1v2h-1zM5 3h1v2h-1zM1 4h1v3h-1zM6 4h1v3h-1zM2 6h1v2h-1zM5 6h1v2h-1zM3 7h2v2h-2z"/><path fill="#46c76a" d="M3 4h2v3h-2zM2 5h1v1h-1zM5 5h1v1h-1z"/></symbol><symbol id="ic-chart" viewBox="0 0 9 9"><path fill="#7f8b98" d="M0 0h1v8h-1zM1 7h8v1h-8z"/><path fill="#46c76a" d="M5 1h1v6h-1zM4 6h1v1h-1z"/><path fill="#f4b73d" d="M3 2h1v5h-1zM7 4h1v3h-1z"/><path fill="#2fd0e0" d="M2 4h1v3h-1z"/></symbol><symbol id="ic-news" viewBox="0 0 9 9"><path fill="#dcddd2" d="M0 0h9v1h-9zM0 1h1v8h-1zM8 1h1v3h-1zM8 5h1v2h-1zM1 8h8v1h-8z"/><path fill="#ff3b30" d="M1 1h4v1h-4z"/><path fill="#7f8b98" d="M5 1h3v1h-3zM1 2h1v6h-1zM3 2h2v6h-2zM6 2h2v6h-2zM2 4h1v1h-1zM5 4h1v4h-1zM8 4h1v1h-1zM2 7h1v1h-1zM8 7h1v1h-1z"/></symbol><symbol id="ic-sat" viewBox="0 0 9 9"><path fill="#ffd21e" d="M0 0h1v4h-1zM8 0h1v4h-1zM1 1h1v2h-1zM7 1h1v2h-1z"/><path fill="#c2cad4" d="M2 0h1v1h-1zM6 0h1v1h-1zM3 1h3v2h-3zM2 3h1v1h-1zM4 3h1v2h-1zM6 3h1v1h-1zM3 4h1v1h-1zM5 4h1v1h-1z"/><path fill="#7f8b98" d="M2 5h1v1h-1zM6 5h1v1h-1zM1 6h1v1h-1zM7 6h1v1h-1z"/></symbol><symbol id="ic-radiation" viewBox="0 0 9 9"><path fill="#ffd21e" d="M0 0h9v1h-9zM0 1h3v1h-3zM6 1h3v1h-3zM0 2h2v2h-2zM7 2h2v2h-2zM2 3h1v1h-1zM6 3h1v1h-1zM0 4h1v1h-1zM3 4h3v3h-3zM8 4h1v1h-1zM0 6h1v3h-1zM8 6h1v3h-1zM1 7h3v2h-3zM5 7h3v2h-3zM4 8h1v1h-1z"/><path fill="#12161c" d="M3 1h3v3h-3zM2 2h1v1h-1zM6 2h1v1h-1zM1 4h2v3h-2zM6 4h2v3h-2zM0 5h1v1h-1zM8 5h1v1h-1zM4 7h1v1h-1z"/></symbol><symbol id="ic-book" viewBox="0 0 9 9"><path fill="#3f8fd0" d="M1 1h3v1h-3zM5 1h3v1h-3zM0 2h1v5h-1zM4 2h1v5h-1zM8 2h1v5h-1zM1 7h3v1h-3zM5 7h3v1h-3z"/><path fill="#dcddd2" d="M1 2h3v5h-3zM5 2h3v5h-3z"/></symbol><symbol id="ic-clock" viewBox="0 0 9 9"><path fill="#7f8b98" d="M2 0h5v1h-5zM1 1h1v1h-1zM7 1h1v1h-1zM0 2h1v5h-1zM8 2h1v4h-1zM1 7h1v1h-1zM7 7h1v1h-1zM2 8h5v1h-5z"/><path fill="#dcddd2" d="M2 1h5v1h-5zM1 2h2v5h-2zM6 2h2v5h-2zM3 5h3v3h-3zM8 6h1v1h-1zM2 7h1v1h-1zM6 7h1v1h-1z"/><path fill="#12161c" d="M4 2h1v3h-1zM3 4h1v1h-1zM5 4h1v1h-1z"/></symbol><symbol id="ic-abacus" viewBox="0 0 9 9"><path fill="#c9782e" d="M0 0h9v1h-9zM0 1h1v8h-1zM8 1h1v8h-1zM1 3h7v1h-7zM1 6h7v1h-7zM1 8h7v1h-7z"/><path fill="#2fd0e0" d="M2 1h1v2h-1zM6 1h1v2h-1zM4 4h1v2h-1zM2 7h1v1h-1zM6 7h1v1h-1z"/><path fill="#f4b73d" d="M4 1h1v2h-1zM2 4h1v2h-1zM6 4h1v2h-1zM4 7h1v1h-1z"/></symbol><symbol id="ic-globe" viewBox="0 0 9 9"><path fill="#3f8fd0" d="M2 0h5v1h-5zM1 1h1v2h-1zM4 1h2v3h-2zM7 1h1v2h-1zM0 2h1v5h-1zM6 2h1v1h-1zM8 2h1v5h-1zM2 3h2v2h-2zM1 4h1v1h-1zM6 4h1v5h-1zM3 5h3v1h-3zM7 5h1v3h-1zM1 6h2v2h-2zM5 6h1v1h-1zM3 7h1v2h-1zM2 8h1v1h-1zM4 8h2v1h-2z"/><path fill="#46c76a" d="M2 1h2v2h-2zM6 1h1v1h-1zM1 3h1v1h-1zM6 3h2v1h-2zM4 4h2v1h-2zM7 4h1v1h-1zM1 5h2v1h-2zM3 6h2v1h-2zM4 7h2v1h-2z"/></symbol><symbol id="ic-globe2" viewBox="0 0 9 9"><path fill="#2fd0e0" d="M2 0h5v1h-5zM1 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM7 1h1v1h-1zM0 2h1v5h-1zM2 2h1v5h-1zM4 2h1v5h-1zM6 2h1v5h-1zM8 2h1v5h-1zM1 3h1v1h-1zM3 3h1v1h-1zM5 3h1v1h-1zM7 3h1v1h-1zM1 5h1v1h-1zM3 5h1v1h-1zM5 5h1v1h-1zM7 5h1v1h-1zM1 7h1v1h-1zM3 7h1v2h-1zM5 7h1v2h-1zM7 7h1v1h-1zM2 8h1v1h-1zM4 8h1v1h-1zM6 8h1v1h-1z"/><path fill="#3f8fd0" d="M2 1h1v1h-1zM4 1h1v1h-1zM6 1h1v1h-1zM1 2h1v1h-1zM3 2h1v1h-1zM5 2h1v1h-1zM7 2h1v1h-1zM1 4h1v1h-1zM3 4h1v1h-1zM5 4h1v1h-1zM7 4h1v1h-1zM1 6h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM7 6h1v1h-1zM2 7h1v1h-1zM4 7h1v1h-1zM6 7h1v1h-1z"/></symbol><symbol id="ic-bolt" viewBox="0 0 9 9"><path fill="#ffd21e" d="M4 0h2v1h-2zM3 1h2v1h-2zM2 2h2v2h-2zM1 3h1v1h-1zM4 3h2v1h-2zM3 4h2v1h-2zM2 5h2v1h-2zM1 6h2v1h-2zM0 7h2v1h-2z"/></symbol><symbol id="ic-target" viewBox="0 0 9 9"><path fill="#ff3b30" d="M2 0h5v1h-5zM1 1h1v1h-1zM7 1h1v1h-1zM0 2h1v5h-1zM2 2h5v1h-5zM8 2h1v5h-1zM2 3h1v4h-1zM6 3h1v4h-1zM4 4h1v1h-1zM3 6h3v1h-3zM1 7h1v1h-1zM7 7h1v1h-1zM2 8h5v1h-5z"/><path fill="#eef2f5" d="M2 1h5v1h-5zM1 2h1v5h-1zM7 2h1v5h-1zM3 3h3v1h-3zM3 4h1v2h-1zM5 4h1v2h-1zM4 5h1v1h-1zM2 7h5v1h-5z"/></symbol><symbol id="ic-shield" viewBox="0 0 9 9"><path fill="#3f8fd0" d="M1 0h7v1h-7zM1 1h1v4h-1zM7 1h1v4h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path fill="#2fd0e0" d="M2 1h5v4h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/></symbol><symbol id="ic-fuel" viewBox="0 0 9 9"><path fill="#ff3b30" d="M0 0h6v1h-6zM0 1h1v7h-1zM2 1h2v7h-2zM5 1h1v7h-1zM1 3h1v1h-1zM4 3h1v1h-1zM6 3h1v2h-1zM1 6h1v2h-1zM4 6h1v2h-1z"/><path fill="#7f8b98" d="M7 0h1v2h-1zM6 1h1v2h-1zM7 3h1v2h-1z"/></symbol><symbol id="ic-volcano" viewBox="0 0 9 9"><path fill="#ff3b30" d="M3 0h1v1h-1zM5 0h1v1h-1zM2 1h1v1h-1zM6 1h1v1h-1z"/><path fill="#ff7a18" d="M4 1h1v4h-1zM3 2h1v1h-1zM5 2h1v1h-1zM3 5h1v1h-1zM5 5h1v1h-1zM4 6h1v1h-1z"/><path fill="#7f8b98" d="M3 3h1v2h-1zM5 3h1v2h-1zM2 4h1v5h-1zM6 4h1v5h-1zM4 5h1v1h-1zM1 6h1v3h-1zM3 6h1v3h-1zM5 6h1v3h-1zM7 6h1v3h-1zM4 7h1v2h-1zM0 8h1v1h-1zM8 8h1v1h-1z"/></symbol><symbol id="ic-snow" viewBox="0 0 9 9"><path fill="#2fd0e0" d="M4 0h1v5h-1zM2 1h1v1h-1zM6 1h1v1h-1zM3 2h1v2h-1zM5 2h1v2h-1zM1 3h2v1h-2zM6 3h2v1h-2zM1 5h3v1h-3zM5 5h3v1h-3zM3 6h3v1h-3zM2 7h1v1h-1zM4 7h1v2h-1zM6 7h1v1h-1z"/></symbol><symbol id="ic-wave" viewBox="0 0 9 9"><path fill="#2fd0e0" d="M3 1h2v1h-2zM2 2h1v1h-1zM5 2h1v1h-1zM7 2h1v1h-1zM1 3h1v1h-1zM6 3h1v1h-1zM8 3h1v1h-1zM0 4h1v1h-1zM2 6h1v1h-1zM4 6h2v1h-2zM7 6h1v1h-1zM1 7h1v1h-1zM3 7h1v1h-1zM6 7h1v1h-1zM8 7h1v1h-1z"/><path fill="#3f8fd0" d="M3 2h2v1h-2zM2 3h1v1h-1zM5 3h1v1h-1zM7 3h1v2h-1zM1 4h1v1h-1zM6 4h1v1h-1zM2 7h1v2h-1zM4 7h2v2h-2zM7 7h1v2h-1zM0 8h2v1h-2zM3 8h1v1h-1zM6 8h1v1h-1zM8 8h1v1h-1z"/></symbol><symbol id="ic-gamepad" viewBox="0 0 9 9"><path fill="#7f8b98" d="M1 1h7v1h-7zM0 2h2v1h-2zM4 2h1v4h-1zM7 2h2v5h-2zM0 3h1v4h-1zM2 3h2v1h-2zM1 4h1v3h-1zM2 5h2v1h-2zM5 5h2v1h-2z"/><path fill="#2fd0e0" d="M2 2h1v1h-1zM1 3h1v1h-1zM2 4h1v1h-1z"/><path fill="#ff3b30" d="M6 2h1v2h-1z"/></symbol><symbol id="ic-mouse" viewBox="0 0 7 7"><path fill="#7f8b98" d="M2 0h3v1h-3zM1 1h1v5h-1zM3 1h2v1h-2zM6 1h1v1h-1zM3 2h1v5h-1zM5 2h1v4h-1zM2 3h1v4h-1zM4 3h1v4h-1z"/><path fill="#2fd0e0" d="M2 1h1v2h-1zM5 1h1v1h-1z"/></symbol><symbol id="ic-phone" viewBox="0 0 7 7"><path fill="#7f8b98" d="M1 0h5v1h-5zM1 1h1v6h-1zM5 1h1v6h-1zM2 6h3v1h-3z"/><path fill="#2fd0e0" d="M2 1h3v5h-3z"/></symbol><symbol id="ic-trendup" viewBox="0 0 9 9"><path fill="#7f8b98" d="M0 0h1v8h-1zM1 7h8v1h-8z"/><path fill="#46c76a" d="M7 0h1v1h-1zM6 1h1v1h-1zM8 1h1v1h-1zM5 2h1v2h-1zM3 3h1v1h-1zM2 4h1v1h-1zM4 4h1v1h-1zM1 5h1v1h-1zM3 5h1v1h-1zM2 6h1v1h-1z"/></symbol><symbol id="ic-warn" viewBox="0 0 9 9"><path fill="#ffd21e" d="M4 0h1v2h-1zM3 1h1v8h-1zM5 1h1v8h-1zM2 3h1v6h-1zM6 3h1v6h-1zM1 5h1v4h-1zM7 5h1v4h-1zM4 6h1v1h-1zM0 7h1v2h-1zM8 7h1v2h-1zM4 8h1v1h-1z"/><path fill="#12161c" d="M4 2h1v4h-1z"/></symbol><symbol id="ic-siren" viewBox="0 0 9 9"><path fill="#eef2f5" d="M3 0h3v1h-3zM2 1h1v1h-1zM6 1h1v1h-1zM1 2h1v1h-1zM7 2h1v1h-1z"/><path fill="#ff3b30" d="M3 1h3v5h-3zM2 2h1v4h-1zM6 2h1v4h-1zM1 3h1v2h-1zM7 3h1v2h-1z"/><path fill="#7f8b98" d="M2 6h5v2h-5zM1 7h1v1h-1zM7 7h1v1h-1z"/></symbol><symbol id="ic-check" viewBox="0 0 9 9"><path fill="#46c76a" d="M7 0h1v2h-1zM6 1h1v2h-1zM5 2h1v2h-1zM0 3h1v2h-1zM4 3h1v2h-1zM1 4h1v2h-1zM3 4h1v2h-1zM2 5h1v2h-1z"/></symbol><symbol id="ic-checkbox" viewBox="0 0 9 9"><path fill="#46c76a" d="M1 0h7v1h-7zM0 1h1v7h-1zM7 1h2v2h-2zM6 3h1v1h-1zM8 3h1v5h-1zM1 8h7v1h-7z"/><path fill="#eef2f5" d="M6 1h1v2h-1zM5 2h1v4h-1zM1 3h1v2h-1zM2 4h1v2h-1zM4 4h1v3h-1zM3 5h1v2h-1z"/></symbol><symbol id="ic-noentry" viewBox="0 0 9 9"><path fill="#ff3b30" d="M2 0h5v3h-5zM1 1h1v2h-1zM7 1h1v2h-1zM0 2h1v5h-1zM8 2h1v5h-1zM1 5h7v3h-7zM2 8h5v1h-5z"/><path fill="#eef2f5" d="M1 3h7v2h-7z"/></symbol><symbol id="ic-sqblack" viewBox="0 0 7 7"><path fill="#2a2f38" d="M0 0h7v7h-7z"/></symbol><symbol id="ic-sqred" viewBox="0 0 7 7"><path fill="#ff3b30" d="M0 0h7v7h-7z"/></symbol><symbol id="ic-fl_ru" viewBox="0 0 12 8"><path fill="#eef2f5" d="M0 0h12v2h-12z"/><path fill="#3f8fd0" d="M0 2h12v2h-12z"/><path fill="#ff3b30" d="M0 4h12v4h-12z"/></symbol><symbol id="ic-fl_ua" viewBox="0 0 12 8"><path fill="#3f8fd0" d="M0 0h12v4h-12z"/><path fill="#ffd21e" d="M0 4h12v4h-12z"/></symbol><symbol id="ic-fl_ir" viewBox="0 0 12 8"><path fill="#46c76a" d="M0 0h12v2h-12z"/><path fill="#eef2f5" d="M0 2h12v2h-12z"/><path fill="#ff3b30" d="M0 4h12v4h-12z"/></symbol><symbol id="ic-fl_sy" viewBox="0 0 12 8"><path fill="#ff3b30" d="M0 0h12v2h-12z"/><path fill="#eef2f5" d="M0 2h12v2h-12z"/><path fill="#12161c" d="M0 4h5v4h-5zM7 4h5v4h-5zM5 5h2v3h-2z"/><path fill="#46c76a" d="M5 4h2v1h-2z"/></symbol><symbol id="ic-fl_iq" viewBox="0 0 12 8"><path fill="#ff3b30" d="M0 0h12v2h-12z"/><path fill="#eef2f5" d="M0 2h12v2h-12z"/><path fill="#12161c" d="M0 4h5v4h-5zM6 4h6v4h-6zM5 5h1v3h-1z"/><path fill="#46c76a" d="M5 4h1v1h-1z"/></symbol><symbol id="ic-fl_ye" viewBox="0 0 12 8"><path fill="#ff3b30" d="M0 0h12v2h-12z"/><path fill="#eef2f5" d="M0 2h12v2h-12z"/><path fill="#12161c" d="M0 4h12v4h-12z"/></symbol><symbol id="ic-fl_cn" viewBox="0 0 12 8"><path fill="#ff3b30" d="M0 0h12v1h-12zM0 1h2v7h-2zM3 1h1v7h-1zM5 1h7v7h-7zM2 2h1v1h-1zM4 3h1v5h-1zM2 4h1v4h-1z"/><path fill="#ffd21e" d="M2 1h1v1h-1zM4 1h1v2h-1zM2 3h1v1h-1z"/></symbol><symbol id="ic-fl_us" viewBox="0 0 12 8"><path fill="#3f8fd0" d="M0 0h5v4h-5z"/><path fill="#ff3b30" d="M5 0h7v1h-7zM5 2h7v1h-7zM0 4h12v1h-12zM0 6h12v1h-12z"/><path fill="#eef2f5" d="M5 1h7v1h-7zM5 3h7v1h-7zM0 5h12v1h-12zM0 7h12v1h-12z"/></symbol><symbol id="ic-fl_il" viewBox="0 0 12 8"><path fill="#eef2f5" d="M0 0h12v1h-12zM0 2h12v1h-12zM0 3h5v3h-5zM6 3h6v1h-6zM5 4h1v2h-1zM7 4h5v2h-5zM6 5h1v1h-1zM0 7h12v1h-12z"/><path fill="#3f8fd0" d="M0 1h12v1h-12zM5 3h1v1h-1zM6 4h1v1h-1zM0 6h12v1h-12z"/></symbol><symbol id="ic-fl_tw" viewBox="0 0 12 8"><path fill="#3f8fd0" d="M0 0h6v1h-6zM0 1h2v3h-2zM3 1h3v1h-3zM2 2h1v2h-1zM4 2h2v2h-2zM3 3h1v1h-1z"/><path fill="#ff3b30" d="M6 0h6v8h-6zM0 4h6v4h-6z"/><path fill="#eef2f5" d="M2 1h1v1h-1zM3 2h1v1h-1z"/></symbol><symbol id="ic-fl_kp" viewBox="0 0 12 8"><path fill="#3f8fd0" d="M0 0h12v2h-12zM0 6h12v2h-12z"/><path fill="#ff3b30" d="M0 2h12v1h-12zM0 3h3v3h-3zM4 3h8v3h-8zM3 4h1v2h-1z"/><path fill="#eef2f5" d="M3 3h1v1h-1z"/></symbol><symbol id="ic-fl_kr" viewBox="0 0 12 8"><path fill="#eef2f5" d="M0 0h12v3h-12zM0 3h5v5h-5zM7 3h5v5h-5zM5 5h2v3h-2z"/><path fill="#ff3b30" d="M5 3h2v1h-2z"/><path fill="#3f8fd0" d="M5 4h2v1h-2z"/></symbol><symbol id="ic-fl_lb" viewBox="0 0 12 8"><path fill="#ff3b30" d="M0 0h12v2h-12zM0 4h6v4h-6zM7 4h5v4h-5zM6 5h1v3h-1z"/><path fill="#eef2f5" d="M0 2h12v1h-12zM0 3h5v1h-5zM6 3h6v1h-6z"/><path fill="#46c76a" d="M5 3h1v1h-1zM6 4h1v1h-1z"/></symbol><symbol id="ic-fl_in" viewBox="0 0 12 8"><path fill="#ff8f1c" d="M0 0h12v2h-12z"/><path fill="#eef2f5" d="M0 2h12v1h-12zM0 3h5v1h-5zM7 3h5v1h-5z"/><path fill="#3f8fd0" d="M5 3h2v1h-2z"/><path fill="#46c76a" d="M0 4h12v4h-12z"/></symbol><symbol id="ic-fl_pk" viewBox="0 0 12 8"><path fill="#eef2f5" d="M0 0h4v8h-4zM9 2h1v1h-1zM8 3h1v1h-1zM7 4h1v1h-1z"/><path fill="#46c76a" d="M4 0h8v2h-8zM4 2h5v1h-5zM10 2h2v6h-2zM4 3h4v1h-4zM9 3h1v5h-1zM4 4h3v4h-3zM8 4h1v4h-1zM7 5h1v3h-1z"/></symbol><symbol id="ic-pizza" viewBox="0 0 9 9"><path fill="#c9782e" d="M1 0h7v2h-7zM0 1h1v1h-1zM8 1h1v1h-1z"/><path fill="#f4b73d" d="M1 2h7v1h-7zM1 3h1v1h-1zM3 3h3v2h-3zM7 3h1v1h-1zM2 4h1v2h-1zM6 4h1v2h-1zM3 5h1v3h-1zM5 5h1v3h-1zM4 6h1v3h-1z"/><path fill="#e23b2a" d="M2 3h1v1h-1zM6 3h1v1h-1zM4 5h1v1h-1z"/></symbol><symbol id="ic-wheat" viewBox="0 0 9 9"><path fill="#ffd21e" d="M4 0h1v1h-1zM4 2h1v1h-1zM4 4h1v1h-1z"/><path fill="#f5a623" d="M3 1h1v5h-1zM5 1h1v5h-1z"/><path fill="#35e08a" d="M4 3h1v1h-1zM4 5h1v4h-1zM2 6h1v1h-1zM6 6h1v1h-1z"/></symbol><symbol id="ic-gear" viewBox="0 0 9 9"><path fill="#c2cad4" d="M4 0h1v1h-1zM1 1h1v1h-1zM7 1h1v1h-1zM3 2h3v2h-3zM2 3h1v3h-1zM6 3h1v3h-1zM0 4h1v1h-1zM3 4h1v3h-1zM5 4h1v3h-1zM8 4h1v1h-1zM4 5h1v2h-1zM1 7h1v1h-1zM7 7h1v1h-1zM4 8h1v1h-1z"/><path fill="#00cfe8" d="M4 4h1v1h-1z"/></symbol><symbol id="ic-medal" viewBox="0 0 9 9"><path fill="#ff3b30" d="M3 0h1v2h-1z"/><path fill="#7fb2ff" d="M5 0h1v2h-1z"/><path fill="#f5a623" d="M4 2h1v2h-1zM3 3h1v4h-1zM5 3h1v4h-1zM2 4h1v1h-1zM6 4h1v1h-1zM4 5h1v1h-1z"/><path fill="#ffd21e" d="M4 4h1v1h-1z"/></symbol><symbol id="ic-backpack" viewBox="0 0 9 9"><path fill="#7f8b98" d="M3 0h3v1h-3zM2 1h1v1h-1zM6 1h1v1h-1z"/><path fill="#e2553a" d="M1 2h7v2h-7zM1 4h1v2h-1zM7 4h1v2h-1zM1 6h7v2h-7zM2 8h1v1h-1zM6 8h1v1h-1z"/><path fill="#ff7a18" d="M2 4h5v2h-5z"/><path fill="#12161c" d="M4 4h1v1h-1z"/></symbol><symbol id="ic-can" viewBox="0 0 9 9"><path fill="#c2cad4" d="M1 0h7v1h-7zM1 8h7v1h-7z"/><path fill="#e2553a" d="M1 1h7v2h-7zM1 6h7v2h-7z"/><path fill="#f4b73d" d="M1 3h7v3h-7z"/><path fill="#eef2f5" d="M3 4h3v1h-3z"/></symbol><symbol id="ic-radio" viewBox="0 0 9 9"><path fill="#c2cad4" d="M6 0h1v1h-1zM5 1h1v1h-1z"/><path fill="#c9782e" d="M0 2h9v1h-9zM0 3h1v3h-1zM4 3h1v3h-1zM8 3h1v3h-1zM5 5h3v1h-3zM0 6h9v1h-9zM1 7h1v1h-1zM7 7h1v1h-1z"/><path fill="#7f8b98" d="M1 3h3v3h-3z"/><path fill="#2fd0e0" d="M5 3h3v2h-3z"/></symbol></defs></svg>
 
 <div class="bg-grid"></div>
 
@@ -1814,6 +1818,77 @@
     </div>
   </div>
 
+  <!-- ══════════ 🇨🇳 中國戰備動向監測（整合區塊）══════════ -->
+  <div class="cn-banner" id="china-watch">
+    <div class="cn-banner-t">🇨🇳 中國戰備動向監測</div>
+    <div class="cn-banner-s">以中國海關直報與<strong>出口國鏡像資料</strong>觀察貿易趨勢；兩者涵蓋範圍不同，不能直接混算增幅。缺少紀錄不代表停止公布或零進口。進口增減亦受價格、季節、需求及申報延遲影響，<strong>不能單憑增減推論備戰</strong>。</div>
+  </div>
+
+  <!-- ══════════ 🌾 中國糧食進口監測（結構性背景指標）══════════ -->
+  <div class="card food-card" id="food-card" style="margin-bottom:1.5rem">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-bottom:.4rem">
+      <div class="section-title" style="margin:0">🌾 中國糧食進口監測</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim)"><span id="food-updated">結構性背景指標</span></div>
+    </div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim);margin-bottom:.6rem" id="food-sub">
+      出口國回推（採主要出口國回報，改由主要出口國「對中國出口」海關數據回推）· <strong>異常高可能反映需求、價格或庫存調整，不能直接判定備戰</strong>；<strong>異常低≠自給提升</strong>，亦可能受需求、價格、季節與申報延遲影響· 佐證訊號，非即時、單月僅供參考，看趨勢
+    </div>
+    <div id="food-grid">
+      <div style="padding:1rem;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 連接 UN Comtrade…</div>
+    </div>
+    <div id="grain-explorer" class="fh-wrap">
+      <div class="fh-controls">
+        <div class="fh-tabs" id="grain-cmd"><button class="fh-tab on" data-cmd="soy">大豆</button><button class="fh-tab" data-cmd="wheat">小麥</button><button class="fh-tab" data-cmd="corn">玉米</button></div>
+        <div class="fh-tabs" id="grain-view"><button class="fh-tab on" data-view="vol">進口總量</button><button class="fh-tab" data-view="usshare">美國佔比%</button><button class="fh-tab" data-view="commit">累計承諾趨勢</button><button class="fh-tab" data-view="flow">下單 vs 提貨</button></div>
+      </div>
+    <div id="food-hist-wrap" class="fh-wrap" style="display:none">
+      <div class="fh-controls">
+        <div class="fh-tabs" id="fh-cmd"></div>
+        <div class="fh-tabs" id="fh-range"></div>
+        <div class="fh-tabs" id="fh-view"></div>
+      </div>
+      <div class="fh-chart"><svg id="fh-svg" viewBox="0 0 720 240" preserveAspectRatio="xMidYMid meet"></svg></div>
+      <div class="fh-legend" id="fh-legend"></div>
+    </div>
+    <!-- 🇺🇸→🇨🇳 USDA ESR 週報趨勢（承諾趨勢 / 下單 vs 提貨） -->
+    <div id="uh-wrap" class="fh-wrap" style="display:none;margin-top:1rem;border-top:1px dashed var(--border);padding-top:.7rem">
+      <div style="font-family:'Orbitron',monospace;font-size:.7rem;color:var(--text);margin-bottom:.15rem">🇺🇸→🇨🇳 美對中穀物週報趨勢 · USDA ESR</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim);margin-bottom:.45rem">此區為美國出口端週報(每週更新);中國直報資料可用性需逐期核對,故無法對比進口端落差,僅觀察美方趨勢</div>
+      <div class="fh-controls">
+        <div class="fh-tabs" id="uh-cmd"></div>
+        <div class="fh-tabs" id="uh-view"></div>
+      </div>
+      <div class="fh-chart"><svg id="uh-svg" viewBox="0 0 720 240" preserveAspectRatio="xMidYMid meet"></svg></div>
+      <div class="fh-legend" id="uh-legend"></div>
+    </div>
+    </div>
+  </div>
+
+  <!-- ⚙️ 戰略物資進口監測 -->
+  <div class="card" id="strat-card" style="margin-bottom:1.5rem">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-bottom:.4rem">
+      <div class="section-title" style="margin:0">⚙️ 戰略物資進口監測</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim)"><span id="strat-updated">軍工原料</span></div>
+    </div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim);margin-bottom:.6rem">
+      月度進口背景 · <strong>資料待補不等於零；增減原因未定。</strong>
+    </div>
+    <div id="sh-wrap" class="fh-wrap" style="display:none">
+      <div class="fh-controls">
+        <div class="fh-tabs" id="sh-cmd"></div>
+        <div class="fh-tabs" id="sh-range"></div>
+      </div>
+      <div class="chart-scroll-hint">左右滑動查看月份；點選圖表查看數值。</div>
+      <div class="fh-chart" tabindex="0" aria-label="戰略物資逐月圖表"><svg id="sh-svg" viewBox="0 0 720 220" preserveAspectRatio="xMidYMid meet"></svg></div>
+      <div class="fh-legend" id="sh-legend"></div>
+    </div>
+    <div id="strat-grid">
+      <div style="padding:1rem;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 連接 UN Comtrade…</div>
+    </div>
+
+  </div>
+
+
   <!-- ══════════ 🛡️ 台灣民眾準備指南（導向避難指南）══════════ -->
   <div class="card" id="prep-guides-card" style="margin-bottom:1.5rem">
     <div class="section-title">🛡️ 台灣民眾準備指南</div>
@@ -1909,76 +1984,6 @@
       ⚠️ 僅供資訊參考，不構成投資建議。機率隨事件發展即時變動。
     </div>
   </div><!-- /.poly-card -->
-
-  <!-- ══════════ 🇨🇳 中國戰備動向監測（整合區塊）══════════ -->
-  <div class="cn-banner" id="china-watch">
-    <div class="cn-banner-t">🇨🇳 中國戰備動向監測</div>
-    <div class="cn-banner-s">以中國海關直報與<strong>出口國鏡像資料</strong>觀察貿易趨勢；兩者涵蓋範圍不同，不能直接混算增幅。缺少紀錄不代表停止公布或零進口。進口增減亦受價格、季節、需求及申報延遲影響，<strong>不能單憑增減推論備戰</strong>。</div>
-  </div>
-
-  <!-- ══════════ 🌾 中國糧食進口監測（結構性背景指標）══════════ -->
-  <div class="card food-card" id="food-card" style="margin-bottom:1.5rem">
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-bottom:.4rem">
-      <div class="section-title" style="margin:0">🌾 中國糧食進口監測</div>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim)"><span id="food-updated">結構性背景指標</span></div>
-    </div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim);margin-bottom:.6rem" id="food-sub">
-      出口國回推（採主要出口國回報，改由主要出口國「對中國出口」海關數據回推）· <strong>異常高可能反映需求、價格或庫存調整，不能直接判定備戰</strong>；<strong>異常低≠自給提升</strong>，亦可能受需求、價格、季節與申報延遲影響· 佐證訊號，非即時、單月僅供參考，看趨勢
-    </div>
-    <div id="food-grid">
-      <div style="padding:1rem;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 連接 UN Comtrade…</div>
-    </div>
-    <div id="grain-explorer" class="fh-wrap">
-      <div class="fh-controls">
-        <div class="fh-tabs" id="grain-cmd"><button class="fh-tab on" data-cmd="soy">大豆</button><button class="fh-tab" data-cmd="wheat">小麥</button><button class="fh-tab" data-cmd="corn">玉米</button></div>
-        <div class="fh-tabs" id="grain-view"><button class="fh-tab on" data-view="vol">進口總量</button><button class="fh-tab" data-view="usshare">美國佔比%</button><button class="fh-tab" data-view="commit">累計承諾趨勢</button><button class="fh-tab" data-view="flow">下單 vs 提貨</button></div>
-      </div>
-    <div id="food-hist-wrap" class="fh-wrap" style="display:none">
-      <div class="fh-controls">
-        <div class="fh-tabs" id="fh-cmd"></div>
-        <div class="fh-tabs" id="fh-range"></div>
-        <div class="fh-tabs" id="fh-view"></div>
-      </div>
-      <div class="fh-chart"><svg id="fh-svg" viewBox="0 0 720 240" preserveAspectRatio="xMidYMid meet"></svg></div>
-      <div class="fh-legend" id="fh-legend"></div>
-    </div>
-    <!-- 🇺🇸→🇨🇳 USDA ESR 週報趨勢（承諾趨勢 / 下單 vs 提貨） -->
-    <div id="uh-wrap" class="fh-wrap" style="display:none;margin-top:1rem;border-top:1px dashed var(--border);padding-top:.7rem">
-      <div style="font-family:'Orbitron',monospace;font-size:.7rem;color:var(--text);margin-bottom:.15rem">🇺🇸→🇨🇳 美對中穀物週報趨勢 · USDA ESR</div>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim);margin-bottom:.45rem">此區為美國出口端週報(每週更新);中國直報資料可用性需逐期核對,故無法對比進口端落差,僅觀察美方趨勢</div>
-      <div class="fh-controls">
-        <div class="fh-tabs" id="uh-cmd"></div>
-        <div class="fh-tabs" id="uh-view"></div>
-      </div>
-      <div class="fh-chart"><svg id="uh-svg" viewBox="0 0 720 240" preserveAspectRatio="xMidYMid meet"></svg></div>
-      <div class="fh-legend" id="uh-legend"></div>
-    </div>
-    </div>
-  </div>
-
-  <!-- ⚙️ 戰略物資進口監測 -->
-  <div class="card" id="strat-card" style="margin-bottom:1.5rem">
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-bottom:.4rem">
-      <div class="section-title" style="margin:0">⚙️ 戰略物資進口監測</div>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim)"><span id="strat-updated">軍工原料</span></div>
-    </div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim);margin-bottom:.6rem">
-      月度進口背景 · <strong>資料待補不等於零；增減原因未定。</strong>
-    </div>
-    <div id="sh-wrap" class="fh-wrap" style="display:none">
-      <div class="fh-controls">
-        <div class="fh-tabs" id="sh-cmd"></div>
-        <div class="fh-tabs" id="sh-range"></div>
-      </div>
-      <div class="chart-scroll-hint">左右滑動查看月份；點選圖表查看數值。</div>
-      <div class="fh-chart" tabindex="0" aria-label="戰略物資逐月圖表"><svg id="sh-svg" viewBox="0 0 720 220" preserveAspectRatio="xMidYMid meet"></svg></div>
-      <div class="fh-legend" id="sh-legend"></div>
-    </div>
-    <div id="strat-grid">
-      <div style="padding:1rem;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim)">⏳ 連接 UN Comtrade…</div>
-    </div>
-
-  </div>
 
 <style>
 /* ── 🇨🇳 中國戰備動向監測 區塊橫幅 ── */
@@ -2689,7 +2694,10 @@ function htmlWpiRender() {
 
   // 時間戳
   const ts = document.getElementById('html-wpi-updated');
-  if (ts) ts.textContent = `資料時間：${observedTime()} · 有效權重覆蓋 ${Math.round((BACKEND_SCORE?.coverage || 0)*100)}% · 人工權重觀察指數，非開戰機率`;
+  // Name what the missing weight is, so a low coverage number is not a mystery. FIRMS is unscored by design.
+  const gaps=[['z','披薩人流'],['a','軍機'],['g','新聞強度'],['p','預測市場'],['s','金融情緒'],['w','維基焦慮']].filter(([k])=>sc[k]==null).map(([,n])=>n);
+  const gapText=(gaps.length?'（暫缺：'+gaps.join('、')+'；熱異常不計分）':'（熱異常不計分）');
+  if (ts) ts.textContent = `資料時間：${observedTime()} · 有效權重覆蓋 ${Math.round((BACKEND_SCORE?.coverage || 0)*100)}%${gapText} · 人工權重觀察指數，非開戰機率`;
 }
 
 // 啟動 WPI
@@ -2933,7 +2941,7 @@ function renderPizzaRadar(json) {
   const barsList = Array.isArray(bars.bars) ? bars.bars : [];
   let headline, tone;
   if (!shops.length) { headline = '尚未取得披薩店資料'; tone = 'dim'; }
-  else if (!live.length && shops.every(s => s && s.data_source === 'none')) { headline = '來源 PizzINT 目前沒有提供即時人流（上游暫停，不是店家打烊）'; tone = 'dim'; }
+  else if (!live.length && shops.every(s => s && s.data_source === 'none')) { headline = '披薩人流來源目前暫停提供即時資料（不是店家打烊）'; tone = 'dim'; }
   else if (!live.length) { headline = `${dc ? `華府 ${dc} 的資料：` : ''}${shops.length} 家店都沒有即時人流`; tone = 'dim'; }
   else if (busy.length) { headline = `${busy.length} 家店人流高於平常${top != null ? `（最高為平常的 ${Math.round(top)}%）` : ''}`; tone = 'hot'; }
   else { headline = `${live.length}/${shops.length} 家店營業中，人流在平常範圍內`; tone = 'ok'; }
@@ -3386,12 +3394,18 @@ function renderFood(json){
   // 🇺🇸→🇨🇳 USDA 每週銷售（有 key 才有）
   var u=json.usda;
   if(u?.schema_version === 2 && u.items?.length){
-    var rows=u.items.map(function(it){
-      return '<div class="usda-row"><div class="u-name">'+escapeHtml(it.name)+' · MY '+(it.market_year ?? '未知')+' · '+escapeHtml(it.week || '無觀測週次')+(it.stale?'（舊資料）':'')+'</div>'
-        +'<div class="u-v">當年度本週淨銷售 <b>'+(it.week_net_kt?.toLocaleString() ?? '--')+'</b> 千噸</div>'
-        +'<div class="u-v">下一年度本週淨銷售 <b>'+(it.next_year_net_kt?.toLocaleString() ?? '--')+'</b> 千噸</div>'
-        +'<div class="u-v">未裝運 <b>'+(it.outstanding_kt?.toLocaleString() ?? '--')+'</b> 千噸</div></div>';
+    // Rows with no observation collapse into one line; a reported 0 is still a value and keeps its row.
+    var has=function(it){return ['week_net_kt','next_year_net_kt','outstanding_kt'].some(function(k){return it[k]!=null;});};
+    var kt=function(v){return v==null?'--':v.toLocaleString();};
+    var rows=u.items.filter(has).map(function(it){
+      var wk=it.week&&it.week!==u.week_ending?' · '+escapeHtml(it.week):'';
+      return '<div class="usda-row"><div class="u-name">'+escapeHtml(it.name)+'<small> · MY '+escapeHtml(it.market_year ?? '未知')+wk+(it.stale?'（舊資料）':'')+'</small></div>'
+        +'<div class="u-v"><span>當年度本週淨銷售</span><b>'+kt(it.week_net_kt)+'</b> 千噸</div>'
+        +'<div class="u-v"><span>下一年度本週淨銷售</span><b>'+kt(it.next_year_net_kt)+'</b> 千噸</div>'
+        +'<div class="u-v"><span>未裝運</span><b>'+kt(it.outstanding_kt)+'</b> 千噸</div></div>';
     }).join('');
+    var none=u.items.filter(function(it){return !has(it);}).map(function(it){return escapeHtml(it.name);});
+    if(none.length) rows+='<div class="usda-none">'+none.join('、')+'：本期沒有美對中銷售觀測（不等於零）</div>';
     el.innerHTML += '<div class="usda-block"><div class="usda-hd">🇺🇸→🇨🇳 美對中每週穀物銷售 · USDA ESR（截至 '+escapeHtml(u.week_ending||'')+'）</div>'+rows+'</div>';
   }
   var upd=document.getElementById('food-updated');
@@ -4480,7 +4494,7 @@ function renderWarMap(json){
 
 /* ===== 全站 emoji → 8-bit 像素 icon（DOM walker + MutationObserver）===== */
 (function(){
-  var EMOJI_IC = {"\u2694": "swords", "\ud83d\udd25": "fire", "\ud83c\udf7a": "beer", "\u2708": "plane", "\ud83d\udcb0": "money", "\ud83d\udcca": "chart", "\ud83d\udcf0": "news", "\ud83d\udef0": "sat", "\ud83d\udce1": "sat", "\u2622": "radiation", "\ud83d\udcd6": "book", "\ud83d\udd50": "clock", "\ud83e\uddee": "abacus", "\ud83c\udf0d": "globe", "\ud83c\udf10": "globe2", "\u26a1": "bolt", "\ud83c\udfaf": "target", "\ud83d\udee1": "shield", "\u26fd": "fuel", "\ud83c\udf0b": "volcano", "\u2744": "snow", "\ud83c\udf0a": "wave", "\ud83c\udfae": "gamepad", "\ud83d\uddb1": "mouse", "\ud83d\udcf1": "phone", "\ud83d\udcc8": "trendup", "\u26a0": "warn", "\ud83d\udea8": "siren", "\u2713": "check", "\u2705": "checkbox", "\u26d4": "noentry", "\u2b1b": "sqblack", "\ud83d\udfe5": "sqred", "\ud83c\udf55": "pizza", "\ud83c\udf3e": "wheat", "\u2699": "gear", "\ud83c\udf96": "medal",  "\ud83c\uddee\ud83c\uddf7": "fl_ir", "\ud83c\uddf7\ud83c\uddfa": "fl_ru", "\ud83c\uddfa\ud83c\uddf8": "fl_us", "\ud83c\udde8\ud83c\uddf3": "fl_cn", "\ud83c\uddfa\ud83c\udde6": "fl_ua", "\ud83c\uddee\ud83c\uddf1": "fl_il", "\ud83c\uddf9\ud83c\uddfc": "fl_tw", "\ud83c\uddf0\ud83c\uddf5": "fl_kp", "\ud83c\uddf0\ud83c\uddf7": "fl_kr", "\ud83c\uddf1\ud83c\udde7": "fl_lb", "\ud83c\uddf8\ud83c\uddfe": "fl_sy", "\ud83c\uddee\ud83c\uddf6": "fl_iq", "\ud83c\uddfe\ud83c\uddea": "fl_ye", "\ud83c\uddee\ud83c\uddf3": "fl_in", "\ud83c\uddf5\ud83c\uddf0": "fl_pk"};
+  var EMOJI_IC = {"\u2694": "swords", "\ud83d\udd25": "fire", "\ud83c\udf7a": "beer", "\u2708": "plane", "\ud83d\udcb0": "money", "\ud83d\udcca": "chart", "\ud83d\udcf0": "news", "\ud83d\udef0": "sat", "\ud83d\udce1": "sat", "\u2622": "radiation", "\ud83d\udcd6": "book", "\ud83d\udd50": "clock", "\ud83e\uddee": "abacus", "\ud83c\udf0d": "globe", "\ud83c\udf10": "globe2", "\u26a1": "bolt", "\ud83c\udfaf": "target", "\ud83d\udee1": "shield", "\u26fd": "fuel", "\ud83c\udf0b": "volcano", "\u2744": "snow", "\ud83c\udf0a": "wave", "\ud83c\udfae": "gamepad", "\ud83d\uddb1": "mouse", "\ud83d\udcf1": "phone", "\ud83d\udcc8": "trendup", "\u26a0": "warn", "\ud83d\udea8": "siren", "\u2713": "check", "\u2705": "checkbox", "\u26d4": "noentry", "\u2b1b": "sqblack", "\ud83d\udfe5": "sqred", "\ud83c\udf55": "pizza", "\ud83c\udf3e": "wheat", "\u2699": "gear", "\ud83c\udf96": "medal", "\ud83c\udf92": "backpack", "\ud83e\udd6b": "can", "\ud83d\udcfb": "radio",  "\ud83c\uddee\ud83c\uddf7": "fl_ir", "\ud83c\uddf7\ud83c\uddfa": "fl_ru", "\ud83c\uddfa\ud83c\uddf8": "fl_us", "\ud83c\udde8\ud83c\uddf3": "fl_cn", "\ud83c\uddfa\ud83c\udde6": "fl_ua", "\ud83c\uddee\ud83c\uddf1": "fl_il", "\ud83c\uddf9\ud83c\uddfc": "fl_tw", "\ud83c\uddf0\ud83c\uddf5": "fl_kp", "\ud83c\uddf0\ud83c\uddf7": "fl_kr", "\ud83c\uddf1\ud83c\udde7": "fl_lb", "\ud83c\uddf8\ud83c\uddfe": "fl_sy", "\ud83c\uddee\ud83c\uddf6": "fl_iq", "\ud83c\uddfe\ud83c\uddea": "fl_ye", "\ud83c\uddee\ud83c\uddf3": "fl_in", "\ud83c\uddf5\ud83c\uddf0": "fl_pk"};
   var keys = Object.keys(EMOJI_IC).sort(function(a,b){return b.length-a.length;});
   var esc = function(k){return k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');};
   var pat = '(?:'+keys.map(esc).join('|')+')️?';
