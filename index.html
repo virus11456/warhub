@@ -29,6 +29,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="preload" href="/fonts/cubic11-subset.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=IBM+Plex+Sans:wght@300;400;500&family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
@@ -1244,8 +1245,8 @@
   /* 繁體中文像素字型 Cubic 11（俐方體十一號）*/
   @font-face {
     font-family:'Cubic 11';
-    src:url('https://cdn.jsdelivr.net/gh/ACh-K/Cubic-11@1.500/fonts/web/Cubic_11.woff2') format('woff2'),
-        url('https://cdn.jsdelivr.net/gh/ACh-K/Cubic-11@1.500/fonts/web/Cubic_11.woff') format('woff');
+    /* 只含網站用到的字（scripts/build_font_subset.py；授權見 fonts/CUBIC11-LICENSE.txt）*/
+    src:url('/fonts/cubic11-subset.woff2') format('woff2');
     font-display:swap;
   }
 
@@ -1359,8 +1360,7 @@
 
 </style>
 <link rel="stylesheet" href="/i18n.css?v=20260916b">
-<script src="/locales/en.js?v=20260917a" defer></script>
-<script src="/i18n.js?v=20260916a" defer></script>
+<script src="/i18n.js?v=20261028b" defer></script>
 <script src="/cross-context.js"></script>
 <script src="/kalshi-markets.js?v=20260923a" defer></script>
 <link rel="stylesheet" href="/kalshi-markets.css?v=20260923a">
@@ -2495,7 +2495,10 @@ setInterval(htmlWpiRender, 10 * 60 * 1000);
 // 部署凍結而卡在舊快照），失敗才退回同站部署快照（較舊，保底用）。
 const SNAPSHOT_ORIGINS = new WeakMap();
 async function wLoad(file){
-  let r = await fetch('/api/data?f=' + file, { cache: 'no-store', signal: AbortSignal.timeout(10000) }).catch(function(){return null;});
+  const live = function(){ return fetch('/api/data?f=' + file, { cache: 'no-store', signal: AbortSignal.timeout(10000) }).catch(function(){return null;}); };
+  let r = await live();
+  // One retry before the deployment copy: that copy is frozen at the last code deploy and can be hours old.
+  if (!r || !r.ok) { await new Promise(function(done){ setTimeout(done, 500); }); r = await live(); }
   let origin = 'live';
   if (!r || !r.ok) {
     origin = 'backup';

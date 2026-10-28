@@ -71,6 +71,19 @@ class GroqTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(s.calls[0][0],'https://api.groq.com/openai/v1/chat/completions')
         self.assertEqual(s.calls[0][1]['json']['model'],'openai/gpt-oss-20b')
         self.assertTrue(s.calls[0][1]['json']['response_format']['json_schema']['strict'])
+    async def test_translation_adding_a_country_is_rejected_alone(self):
+        items=[{'title':'Pakistan imports wheat as food costs, US-Iran war fuel inflation'},{'title':'US warns Gulf states'}]
+        s=Session(rows=[{'id':0,'text':'巴基斯坦進口小麥因食品成本、俄美伊戰爭燃料通膨'},{'id':1,'text':'美國警告海灣國家'}])
+        await translate_groq(s,items,{})
+        self.assertNotIn('title_zh',items[0])                       # wrong title stays untranslated, retried next run
+        self.assertEqual(items[0]['translation_error'],'entity_mismatch')
+        self.assertEqual(items[1]['title_zh'],'美國警告海灣國家')       # the rest of the batch still applies
+        self.assertIn('never 俄',s.calls[0][1]['json']['messages'][0]['content'])
+    async def test_cached_translation_adding_a_country_is_retranslated(self):
+        items=[{'title':'US-Iran war fuel inflation'}];s=Session(rows=[{'id':0,'text':'美伊戰爭推升燃料通膨'}])
+        await translate_groq(s,items,{'US-Iran war fuel inflation':'俄美伊戰爭燃料通膨'})
+        self.assertEqual(len(s.calls),1)
+        self.assertEqual(items[0]['title_zh'],'美伊戰爭推升燃料通膨')
     async def test_missing_key_retains_cache_without_network(self):
         items=[{'title':'known'},{'title':'new'}];s=Session()
         with patch.dict('os.environ',{'GROQ_API_KEY':''}): await translate_groq(s,items,{'known':'已翻譯'})
@@ -106,3 +119,13 @@ class GroqTests(unittest.IsolatedAsyncioTestCase):
         await translate_groq(ArraySession(), items, {})
         self.assertNotIn('title_zh', items[0])
         self.assertEqual(items[0]['translation_error'], 'groq_ValueError')
+
+
+class EntityCheckTests(unittest.TestCase):
+    def test_only_added_countries_are_flagged(self):
+        from translation_check import added_entities as a
+        self.assertEqual(a('US-Iran war fuel inflation', '俄美伊戰爭燃料通膨'), ['(?<!塞)俄'])
+        for en, zh in [('Russo-Ukrainian war, day 1702', '俄烏戰爭第1702天'), ('Eritrea invades Ethiopia by October 31?', '厄立特里亞於10月31日前入侵埃塞俄比亞？'),
+                       ('Chinese ships near PH shoal — PCG', '中國船隻在菲律賓海域'), ('Kremlin warns Kyiv', '俄羅斯警告烏克蘭'), ('Putin meets Xi', '普丁會見習近平')]:
+            self.assertEqual(a(en, zh), [], en)
+        self.assertEqual(a(None, '俄'), [])

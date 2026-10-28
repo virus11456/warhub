@@ -7,27 +7,46 @@
   const normalize=s=>String(s).replace(/\s+/g,' ').trim();
   const hasZh=s=>/[\u3400-\u9fff]/u.test(s);
   const escape=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-  const catalog={...(window.WARHUB_EN||{})};
+  // English catalogue (~190 KB) loads only when a visitor switches to English.
+  const EN_SRC='/locales/en.js?v=20261028a';
+  let catalog={}, ready=false, loading=null;
   // The existing icon renderer replaces emoji with SVG before translation.
   // Keep matching whole labels after that presentation change.
   const withoutIcons=s=>normalize(s.replace(/[\p{Extended_Pictographic}\p{Regional_Indicator}\uFE0F\u200D]/gu,''));
-  for(const [zh,en] of Object.entries(catalog)){
-    const plain=withoutIcons(zh);
-    if(plain&&plain!==zh&&!Object.hasOwn(catalog,plain))catalog[plain]=withoutIcons(en);
-  }
   let phrases, titlePhrases;
   const numeric=[];
-  for(const [zh,en] of Object.entries(catalog)) {
-    const numbers=zh.match(/\d+(?:[.,:]\d+)*/g);
-    if(!numbers||!hasZh(zh))continue;
-    const unused=numbers.map((value,index)=>({value,index}));
-    const format=en.replace(/\d+(?:[.,:]\d+)*/g,n=>{
-      const pos=unused.findIndex(x=>x.value===n);
-      return pos<0?n:'\u0001'+unused.splice(pos,1)[0].index+'\u0001';
+  function prepare(raw){
+    catalog={...raw};
+    for(const [zh,en] of Object.entries(catalog)){
+      const plain=withoutIcons(zh);
+      if(plain&&plain!==zh&&!Object.hasOwn(catalog,plain))catalog[plain]=withoutIcons(en);
+    }
+    for(const [zh,en] of Object.entries(catalog)) {
+      const numbers=zh.match(/\d+(?:[.,:]\d+)*/g);
+      if(!numbers||!hasZh(zh))continue;
+      const unused=numbers.map((value,index)=>({value,index}));
+      const format=en.replace(/\d+(?:[.,:]\d+)*/g,n=>{
+        const pos=unused.findIndex(x=>x.value===n);
+        return pos<0?n:'\u0001'+unused.splice(pos,1)[0].index+'\u0001';
+      });
+      if(unused.length)continue;
+      const pieces=zh.split(/\d+(?:[.,:]\d+)*/g);
+      numeric.push([new RegExp('^'+pieces.map(escape).join('(\\d+(?:[.,:]\\d+)*)')+'$'),format]);
+    }
+    ready=Object.keys(catalog).length>0;
+    rebuild();
+  }
+  function loadCatalog(){
+    if(ready)return Promise.resolve(true);
+    if(window.WARHUB_EN){prepare(window.WARHUB_EN);return Promise.resolve(ready);}
+    loading=loading||new Promise(done=>{
+      const tag=document.createElement('script');
+      tag.src=EN_SRC;tag.async=true;
+      tag.onload=()=>{prepare(window.WARHUB_EN||{});done(ready);};
+      tag.onerror=()=>{loading=null;done(false);};
+      document.head.appendChild(tag);
     });
-    if(unused.length)continue;
-    const pieces=zh.split(/\d+(?:[.,:]\d+)*/g);
-    numeric.push([new RegExp('^'+pieces.map(escape).join('(\\d+(?:[.,:]\\d+)*)')+'$'),format]);
+    return loading;
   }
   function rebuild(){
     const keys=Object.keys(catalog).filter(Boolean).sort((a,b)=>b.length-a.length);
@@ -122,7 +141,16 @@
   }
   function select(next){
     if(!['zh-TW','en'].includes(next))return;
-    if(next==='en'&&!Object.keys(catalog).length)return;
+    if(next==='en'&&!ready){
+      const buttons=document.querySelectorAll('[data-language="en"]');
+      buttons.forEach(b=>b.setAttribute('aria-busy','true'));
+      loadCatalog().then(ok=>{
+        buttons.forEach(b=>b.removeAttribute('aria-busy'));
+        if(ok)select('en');
+        else buttons.forEach(b=>{b.title='英文資源載入失敗，請稍後再試';});
+      });
+      return;
+    }
     language=next;document.documentElement.lang=next;
     document.title=next==='en'?english(initialTitle):initialTitle;
     apply(document.body);
@@ -130,15 +158,11 @@
     document.dispatchEvent(new CustomEvent('warhub-language-change',{detail:{language:next}}));
   }
   window.WarhubI18n={text,registerData,select,get language(){return language;}};
-  rebuild();
+  if(window.WARHUB_EN)prepare(window.WARHUB_EN);else rebuild();
   function start(){
     // No local/sessionStorage or browser-language preference: fresh opens use Chinese.
     select('zh-TW');
     for(const button of document.querySelectorAll('[data-language]'))button.addEventListener('click',()=>select(button.dataset.language));
-    if(!Object.keys(catalog).length){
-      const button=document.querySelector('[data-language="en"]');
-      if(button){button.disabled=true;button.title='英文資源載入失敗，請重新整理';}
-    }
     new MutationObserver(records=>{
       for(const record of records){
         if(record.type==='characterData')updateNode(record.target);
