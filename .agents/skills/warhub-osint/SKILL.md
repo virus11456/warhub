@@ -117,3 +117,5 @@ GDELT DOC API 對共用 IP（GitHub runner 及雲端主機）第一個請求即�
 2026-10-27 GDELT events 批次缺檔修正：lastupdate.txt 常先於檔案上線，最新1–3批會暫時404；原本固定取最新8批、少於6批就整輪失敗（2026-10-27 15:31 即因此 ValueError，地區新聞強度全部變 stale）。fetch_gdelt_events 改為由新到舊逐批取，缺檔往前補，最多多試 BATCH_EXTRA=4 批（每輪至多 1 清單＋12 批，仍不重試），取滿8批即停；視窗起訖以實際取到的最舊／最新批次為準，latest_batch 為實際最新批。仍少於6批才失敗並沿用舊序列標 stale，不補零。tests/test_gdelt_event_intensity.py 覆蓋最新兩批404與大量缺檔。collect_gdelt_events.py（六小時原始封存抽樣）只抓清單所列最新批，未改。
 
 2026-10-27 地區卡移除「參考（不計分）：熱異常 · 廣域軍機」行：軍機數已在空中動態卡逐區顯示，熱異常在地球圖與 FIRMS 卡；regions[].factors.firms_hotspots／avi_count 資料與計分不變。
+
+2026-10-28 軍機異常基準修正（數據排查）：可見軍機數有強烈日內週期（美國白天約400–560架、夜間約120–200架），舊做法拿當下總數比「7天全部時段平均」，使每個美國下午都被算成+100%以上、WPI每天固定由約24跳到41。現改用 fetch_data.aviation_baseline：只取過去7天內、與現在UTC時刻相差±2小時的歷史讀數平均，需≥5筆且分布≥5天，否則不寫anomaly_pct（不計分，不當0）。summary.baseline_7d 現為「同時段7日平均」，另寫 baseline_samples。驗證：tests/test_aviation_baseline.py。GDELT事件檔台海單窗122篇（48小時平均約30篇）得滿分屬真實偏高，非計算錯誤；單一大新聞即可拉高，判讀時看region_articles。

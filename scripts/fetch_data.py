@@ -2190,6 +2190,31 @@ def compute_avi_trends(history: list[dict]) -> dict | None:
 # ─────────────────────────────────────────────────────────────
 # Combined score
 # ─────────────────────────────────────────────────────────────
+def aviation_baseline(history, now, window_hours=2):
+    """
+    Same-time-of-day 7-day baseline for visible military aircraft.
+    Counts swing ~4x between US night and US afternoon, so an all-hours average turns every
+    afternoon into a false surge. Only readings within ±window_hours of the current UTC hour
+    are compared; needs ≥5 such readings spread over ≥5 days, else None (unscored, not zero).
+    """
+    from datetime import timedelta
+    pts = []
+    for h in history or []:
+        try:
+            t = datetime.fromisoformat(h["ts"])
+            tot = (h.get("avi") or {}).get("tot")
+        except (KeyError, TypeError, ValueError):
+            continue
+        if not isinstance(tot, (int, float)) or isinstance(tot, bool) or tot <= 0 or not (now - timedelta(days=7) <= t < now):
+            continue
+        minutes = abs((t.hour * 60 + t.minute) - (now.hour * 60 + now.minute))
+        if min(minutes, 1440 - minutes) <= window_hours * 60:
+            pts.append((t, tot))
+    if len(pts) < 5 or len({t.date() for t, _ in pts}) < 5:
+        return None
+    return {"avg": round(sum(v for _, v in pts) / len(pts), 1), "samples": len(pts)}
+
+
 def calculate_score(pizza_index, polymarket, **sources):
     return calculate_wpi(pizza_index, polymarket, **sources)
 
@@ -2305,18 +2330,12 @@ async def main():
     pizza_shops  = pizza["shops"]
     pizza_index  = pizza["summary"]["index"]
     pizza_level  = pizza["summary"]["level"]
-    # Use a genuine past 7-day baseline; require history spanning at least 6 days.
     try:
-        from datetime import timedelta
-        old = json.loads(HISTORY_FILE.read_text())
-        now = datetime.now(timezone.utc)
-        pts = [(datetime.fromisoformat(h["ts"]), h.get("avi")) for h in old]
-        pts = [(t,a) for t,a in pts if a and now-timedelta(days=7) <= t < now]
-        if not aviation.get("error") and len(pts) >= 12 and min(t for t,_ in pts) <= now-timedelta(days=6):
-            baseline = sum(a.get("tot",0) for _,a in pts)/len(pts)
-            if baseline > 0:
-                aviation["summary"]["anomaly_pct"] = round((aviation["summary"]["total"] / baseline - 1)*100,1)
-                aviation["summary"]["baseline_7d"] = round(baseline,1)
+        baseline = aviation_baseline(json.loads(HISTORY_FILE.read_text()), datetime.now(timezone.utc))
+        if not aviation.get("error") and baseline:
+            aviation["summary"]["anomaly_pct"] = round((aviation["summary"]["total"] / baseline["avg"] - 1)*100,1)
+            aviation["summary"]["baseline_7d"] = baseline["avg"]
+            aviation["summary"]["baseline_samples"] = baseline["samples"]
     except (ValueError, KeyError, TypeError, OSError):
         pass
     score        = calculate_score(pizza_index, polymarket, aviation=aviation, firms=firms, gdelt=gdelt, wikipedia=wikipedia, finance=finance, gdelt_events=gdelt_events)
