@@ -42,6 +42,9 @@ DIGEST_EVERY_HOURS  = max(1, _int("DIGEST_EVERY_HOURS", 1))   # 摘要去重時�
 ALERT_ESCALATION    = _on("ALERT_ESCALATION", True)          # 等級升高
 ALERT_PIZZA         = _on("ALERT_PIZZA", True)               # 披薩爆量
 ALERT_HOTSPOT       = _on("ALERT_HOTSPOT", True)             # 火點激增
+ALERT_REGION_JUMP   = _on("ALERT_REGION_JUMP", True)         # 地區一輪內跳升兩級以上到 HIGH+（只送站長）
+REGION_JUMP_COOLDOWN_HOURS = max(1, _int("REGION_JUMP_COOLDOWN_HOURS", 6))
+REGION_ORDER = ["WATCH", "ELEVATED", "HIGH", "CRITICAL"]
 HOTSPOT_SURGE_RATIO = float(os.environ.get("HOTSPOT_SURGE_RATIO", "") or 1.4)
 HOTSPOT_SURGE_MIN   = _int("HOTSPOT_SURGE_MIN", 12)          # 至少幾處才視為激增
 ALERT_SOURCE_OUTAGE = _on("ALERT_SOURCE_OUTAGE", True)       # 資料來源中斷（只送站長個人）
@@ -368,6 +371,47 @@ def build_outage_alert(newly_down: list, recovered: list) -> str:
     return "\n".join(lines)
 
 
+def region_jumps(regions, prev_notify, now):
+    """
+    地區等級跳升：本輪到 HIGH 或 CRITICAL、且比上一輪高兩級以上（如 觀察→HIGH）。
+    INSUFFICIENT_DATA 不覆蓋上一輪的已知等級；同一地區冷卻 REGION_JUMP_COOLDOWN_HOURS 小時。
+    回傳 (jumps, levels)；levels 為下一輪比較用的已知等級。
+    """
+    prev_levels = dict((prev_notify or {}).get("region_levels") or {})
+    alerted = (prev_notify or {}).get("region_alerted") or {}
+    levels, jumps = dict(prev_levels), []
+    for r in regions or []:
+        level = r.get("level") if isinstance(r, dict) else None
+        if level not in REGION_ORDER:
+            continue
+        levels[r["key"]] = level
+        before = prev_levels.get(r["key"])
+        last = _iso(alerted.get(r["key"]))
+        if (before in REGION_ORDER and level in ("HIGH", "CRITICAL")
+                and REGION_ORDER.index(level) - REGION_ORDER.index(before) >= 2
+                and (last is None or now - last >= timedelta(hours=REGION_JUMP_COOLDOWN_HOURS))):
+            jumps.append({**r, "previous_level": before})
+    return jumps, levels
+
+
+def build_region_jump_alert(jumps) -> str:
+    names = {"WATCH": "觀察", "ELEVATED": "升高", "HIGH": "HIGH", "CRITICAL": "CRITICAL"}
+    lines = ["🚨 WARHUBS 地區風險跳升"]
+    for r in jumps:
+        score = _fmt_score(r.get("score"))
+        lines.append(f"• {r.get('flag', '')} {r.get('name', r['key'])}：{names[r['previous_level']]} → "
+                     f"{names[r['level']]}（{score}）")
+        delta = (r.get("factors") or {}).get("gdelt_delta")
+        if _valid_number(delta) and delta >= 100:
+            lines.append(f"  新聞量約為平常的 {round(1 + delta / 100)} 倍")
+        head = r.get("headline") or {}
+        if head.get("title"):
+            lines.append(f"  主要新聞：{head['title']}")
+    lines.append(f"這是人工權重觀察，不是開戰機率；請交叉查證。{SITE}")
+    lines.append("此通知只送站長，不會發到公開頻道。")
+    return "\n".join(lines)
+
+
 def _target_key(kind, target):
     # Public data must not disclose private chat IDs or webhook credentials.
     return hashlib.sha256(f"{kind}:{target}".encode()).hexdigest()
@@ -438,7 +482,7 @@ async def run_notifications(data: dict, prev_notify: dict | None = None,
     if digest_only:
         # A saved-snapshot digest must not consume or replay event edges.
         for key in ("level", "pizza_extreme", "hotspots", "hotspot_counter_version",
-                    "source_down_since", "source_alerted"):
+                    "source_down_since", "source_alerted", "region_levels", "region_alerted"):
             if key in prev_notify:
                 new_notify[key] = prev_notify[key]
             else:
@@ -477,7 +521,22 @@ async def run_notifications(data: dict, prev_notify: dict | None = None,
             and hs_cnt >= prev_hs * HOTSPOT_SURGE_RATIO:
         alert_msgs.append(build_hotspot_alert(data, hs_cnt, prev_hs))
 
-    # 3) 資料來源中斷／恢復：只送站長個人 chat，不送公開頻道與 Discord
+    # 3) 地區跳升：只送站長個人 chat；送達才記冷卻，沒送達下輪再試
+    region_sent = {}
+    if not digest_only:
+        jumps, region_levels = region_jumps(data.get("regions"), prev_notify, now)
+        region_alerted = dict(prev_notify.get("region_alerted") or {})
+        if ALERT_REGION_JUMP and jumps:
+            region_sent = await _send_all([build_region_jump_alert(jumps)], new_level,
+                                          tg_chats=personal, pacer=pacer, discord=False)
+            if region_sent and all(region_sent.values()):
+                region_alerted.update({r["key"]: now.isoformat() for r in jumps})
+            else:
+                region_levels.update({r["key"]: r["previous_level"] for r in jumps})
+        new_notify["region_levels"] = region_levels
+        new_notify["region_alerted"] = region_alerted
+
+    # 4) 資料來源中斷／恢復：只送站長個人 chat，不送公開頻道與 Discord
     outage = {}
     if not digest_only:
         down_since, newly_down, recovered = source_outages(data.get("source_health"), prev_notify, now)
@@ -512,5 +571,6 @@ async def run_notifications(data: dict, prev_notify: dict | None = None,
     new_notify["telegram_retry_at"] = pacer.retry_at
     new_notify["delivery_version"] = 1
     new_notify["delivery"] = {"checked_at": now.isoformat(), "alerts": alerts, "digest": digest,
-                              **({"source_outage": outage} if outage else {})}
+                              **({"source_outage": outage} if outage else {}),
+                              **({"region_jump": region_sent} if region_sent else {})}
     return new_notify

@@ -88,6 +88,40 @@ class ShopTests(unittest.TestCase):
         self.assertEqual(pt.spike_events(shops)[0]['place_name'], two[0])
 
 
+class BackupTests(unittest.TestCase):
+    def payload(self, live=None, minutes_ago=10, name=NAME):
+        rows = [{'hour': h, 'popularity': 30} for h in range(6, 24)]
+        return {'data': [{'name': name, 'current_popularity': live,
+                          'recorded_at': (NOW - timedelta(minutes=minutes_ago)).isoformat().replace('+00:00', 'Z'),
+                          'baseline_popular_times': {str(d): rows for d in range(7)}},
+                         {'name': 'Not one of ours', 'current_popularity': 90}]}
+
+    def test_backup_fills_usual_week_and_fresh_live_only_where_ours_is_missing(self):
+        backup = pt.backup_shops(self.payload(live=72))
+        self.assertEqual(list(backup), [NAME])
+        shop = pt.build_shops({}, {}, None, NOW, True, backup)[0]
+        self.assertEqual((shop['busyness'], shop['data_source'], shop['usual_now'], shop['status']), (72, 'backup', 30, 'spike'))
+        self.assertEqual(shop['recorded_at'], (NOW - timedelta(minutes=10)).isoformat())   # original observation time
+        self.assertEqual(pt.summarize([shop], {}, True, NOW)['state'], 'ok')
+        # Our own live reading wins over the backup.
+        own = pt.build_shops({NAME: {'live_available': True, 'live_busyness': 40}}, venues(NAME), None, NOW, True, backup)[0]
+        self.assertEqual((own['busyness'], own['data_source']), (40, 'besttime'))
+
+    def test_stale_or_missing_backup_live_is_not_now(self):
+        for backup in (pt.backup_shops(self.payload(live=72, minutes_ago=200)), pt.backup_shops(self.payload(live=None))):
+            shops = pt.build_shops({}, {}, None, NOW, True, backup)
+            shop = next(s for s in shops if s['name'] == NAME)
+            self.assertEqual((shop['busyness'], shop['status'], shop['data_source']), (None, 'baseline_only', 'none'))
+            self.assertIsNotNone(shop['usual_week'])
+            self.assertEqual(pt.summarize(shops, {}, True, NOW)['state'], 'baseline_only')
+        self.assertEqual(pt.backup_shops({'data': [{'name': NAME, 'current_popularity': 0}]})[NAME]['live'], 0)   # 0 is valid
+
+    def test_health_reports_baseline_only_as_partial(self):
+        from data_quality import source_health
+        h = source_health({'pizza': [{}], 'pizza_summary': {'state': 'baseline_only'}})['pizza']
+        self.assertEqual(h['status'], 'partial')
+
+
 class FetchPizzaTests(unittest.TestCase):
     def run_fetch(self, store, et_hour, key='k'):
         calls = []
@@ -95,7 +129,9 @@ class FetchPizzaTests(unittest.TestCase):
             calls.append(venue['name']); return {'live_available': True, 'live_busyness': 40}
         with tempfile.TemporaryDirectory() as td:
             path = Path(td) / 'v.json'; path.write_text(json.dumps(store))
+            async def no_backup(session): return {}
             with patch.object(pt, 'VENUES_FILE', path), patch.object(collector, 'besttime_live', live), \
+                 patch.object(collector, 'fetch_pizza_backup', no_backup), \
                  patch.object(collector, 'besttime_et_hour', lambda: et_hour), patch.dict('os.environ', {'BESTTIME_API_KEY': key}):
                 return asyncio.run(collector.fetch_pizza(None, None)), calls
 

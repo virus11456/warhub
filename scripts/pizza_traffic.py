@@ -80,6 +80,47 @@ def shop_status(live, usual):
     return ("quiet" if pct is not None and pct < QUIET_RATIO else "normal"), pct, None
 
 
+BACKUP_MAX_AGE = timedelta(minutes=90)  # a backup live reading older than this is not "now"
+
+
+def backup_shops(payload) -> dict:
+    """Backup public popular-times feed → {display name: {usual_week, live, recorded_at}}.
+
+    Used only where our own BestTime data is missing; the page never names the provider.
+    Its baseline_popular_times keys are '0'(Sunday)…'6' with {hour, popularity} rows (local hour).
+    """
+    out = {}
+    for src in (payload or {}).get("data") or []:
+        if not isinstance(src, dict) or src.get("name") not in PIZZA_VENUES:
+            continue
+        usual = {}
+        for day, rows in (src.get("baseline_popular_times") or {}).items():
+            if str(day) not in {"0", "1", "2", "3", "4", "5", "6"} or not isinstance(rows, list):
+                continue
+            hours = [None] * 24
+            for row in rows:
+                hour = row.get("hour") if isinstance(row, dict) else None
+                if isinstance(hour, int) and not isinstance(hour, bool) and 0 <= hour <= 23:
+                    hours[hour] = popularity(row.get("popularity"))
+            if any(v is not None for v in hours):
+                usual[str(day)] = hours
+        out[src["name"]] = {"usual_week": usual or None, "live": popularity(src.get("current_popularity")),
+                            "recorded_at": src.get("recorded_at")}
+    return out
+
+
+def _backup_live(entry, now):
+    """The backup's live value only when it is present and recent; (value, observed_at)."""
+    value = (entry or {}).get("live")
+    try:
+        at = datetime.fromisoformat(str(entry.get("recorded_at")).replace("Z", "+00:00"))
+    except (AttributeError, ValueError):
+        return None, None
+    if value is None or not at.tzinfo or not (timedelta(0) <= now - at <= BACKUP_MAX_AGE):
+        return None, None
+    return value, at.isoformat()
+
+
 def _recent(points, now, hours=24):
     out = []
     for p in points or []:
@@ -92,22 +133,29 @@ def _recent(points, now, hours=24):
     return out
 
 
-def build_shops(live: dict, venues: dict, previous_shops, now: datetime, queried: bool) -> list[dict]:
+def build_shops(live: dict, venues: dict, previous_shops, now: datetime, queried: bool,
+                backup: dict | None = None) -> list[dict]:
     """
     live: {display name: besttime_live result} for this run ({} when not queried).
     previous_shops: last data.json pizza list, for the 24-hour history of our own readings.
     queried: False outside the US Eastern 16–24 window, so missing readings are "waiting", not failures.
+    backup: backup_shops() output; fills the usual week and a recent live value only where ours is missing.
     """
     prev = {s.get("name"): s for s in previous_shops or [] if isinstance(s, dict)}
     shops = []
     for name, venue in PIZZA_VENUES.items():
         stored = (venues.get("venues") or {}).get(name) or {}
-        usual_week = stored.get("usual_week")
+        spare = (backup or {}).get(name) or {}
+        usual_week = stored.get("usual_week") or spare.get("usual_week")
         result = live.get(name) or {}
         value = popularity(result.get("live_busyness")) if result.get("live_available") else None
+        source, observed = ("besttime", now.isoformat()) if value is not None else ("none", None)
+        if value is None:
+            value, observed = _backup_live(spare, now)
+            source = "backup" if value is not None else "none"
         hourly = _recent((prev.get(name) or {}).get("hourly_24h"), now)
-        if value is not None:
-            hourly = (hourly + [{"at": now.isoformat(), "v": value}])[-24:]
+        if value is not None and not any(p.get("at") == observed for p in hourly):
+            hourly = (hourly + [{"at": observed, "v": value}])[-24:]
         usual = usual_at(usual_week, now)
         if usual is None:
             usual = popularity(result.get("forecasted"))
@@ -118,7 +166,8 @@ def build_shops(live: dict, venues: dict, previous_shops, now: datetime, queried
             pct = magnitude = None
             closed = result.get("open") in (False, "Closed", "closed")
             is_open = False if closed else None
-            status = ("closed" if closed else "setup_needed" if not stored.get("venue_id")
+            status = ("closed" if closed else "baseline_only" if not stored.get("venue_id") and usual_week
+                      else "setup_needed" if not stored.get("venue_id")
                       else "waiting" if not queried else "unavailable")
         shops.append({
             "name": name,
@@ -132,8 +181,8 @@ def build_shops(live: dict, venues: dict, previous_shops, now: datetime, queried
             "hourly_24h": hourly,
             "usual_week": usual_week,
             "address": venue["address"],
-            "data_source": "besttime" if value is not None else "none",
-            "recorded_at": now.isoformat() if value is not None else None,
+            "data_source": source,
+            "recorded_at": observed,
             **({"error_message": result["error_message"]} if result.get("error_message") else {}),
         })
     return shops
@@ -146,14 +195,14 @@ def summarize(shops: list[dict], venues: dict, queried: bool, now: datetime) -> 
     busy = [s for s in live if s["status"] == "busy"]
     spikes = [s for s in live if s["status"] == "spike"]
     ready = sum(1 for v in (venues.get("venues") or {}).values() if isinstance(v, dict) and v.get("venue_id"))
-    if not ready:
-        state = "setup_needed"
+    if live:
+        state = "ok"
+    elif not ready:
+        state = "baseline_only" if any(s.get("usual_week") for s in shops) else "setup_needed"
     elif not queried:
         state = "off_hours"
-    elif not live:
-        state = "no_live"
     else:
-        state = "ok"
+        state = "no_live"
     level = None
     if live:
         level = "spike" if spikes or len(busy) >= 2 else "busy" if busy else "normal"
@@ -164,7 +213,8 @@ def summarize(shops: list[dict], venues: dict, queried: bool, now: datetime) -> 
         "state": state, "level": level, "index": index,
         "live_count": len(live), "total": len(shops), "ready_venues": ready,
         "busy": [s["name"] for s in busy], "spikes": [s["name"] for s in spikes],
-        "queried_at": now.isoformat() if queried else None,
+        "queried_at": max((s["recorded_at"] for s in live if s.get("recorded_at")), default=None) if live
+                      else now.isoformat() if queried else None,
     }
 
 

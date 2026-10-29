@@ -91,6 +91,8 @@ def source_health(data):
             if state == 'setup_needed':
                 # A known configuration step, not an outage: keeps the owner outage alert quiet.
                 status, note = 'not_configured', '尚未建檔（需手動執行 BestTime 建檔）'
+            elif state == 'baseline_only':
+                status, note = 'partial', '只有平常人流（備援來源），目前沒有即時值；未觀測不等同已打烊'
             elif state == 'off_hours':
                 status, note = 'waiting', '非下班時段（僅美東 16–24 時查詢）'
             else:

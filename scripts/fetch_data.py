@@ -44,6 +44,8 @@ ADSB_MIL_FEEDS  = [
 FIRMS_CSV_URL   = "https://firms.modaps.eosdis.nasa.gov/data/active_fire/modis-c6.1/csv/MODIS_C6_1_Global_24h.csv"
 # NASA EONET — natural event feed (wildfires, volcanoes, etc.)
 EONET_API       = "https://eonet.gsfc.nasa.gov/api/v3/events?status=open&days=7&limit=100"
+# 披薩人流備援（使用者同意 2026-10-29）：自有 BestTime 缺值時才採用；前台不顯示來源名稱
+PIZZA_BACKUP_API = "https://www.pizzint.watch/api/dashboard-data"
 # GDELT DOC 2.0 — 全球新聞衝突報導強度（免金鑰，限速每 5 秒 1 請求）
 GDELT_API       = "https://api.gdeltproject.org/api/v2/doc/doc"
 # USGS 地震 API — 核試驗場周邊淺層地震監測（免金鑰）
@@ -1833,11 +1835,25 @@ async def besttime_live(session: aiohttp.ClientSession, key: str, venue: dict) -
                 "forecasted": None, "delta": None, "open": None, "error": True}
 
 
+async def fetch_pizza_backup(session) -> dict:
+    """Backup public popular-times feed (free, one request); {} on any failure."""
+    try:
+        async with session.get(PIZZA_BACKUP_API, timeout=aiohttp.ClientTimeout(total=15),
+                               headers={"User-Agent": USER_AGENT, "Accept": "application/json"}) as resp:
+            resp.raise_for_status()
+            return await resp.json()
+    except Exception as e:
+        log.warning(f"Pizza backup feed failed: {type(e).__name__}")
+        return {}
+
+
 async def fetch_pizza(session: aiohttp.ClientSession, previous_shops) -> dict:
     """
-    五角大廈周邊披薩店人流：只用自有 BestTime 帳號。
+    五角大廈周邊披薩店人流：自有 BestTime 帳號優先。
     即時值僅在美東 16–24 時、且已由 besttime_setup.py 建檔（有 venue_id）的店查詢，每店每輪 1 credit；
     平常人流取自建檔時存下的每週預測（data/besttime_venues.json），本函式不建檔、不另扣點。
+    自有資料缺的店，才用備援公開來源（fetch_pizza_backup，免費）補平常人流與 90 分鐘內的即時值，
+    標 data_source='backup'；前台不顯示來源名稱。
     """
     from pizza_traffic import PIZZA_VENUES, build_shops, load_venues, spike_events, summarize
     venues = load_venues()
@@ -1849,14 +1865,18 @@ async def fetch_pizza(session: aiohttp.ClientSession, previous_shops) -> dict:
     if queried and ready:
         results = await asyncio.gather(*(besttime_live(session, key, PIZZA_VENUES[n]) for n in ready))
         live = dict(zip(ready, results))
+    from pizza_traffic import backup_shops
+    backup = backup_shops(await fetch_pizza_backup(session))
     now = datetime.now(timezone.utc)
-    shops = build_shops(live, venues, previous_shops, now, queried)
+    shops = build_shops(live, venues, previous_shops, now, queried, backup)
     summary = summarize(shops, venues, queried, now)
     messages = {n: r["error_message"] for n, r in live.items() if r.get("error_message")}
     if messages:
         summary["messages"] = messages
-    log.info(f"Pizza BestTime: state={summary['state']} live={summary['live_count']}/{summary['total']} "
-             f"ready={len(ready)} level={summary['level']} index={summary['index']}")
+    summary["backup_live"] = sum(s["data_source"] == "backup" for s in shops)
+    log.info(f"Pizza: state={summary['state']} live={summary['live_count']}/{summary['total']} "
+             f"(backup {summary['backup_live']}) ready={len(ready)} backup_shops={len(backup)} "
+             f"level={summary['level']} index={summary['index']}")
     return {"shops": shops, "summary": summary, "events": spike_events(shops)}
 
 
@@ -1940,6 +1960,25 @@ def _region_poly_score(cfg: dict, polymarket: list[dict]) -> tuple[float | None,
     selected = [m for m in polymarket if any(kw in (m.get("question") or "").lower() for kw in cfg["poly_kw"]) and market_risk(m) is not None]
     top = max(selected, key=lambda m: m.get("volume", 0), default={})
     return market_average(selected), top.get("question")
+
+
+# Headlines naming force or military action explain a score jump better than diplomacy or sanctions news.
+HEADLINE_ACTION = re.compile(r"導彈|飛彈|彈道|發射|空襲|襲擊|攻擊|打擊|轟炸|砲擊|炮擊|開火|交火|入侵|擊落|無人機|演習|圍台|封鎖|"
+                             r"missile|launch|strike|attack|airstrike|shell|drone|invasion|drill|blockade|fire[sd]? ", re.I)
+
+
+def attach_region_headlines(regions: list[dict], news: list[dict]) -> None:
+    """One fresh headline per region (already sampled per region by the news collector), so a card can say
+    why its score moved: military-action headlines first, then newest. Context only; it is not scored."""
+    for r in regions:
+        items = [n for n in news or [] if isinstance(n, dict) and n.get("region") == r["key"] and not n.get("stale")
+                 and (n.get("title_zh") or n.get("title")) and str(n.get("url", "")).startswith(("https://", "http://"))]
+        action = lambda n: bool(HEADLINE_ACTION.search(" ".join(str(n.get(k) or "") for k in ("title_zh", "title", "title_en"))))
+        items.sort(key=lambda n: (action(n), str(n.get("ts") or "")), reverse=True)
+        if items:
+            n = items[0]
+            r["headline"] = {"title": n.get("title_zh") or n.get("title"), "url": n["url"],
+                             "ts": n.get("ts"), "source": n.get("domain")}
 
 
 def no_market_excess(relative_score: float) -> float:
@@ -2451,6 +2490,7 @@ async def main():
         if isinstance(record, dict):
             record["relative"] = notam_relative(notam_baseline.get(key), record)
     regions = build_region_risks(polymarket, gdelt, firms, aviation, notams, gdelt_events)
+    attach_region_headlines(regions, news)
     history = update_history(score, pizza_index, regions,
                              (wikipedia or {}).get("score"), aviation)
     # 軍機機型 24h/7d/30d 歷史變化（資料累積後自動填入）
