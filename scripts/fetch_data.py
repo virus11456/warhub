@@ -1942,6 +1942,11 @@ def _region_poly_score(cfg: dict, polymarket: list[dict]) -> tuple[float | None,
     return market_average(selected), top.get("question")
 
 
+def no_market_excess(relative_score: float) -> float:
+    """A relative score (50 = the region's usual level) → how far above usual, 0–100."""
+    return max(0.0, min(100.0, (relative_score - 50.0) * 2))
+
+
 def build_region_risks(polymarket: list[dict], gdelt: dict,
                        firms: dict, aviation: dict,
                        notams: dict | None = None, gdelt_events: dict | None = None) -> list[dict]:
@@ -1997,7 +2002,15 @@ def build_region_risks(polymarket: list[dict], gdelt: dict,
             # No prediction market exists for this region at all (e.g. North Korea), so the 60% bar
             # could never be met. Score it from news + airspace only, both required, and say so.
             factors["no_market"] = True
-            score, coverage = aggregate(factors, {"gdelt": .25, "notam": .15}, min_coverage=.40, min_factors=2)
+            # Both relative scores read 50 at the region's usual level, which alone would sit above the
+            # HIGH line (45). Without a market to anchor them, score only the excess over usual:
+            # usual or quieter = 0, twice the usual score (the 100 cap) = 100.
+            excess = {k: no_market_excess(factors[k]) for k in ("gdelt", "notam")
+                      if number(factors.get(k)) and (k == "notam" or factors.get("gdelt_source") == "events")}
+            if "gdelt" in factors and "gdelt" not in excess and number(factors["gdelt"]):
+                excess["gdelt"] = factors["gdelt"]  # DOC share of coverage is absolute, not relative to usual
+            factors["no_market_scored"] = {k: round(v, 1) for k, v in excess.items()}
+            score, coverage = aggregate(excess, {"gdelt": .25, "notam": .15}, min_coverage=.40, min_factors=2)
         else:
             score, coverage = aggregate(factors, {"poly": .35, "gdelt": .25, "notam": .15, "firms": .12, "avi": .13}, min_coverage=.60, min_factors=2)
 

@@ -209,8 +209,17 @@ class RegionNoMarketTests(unittest.TestCase):
         notams = {'korea': {'stale': False, 'danger': 3, 'closure': False, 'relative': {'score': 50.0, 'baseline_danger': 3}}}
         korea = next(r for r in f.build_region_risks([], {}, {}, {}, notams, events) if r['key'] == 'korea')
         self.assertTrue(korea['factors']['no_market'])
-        self.assertEqual(korea['score'], 37.5)                      # (30*.25 + 50*.15) / .40
+        # Quieter-than-usual news and usual airspace are not a risk: excess over usual is 0, not ~45 (HIGH).
+        self.assertEqual(korea['score'], 0.0)
+        self.assertEqual(korea['level'], 'WATCH')
         self.assertEqual(korea['coverage'], 0.4)
+        self.assertEqual(korea['factors']['gdelt'], 30.0)            # raw readings stay visible
+        # A real surge still climbs: news at 2x usual (100) and airspace a bit above usual (60 → 20).
+        surge = {'regions': {'korea': {'stale': False, 'score': 100.0, 'delta_pct': 150}}}
+        hot_notam = {'korea': {**notams['korea'], 'relative': {'score': 60.0, 'baseline_danger': 3}}}
+        hot = next(r for r in f.build_region_risks([], {}, {}, {}, hot_notam, surge) if r['key'] == 'korea')
+        self.assertEqual(hot['score'], 70.0)                         # (100*.25 + 20*.15) / .40
+        self.assertEqual(hot['level'], 'CRITICAL')
         # One source alone is still not enough to score.
         only_news = next(r for r in f.build_region_risks([], {}, {}, {}, {}, events) if r['key'] == 'korea')
         self.assertIsNone(only_news['score'])
