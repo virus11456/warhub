@@ -1125,6 +1125,7 @@
   }
   .hero-wpi-title { font-family: 'Orbitron', monospace; font-size: .68rem; letter-spacing: 2px; color: var(--text-dim); }
   .hero-wpi-level { font-family: 'Orbitron', monospace; font-size: .95rem; font-weight: 700; letter-spacing: 2px; margin-top: .2rem; }
+  .hero-wpi-basis { font-size: .72rem; color: var(--text-dim); margin-top: .15rem; line-height: 1.4; }
   .hero-regions { display: flex; gap: .5rem; flex-wrap: wrap; }
   .hero-region-pill {
     display: flex; align-items: center; gap: .4rem;
@@ -1360,7 +1361,7 @@
 
 </style>
 <link rel="stylesheet" href="/i18n.css?v=20260916b">
-<script src="/i18n.js?v=20261029a" defer></script>
+<script src="/i18n.js?v=20261029b" defer></script>
 <script src="/cross-context.js"></script>
 <script src="/three-scenes.js?v=20261029b" defer></script>
 <script src="/kalshi-markets.js?v=20260923a" defer></script>
@@ -1564,6 +1565,7 @@
       <div class="hero-wpi-meta">
         <div class="hero-wpi-title">WPI 實驗指數</div>
         <div class="hero-wpi-level" id="hero-wpi-level">計算中…</div>
+        <div class="hero-wpi-basis" id="hero-wpi-basis"></div>
       </div>
     </div>
     <div class="hero-regions" id="hero-regions">
@@ -2315,19 +2317,40 @@ const PIZZA_STATUS_TEXT = {
 };
 const PIZZA_LEVEL_TEXT = { spike: ['爆單', 'var(--accent2)'], busy: ['偏忙', 'var(--accent3)'], normal: ['正常', 'var(--accent)'] };
 
-function renderPizzaShops(shops, fallbackAt) {
+// 沒有即時人流的店：依營業時間寫「營業中 · 到 22:00」或「已打烊 · 明天 10:30 開」
+function hoursLabel(hours, now = new Date()) {
+  const open = openByHours(hours, now);
+  if (open == null) return null;
+  const { day, min } = venueClock(now);
+  const hm = m => `${String(Math.floor(m % 1440 / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+  if (open) {
+    const cur = hours[day].find(([a, b]) => a <= min && min < b);
+    const end = cur ? cur[1] : (hours[(day + 6) % 7].find(([, b]) => b > 1440 && min < b - 1440) || [0, 0])[1];
+    return { open: true, text: end % 1440 === 0 ? '營業中 · 營業到午夜' : `營業中 · 營業到 ${hm(end)}` };
+  }
+  for (let k = 0; k < 7; k++) {
+    const next = (hours[(day + k) % 7] || []).filter(([a]) => k > 0 || a > min).sort((x, y) => x[0] - y[0])[0];
+    if (next) return { open: false, text: `已打烊 · ${k === 0 ? '今天' : k === 1 ? '明天' : '週' + '日一二三四五六'[(day + k) % 7]} ${hm(next[0])} 開` };
+  }
+  return { open: false, text: '已打烊' };
+}
+
+function renderPizzaShops(shops, fallbackAt, venueHours) {
   const grid = document.getElementById('pizza-shops-grid');
   if (!grid) return;
   if (!shops.length) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:.8rem;font-size:.75rem;color:var(--text-dim)">尚未取得披薩店資料</div>'; return; }
   shops.forEach(shop => { shop._chartDay = null; });
   grid.innerHTML = shops.map(shop => {
-    const [label, color] = PIZZA_STATUS_TEXT[shop.status] || PIZZA_STATUS_TEXT.unavailable;
+    let [label, color] = PIZZA_STATUS_TEXT[shop.status] || PIZZA_STATUS_TEXT.unavailable;
     const live = typeof shop.busyness === 'number';
+    // 沒有即時人流、也沒有明確「打烊」回報時，改用營業時間說明，人流另行標示未取得
+    const byHours = !live && shop.is_open == null ? hoursLabel(venueHours?.venues?.[shop.name]?.hours) : null;
+    if (byHours) [label, color] = [byHours.text, byHours.open ? 'var(--accent)' : 'var(--text-dim)'];
     const hot = shop.status === 'spike' || shop.status === 'busy';
     const pct = typeof shop.percentage_of_usual === 'number' ? Math.round(shop.percentage_of_usual) : null;
     const reading = live
       ? `現在 ${shop.busyness}%${typeof shop.usual_now === 'number' ? ` · 平常 ${shop.usual_now}%` : ''}${pct != null ? ` · 為平常的 ${pct}%` : ''}`
-      : '';
+      : byHours ? '人流資料尚未取得' : '';
     const barColor = hot ? color : 'var(--accent)';
     return `<div class="pizza-shop" style="${hot ? 'border-color:rgba(239,91,87,0.4);' : ''}">
       <div class="shop-name"><svg class="px-ic"><use href="#ic-pizza"/></svg> ${escapeHtml(shop.name)}</div>
@@ -2349,7 +2372,8 @@ function renderPizzaBars(json) {
   if (!el) return;
   const b = json?.bars || {};
   if (!b.available) {
-    el.textContent = /下班/.test(b.reason || '') ? '等待查詢時段（美東 16–24 時）' : '本輪沒有酒吧即時資料';
+    el.textContent = b.setup_needed ? '尚未在 BestTime 建檔，暫無酒吧人流'
+      : /下班/.test(b.reason || '') ? '等待查詢時段（美東 16–24 時）' : '本輪沒有酒吧即時資料';
     el.style.color = 'var(--text-dim)';
     return;
   }
@@ -2478,7 +2502,7 @@ function startPizza3D(box) {
 
 function renderPizzaBlock(json) {
   const shops = Array.isArray(json?.pizza) ? json.pizza : [];
-  renderPizzaShops(shops, json?.updated_at);
+  renderPizzaShops(shops, json?.updated_at, json?.venue_hours);
   renderPizzaLevel(json);
   renderPizzaBars(json);
   renderPizzaRadar(json);
@@ -2627,6 +2651,9 @@ function htmlWpiRender() {
   const gaps=[['z','披薩人流'],['a','軍機'],['g','新聞強度'],['p','預測市場'],['s','金融情緒'],['w','維基焦慮']].filter(([k])=>sc[k]==null).map(([,n])=>n);
   const gapText=(gaps.length?'（暫缺：'+gaps.join('、')+'；熱異常不計分）':'（熱異常不計分）');
   if (ts) ts.textContent = `資料時間：${observedTime()} · 有效權重覆蓋 ${Math.round((BACKEND_SCORE?.coverage || 0)*100)}%${gapText} · 人工權重觀察指數，非開戰機率`;
+  // 分數旁直接寫出由幾項算出、缺哪幾項（熱異常依設計不計分，不算在分母）
+  const basis = document.getElementById('hero-wpi-basis');
+  if (basis) basis.textContent = wpi == null ? '' : `由 ${6 - gaps.length} / 6 項計算${gaps.length ? ' · 缺' + gaps.join('、') : ''}`;
 }
 
 // 啟動 WPI

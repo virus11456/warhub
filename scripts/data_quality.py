@@ -102,7 +102,9 @@ def source_health(data):
             fresh = sum(r.get('status') == 'available' for r in samples.values() if isinstance(r, dict))
             status = 'available' if fresh == 5 else 'partial' if fresh else 'stale' if v else 'unavailable'
             note = f'{fresh}/5 地區取得新資料；舊值不計分'
-        if key == 'bars' and isinstance(v, dict) and v.get('available') is False and v.get('off_hours'):
+        if key == 'bars' and isinstance(v, dict) and v.get('available') is False and v.get('setup_needed'):
+            status, note = 'not_configured', '尚未建檔（需手動執行 BestTime 建檔）'
+        elif key == 'bars' and isinstance(v, dict) and v.get('available') is False and v.get('off_hours'):
             status = 'waiting'  # 尚未到美東 16–24 時查詢窗口：排程內等待，不是故障
         if reused:
             note += '；本輪沿用慢資料，未重新查詢，原觀測時間不變'

@@ -103,11 +103,23 @@ class Sources(unittest.IsolatedAsyncioTestCase):
             status=403
         class BarsSession:
             def post(self,*args,**kwargs): return Failed({})
-        with patch.dict('os.environ',{'BESTTIME_API_KEY':'test-only'}), patch.object(f,'ZoneInfo',None):
+        import pizza_traffic as pt
+        ready={'bars':{b['name']:{'venue_id':'v'} for b in f.PENTAGON_BARS}}
+        with patch.dict('os.environ',{'BESTTIME_API_KEY':'test-only'}), patch.object(f,'ZoneInfo',None), patch.object(pt,'load_venues',lambda *a: ready):
             result=await f.fetch_bars(BarsSession())
         self.assertFalse(result['available'])
         self.assertIn('來源請求',result['reason'])
         self.assertTrue(all(b['http_status']==403 for b in result['bars']))
+
+    async def test_bars_not_set_up_are_not_queried(self):
+        import pizza_traffic as pt
+        from data_quality import source_health
+        class NoCalls:
+            def post(self,*a,**k): raise AssertionError('must not query BestTime')
+        with patch.dict('os.environ',{'BESTTIME_API_KEY':'test-only'}), patch.object(pt,'load_venues',lambda *a: {}):
+            result=await f.fetch_bars(NoCalls())
+        self.assertEqual((result['available'],result['setup_needed'],result['bars']),(False,True,[]))
+        self.assertEqual(source_health({'bars':result})['bars']['status'],'not_configured')
 
     async def test_comtrade_coverage_is_per_product(self):
         from unittest.mock import AsyncMock
