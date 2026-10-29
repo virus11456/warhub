@@ -161,7 +161,7 @@ NOTAM_CLOSURE_RE = re.compile(r"AIRSPACE\s+(IS\s+)?(CLSD|CLOSED)", re.IGNORECASE
 # Pentagon 周邊酒吧（反向指標：下班後異常冷清 = 幕僚留守加班）
 # BestTime Live API 只在酒吧營業且 Google 有即時資料時回傳 busyness
 PENTAGON_BARS = [
-    {"name": "Sine Irish Pub",          "address": "1301 S Joyce St, Arlington, VA"},
+    {"name": "Crystal City Sports Pub", "address": "529 23rd St S, Arlington, VA"},  # replaces Siné (permanently closed 2026)
     {"name": "Freddie's Beach Bar",     "address": "555 23rd St S, Arlington, VA"},
     {"name": "Highline RxR",            "address": "2010 Crystal Dr, Arlington, VA"},
     {"name": "Ireland's Four Courts",   "address": "2051 Wilson Blvd, Arlington, VA"},

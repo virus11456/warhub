@@ -58,26 +58,26 @@ assert.equal(d.querySelector('#pizza-level').textContent,'--');assert.ok(d.query
 assert.ok(d.querySelector('#pizza-bars-line').textContent.includes('等待查詢時段'));}
 {const w=d.defaultView;w.eval(fs.readFileSync('three-scenes.js','utf8'));
 const st=w.pizzaOpenStates({pizza:[{name:'We, The Pizza',is_open:true,busyness:70},{name:'Extreme Pizza',is_open:false},{name:'Pizzato Pizza',is_open:null}],
-  bars:{bars:[{name:'Sine Irish Pub',live_available:true,live_busyness:0},{name:'Highline RxR',open:'Closed'},{name:'Not Listed',live_available:true,live_busyness:9}]}});
+  bars:{bars:[{name:'Crystal City Sports Pub',live_available:true,live_busyness:0},{name:'Highline RxR',open:'Closed'},{name:'Not Listed',live_available:true,live_busyness:9}]}});
 assert.deepEqual(JSON.parse(JSON.stringify(st.count)),{pizza:{open:1,total:6},bars:{open:1,total:4},unknown:6,byHours:0,gone:[]});
-assert.equal(st.states['Sine Irish Pub'].level,0); assert.equal(st.states['Extreme Pizza'].state,'closed'); assert.equal(st.states['Not Listed'],undefined);
+assert.equal(st.states['Crystal City Sports Pub'].level,0); assert.equal(st.states['Extreme Pizza'].state,'closed'); assert.equal(st.states['Not Listed'],undefined);
 w.renderPizzaBlock({pizza:[],pizza_summary:{state:'setup_needed'},bars:{available:false,off_hours:true,bars:[]}});
 assert.equal(d.querySelector('#pz-3d-pizza').textContent,'0 / 6');assert.equal(d.querySelector('#pz-3d-bars').textContent,'0 / 4');
 assert.ok(d.querySelector('#pz-3d-why').textContent.startsWith('10 家狀態未知：尚未在 BestTime 建檔'));
 w.renderPizzaBlock({pizza:[],pizza_summary:{state:'off_hours'},bars:{available:false,off_hours:true,bars:[]}});
 assert.ok(d.querySelector('#pz-3d-why').textContent.includes('非查詢時段'));}
 {const w=d.defaultView;const wk=r=>Object.fromEntries([0,1,2,3,4,5,6].map(i=>[i,r]));
-const vh={venues:{'We, The Pizza':{hours:wk([[660,1320]])},'Pizzato Pizza':{hours:wk([[960,1560]])},'Sine Irish Pub':{permanently_closed:true,hours:wk([])}}};
+const vh={venues:{'We, The Pizza':{hours:wk([[660,1320]])},'Pizzato Pizza':{hours:wk([[960,1560]])},'Highline RxR':{permanently_closed:true,hours:wk([])}}};
 const at=iso=>w.pizzaOpenStates({pizza:[],venue_hours:vh,bars:{bars:[]}},new Date(iso));
 let st=at('2026-10-29T00:00:00Z');                    // Wed 20:00 in Washington
 assert.equal(st.states['We, The Pizza'].state,'open');assert.equal(st.states['Pizzato Pizza'].state,'open');
-assert.equal(st.count.pizza.open,2);assert.equal(st.count.bars.total,3);assert.deepEqual([...st.count.gone],['Sine Irish Pub']);
+assert.equal(st.count.pizza.open,2);assert.equal(st.count.bars.total,3);assert.deepEqual([...st.count.gone],['Highline RxR']);
 st=at('2026-10-29T05:00:00Z');                        // Thu 01:00: only the shop open past midnight
 assert.equal(st.states['We, The Pizza'].state,'closed');assert.equal(st.states['Pizzato Pizza'].state,'open');
 st=w.pizzaOpenStates({pizza:[{name:'We, The Pizza',is_open:false}],venue_hours:vh},new Date('2026-10-29T00:00:00Z'));
 assert.equal(st.states['We, The Pizza'].state,'closed');  // a live "Closed" beats the posted hours
 w.renderPizzaBlock({pizza:[],pizza_summary:{state:'setup_needed'},venue_hours:vh,bars:{bars:[]}});
-assert.ok(d.querySelector('#pz-3d-why').textContent.includes('Sine Irish Pub 已永久停業'));
+assert.ok(d.querySelector('#pz-3d-why').textContent.includes('Highline RxR 已永久停業'));
 assert.ok(d.querySelector('#pz-3d-why').textContent.includes('依 Google 營業時間'));}
 // Hourly bars: Washington weekday baseline (grey) + only today's live readings; 0 is drawn, yesterday is not.
 {const w=d.defaultView,usual=Array(24).fill(null);usual[10]=40;usual[12]=80;
