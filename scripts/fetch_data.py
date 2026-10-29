@@ -1874,6 +1874,13 @@ async def fetch_bars(session: aiohttp.ClientSession) -> dict:
     if not key:
         return {"available": False, "reason": "未設定 BESTTIME_API_KEY", "bars": []}
 
+    # 只查已在 BestTime 建檔的酒吧；未建檔的查了只會拿到 409／404，不是來源故障
+    from pizza_traffic import load_venues
+    stored = load_venues().get("bars") or {}
+    ready = [b for b in PENTAGON_BARS if (stored.get(b["name"]) or {}).get("venue_id")]
+    if not ready:
+        return {"available": False, "setup_needed": True, "reason": "尚未在 BestTime 建檔", "bars": []}
+
     # 只在美東傍晚下班時段查詢（省 credit）
     et_hour = besttime_et_hour()
     if et_hour is not None and et_hour not in BAR_QUERY_ET_HOURS:
@@ -1886,7 +1893,7 @@ async def fetch_bars(session: aiohttp.ClientSession) -> dict:
             result.pop(extra, None)
         return result
 
-    bars = await asyncio.gather(*(one(b) for b in PENTAGON_BARS))
+    bars = await asyncio.gather(*(one(b) for b in ready))
     live_bars = [b for b in bars if b["live_available"] and b["live_busyness"] is not None]
 
     result = {"available": bool(live_bars), "bars": bars,

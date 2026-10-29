@@ -79,6 +79,21 @@ assert.equal(st.states['We, The Pizza'].state,'closed');  // a live "Closed" bea
 w.renderPizzaBlock({pizza:[],pizza_summary:{state:'setup_needed'},venue_hours:vh,bars:{bars:[]}});
 assert.ok(d.querySelector('#pz-3d-why').textContent.includes('Highline RxR 已永久停業'));
 assert.ok(d.querySelector('#pz-3d-why').textContent.includes('依 Google 營業時間'));}
+// Shop cards: without live readings they show posted hours and say foot traffic is missing; a live reading wins.
+{const w=d.defaultView;const wk=r=>Object.fromEntries([0,1,2,3,4,5,6].map(i=>[i,r]));
+const hrs=wk([[630,1320]]);
+assert.equal(w.hoursLabel(hrs,new Date('2026-10-29T00:00:00Z')).text,'營業中 · 營業到 22:00');      // Wed 20:00 ET
+assert.equal(w.hoursLabel(hrs,new Date('2026-10-29T05:00:00Z')).text,'已打烊 · 今天 10:30 開');     // Thu 01:00 ET
+assert.equal(w.hoursLabel(hrs,new Date('2026-10-29T03:00:00Z')).text,'已打烊 · 明天 10:30 開');     // Wed 23:00 ET
+assert.equal(w.hoursLabel(wk([[960,1560]]),new Date('2026-10-29T05:00:00Z')).text,'營業中 · 營業到 02:00');
+assert.equal(w.hoursLabel({...wk([[600,1200]]),4:[]},new Date('2026-10-29T03:00:00Z')).text,'已打烊 · 週五 10:00 開');
+assert.equal(w.hoursLabel(null),null);
+w.renderPizzaShops([{name:'A',status:'setup_needed',is_open:null},{name:'B',status:'normal',is_open:true,busyness:40}],null,{venues:{A:{hours:wk([[0,1440]])},B:{hours:wk([])}}});
+const cards=[...d.querySelectorAll('#pizza-shops-grid .pizza-shop')].map(c=>c.textContent);
+assert.ok(cards[0].includes('營業中')&&cards[0].includes('人流資料尚未取得')&&!cards[0].includes('尚未建檔'));
+assert.ok(cards[1].includes('正常')&&cards[1].includes('現在 40%'));
+w.renderPizzaBlock({pizza:[],pizza_summary:{},bars:{available:false,setup_needed:true,bars:[]}});
+assert.ok(d.querySelector('#pizza-bars-line').textContent.includes('尚未在 BestTime 建檔'));}
 // Hourly bars: Washington weekday baseline (grey) + only today's live readings; 0 is drawn, yesterday is not.
 {const w=d.defaultView,usual=Array(24).fill(null);usual[10]=40;usual[12]=80;
 const shop={name:'x',recorded_at:'2026-10-27T16:06:00Z',usual_week:{'1':Array(24).fill(90),'2':usual},
@@ -149,7 +164,7 @@ assert.ok(d.querySelector('footer .network-links[aria-label="相關工具"]'));
 assert.ok(!d.body.textContent.includes('Moneytools'));
 assert.ok(![...d.querySelectorAll('a')].some(a=>/moneytools|firstrade|luxstay/i.test(a.href)));
 
-if(mode==='valid'){{const list=d.getElementById('news-list');const kept=list.innerHTML;list.innerHTML='';for(let i=0;i<12;i++){const x=d.createElement('div');x.textContent='n'+i;list.appendChild(x);}await new Promise(r=>setTimeout(r,0));const btn=list.nextElementSibling;assert.equal(btn.className,'clamp-more');assert.equal(btn.textContent,'顯示全部（共 12 則）');btn.click();assert.ok(list.classList.contains('expanded'));assert.equal(btn.textContent,'收合');list.innerHTML='<div>a</div>';await new Promise(r=>setTimeout(r,0));assert.equal(btn.hidden,true);list.classList.remove('expanded');list.innerHTML=kept;}{const rows=d.querySelectorAll('.usda-row');assert.equal(rows.length,1);assert.ok(rows[0].textContent.includes('0 千噸'));assert.ok(!rows[0].textContent.includes('2026-10-15'));assert.equal(d.querySelector('.usda-none').textContent,'小麥、玉米：本期沒有美對中銷售觀測（不等於零）');}assert.ok(/有效權重覆蓋 65%（暫缺：[^）]*新聞強度[^）]*；熱異常不計分）/.test(d.querySelector('#html-wpi-updated').textContent),d.querySelector('#html-wpi-updated').textContent);assert.ok(d.querySelector('#html-wpi-a-desc').textContent.includes('170 架'));assert.ok(d.querySelector('#html-wpi-a-desc').textContent.includes('異常分數 0'));assert.ok(d.querySelector('#html-wpi-f-desc').textContent.includes('11,785 筆'));assert.ok(d.querySelector('#html-wpi-f-desc').textContent.includes('暫不計分'));assert.ok(d.querySelector('#poly-list-container').textContent.includes('美國會在12月31日前打擊古巴嗎？'));assert.ok(d.querySelector('#news-list').textContent.includes('新聞繁體中文標題'));assert.ok(!d.querySelector('#news-list').textContent.includes('English original'));assert.ok(d.querySelector('#strat-grid').textContent.includes('最近歷史參考：2026-06'));assert.ok(d.querySelector('#sh-svg').textContent.includes('缺報'));assert.ok(!d.querySelector('#sh-svg').innerHTML.includes('999'));}
+if(mode==='valid'){{const list=d.getElementById('news-list');const kept=list.innerHTML;list.innerHTML='';for(let i=0;i<12;i++){const x=d.createElement('div');x.textContent='n'+i;list.appendChild(x);}await new Promise(r=>setTimeout(r,0));const btn=list.nextElementSibling;assert.equal(btn.className,'clamp-more');assert.equal(btn.textContent,'顯示全部（共 12 則）');btn.click();assert.ok(list.classList.contains('expanded'));assert.equal(btn.textContent,'收合');list.innerHTML='<div>a</div>';await new Promise(r=>setTimeout(r,0));assert.equal(btn.hidden,true);list.classList.remove('expanded');list.innerHTML=kept;}{const rows=d.querySelectorAll('.usda-row');assert.equal(rows.length,1);assert.ok(rows[0].textContent.includes('0 千噸'));assert.ok(!rows[0].textContent.includes('2026-10-15'));assert.equal(d.querySelector('.usda-none').textContent,'小麥、玉米：本期沒有美對中銷售觀測（不等於零）');}assert.ok(/有效權重覆蓋 65%（暫缺：[^）]*新聞強度[^）]*；熱異常不計分）/.test(d.querySelector('#html-wpi-updated').textContent),d.querySelector('#html-wpi-updated').textContent);assert.equal(d.querySelector('#hero-wpi-basis').textContent,'由 5 / 6 項計算 · 缺新聞強度');assert.ok(d.querySelector('#html-wpi-a-desc').textContent.includes('170 架'));assert.ok(d.querySelector('#html-wpi-a-desc').textContent.includes('異常分數 0'));assert.ok(d.querySelector('#html-wpi-f-desc').textContent.includes('11,785 筆'));assert.ok(d.querySelector('#html-wpi-f-desc').textContent.includes('暫不計分'));assert.ok(d.querySelector('#poly-list-container').textContent.includes('美國會在12月31日前打擊古巴嗎？'));assert.ok(d.querySelector('#news-list').textContent.includes('新聞繁體中文標題'));assert.ok(!d.querySelector('#news-list').textContent.includes('English original'));assert.ok(d.querySelector('#strat-grid').textContent.includes('最近歷史參考：2026-06'));assert.ok(d.querySelector('#sh-svg').textContent.includes('缺報'));assert.ok(!d.querySelector('#sh-svg').innerHTML.includes('999'));}
 
 if(mode==='valid'){
  const w=dom.window;
