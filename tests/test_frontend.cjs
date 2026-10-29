@@ -110,6 +110,21 @@ assert.equal(w.usualNow({usual_week:wk(40)},at),40);assert.equal(w.usualNow({usu
 assert.deepEqual(JSON.parse(JSON.stringify(w.usualNowAverage([{usual_week:wk(40)},{usual_week:wk(20)},{}],at))),{avg:30,n:2});
 const st=w.pizzaOpenStates({pizza:[{name:'We, The Pizza',busyness:null,usual_week:wk(55)}],venue_hours:{venues:{'We, The Pizza':{hours:Object.fromEntries([0,1,2,3,4,5,6].map(i=>[i,[[600,1380]]]))}}}},at);
 assert.equal(st.states['We, The Pizza'].level,55);assert.equal(st.states['We, The Pizza'].state,'open');}
+// Bars without live readings: open count and each bar's posted hours.
+{const w=d.defaultView;const wk=r=>Object.fromEntries([0,1,2,3,4,5,6].map(i=>[i,r]));
+w.renderPizzaBars({bars:{available:false,setup_needed:true,bars:[]},venue_hours:{venues:{"Freddie's Beach Bar":{hours:wk([[0,1440]])},'Highline RxR':{hours:wk([])},'Crystal City Sports Pub':{permanently_closed:true,hours:wk([])}}}});
+assert.ok(d.querySelector('#pizza-bars-line').textContent.startsWith('現在營業中 1 / 3 家'));
+const items=[...d.querySelectorAll('#pizza-bars-hours li')].map(li=>li.textContent);
+assert.ok(items.some(t=>t.includes("Freddie's Beach Bar")&&t.includes('營業中')));assert.ok(items.some(t=>t.includes('已永久停業')));
+w.renderPizzaBars({bars:{available:false,setup_needed:true,bars:[]}});
+assert.ok(d.querySelector('#pizza-bars-line').textContent.includes('尚未在 BestTime 建檔'));assert.ok(d.querySelector('#pizza-bars-hours').hidden);}
+// Region 7-day sparkline: only valid points in the window; no-market regions skip points before the rescale.
+{const w=d.defaultView;const kept=w.eval('[WW_HISTORY, DATA_UPDATED_AT]');
+w.eval(`DATA_UPDATED_AT='2026-10-29T16:00:00Z';WW_HISTORY=[{ts:'2026-10-20T00:00Z',regions:{korea:90}},{ts:'2026-10-28T00:00Z',regions:{korea:69,ukraine:40}},{ts:'2026-10-29T10:00Z',regions:{korea:62.5,ukraine:55}},{ts:'2026-10-29T15:00Z',regions:{korea:0,ukraine:null}}]`);
+const u=w.regionSpark('ukraine','red',false);assert.ok(u.includes('低 40 · 高 55'));
+const k=w.regionSpark('korea','red',true);assert.ok(k.includes('低 0 · 高 63'));        // 69 before the rescale and 90 outside 7 days are dropped
+assert.equal(w.regionSpark('taiwan','red',false),'');
+w.eval('[WW_HISTORY, DATA_UPDATED_AT]=arguments[0]'.replace('arguments[0]',JSON.stringify(kept)));}
 // Hourly bars: Washington weekday baseline (grey) + only today's live readings; 0 is drawn, yesterday is not.
 {const w=d.defaultView,usual=Array(24).fill(null);usual[10]=40;usual[12]=80;
 const shop={name:'x',recorded_at:'2026-10-27T16:06:00Z',usual_week:{'1':Array(24).fill(90),'2':usual},
