@@ -94,7 +94,7 @@
     { kind: 'pizza', name: "Domino's Pizza (Pentagon Closest)", at: [38.8625, -77.0855] },
     { kind: 'pizza', name: 'Extreme Pizza', at: [38.8602, -77.0560] },
     { kind: 'pizza', name: 'District Pizza Palace', at: [38.8530, -77.0532] },
-    { kind: 'bar', name: 'Sine Irish Pub', at: [38.8635, -77.0630] },
+    { kind: 'bar', name: 'Crystal City Sports Pub', at: [38.8535, -77.0543] },
     { kind: 'bar', name: "Freddie's Beach Bar", at: [38.8535, -77.0510] },
     { kind: 'bar', name: 'Highline RxR', at: [38.8555, -77.0490] },
     { kind: 'bar', name: "Ireland's Four Courts", at: [38.8915, -77.0855] },
