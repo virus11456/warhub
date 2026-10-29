@@ -123,3 +123,5 @@ GDELT DOC API 對共用 IP（GitHub runner 及雲端主機）第一個請求即�
 2026-10-28 GDELT事件檔小量平滑（數據排查：南海平常每窗約10篇、常在0–30間跳動，20篇就被打成滿分100、地區升為HIGH）：regional_metrics 分數改為 50×(本窗篇數+20)÷(預期篇數+20)，預期篇數＝48小時平均占比×本窗總篇數，上限100。大地區（數百篇）幾乎不變（烏克蘭 54.8→54.7），小地區雜訊不再衝到0或100（南海20篇對約10篇：100→67.6），真正暴增仍滿分（台海122對30篇：100）。實測0篇為低分而非0（例：預期10篇時33.3），仍是有效值、不當缺值。SMOOTHING_ARTICLES 常數可調。驗證：tests/test_gdelt_event_intensity.py。
 
 2026-10-28 地球圖改用 three.js 畫本體（只改前端）：WarGlobe 在地球接近畫面時載入 three-scenes.js 的 WarhubThree.globe（three@0.160.0，jsDelivr），以 WGLOBE_OCEAN／WGLOBE_PTS 畫立體海陸方塊與光照；投影與 2D 版相同（lam0、phi0、zoom、半徑 0.46×短邊），所以國名、戰區圈與 FIRMS 火點仍由原 2D 程式畫在上層、位置對齊。沒有 WebGL 或下載失敗自動回到 2D 畫法。資料與計分不變。
+
+2026-10-29 無市場地區改計「高於平常的幅度」（修正 #212 的誤判）：GDELT 事件檔與 NOTAM 相對分數都以「平常＝50」設計，而 HIGH 門檻是 45，無市場地區只靠這兩項時，一切正常也會被算成 HIGH（實例：韓國新聞比平常少 32%、NOTAM 與平常同為 0，卻得 45.7 HIGH；南海僅略高於平常得 53.6 HIGH）。現在 no_market 分支以 `no_market_excess` 轉換：max(0, (相對分數−50)×2)，平常或更少＝0、平常兩倍（相對分數上限 100）＝100；GDELT 若來自 DOC 百分比（非事件檔）本來就是絕對量，不轉換。原始 gdelt／notam 值仍保留在 factors 供顯示，實際計分值另存 factors.no_market_scored。有市場的地區計分不變。驗證：tests/test_integrity.py RegionNoMarketTests。
