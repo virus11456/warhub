@@ -106,3 +106,37 @@ class ContentTests(unittest.TestCase):
         data['regions'][0]['factors'] = {}
         self.assertIn('公告缺資料', alerts.build_digest(data))
         self.assertIn('市場缺可用題目', alerts.build_digest(data))
+
+
+class DigestMatchesSiteTests(unittest.TestCase):
+    def test_scored_region_shows_level_week_range_volume_and_headline(self):
+        from datetime import datetime, timezone
+        data = {'updated_at': '2026-10-29T16:23:00+00:00',
+                'regions': [{'key': 'korea', 'name': '朝鮮半島', 'score': 62.5, 'level': 'HIGH',
+                             'factors': {'no_market': True, 'gdelt': 100, 'gdelt_source': 'events', 'gdelt_delta': 1116.3},
+                             'headline': {'title': '北韓發射約十二枚彈道導彈'}}],
+                'notams': {'korea': {'complete': True, 'available': True, 'total': 2}}}
+        history = [{'ts': '2026-10-29T02:00+00:00', 'regions': {'korea': 99}},      # before the rescale: ignored
+                   {'ts': '2026-10-29T09:00+00:00', 'regions': {'korea': 44.3}},
+                   {'ts': '2026-10-29T14:00+00:00', 'regions': {'korea': 62.5}}]
+        text = alerts._fmt_regions(data['regions'], data, history)
+        self.assertIn('朝鮮半島 62（高度風險） · 7 天 44–62（無市場題目）', text)
+        self.assertIn('新聞量約為平常的 12 倍', text)
+        self.assertIn('📰 北韓發射約十二枚彈道導彈', text)
+        self.assertNotIn('公告查詢', text)
+
+    def test_pizza_without_live_gives_usual_average(self):
+        shops = [{'name': 'a', 'busyness': None, 'is_open': None, 'usual_now': 70},
+                 {'name': 'b', 'busyness': None, 'is_open': None, 'usual_now': 30},
+                 {'name': 'c', 'busyness': None, 'is_open': None, 'usual_now': None}]
+        text = alerts._fmt_pizza_shops(shops, {'status': 'partial'})
+        self.assertIn('無即時人流 · 平常這時段約 50%（2 家平均，不是即時值）', text)
+
+    def test_news_one_per_region_chinese_first_without_opinion_or_labels(self):
+        news = [{'region': 'ukraine', 'topic': '俄烏', 'title': 'Opinion | the catch', 'ts': '3'},
+                {'region': 'ukraine', 'topic': '俄烏', 'title_zh': '俄烏戰爭', 'ts': '4'},
+                {'region': 'ukraine', 'topic': '俄烏', 'title_zh': '赫爾松停火進入第三天', 'ts': '1'},
+                {'region': 'ukraine', 'topic': '俄烏', 'title_zh': '基輔附近遭到無人機攻擊', 'ts': '0'},
+                {'region': 'korea', 'topic': '朝鮮', 'title': 'North Korea fires missiles into the sea', 'ts': '2'}]
+        lines = alerts._fmt_news(news).splitlines()
+        self.assertEqual(lines, ['  • [俄烏] 赫爾松停火進入第三天', '  • [朝鮮] North Korea fires missiles into the sea'])

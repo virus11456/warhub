@@ -116,6 +116,18 @@ class RegionHeadlineTests(unittest.TestCase):
         self.assertNotIn('headline', regions[2])
 
 
+class HeadlineChoiceTests(unittest.TestCase):
+    def test_opinion_and_bare_labels_are_skipped_and_chinese_preferred(self):
+        import fetch_data as f
+        news = [{'region': 'ukraine', 'title': 'Opinion | The terrifying catch in the ceasefire', 'url': 'https://a', 'ts': '2026-10-29T16:00:00+00:00'},
+                {'region': 'ukraine', 'title_zh': '俄烏戰爭', 'url': 'https://b', 'ts': '2026-10-29T15:00:00+00:00'},
+                {'region': 'ukraine', 'title': 'Russian attacks continue near Kherson', 'url': 'https://c', 'ts': '2026-10-29T14:00:00+00:00'},
+                {'region': 'ukraine', 'title_zh': '赫爾松停火進入第三天，俄軍仍有攻擊', 'url': 'https://d', 'ts': '2026-10-29T13:00:00+00:00'}]
+        regions = [{'key': 'ukraine'}]
+        f.attach_region_headlines(regions, news)
+        self.assertEqual(regions[0]['headline']['url'], 'https://d')
+
+
 class HeadlineCleanupTests(unittest.TestCase):
     def test_source_and_section_tails_are_removed_but_real_dashes_stay(self):
         import fetch_data as f
