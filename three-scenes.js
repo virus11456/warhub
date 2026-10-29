@@ -90,9 +90,9 @@
   const VENUES = [
     { kind: 'pizza', name: 'We, The Pizza', at: [38.8545, -77.0497] },
     { kind: 'pizza', name: 'Pizzato Pizza', at: [38.8795, -77.0905] },
-    { kind: 'pizza', name: 'Papa Johns Pizza', at: [38.8600, -77.0960] },
+    { kind: 'pizza', name: 'Papa Johns Pizza', at: [38.8607, -77.0922] },
     { kind: 'pizza', name: "Domino's Pizza (Pentagon Closest)", at: [38.8625, -77.0855] },
-    { kind: 'pizza', name: 'Extreme Pizza', at: [38.8615, -77.0530] },
+    { kind: 'pizza', name: 'Extreme Pizza', at: [38.8602, -77.0560] },
     { kind: 'pizza', name: 'District Pizza Palace', at: [38.8530, -77.0532] },
     { kind: 'bar', name: 'Sine Irish Pub', at: [38.8635, -77.0630] },
     { kind: 'bar', name: "Freddie's Beach Bar", at: [38.8535, -77.0510] },
@@ -170,7 +170,7 @@
           m.mat.color.setHex(open ? COLORS[m.kind] : s.state === 'closed' ? COLORS.closed : COLORS.unknown);
           m.mat.emissive.setHex(open ? COLORS[m.kind] : 0x000000);
           m.mat.emissiveIntensity = open ? 0.35 : 0;
-          const h = open ? 0.3 + 1.3 * (typeof s.level === 'number' ? s.level / 100 : 0.4) : s.state === 'closed' ? 0.06 : 0.14;
+          const h = open ? (typeof s.level === 'number' ? 0.3 + 1.3 * s.level / 100 : 0.45) : s.state === 'closed' ? 0.06 : 0.14;
           m.mesh.scale.y = h;
           m.mesh.position.y = h / 2;
         }

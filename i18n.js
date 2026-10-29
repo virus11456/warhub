@@ -8,7 +8,7 @@
   const hasZh=s=>/[\u3400-\u9fff]/u.test(s);
   const escape=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
   // English catalogue (~190 KB) loads only when a visitor switches to English.
-  const EN_SRC='/locales/en.js?v=20261028c';
+  const EN_SRC='/locales/en.js?v=20261029a';
   let catalog={}, ready=false, loading=null;
   // The existing icon renderer replaces emoji with SVG before translation.
   // Keep matching whole labels after that presentation change.
