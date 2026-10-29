@@ -52,7 +52,11 @@ def calculate_wpi(pizza_index, markets, aviation=None, firms=None, gdelt=None, w
     # A is a measured 7-day change, never the composition of the current fleet.
     ap = (a.get('summary') or {}).get('anomaly_pct')
     if not a.get('error') and number(ap): factors['a'] = clamp(ap / 2)
-    # Global fires do not identify conflict. Keep F unavailable until a validated regional baseline exists.
+    # Global fire totals do not identify conflict. F is the mean of conflict regions' counts relative to
+    # their own 7-day level (50 = usual); unavailable while baselines are short or the snapshot is stale.
+    fr = [v['score'] for v in (f.get('relative') or {}).values()
+          if isinstance(v, dict) and number(v.get('score'))] if not f.get('stale') and not f.get('error') else []
+    factors['f'] = clamp(sum(fr)/len(fr)) if fr else None
     gv = [clamp(v['latest']*25) for v in g.values() if not v.get('stale') and number(v.get('latest'))]
     g_source = 'doc' if gv else None
     if not gv:

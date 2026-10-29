@@ -20,7 +20,7 @@ description: "Maintain WARHUB ADS-B, FIRMS, EONET, GDELT, USGS, Wikipedia and NO
 
 這些來源在每輪快收集中檢查，但實際觀測頻率不同。先核對各來源的資料时间和健康狀態，不只看根層 `updated_at`。GDELT／FAA 遇到封鎖、限流、非預期 HTML，保留缺值或 stale；遵循 `SourceBackoff`、來源總預算及單次 timeout，停止該輪來源，不能無限改 URL 或增加請求。
 
-目前全球 WPI 的 FIRMS 因子與地區廣域軍機／火點不直接計分；依 `scoring.py` 保留此界線。198 架可見軍機與異常分數 0 可以同時成立，不能用原始筆數填上分數。資料不足的地區留空，不能為了滿版補安全等級。
+全球 WPI 的 FIRMS 因子自 2026-10-29 起只用「衝突區火點相對各自 7 天平常水準」（`scripts/firms_baseline.py`，見下方紀錄），原始全球總筆數仍不計分；地區卡的廣域軍機／火點不計入地區分數。198 架可見軍機與異常分數 0 可以同時成立，不能用原始筆數填上分數。資料不足的地區留空，不能為了滿版補安全等級。
 
 驗證 `tests/test_source_budgets.py`、`tests/test_integrity.py` 與 `tests/test_frontend.cjs`。用 mock 檢查限流快速停止、來源整體 timeout、部分成功保留、新舊時間不混淆與原始數量仍可展示。若要換 API 或申請 key，先確認官方現行文件和帳戶可用權限，歷史 403／429 不代表永久不可用。
 
@@ -131,3 +131,5 @@ GDELT DOC API 對共用 IP（GitHub runner 及雲端主機）第一個請求即�
 2026-10-29 地區卡 7 天走勢：前台 regionSpark 從 history.json（WW_HISTORY）畫各區最近 7 天分數折線（固定 0–100 刻度，虛線為 HIGH 門檻 45），只取 0–100 有效數字；無市場地區（factors.no_market）略過 NO_MARKET_RESCALED_AT（2026-10-29 07:20 UTC，改為高於平常幅度計分）之前的點，避免新舊算法混畫。不足 2 點不畫。只讀既有歷史，不增加抓取。
 
 2026-10-29 地區跳升防誤報（使用者選擇）：GDELT 事件檔只看 2 小時窗，一則大新聞就能讓無市場地區衝到 100（實例：韓國 14:23 62.5 → 16:23 0）。`alerts.region_jumps` 改為兩段：跳升兩級到 HIGH+ 時，若 `_airspace_confirms`（notam_closure 或 NOTAM 相對分數 ≥75）立即通知（confirmed_by=airspace）；否則記入 `_notify.region_pending {key: {from, since}}`，下一輪仍在 HIGH／CRITICAL 才通知（confirmed_by=two_runs，約晚 2 小時），回落則取消；INSUFFICIENT_DATA 不取消也不覆蓋。冷卻、只送站長、送達才記 region_alerted 不變；送達失敗改留在 region_pending 下輪重送。訊息會註明「禁航公告同步升高，立即通知」或「已連續兩輪維持 HIGH 以上」。驗證：tests/test_region_jump.py。
+
+2026-10-29 WPI 衛星火點因子改用相對基準（使用者選擇）：原本 F 因子永遠缺值，WPI 覆蓋率卡在 76%。`scripts/firms_baseline.py` 保存 `data.json.firms_baseline`（7 天，每個 FIRMS 取得時間一筆 `{at, counts}`；`firms.observed_at` 相同的輪次合併，stale／error／缺欄位不算樣本；有效快照中未出現的標籤＝0）。`firms.relative[region]` 以 REGIONS[].firms 標籤加總，分數＝min(100, 50×(現在+1)/(平均+1))，50＝平常，需 ≥8 筆且跨 24 小時；南海沒有火點區標籤所以不算。WPI `factors.f`＝各地區相對分數平均（`scoring.calculate_wpi`），快照 stale／error 或基準不足時為 None。首次無序列時從 archives 播種（約 30–40 秒）。地區分數不變，火點仍只是參考。秋季燒田會讓韓國、俄烏偏高，前台描述寫明「含野火與農業用火，不等於戰火」，WPI 摘要改為「由 N / 7 項計算」。/api/data 不送 firms_baseline。驗證：tests/test_firms_markets.py。

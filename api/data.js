@@ -18,7 +18,7 @@ const ALLOW = new Set([
 
 // Server-only bookkeeping the page never reads. Dropping it cuts data.json from
 // ~1.4 MB to ~0.4 MB per visit; the full snapshot stays in the repository.
-const DROP_TOP = ['translation_cache', 'trade_api', 'trade_availability', 'gdelt_events_sampling', '_notify'];
+const DROP_TOP = ['translation_cache', 'trade_api', 'trade_availability', 'gdelt_events_sampling', '_notify', 'firms_baseline'];
 export function slim(payload) {
   if (!payload || typeof payload !== 'object') return payload;
   const out = { ...payload };

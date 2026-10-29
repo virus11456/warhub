@@ -1271,7 +1271,7 @@
 
 </style>
 <link rel="stylesheet" href="/i18n.css?v=20260916b">
-<script src="/i18n.js?v=20261029e" defer></script>
+<script src="/i18n.js?v=20261029f" defer></script>
 <script src="/cross-context.js"></script>
 <script src="/three-scenes.js?v=20261029b" defer></script>
 <script src="/kalshi-markets.js?v=20260923a" defer></script>
@@ -2574,7 +2574,7 @@ function htmlWpiRender() {
   const fires=count(raw.firms?.total_24h,' 筆');
   const observation=(value,unavailable)=>!fresh?'快照過期或尚未載入，暫不計分':(value?'已取得 '+value:unavailable);
   const aDesc=observation(!raw.aviation?.error?aircraft:null,'未取得有效軍機資料')+'｜'+(sc.a==null?'缺少可比較基準，暫不計分':'異常分數 '+sc.a.toFixed(1)+(sc.a===0?'（未高於基準）':''));
-  const fDesc=observation(!raw.firms?.error?fires:null,'未取得有效熱異常資料')+'｜暫不計分；熱異常不等於戰火';
+  const fDesc=observation(!raw.firms?.error?fires:null,'未取得有效熱異常資料')+'｜'+(sc.f==null?'各地區 7 天基準累積中，暫不計分':'衝突區火點相對平常 '+sc.f.toFixed(1)+'（50＝平常；含野火與農業用火，不等於戰火）');
   // 子指標
   [
     { key:'p', pfx:'html-wpi-p', desc:`事件方向觀察值 ${(sc.p == null ? '--' : sc.p.toFixed(1))}%` },
@@ -2607,13 +2607,13 @@ function htmlWpiRender() {
 
   // 時間戳
   const ts = document.getElementById('html-wpi-updated');
-  // Name what the missing weight is, so a low coverage number is not a mystery. FIRMS is unscored by design.
-  const gaps=[['z','披薩人流'],['a','軍機'],['g','新聞強度'],['p','預測市場'],['s','金融情緒'],['w','維基焦慮']].filter(([k])=>sc[k]==null).map(([,n])=>n);
-  const gapText=(gaps.length?'（暫缺：'+gaps.join('、')+'；熱異常不計分）':'（熱異常不計分）');
+  // Name what the missing weight is, so a low coverage number is not a mystery.
+  const gaps=[['z','披薩人流'],['a','軍機'],['g','新聞強度'],['p','預測市場'],['s','金融情緒'],['w','維基焦慮'],['f','衛星火點']].filter(([k])=>sc[k]==null).map(([,n])=>n);
+  const gapText=(gaps.length?'（暫缺：'+gaps.join('、')+'）':'');
   if (ts) ts.textContent = `資料時間：${observedTime()} · 有效權重覆蓋 ${Math.round((BACKEND_SCORE?.coverage || 0)*100)}%${gapText} · 人工權重觀察指數，非開戰機率`;
-  // 分數旁直接寫出由幾項算出、缺哪幾項（熱異常依設計不計分，不算在分母）
+  // 分數旁直接寫出由幾項算出、缺哪幾項
   const basis = document.getElementById('hero-wpi-basis');
-  if (basis) basis.textContent = wpi == null ? '' : `由 ${6 - gaps.length} / 6 項計算${gaps.length ? ' · 缺' + gaps.join('、') : ''}`;
+  if (basis) basis.textContent = wpi == null ? '' : `由 ${7 - gaps.length} / 7 項計算${gaps.length ? ' · 缺' + gaps.join('、') : ''}`;
 }
 
 // 啟動 WPI
