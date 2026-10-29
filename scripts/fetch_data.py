@@ -34,6 +34,7 @@ except ImportError:  # Python < 3.9
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 log = logging.getLogger("warhub")
 
+POLYMARKET_SEARCH = "https://gamma-api.polymarket.com/public-search"
 POLYMARKET_API  = "https://gamma-api.polymarket.com/markets"
 # Public ADS-B "/mil" feeds — try in order, both return identical schema
 ADSB_MIL_FEEDS  = [
@@ -112,6 +113,7 @@ REGIONS = {
     "taiwan": {
         "name": "台海", "flag": "🇹🇼",
         "poly_kw": ["taiwan", "invade taiwan", "blockade taiwan", "xi jinping"],
+        "poly_search": "taiwan",
         "gdelt_q": "(taiwan china) (invasion OR military OR blockade OR war)",
         "firms": ["taiwan"],
         "avi_regions": ["西太平洋"],
@@ -119,6 +121,7 @@ REGIONS = {
     "korea": {
         "name": "朝鮮半島", "flag": "🇰🇵",
         "poly_kw": ["north korea", "kim jong", "dprk", "pyongyang"],
+        "poly_search": "north korea",
         "gdelt_q": '"north korea" (missile OR nuclear OR war OR attack)',
         "firms": ["korea"],
         "avi_regions": ["西太平洋"],
@@ -126,6 +129,7 @@ REGIONS = {
     "southsea": {
         "name": "南海爭議", "flag": "🌊",
         "poly_kw": ["south china sea", "philippines", "scarborough", "spratly"],
+        "poly_search": "south china sea",
         "gdelt_q": '"south china sea" (conflict OR military OR clash OR standoff)',
         "firms": [],
         "avi_regions": ["西太平洋"],
@@ -255,11 +259,70 @@ def _parse_outcome_prices(market: dict) -> tuple[float | None, float | None]:
     return yes, no
 
 
+async def _search_region_markets(session: aiohttp.ClientSession, seen_ids: set) -> list[dict]:
+    """
+    Region keyword search (Polymarket public-search), one request per region with poly_search.
+    Low-volume regional markets (e.g. China x Taiwan) fall outside the top 300 geopolitics markets by
+    24h volume, which left Taiwan and Korea scored as if no market existed. A failed search only loses
+    that region's extra markets.
+    """
+    found = []
+    for key, cfg in REGIONS.items():
+        query = cfg.get("poly_search")
+        if not query:
+            continue
+        try:
+            async with session.get(
+                POLYMARKET_SEARCH, params={"q": query, "limit_per_type": 20, "events_status": "active"},
+                timeout=aiohttp.ClientTimeout(total=15), headers={"User-Agent": USER_AGENT},
+            ) as resp:
+                if resp.status != 200:
+                    log.warning(f"Polymarket search '{query}' returned {resp.status}")
+                    continue
+                data = await resp.json()
+        except Exception as e:
+            log.warning(f"Polymarket search '{query}' failed: {type(e).__name__}")
+            continue
+        for event in (data.get("events") if isinstance(data, dict) else None) or []:
+            for m in (event.get("markets") if isinstance(event, dict) else None) or []:
+                if not isinstance(m, dict) or m.get("closed") or m.get("active") is False:
+                    continue
+                mid = m.get("conditionId") or m.get("id")
+                if mid and mid not in seen_ids:
+                    seen_ids.add(mid)
+                    found.append(m)
+    return found
+
+
+def _war_candidate(m: dict) -> dict | None:
+    """A Gamma market → our market row, or None when it is not a scorable war/conflict question."""
+    if excluded_market_title(m.get("question") or ""):
+        return None
+    yes_price, no_price = _parse_outcome_prices(m)
+    if yes_price is None or no_price is None:
+        return None
+    candidate = {
+        "id":         m.get("conditionId") or m.get("id"),
+        "question":   m.get("question"),
+        "yes_price":  yes_price,
+        "no_price":   no_price,
+        "volume":     float(m.get("volume", 0) or 0),
+        "category":   m.get("category") or "geopolitics",
+        "slug":       m.get("slug"),
+        "end_date":   m.get("endDate"),
+        "yes_token":  _yes_token(m),
+    }
+    risk = selected_market_risk(candidate)
+    if risk is None:
+        return None
+    candidate["risk_score"] = round(risk, 2)
+    return candidate
+
+
 async def fetch_polymarket(session: aiohttp.ClientSession) -> list[dict]:
     """從 Polymarket Gamma API 抓取戰爭/衝突相關市場"""
     # gamma API 單頁上限 100 筆，抓 3 頁並按 24h 交易量排序，
     # 確保大交易量的戰爭市場（俄烏停火等）不會因分頁被漏掉
-    war_markets = []
     markets = []
     seen_ids = set()
     try:
@@ -298,34 +361,15 @@ async def fetch_polymarket(session: aiohttp.ClientSession) -> list[dict]:
             if len(page) < 100:
                 break
         log.info(f"Fetched {len(markets)} Polymarket markets")
-
-        for m in markets:
-            if excluded_market_title(m.get("question") or ""):
-                continue
-            yes_price, no_price = _parse_outcome_prices(m)
-
-            if yes_price is None or no_price is None:
-                continue
-            candidate = {
-                "id":         m.get("conditionId") or m.get("id"),
-                "question":   m.get("question"),
-                "yes_price":  yes_price,
-                "no_price":   no_price,
-                "volume":     float(m.get("volume", 0) or 0),
-                "category":   m.get("category") or "geopolitics",
-                "slug":       m.get("slug"),
-                "end_date":   m.get("endDate"),
-                "yes_token":  _yes_token(m),
-            }
-            risk = selected_market_risk(candidate)
-            if risk is not None:
-                candidate["risk_score"] = round(risk, 2)
-                war_markets.append(candidate)
-
-        log.info(f"Filtered {len(war_markets)} war-related markets")
     except Exception as e:
         log.error(f"Polymarket error: {e}")
+    if not markets:
+        return []  # main list failed: keep the previous-snapshot fallback instead of a region-only partial list
+    extra = await _search_region_markets(session, seen_ids)
+    log.info(f"Region search added {len(extra)} Polymarket markets")
 
+    war_markets = [c for c in map(_war_candidate, markets + extra) if c is not None]
+    log.info(f"Filtered {len(war_markets)} war-related markets")
     await _translate_market_questions(session, war_markets)
     return war_markets
 
@@ -2474,6 +2518,19 @@ async def main():
             aviation["summary"]["baseline_samples"] = baseline["samples"]
     except (ValueError, KeyError, TypeError, OSError):
         pass
+    # FIRMS conflict-area counts relative to each region's own 7-day level (fresh snapshots only).
+    from firms_baseline import update as firms_update, relative as firms_relative, seed_from_archives as firms_seed
+    firms_now = datetime.now(timezone.utc)
+    firms_series = previous.get("firms_baseline")
+    if not isinstance(firms_series, list) or not firms_series:
+        try:
+            firms_series = firms_seed(DATA_DIR.parent / "archives", firms_now)
+        except OSError:
+            firms_series = []
+    firms_baseline = firms_update(firms_series, firms, firms_now)
+    if isinstance(firms, dict) and not firms.get("error"):
+        firms["relative"] = {key: firms_relative(firms_baseline, firms, cfg["firms"])
+                             for key, cfg in REGIONS.items() if cfg["firms"]}
     score        = calculate_score(pizza_index, polymarket, aviation=aviation, firms=firms, gdelt=gdelt, wikipedia=wikipedia, finance=finance, gdelt_events=gdelt_events)
 
     # 前一份 data.json 的警戒等級 + 推播狀態（供 alerts.py 判斷升級/去重）
@@ -2561,6 +2618,7 @@ async def main():
         "wikipedia":     wikipedia,
         "notams":        notams,
         "notam_baseline": notam_baseline,
+        "firms_baseline": firms_baseline,
         "nuclear_seismic": nuclear_seismic,
         "bars":          bars,
         "venue_hours":   stored_venue_hours(),
