@@ -12,9 +12,12 @@ import asyncio
 import math
 import time
 import hashlib
+import json
+import re
 import aiohttp
 import os
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
@@ -84,9 +87,39 @@ def _fmt_count(value):
     return str(int(value)) if _valid_number(value) and float(value).is_integer() else "缺資料"
 
 
-def _fmt_regions(regions, data=None):
-    """Describe usable inputs without presenting missing scores as missing observations."""
+REGION_ZH = {"CRITICAL": "觀察指數高", "HIGH": "高度風險", "ELEVATED": "風險升高", "WATCH": "觀察中"}
+# 無市場地區 2026-10-29 07:20 UTC 起改為「高於平常幅度」計分，之前的歷史點不同算法（與網站 regionSpark 一致）
+NO_MARKET_RESCALED_AT = datetime(2026, 10, 29, 7, 20, tzinfo=timezone.utc)
+HISTORY_FILE = Path(__file__).resolve().parent.parent / "data" / "history.json"
+
+
+def _load_history():
+    try:
+        rows = json.loads(HISTORY_FILE.read_text(encoding="utf-8"))
+        return rows if isinstance(rows, list) else []
+    except (OSError, ValueError):
+        return []
+
+
+def _region_week_range(history, key, end, no_market=False):
+    """7 天內有效分數的 (低, 高)；不足 2 點回傳 None。"""
+    if end is None:
+        return None
+    vals = []
+    for h in history or []:
+        at = _iso(h.get("ts")) if isinstance(h, dict) else None
+        v = (h.get("regions") or {}).get(key) if isinstance(h, dict) else None
+        if at and end - timedelta(days=7) <= at <= end and _valid_number(v, 100) \
+                and not (no_market and at < NO_MARKET_RESCALED_AT):
+            vals.append(v)
+    return (min(vals), max(vals)) if len(vals) >= 2 else None
+
+
+def _fmt_regions(regions, data=None, history=None):
+    """有分數的地區寫等級、分數、7 天高低與主要新聞（與網站一致）；資料問題另外註明。
+    沒有分數的地區列出各來源狀態，不把缺分數說成缺觀測。"""
     data = data or {}
+    end = _iso(data.get("updated_at"))
     lines = []
     for r in (regions or [])[:5]:
         key = r.get('key')
@@ -111,15 +144,45 @@ def _fmt_regions(regions, data=None):
         else:
             parts.append('新聞強度過期' if g.get('stale') else
                          ('新聞強度有資料' if _valid_number(factors.get('gdelt'), 100) else '新聞強度缺資料'))
-        # Old model scores remain in saved history; these are observations, not risk levels.
-        lines.append(f"  • {r.get('name', '?')}：" + '；'.join(parts))
+        score, level = r.get('score'), r.get('level')
+        if _valid_number(score, 100) and level in REGION_ZH:
+            ok = ('市場有資料', '市場缺可用題目', '新聞強度有資料', '新聞強度有資料（事件檔備援）')
+            problems = [p for p in parts if p not in ok and not p.startswith('公告查詢')]
+            if factors.get('no_market'):
+                problems.insert(0, '無市場題目')
+            week = _region_week_range(history, key, end, bool(factors.get('no_market')))
+            line = f"  • {r.get('name', '?')} {round(score)}（{REGION_ZH[level]}）"
+            line += f" · 7 天 {round(week[0])}–{round(week[1])}" if week else ""
+            line += f"（{'；'.join(problems)}）" if problems else ""
+            delta = factors.get('gdelt_delta')
+            if _valid_number(delta) and delta >= 100:
+                line += f"\n    新聞量約為平常的 {round(1 + delta / 100)} 倍"
+            head = (r.get('headline') or {}).get('title')
+            if head:
+                line += f"\n    📰 {head if len(head) <= 60 else head[:59] + '…'}"
+            lines.append(line)
+        else:
+            lines.append(f"  • {r.get('name', '?')}：" + '；'.join(parts))
     return '\n'.join(lines) or '  （尚無地區觀測）'
 
 
+_NEWS_SKIP = re.compile(r"^\s*(?:opinion|editorial|analysis|commentary|letters?|op-ed)\b|社論|評論|觀點|投書|致編輯信|讀者來函", re.I)
+
+
 def _fmt_news(news, n=3):
-    lines = []
-    for a in (news or [])[:n]:
-        lines.append(f"  • [{a.get('topic','')}] {a.get('title','')[:60]}")
+    """每個地區最多一則；中文標題優先，略過評論文章與太短的標籤式標題（例：只有「俄烏戰爭」）。"""
+    lines, seen = [], set()
+    items = [a for a in news or [] if isinstance(a, dict) and not a.get("stale")]
+    items.sort(key=lambda a: (bool(a.get("title_zh")), str(a.get("ts") or "")), reverse=True)
+    for a in items:
+        title = (a.get("title_zh") or a.get("title") or "").strip()
+        group = a.get("region") or a.get("topic") or title
+        if len(title) < 6 or group in seen or any(_NEWS_SKIP.search(str(a.get(k) or "")) for k in ("title", "title_zh")):
+            continue
+        seen.add(group)
+        lines.append(f"  • [{a.get('topic','')}] {title[:60]}")
+        if len(lines) >= n:
+            break
     return "\n".join(lines) or "  （無即時頭條）"
 
 
@@ -153,6 +216,12 @@ def _fmt_pizza_shops(shops, health=None):
     missing = len(shops) - len(live) - closed
     hot = [shop for shop in live if shop.get("status") in ("spike", "busy")]
     summary = f"   有效即時人流 {len(live)}/{len(shops)} 家；已知未營業 {closed} 家；缺值或過期 {missing} 家"
+    if not live:
+        # 沒有即時值時，至少給平常這時段的人潮（資料時間的華府小時；與網站一致，明確標示不是即時）
+        usual = [shop["usual_now"] for shop in shops if _valid_number(shop.get("usual_now"), 100)]
+        if usual:
+            closed_note = f"；已知未營業 {closed} 家" if closed else ""
+            return f"   無即時人流 · 平常這時段約 {round(sum(usual) / len(usual))}%（{len(usual)} 家平均，不是即時值）{closed_note}"
     if not hot:
         return summary + ("；有效樣本未見偏忙／爆量" if live else "；無即時人流可供判斷")
     hot.sort(key=lambda shop: shop["busyness"], reverse=True)
@@ -184,12 +253,11 @@ def build_digest(data: dict) -> str:
         f"🛰️ *WARHUBS 更新觀測回報*\n"
         f"{now}\n資料時間：{data.get('updated_at') or '未提供'}\n\n"
         f"{emoji} *WPI 實驗指數：{_fmt_score(score.get('combined_score'))} / 100*（不作戰情警戒）\n\n"
-        f"🗺️ 地區觀測（非風險評級）：\n{_fmt_regions(data.get('regions'), data)}\n\n"
+        f"🗺️ 地區觀測（人工權重，不是開戰機率）：\n{_fmt_regions(data.get('regions'), data, _load_history())}\n\n"
         f"🍕 人流實驗觀察：{_fmt_score(score.get('pizza_score')) if _valid_number(score.get('pizza_score'), 100) else '暫無有效即時指數'}\n"
         f"{_fmt_pizza_shops(data.get('pizza'), health.get('pizza'))}\n"
         f"{_fmt_aviation(data.get('aviation'), health.get('aviation'))}\n"
         f"{_fmt_firms(data.get('firms'), health.get('firms'))}\n\n"
-        f"📡 最新戰情頭條：\n{_fmt_news(data.get('news'))}\n\n"
         f"WPI 有效權重：{_fmt_coverage((data.get('score') or {}).get('coverage'))}（非全站資料完整率） · 未校準為開戰機率\n"
         f"🔗 {SITE}"
     ).strip()

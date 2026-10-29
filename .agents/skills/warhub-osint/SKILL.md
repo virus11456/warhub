@@ -131,3 +131,5 @@ GDELT DOC API 對共用 IP（GitHub runner 及雲端主機）第一個請求即�
 2026-10-29 地區卡 7 天走勢：前台 regionSpark 從 history.json（WW_HISTORY）畫各區最近 7 天分數折線（固定 0–100 刻度，虛線為 HIGH 門檻 45），只取 0–100 有效數字；無市場地區（factors.no_market）略過 NO_MARKET_RESCALED_AT（2026-10-29 07:20 UTC，改為高於平常幅度計分）之前的點，避免新舊算法混畫。不足 2 點不畫。只讀既有歷史，不增加抓取。
 
 2026-10-29 地區跳升防誤報（使用者選擇）：GDELT 事件檔只看 2 小時窗，一則大新聞就能讓無市場地區衝到 100（實例：韓國 14:23 62.5 → 16:23 0）。`alerts.region_jumps` 改為兩段：跳升兩級到 HIGH+ 時，若 `_airspace_confirms`（notam_closure 或 NOTAM 相對分數 ≥75）立即通知（confirmed_by=airspace）；否則記入 `_notify.region_pending {key: {from, since}}`，下一輪仍在 HIGH／CRITICAL 才通知（confirmed_by=two_runs，約晚 2 小時），回落則取消；INSUFFICIENT_DATA 不取消也不覆蓋。冷卻、只送站長、送達才記 region_alerted 不變；送達失敗改留在 region_pending 下輪重送。訊息會註明「禁航公告同步升高，立即通知」或「已連續兩輪維持 HIGH 以上」。驗證：tests/test_region_jump.py。
+
+2026-10-29 主要新聞挑選：`headline_usable` 略過 Opinion／Editorial／Analysis／社論／評論／投書等，以及少於 6 字的標題（如只有「俄烏戰爭」）；排序改為中文標題優先 → 軍事行動關鍵字 → 最新。驗證：tests/test_region_jump.py HeadlineChoiceTests。

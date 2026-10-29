@@ -1987,14 +1987,24 @@ def clean_headline(title, source=None):
     return t or title
 
 
+# Opinion pieces and bare topic labels say nothing about what happened.
+HEADLINE_SKIP = re.compile(r"^\s*(?:opinion|editorial|analysis|commentary|letters?|op-ed)\b|社論|評論|觀點|投書|致編輯信|讀者來函", re.I)
+
+
+def headline_usable(item) -> bool:
+    title = (item.get("title_zh") or item.get("title") or "").strip()
+    return len(title) >= 6 and not any(HEADLINE_SKIP.search(str(item.get(k) or "")) for k in ("title", "title_zh"))
+
+
 def attach_region_headlines(regions: list[dict], news: list[dict]) -> None:
     """One fresh headline per region (already sampled per region by the news collector), so a card can say
-    why its score moved: military-action headlines first, then newest. Context only; it is not scored."""
+    why its score moved. Skips opinion pieces and bare labels; then Chinese titles, military-action
+    headlines, newest. Context only; it is not scored."""
     for r in regions:
         items = [n for n in news or [] if isinstance(n, dict) and n.get("region") == r["key"] and not n.get("stale")
-                 and (n.get("title_zh") or n.get("title")) and str(n.get("url", "")).startswith(("https://", "http://"))]
+                 and headline_usable(n) and str(n.get("url", "")).startswith(("https://", "http://"))]
         action = lambda n: bool(HEADLINE_ACTION.search(" ".join(str(n.get(k) or "") for k in ("title_zh", "title", "title_en"))))
-        items.sort(key=lambda n: (action(n), str(n.get("ts") or "")), reverse=True)
+        items.sort(key=lambda n: (bool(n.get("title_zh")), action(n), str(n.get("ts") or "")), reverse=True)
         if items:
             n = items[0]
             r["headline"] = {"title": n.get("title_zh") or n.get("title"), "url": n["url"],
