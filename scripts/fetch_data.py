@@ -44,8 +44,8 @@ ADSB_MIL_FEEDS  = [
 FIRMS_CSV_URL   = "https://firms.modaps.eosdis.nasa.gov/data/active_fire/modis-c6.1/csv/MODIS_C6_1_Global_24h.csv"
 # NASA EONET — natural event feed (wildfires, volcanoes, etc.)
 EONET_API       = "https://eonet.gsfc.nasa.gov/api/v3/events?status=open&days=7&limit=100"
-# 披薩人流備援（使用者同意 2026-10-29）：自有 BestTime 缺值時才採用；前台不顯示來源名稱
-PIZZA_BACKUP_API = "https://www.pizzint.watch/api/dashboard-data"
+# 披薩人流主要來源（使用者決定 2026-10-29）：公開熱門時段資料，自有 BestTime 只補缺；前台不顯示來源名稱
+PIZZA_FEED_API = "https://www.pizzint.watch/api/dashboard-data"
 # GDELT DOC 2.0 — 全球新聞衝突報導強度（免金鑰，限速每 5 秒 1 請求）
 GDELT_API       = "https://api.gdeltproject.org/api/v2/doc/doc"
 # USGS 地震 API — 核試驗場周邊淺層地震監測（免金鑰）
@@ -1835,25 +1835,25 @@ async def besttime_live(session: aiohttp.ClientSession, key: str, venue: dict) -
                 "forecasted": None, "delta": None, "open": None, "error": True}
 
 
-async def fetch_pizza_backup(session) -> dict:
-    """Backup public popular-times feed (free, one request); {} on any failure."""
+async def fetch_pizza_feed(session) -> dict:
+    """Main public popular-times feed (free, one request per run); {} on any failure."""
     try:
-        async with session.get(PIZZA_BACKUP_API, timeout=aiohttp.ClientTimeout(total=15),
+        async with session.get(PIZZA_FEED_API, timeout=aiohttp.ClientTimeout(total=15),
                                headers={"User-Agent": USER_AGENT, "Accept": "application/json"}) as resp:
             resp.raise_for_status()
             return await resp.json()
     except Exception as e:
-        log.warning(f"Pizza backup feed failed: {type(e).__name__}")
+        log.warning(f"Pizza feed failed: {type(e).__name__}")
         return {}
 
 
 async def fetch_pizza(session: aiohttp.ClientSession, previous_shops) -> dict:
     """
-    五角大廈周邊披薩店人流：自有 BestTime 帳號優先。
+    五角大廈周邊披薩店人流：公開熱門時段資料（fetch_pizza_feed）為主，自有 BestTime 補缺。
     即時值僅在美東 16–24 時、且已由 besttime_setup.py 建檔（有 venue_id）的店查詢，每店每輪 1 credit；
     平常人流取自建檔時存下的每週預測（data/besttime_venues.json），本函式不建檔、不另扣點。
-    自有資料缺的店，才用備援公開來源（fetch_pizza_backup，免費）補平常人流與 90 分鐘內的即時值，
-    標 data_source='backup'；前台不顯示來源名稱。
+    主要來源給平常人流與 90 分鐘內的即時值（data_source='feed'）；它缺的店才用自有 BestTime 補；
+    前台不顯示來源名稱。
     """
     from pizza_traffic import PIZZA_VENUES, build_shops, load_venues, spike_events, summarize
     venues = load_venues()
@@ -1865,17 +1865,17 @@ async def fetch_pizza(session: aiohttp.ClientSession, previous_shops) -> dict:
     if queried and ready:
         results = await asyncio.gather(*(besttime_live(session, key, PIZZA_VENUES[n]) for n in ready))
         live = dict(zip(ready, results))
-    from pizza_traffic import backup_shops
-    backup = backup_shops(await fetch_pizza_backup(session))
+    from pizza_traffic import feed_shops
+    feed = feed_shops(await fetch_pizza_feed(session))
     now = datetime.now(timezone.utc)
-    shops = build_shops(live, venues, previous_shops, now, queried, backup)
+    shops = build_shops(live, venues, previous_shops, now, queried, feed)
     summary = summarize(shops, venues, queried, now)
     messages = {n: r["error_message"] for n, r in live.items() if r.get("error_message")}
     if messages:
         summary["messages"] = messages
-    summary["backup_live"] = sum(s["data_source"] == "backup" for s in shops)
+    summary["feed_live"] = sum(s["data_source"] == "feed" for s in shops)
     log.info(f"Pizza: state={summary['state']} live={summary['live_count']}/{summary['total']} "
-             f"(backup {summary['backup_live']}) ready={len(ready)} backup_shops={len(backup)} "
+             f"(feed {summary['feed_live']}) ready={len(ready)} feed_shops={len(feed)} "
              f"level={summary['level']} index={summary['index']}")
     return {"shops": shops, "summary": summary, "events": spike_events(shops)}
 
@@ -1965,6 +1965,26 @@ def _region_poly_score(cfg: dict, polymarket: list[dict]) -> tuple[float | None,
 # Headlines naming force or military action explain a score jump better than diplomacy or sanctions news.
 HEADLINE_ACTION = re.compile(r"導彈|飛彈|彈道|發射|空襲|襲擊|攻擊|打擊|轟炸|砲擊|炮擊|開火|交火|入侵|擊落|無人機|演習|圍台|封鎖|"
                              r"missile|launch|strike|attack|airstrike|shell|drone|invasion|drill|blockade|fire[sd]? ", re.I)
+
+
+_HEADLINE_TAIL = re.compile(r"^(?P<head>.+?)\s*(?:[｜|]|[-–—])\s*(?P<tail>[^｜|\-–—]{1,14})$")
+_HEADLINE_TAGS = re.compile(r"^(?:#.+|.*(?:新聞|電台|電臺|電視|日報|時報|晚報|週刊|網)|國際|兩岸|政治|軍事|焦點|鏡轉全球|即時)$")
+
+
+def clean_headline(title, source=None):
+    """Drop trailing source/section tags left by RSS feeds and translation
+    (「…有效」-新聞-台灣國際電台, …｜鏡轉全球｜#鏡新聞, …外海- 國際). A tail is removed only when it is
+    the item's source or looks like a section or outlet tag, so real wording after a dash stays."""
+    if not isinstance(title, str):
+        return title
+    t = title.strip()
+    for _ in range(4):
+        m = _HEADLINE_TAIL.match(t)
+        tail = m.group("tail").strip() if m else ""
+        if not m or not (tail == (source or "").strip() or _HEADLINE_TAGS.match(tail)):
+            break
+        t = m.group("head").rstrip(" -–—｜|")
+    return t or title
 
 
 def attach_region_headlines(regions: list[dict], news: list[dict]) -> None:
@@ -2489,6 +2509,11 @@ async def main():
     for key, record in (notams or {}).items():
         if isinstance(record, dict):
             record["relative"] = notam_relative(notam_baseline.get(key), record)
+    for item in [*news, *tw_news]:
+        if isinstance(item, dict):
+            for k in ("title", "title_zh"):
+                if item.get(k):
+                    item[k] = clean_headline(item[k], item.get("domain"))
     regions = build_region_risks(polymarket, gdelt, firms, aviation, notams, gdelt_events)
     attach_region_headlines(regions, news)
     history = update_history(score, pizza_index, regions,

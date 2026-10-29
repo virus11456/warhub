@@ -103,6 +103,13 @@ assert.equal(w.regionHeadline({headline:{title:'x',url:'javascript:alert(1)'}}),
 w.renderPizzaRadar({pizza:[{name:'a',busyness:null}],pizza_summary:{state:'baseline_only'}});
 assert.ok(d.querySelector('#pizza-radar-summary').textContent.includes('目前只有平常人流'));
 assert.ok(!/PizzINT|pizzint/i.test(d.querySelector('#pizza-card').textContent));}
+// Without live readings the block still shows numbers: usual traffic for this Washington hour, labelled as not live.
+{const w=d.defaultView;const at=new Date('2026-10-29T00:30:00Z');   // Wed 20:30 ET
+const wk=v=>Object.fromEntries([0,1,2,3,4,5,6].map(i=>[i,Array.from({length:24},(_,h)=>h===20?v:null)]));
+assert.equal(w.usualNow({usual_week:wk(40)},at),40);assert.equal(w.usualNow({usual_week:wk(0)},at),0);assert.equal(w.usualNow({},at),null);
+assert.deepEqual(JSON.parse(JSON.stringify(w.usualNowAverage([{usual_week:wk(40)},{usual_week:wk(20)},{}],at))),{avg:30,n:2});
+const st=w.pizzaOpenStates({pizza:[{name:'We, The Pizza',busyness:null,usual_week:wk(55)}],venue_hours:{venues:{'We, The Pizza':{hours:Object.fromEntries([0,1,2,3,4,5,6].map(i=>[i,[[600,1380]]]))}}}},at);
+assert.equal(st.states['We, The Pizza'].level,55);assert.equal(st.states['We, The Pizza'].state,'open');}
 // Hourly bars: Washington weekday baseline (grey) + only today's live readings; 0 is drawn, yesterday is not.
 {const w=d.defaultView,usual=Array(24).fill(null);usual[10]=40;usual[12]=80;
 const shop={name:'x',recorded_at:'2026-10-27T16:06:00Z',usual_week:{'1':Array(24).fill(90),'2':usual},

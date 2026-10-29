@@ -80,13 +80,13 @@ def shop_status(live, usual):
     return ("quiet" if pct is not None and pct < QUIET_RATIO else "normal"), pct, None
 
 
-BACKUP_MAX_AGE = timedelta(minutes=90)  # a backup live reading older than this is not "now"
+FEED_MAX_AGE = timedelta(minutes=90)  # a feed live reading older than this is not "now"
 
 
-def backup_shops(payload) -> dict:
-    """Backup public popular-times feed → {display name: {usual_week, live, recorded_at}}.
+def feed_shops(payload) -> dict:
+    """Public popular-times feed (main source since 2026-10-29) → {display name: {usual_week, live, recorded_at}}.
 
-    Used only where our own BestTime data is missing; the page never names the provider.
+    Our own BestTime data only fills what the feed lacks; the page never names the provider.
     Its baseline_popular_times keys are '0'(Sunday)…'6' with {hour, popularity} rows (local hour).
     """
     out = {}
@@ -109,14 +109,14 @@ def backup_shops(payload) -> dict:
     return out
 
 
-def _backup_live(entry, now):
-    """The backup's live value only when it is present and recent; (value, observed_at)."""
+def _feed_live(entry, now):
+    """The feed's live value only when it is present and recent; (value, observed_at)."""
     value = (entry or {}).get("live")
     try:
         at = datetime.fromisoformat(str(entry.get("recorded_at")).replace("Z", "+00:00"))
     except (AttributeError, ValueError):
         return None, None
-    if value is None or not at.tzinfo or not (timedelta(0) <= now - at <= BACKUP_MAX_AGE):
+    if value is None or not at.tzinfo or not (timedelta(0) <= now - at <= FEED_MAX_AGE):
         return None, None
     return value, at.isoformat()
 
@@ -134,25 +134,26 @@ def _recent(points, now, hours=24):
 
 
 def build_shops(live: dict, venues: dict, previous_shops, now: datetime, queried: bool,
-                backup: dict | None = None) -> list[dict]:
+                feed: dict | None = None) -> list[dict]:
     """
     live: {display name: besttime_live result} for this run ({} when not queried).
     previous_shops: last data.json pizza list, for the 24-hour history of our own readings.
     queried: False outside the US Eastern 16–24 window, so missing readings are "waiting", not failures.
-    backup: backup_shops() output; fills the usual week and a recent live value only where ours is missing.
+    feed: feed_shops() output, the main source: its usual week and recent live value come first;
+          our own BestTime reading / stored week fill in where the feed has none.
     """
     prev = {s.get("name"): s for s in previous_shops or [] if isinstance(s, dict)}
     shops = []
     for name, venue in PIZZA_VENUES.items():
         stored = (venues.get("venues") or {}).get(name) or {}
-        spare = (backup or {}).get(name) or {}
-        usual_week = stored.get("usual_week") or spare.get("usual_week")
+        main = (feed or {}).get(name) or {}
+        usual_week = main.get("usual_week") or stored.get("usual_week")
         result = live.get(name) or {}
-        value = popularity(result.get("live_busyness")) if result.get("live_available") else None
-        source, observed = ("besttime", now.isoformat()) if value is not None else ("none", None)
-        if value is None:
-            value, observed = _backup_live(spare, now)
-            source = "backup" if value is not None else "none"
+        value, observed = _feed_live(main, now)
+        source = "feed" if value is not None else "none"
+        if value is None and result.get("live_available"):
+            value = popularity(result.get("live_busyness"))
+            source, observed = ("besttime", now.isoformat()) if value is not None else ("none", None)
         hourly = _recent((prev.get(name) or {}).get("hourly_24h"), now)
         if value is not None and not any(p.get("at") == observed for p in hourly):
             hourly = (hourly + [{"at": observed, "v": value}])[-24:]

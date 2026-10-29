@@ -89,5 +89,18 @@ class RegionHeadlineTests(unittest.TestCase):
         self.assertNotIn('headline', regions[2])
 
 
+class HeadlineCleanupTests(unittest.TestCase):
+    def test_source_and_section_tails_are_removed_but_real_dashes_stay(self):
+        import fetch_data as f
+        c = f.clean_headline
+        self.assertEqual(c('美國太平洋陸軍司令：2027年台灣入侵窗口仍「有效」-新聞-台灣國際電台'), '美國太平洋陸軍司令：2027年台灣入侵窗口仍「有效」')
+        self.assertEqual(c('美國示警威脅依然存在｜鏡轉全球｜#鏡新聞', 'Yahoo新聞'), '美國示警威脅依然存在')
+        self.assertEqual(c('日防衛省首公布中海警船同共艦通過鹿兒島外海- 國際'), '日防衛省首公布中海警船同共艦通過鹿兒島外海')
+        self.assertEqual(c('Hegseth fires planner - Reuters', 'Reuters'), 'Hegseth fires planner')
+        self.assertEqual(c('德國與南韓在俄羅斯-北韓擔憂中深化安全夥伴關係'), '德國與南韓在俄羅斯-北韓擔憂中深化安全夥伴關係')
+        self.assertEqual(c('Russia-Ukraine talks', 'x'), 'Russia-Ukraine talks')
+        self.assertIsNone(c(None))
+
+
 if __name__ == '__main__':
     unittest.main()

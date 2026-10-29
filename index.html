@@ -450,83 +450,9 @@
   /* Polymarket 網格多欄 */
   .poly-grid      { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: .6rem; }
 
-  .pizza-status-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1.5rem;
-  }
-
-  .pizza-emoji {
-    font-size: 2.5rem;
-    filter: drop-shadow(0 0 10px rgba(227,168,63,0.6));
-    animation: pizza-spin 3s ease-in-out infinite;
-  }
-
-  @keyframes pizza-spin {
-    0%, 100% { transform: rotate(-5deg); }
-    50% { transform: rotate(5deg); }
-  }
-
   .pizza-level {
     text-align: right;
   }
-
-  .pizza-level-num {
-    font-family: 'Orbitron', monospace;
-    font-size: 2.5rem;
-    font-weight: 900;
-    color: var(--accent3);
-    text-shadow: 0 0 20px rgba(227,168,63,0.5);
-  }
-
-  .pizza-level-label {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.7rem;
-    color: var(--text-dim);
-    letter-spacing: 2px;
-  }
-
-  .pizza-alert-box {
-    background: rgba(227,168,63,0.05);
-    border: 1px solid rgba(227,168,63,0.3);
-    padding: 0.8rem 1rem;
-    margin: 1rem 0;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.75rem;
-    color: var(--accent3);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .pizza-history {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-top: 1rem;
-  }
-
-  .history-item {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    padding: 0.5rem;
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    font-size: 0.75rem;
-  }
-
-  .history-year {
-    font-family: 'Orbitron', monospace;
-    font-size: 0.7rem;
-    color: var(--accent4);
-    min-width: 45px;
-    font-weight: 700;
-  }
-
-  .history-event { color: var(--text-dim); flex: 1; }
-  .history-pizzas { font-family: 'Share Tech Mono', monospace; color: var(--accent3); min-width: 60px; text-align: right; font-size: 0.7rem; }
 
   .pizza-tracker-grid {
     display: grid;
@@ -952,19 +878,10 @@
     .hdr-left { gap: .55rem; }
     .nav-guides, .nav-tg { font-size:.6rem; padding:3px 8px; letter-spacing:.5px; }
     #clock .clk:first-child { display:none; }   /* 手機：隱藏 UTC，保留五角＋本地，騰出空間給導覽按鈕 */
-
-    /* Pizza */
-    .pizza-emoji   { font-size: 2rem; }
-    .pizza-level-num { font-size: 1.3rem; }
     /* 手機：披薩卡片標題列改直排，等級區塊移到標題下方，避免跑版 */
     .pbi-title-row { flex-direction: column; gap: .3rem; }
     .pbi-title-row > div:last-child { text-align: left !important; }
-    .pizza-level-label { letter-spacing: .5px; }
     .shop-name     { font-size: 0.6rem; }
-    /* 隱藏披薩歷史的數量欄 */
-    .history-pizzas { display: none; }
-    .history-item  { gap: .5rem; padding: .4rem; }
-    .history-event { font-size: 0.68rem; }
 
     /* Polymarket */
     .poly-question { font-size: 0.75rem; }
@@ -1031,10 +948,6 @@
     #pizza-war-alert > div[style*="grid-template-columns:1fr 1fr"] {
       display: flex; flex-direction: column;
     }
-
-    /* History */
-    .history-year  { font-size: 0.6rem; min-width: 32px; }
-    .history-event { font-size: 0.62rem; }
 
     /* Doomsday */
     .clock-face    { font-size: 1.8rem; }
@@ -1177,11 +1090,8 @@
   .ph-chip-year   { font-size: .66rem; }
   .ph-chip-event  { font-size: .66rem; }
   .ph-chip-tag    { font-size: .68rem; }
-  .pizza-level-label { font-size: .76rem; }
   .clock-label    { font-size: .74rem; }
-
   /* 動畫收斂：保留警報脈衝，其餘裝飾性動畫移除 */
-  .pizza-emoji { animation: none; }
   .wpi-badge   { animation: none; }
 
   /* ══════════ 融合改版：統一寬度 + 卡片視覺 + 收斂色 ══════════ */
@@ -1361,7 +1271,7 @@
 
 </style>
 <link rel="stylesheet" href="/i18n.css?v=20260916b">
-<script src="/i18n.js?v=20261029c" defer></script>
+<script src="/i18n.js?v=20261029d" defer></script>
 <script src="/cross-context.js"></script>
 <script src="/three-scenes.js?v=20261029b" defer></script>
 <script src="/kalshi-markets.js?v=20260923a" defer></script>
@@ -1535,7 +1445,7 @@
         <div class="pz-3d-why" id="pz-3d-why"></div>
       </div>
       <div class="pz-3d-stage"><canvas id="pz-3d-canvas" aria-hidden="true"></canvas></div>
-      <div class="pz-3d-legend"><i class="pz-k-pizza"></i>披薩店 <i class="pz-k-bar"></i>酒吧 <i class="pz-k-off"></i>未營業／無資料 · 中央為五角大廈，柱高＝即時人流（無即時值時為固定高度），位置為示意</div>
+      <div class="pz-3d-legend"><i class="pz-k-pizza"></i>披薩店 <i class="pz-k-bar"></i>酒吧 <i class="pz-k-off"></i>未營業／無資料 · 中央為五角大廈，柱高＝人流（沒有即時值時用平常這時段的人潮），位置為示意</div>
     </div>
 
     <div id="pizza-hourly-legend" hidden class="pz-legend"></div>
@@ -2346,6 +2256,9 @@ function renderPizzaShops(shops, fallbackAt, venueHours) {
   if (!grid) return;
   if (!shops.length) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:.8rem;font-size:.75rem;color:var(--text-dim)">尚未取得披薩店資料</div>'; return; }
   shops.forEach(shop => { shop._chartDay = null; });
+  // 沒有任何即時值時，長條圖的虛線框標「現在」，與卡片上的「平常這時段」對齊
+  const anyLive = shops.some(s => typeof s.busyness === 'number');
+  const chartAt = anyLive ? fallbackAt : new Date().toISOString();
   grid.innerHTML = shops.map(shop => {
     let [label, color] = PIZZA_STATUS_TEXT[shop.status] || PIZZA_STATUS_TEXT.unavailable;
     const live = typeof shop.busyness === 'number';
@@ -2356,12 +2269,13 @@ function renderPizzaShops(shops, fallbackAt, venueHours) {
     const pct = typeof shop.percentage_of_usual === 'number' ? Math.round(shop.percentage_of_usual) : null;
     const reading = live
       ? `現在 ${shop.busyness}%${typeof shop.usual_now === 'number' ? ` · 平常 ${shop.usual_now}%` : ''}${pct != null ? ` · 為平常的 ${pct}%` : ''}`
-      : byHours ? (shop.usual_week ? '灰色是平常人潮 · 即時人流尚未取得' : '人流資料尚未取得') : '';
+      : usualNow(shop) != null ? `平常這時段 ${usualNow(shop)}% · 即時人流尚未取得`
+      : byHours ? '人流資料尚未取得' : '';
     const barColor = hot ? color : 'var(--accent)';
     return `<div class="pizza-shop" style="${hot ? 'border-color:rgba(239,91,87,0.4);' : ''}">
       <div class="shop-name"><svg class="px-ic"><use href="#ic-pizza"/></svg> ${escapeHtml(shop.name)}</div>
       <div class="shop-status"><span style="color:${color};font-size:.75rem;font-weight:700">${label}</span></div>
-      ${pizzaHourlyChart(shop, barColor, fallbackAt)}
+      ${pizzaHourlyChart(shop, barColor, chartAt)}
       <div class="pz-why">${reading}</div>
     </div>`;
   }).join('');
@@ -2369,7 +2283,7 @@ function renderPizzaShops(shops, fallbackAt, venueHours) {
   const day = (shops.find(x => x._chartDay) || {})._chartDay;
   if (legend) {
     legend.hidden = !day;
-    legend.innerHTML = day ? '<span>每小時人潮</span> · <span>華府時間</span> · <span>灰色是平常</span> <span>' + day + '</span> · <span>亮色是實測</span> · <span>虛線框是資料時間</span>' : '';
+    legend.innerHTML = day ? '<span>每小時人潮</span> · <span>華府時間</span> · <span>灰色是平常</span> <span>' + day + '</span> · <span>亮色是實測</span> · <span>' + (anyLive ? '虛線框是資料時間' : '虛線框是現在') + '</span>' : '';
   }
 }
 
@@ -2390,12 +2304,27 @@ function renderPizzaBars(json) {
   el.style.color = s[1];
 }
 
+// 平常人潮：店家每週平常值中「華府現在這個小時」的那一格（0 是有效值；缺格回傳 null）
+function usualNow(shop, now = new Date()) {
+  const { day, min } = venueClock(now), row = shop?.usual_week?.[day];
+  const v = Array.isArray(row) ? row[Math.floor(min / 60)] : null;
+  return typeof v === 'number' ? v : null;
+}
+function usualNowAverage(shops, now = new Date()) {
+  const vals = (shops || []).map(s => usualNow(s, now)).filter(v => v != null);
+  return vals.length ? { avg: Math.round(vals.reduce((a, b) => a + b, 0) / vals.length), n: vals.length } : null;
+}
+
 function renderPizzaLevel(json) {
   const sum = json?.pizza_summary || {};
   const lv = document.getElementById('pizza-level'), ix = document.getElementById('pizza-index');
-  const [t, c] = PIZZA_LEVEL_TEXT[sum.level] || ['--', 'var(--text-dim)'];
+  let [t, c] = PIZZA_LEVEL_TEXT[sum.level] || ['--', 'var(--text-dim)'];
+  // 沒有即時人流時，至少顯示「平常這時段」的平均（明確標示不是即時值）
+  const usual = sum.level ? null : usualNowAverage(json?.pizza);
+  if (usual) [t, c] = [`平常 ${usual.avg}%`, 'var(--text)'];
   if (lv) { lv.textContent = t; lv.style.color = c; }
-  if (ix) ix.textContent = typeof sum.index === 'number' ? `異常指數 ${Math.round(sum.index)} / 100` : '異常指數：資料不足';
+  if (ix) ix.textContent = typeof sum.index === 'number' ? `異常指數 ${Math.round(sum.index)} / 100`
+    : usual ? `這時段 ${usual.n} 家平均 · 不是即時值` : '異常指數：資料不足';
 }
 
 // 營業狀態：有即時人流＝營業中；BestTime 明確回報 Closed＝未營業；其餘（未建檔、非查詢時段、查詢失敗）＝未知
@@ -2428,7 +2357,8 @@ function pizzaOpenStates(json, now = new Date()) {
   for (const name of pizzaNames.length ? pizzaNames : shops.map(s => s.name)) {
     const s = shops.find(x => x.name === name) || {};
     const st = s.is_open === true ? 'open' : s.is_open === false ? 'closed' : 'unknown';
-    states[name] = { ...withHours(name, st), level: typeof s.busyness === 'number' ? s.busyness : null };
+    // 柱高：有即時值用即時值，沒有就用平常這時段的人潮
+    states[name] = { ...withHours(name, st), level: typeof s.busyness === 'number' ? s.busyness : usualNow(s, now) };
   }
   const bars = Array.isArray(json?.bars?.bars) ? json.bars.bars : [];
   const barNames = (window.WarhubThree?.VENUES || []).filter(v => v.kind === 'bar').map(v => v.name);
@@ -2874,7 +2804,11 @@ function renderPizzaRadar(json) {
   let headline, detail, tone = 'dim';
   if (!shops.length) { headline = '尚未取得披薩店資料'; detail = ''; }
   else if (sum.state === 'setup_needed') { headline = '披薩店尚未在 BestTime 建檔，還沒有人流資料'; detail = '建檔完成後，每天美東 16–24 時會自動更新。'; }
-  else if (sum.state === 'baseline_only') { headline = '目前只有平常人流，沒有即時人流'; detail = '灰色長條是各店平常的人潮；沒有即時值不等於店家打烊。'; }
+  else if (sum.state === 'baseline_only') {
+    const usual = usualNowAverage(shops);
+    headline = usual ? `華府現在平常的人潮約 ${usual.avg}%（${usual.n} 家平均），目前沒有即時人流` : '目前只有平常人流，沒有即時人流';
+    detail = '灰色長條是各店平常的人潮；沒有即時值不等於店家打烊。';
+  }
   else if (sum.state === 'off_hours') { headline = '現在不是查詢時段'; detail = `即時人流只在美東 16–24 時查詢${wait ? '；' + wait : ''}。灰色長條是平常人流。`; }
   else if (!live.length) { headline = `華府 ${dc || '--'} 查詢：${shops.length} 家店都沒有即時人流`; detail = '沒有即時值不等於店家打烊。'; }
   else if (hot.length) { headline = `${hot.length} 家店人流高於平常${top != null ? `（最高為平常的 ${Math.round(top)}%）` : ''}`; detail = `華府 ${dc || '--'} 的資料。`; tone = 'hot'; }
