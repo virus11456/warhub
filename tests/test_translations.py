@@ -13,6 +13,7 @@ class Response:
     async def __aexit__(self, *args): pass
     async def json(self, **kwargs):
         return {'choices':[{'finish_reason':'stop','message':{'content':json.dumps({'translations':self.rows})}}]}
+    async def text(self): return '{"error":{"code":"json_validate_failed"}}'
 
 class Session:
     def __init__(self, status=200, rows=None): self.status, self.rows, self.calls = status, rows, []
@@ -21,6 +22,14 @@ class Session:
         inputs=json.loads(kwargs['json']['messages'][1]['content'])
         rows=self.rows if self.rows is not None else [{'id':r['id'],'text':f"中文標題 {r['id']}"} for r in reversed(inputs)]
         return Response(self.status,rows)
+
+class RejectsOne(Session):
+    """Groq-style 400 for any batch that contains the poisoned title."""
+    def post(self, url, **kwargs):
+        inputs=json.loads(kwargs['json']['messages'][1]['content'])
+        if any('poison' in r['text'] for r in inputs):
+            self.calls.append((url, kwargs)); return Response(400, [])
+        return super().post(url, **kwargs)
 
 class CacheTests(unittest.TestCase):
     def test_translations_survive_disappearing_titles_and_sources_stay_separate(self):
@@ -104,6 +113,15 @@ class GroqTests(unittest.IsolatedAsyncioTestCase):
                 await translate_groq(Session(rows=rows),items,{})
                 self.assertTrue(all('title_zh' not in i for i in items))
                 self.assertTrue(all(i['translation_error']=='groq_ValueError' for i in items))
+    async def test_http_400_batch_is_retried_singly_and_only_the_bad_title_stays_untranslated(self):
+        s=RejectsOne();items=[{'title':'headline one'},{'title':'poison title'},{'title':'headline two'}]
+        await translate_groq(s,items,{})
+        self.assertEqual([i.get('translation_status') for i in items],['translated','unavailable','translated'])
+        self.assertEqual(items[1]['translation_error'],'groq_http_400')
+        self.assertEqual(len(s.calls),4)                     # whole batch, then three single tries
+        await translate_groq(s,[{'title':'market?'}],{})    # a 400 does not stop later sources
+        self.assertEqual(len(s.calls),5)
+
     async def test_batches_are_bounded(self):
         s=Session(); await translate_groq(s,[{'title':f'headline {i}'} for i in range(21)],{})
         self.assertEqual(len(s.calls),3)

@@ -82,3 +82,5 @@ tests/test_news_sampling.py驗證平衡首頁、50筆上限、去重、來源名
 2026-10-28 翻譯國名檢查（數據排查發現「US-Iran war」被譯成「俄美伊戰爭」）：scripts/translation_check.added_entities 比對譯文中的國家標記（俄、烏克蘭、伊朗、以色列、北韓／朝鮮、菲律賓、日本）與英文原文是否有對應名稱（含 Russo-、PH、PCG 等縮寫；埃塞俄比亞的「俄」不算）。translate_groq 只拒絕「多出」國名的單筆譯文（translation_error='entity_mismatch'，保留未翻譯、下輪重試），同批其他譯文照常套用；快取中的同類錯譯不再沿用。提示詞加上不得加入原文未提及的國家或人物。對 887 筆既有譯文掃描只命中該錯譯。驗證：tests/test_translations.py。
 
 2026-10-29 標題字尾清理：輸出前 `fetch_data.clean_headline` 處理 news 與 tw_news 的 title／title_zh，移除 RSS／翻譯留下的來源或欄目字尾（例：「…有效」-新聞-台灣國際電台、…｜鏡轉全球｜#鏡新聞、…外海- 國際、"… - Reuters"）。分隔符為 ｜ | - – —，只在字尾等於該則 domain 或像媒體／欄目標籤（#開頭、含新聞／電台／電視／日報／時報／網，或國際、兩岸等）且 ≤14 字時移除，最多 4 層；「俄羅斯-北韓」「Russia-Ukraine」等正文連字號保留。驗證：tests/test_region_jump.py HeadlineCleanupTests。
+
+2026-10-29 翻譯 HTTP 400 不再整輪中止：實測 16:23 一輪新聞 7 則全部 groq_http_400（同輪 Polymarket 52/52 成功），前台整排「中文翻譯暫時無法取得」。Groq 對 json_schema strict 輸出無法通過驗證時回 400（json_validate_failed），屬單批內容問題、非帳號問題，舊程式卻把它當全域失敗停止整輪。`translate_groq` 拆成 `send(batch)`：400 時讀回應前 200 字寫 log（遮蔽 key），回 'rejected'，`batches()` 改逐則重送該批；仍被拒的那則標 translation_error='groq_http_400'，其餘照常翻譯，也不影響後續來源。其他非 200（429 等）仍整輪停止。驗證：tests/test_translations.py。
