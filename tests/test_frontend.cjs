@@ -94,6 +94,15 @@ assert.ok(cards[0].includes('營業中')&&cards[0].includes('人流資料尚未�
 assert.ok(cards[1].includes('正常')&&cards[1].includes('現在 40%'));
 w.renderPizzaBlock({pizza:[],pizza_summary:{},bars:{available:false,setup_needed:true,bars:[]}});
 assert.ok(d.querySelector('#pizza-bars-line').textContent.includes('尚未在 BestTime 建檔'));}
+// Region card headline: says why a score moved; escaped, http(s) only, volume multiple only for big surges.
+{const w=d.defaultView;const ts=new Date(Date.now()-2*3600000).toISOString();
+const html=w.regionHeadline({headline:{title:'北韓<b>發射</b>',url:'https://example.com/a',ts},factors:{gdelt_delta:1116.3}});
+assert.ok(html.includes('新聞量約為平常的 12 倍</div>'));assert.ok(html.includes('&lt;b&gt;'));assert.ok(html.includes('2 小時前'));
+assert.ok(!w.regionHeadline({headline:{title:'x',url:'https://e.com',ts},factors:{gdelt_delta:40}}).includes('倍'));
+assert.equal(w.regionHeadline({headline:{title:'x',url:'javascript:alert(1)'}}),'');assert.equal(w.regionHeadline({}),'');
+w.renderPizzaRadar({pizza:[{name:'a',busyness:null}],pizza_summary:{state:'baseline_only'}});
+assert.ok(d.querySelector('#pizza-radar-summary').textContent.includes('目前只有平常人流'));
+assert.ok(!/PizzINT|pizzint/i.test(d.querySelector('#pizza-card').textContent));}
 // Hourly bars: Washington weekday baseline (grey) + only today's live readings; 0 is drawn, yesterday is not.
 {const w=d.defaultView,usual=Array(24).fill(null);usual[10]=40;usual[12]=80;
 const shop={name:'x',recorded_at:'2026-10-27T16:06:00Z',usual_week:{'1':Array(24).fill(90),'2':usual},
