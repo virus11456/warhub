@@ -371,27 +371,48 @@ def build_outage_alert(newly_down: list, recovered: list) -> str:
     return "\n".join(lines)
 
 
+def _airspace_confirms(region):
+    """禁航公告同步升高：有關閉公告，或 NOTAM 相對分數 ≥ 75（約為平常的 1.5 倍）。"""
+    f = (region or {}).get("factors") or {}
+    return bool(f.get("notam_closure")) or (_valid_number(f.get("notam"), 100) and f["notam"] >= 75)
+
+
 def region_jumps(regions, prev_notify, now):
     """
-    地區等級跳升：本輪到 HIGH 或 CRITICAL、且比上一輪高兩級以上（如 觀察→HIGH）。
-    INSUFFICIENT_DATA 不覆蓋上一輪的已知等級；同一地區冷卻 REGION_JUMP_COOLDOWN_HOURS 小時。
-    回傳 (jumps, levels)；levels 為下一輪比較用的已知等級。
+    地區等級跳升：本輪到 HIGH 或 CRITICAL、且比上一輪已知等級高兩級以上（如 觀察→HIGH）。
+    防誤報：新聞強度只看 2 小時窗，一則大新聞就可能衝高，所以
+      - 禁航公告同步升高（_airspace_confirms）→ 本輪立即通知；
+      - 否則先記為待確認（region_pending），下一輪仍在 HIGH 以上才通知；回落就取消。
+    INSUFFICIENT_DATA 不覆蓋已知等級、也不取消待確認；同一地區冷卻 REGION_JUMP_COOLDOWN_HOURS 小時。
+    回傳 (jumps, levels, pending)。
     """
     prev_levels = dict((prev_notify or {}).get("region_levels") or {})
     alerted = (prev_notify or {}).get("region_alerted") or {}
+    pending = dict((prev_notify or {}).get("region_pending") or {})
     levels, jumps = dict(prev_levels), []
     for r in regions or []:
         level = r.get("level") if isinstance(r, dict) else None
         if level not in REGION_ORDER:
             continue
-        levels[r["key"]] = level
-        before = prev_levels.get(r["key"])
-        last = _iso(alerted.get(r["key"]))
-        if (before in REGION_ORDER and level in ("HIGH", "CRITICAL")
-                and REGION_ORDER.index(level) - REGION_ORDER.index(before) >= 2
-                and (last is None or now - last >= timedelta(hours=REGION_JUMP_COOLDOWN_HOURS))):
-            jumps.append({**r, "previous_level": before})
-    return jumps, levels
+        key = r["key"]
+        levels[key] = level
+        before = prev_levels.get(key)
+        last = _iso(alerted.get(key))
+        cooled = last is None or now - last >= timedelta(hours=REGION_JUMP_COOLDOWN_HOURS)
+        if level not in ("HIGH", "CRITICAL"):
+            pending.pop(key, None)
+            continue
+        waiting = pending.get(key)
+        if waiting and waiting.get("from") in REGION_ORDER:
+            pending.pop(key)
+            if cooled:
+                jumps.append({**r, "previous_level": waiting["from"], "confirmed_by": "two_runs"})
+        elif (before in REGION_ORDER and REGION_ORDER.index(level) - REGION_ORDER.index(before) >= 2 and cooled):
+            if _airspace_confirms(r):
+                jumps.append({**r, "previous_level": before, "confirmed_by": "airspace"})
+            else:
+                pending[key] = {"from": before, "since": now.isoformat()}
+    return jumps, levels, pending
 
 
 def build_region_jump_alert(jumps) -> str:
@@ -401,6 +422,10 @@ def build_region_jump_alert(jumps) -> str:
         score = _fmt_score(r.get("score"))
         lines.append(f"• {r.get('flag', '')} {r.get('name', r['key'])}：{names[r['previous_level']]} → "
                      f"{names[r['level']]}（{score}）")
+        if r.get("confirmed_by") == "airspace":
+            lines.append("  禁航公告同步升高，立即通知")
+        elif r.get("confirmed_by") == "two_runs":
+            lines.append("  已連續兩輪維持 HIGH 以上")
         delta = (r.get("factors") or {}).get("gdelt_delta")
         if _valid_number(delta) and delta >= 100:
             lines.append(f"  新聞量約為平常的 {round(1 + delta / 100)} 倍")
@@ -482,7 +507,7 @@ async def run_notifications(data: dict, prev_notify: dict | None = None,
     if digest_only:
         # A saved-snapshot digest must not consume or replay event edges.
         for key in ("level", "pizza_extreme", "hotspots", "hotspot_counter_version",
-                    "source_down_since", "source_alerted", "region_levels", "region_alerted"):
+                    "source_down_since", "source_alerted", "region_levels", "region_alerted", "region_pending"):
             if key in prev_notify:
                 new_notify[key] = prev_notify[key]
             else:
@@ -524,7 +549,7 @@ async def run_notifications(data: dict, prev_notify: dict | None = None,
     # 3) 地區跳升：只送站長個人 chat；送達才記冷卻，沒送達下輪再試
     region_sent = {}
     if not digest_only:
-        jumps, region_levels = region_jumps(data.get("regions"), prev_notify, now)
+        jumps, region_levels, region_pending = region_jumps(data.get("regions"), prev_notify, now)
         region_alerted = dict(prev_notify.get("region_alerted") or {})
         if ALERT_REGION_JUMP and jumps:
             region_sent = await _send_all([build_region_jump_alert(jumps)], new_level,
@@ -532,9 +557,11 @@ async def run_notifications(data: dict, prev_notify: dict | None = None,
             if region_sent and all(region_sent.values()):
                 region_alerted.update({r["key"]: now.isoformat() for r in jumps})
             else:
-                region_levels.update({r["key"]: r["previous_level"] for r in jumps})
+                # 沒送達：留成待確認，下一輪仍在 HIGH 以上就再送
+                region_pending.update({r["key"]: {"from": r["previous_level"], "since": now.isoformat()} for r in jumps})
         new_notify["region_levels"] = region_levels
         new_notify["region_alerted"] = region_alerted
+        new_notify["region_pending"] = region_pending
 
     # 4) 資料來源中斷／恢復：只送站長個人 chat，不送公開頻道與 Discord
     outage = {}
