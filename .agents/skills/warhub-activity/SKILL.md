@@ -11,6 +11,7 @@ description: "Maintain WARHUB pizza-shop and bar foot-traffic collectors (own Be
 |---|---|---|
 | `fetch_pizza` | BestTime `/api/v1/forecasts/live`（與酒吧共用 `besttime_live`），只查 `data/besttime_venues.json` 已有 venue_id 的店 | `data.json.pizza`、`pizza_summary`、`pizza_index`（WPI z）、`pizza_events` |
 | `fetch_bars` | BestTime `/api/v1/forecasts/live` | `data.json.bars`；需 `BESTTIME_API_KEY` |
+| `venue_hours.py`（非排程）＋`fetch_data.stored_venue_hours` | SerpApi `engine=google_maps`（Google 地圖營業時間），每家 1 次搜尋 | `data/venue_hours.json`；排程只把 hours／permanently_closed 複製進 `data.json.venue_hours`，不發請求 |
 | `besttime_setup.py`（非排程） | BestTime `POST /api/v1/forecasts`，每店成功 2／失敗 1 credit | `data/besttime_venues.json`：披薩店 venue_id＋usual_week、酒吧 venue_id、errors |
 
 2026-10-28 起披薩人流只用自有 BestTime 帳號（使用者決定），已移除 PizzINT 來源、DEFCON、48小時回測卡與 pizza_backtest；research/ 與 archives/ 舊資料保留不改。網頁不顯示 PizzINT 名稱。下方較早日期的 PizzINT 筆記僅為歷史紀錄。
@@ -55,3 +56,5 @@ research/pizza-reviews.json 保存版本化重大行動定義與逐事件審核�
 2026-10-28 BestTime 409 原因確定（使用者授權執行 besttime-setup，scope=all）：10 家店全部回 HTTP 409「Your free forecast credits are used up. Choose a plan to continue using Radar.」＝帳號免費額度已用完，不是程式或建檔流程問題；建檔與即時查詢都需付費方案。errors 已寫入 data/besttime_venues.json。換方案或補額度後，重跑 besttime-setup（confirm=SPEND）即可。
 
 2026-10-28 披薩區塊 three.js 營業示意（使用者要求，只改前端、不加請求或扣點）：#pz-3d 顯示「披薩店營業中 x / 6」「酒吧營業中 y / 4」與 3D 示意圖（three-scenes.js 的 WarhubThree.pentagon，五角大廈居中，店家位置為近似座標）。前端 pizzaOpenStates：披薩 is_open=true＝營業、false＝未營業、其他＝未知；酒吧 live_available 有值或 open 為 true／'Open'＝營業，open 為 false／'Closed'＝未營業，其他（含非查詢時段 bars=[]）＝未知。柱高＝即時人流（0 是有效值），未知與未營業不補零。未知原因：pizza_summary.state 為 setup_needed→尚未建檔、off_hours 或 bars.off_hours→非查詢時段，否則本輪無即時資料。店名須與 PIZZA_VENUES／PENTAGON_BARS 一致，改名時同步 three-scenes.js VENUES。three.js 只在區塊接近畫面時從 jsDelivr 載入；無 WebGL 或載入失敗只顯示數字。驗證：tests/test_frontend.cjs。
+
+2026-10-29 營業時間（使用者要求，SerpApi 免費方案）：Google 自 2026-02 起對資料中心 IP／匿名自動化顯示 limited view，Popular Times 從地圖頁、`tbm=map` JSON（info[84]）與 SerpApi google_maps（popular_times=null，購物中心亦同）消失；營業時間仍公開。`scripts/venue_hours.py` 手動執行（`.github/workflows/venue-hours.yml`，需 secret `SERPAPI_API_KEY`，可用 only 只重查部分店），查 6 披薩＋4 酒吧，比對門牌（同街名、門牌差 ≤30）避免分店錯誤，hours 存成 `'0'`(週日)…`'6'` 的 [開, 關] 分鐘，關 >1440 表示跨午夜；"Closed" 存 []（有效公休，不是缺值）；無法解析或缺任一天則不存並寫 errors；open_state 為 Permanently closed 時存 permanently_closed=true。前端 `openByHours` 以 America/New_York 時鐘判斷現在是否營業（含前一天跨午夜時段），每 5 分鐘重算；即時資料（is_open／live_available／Closed）優先於營業時間；永久停業的店不列入分母並註明。營業時間不是人流，不計分、不影響 WPI。2026-10-29 實測：Papa Johns 原地址 3400 Columbia Pike 已無此店，改 1014 S Glebe Rd；Extreme Pizza 改 1419 S Fern St（PIZZA_VENUES 同步，BestTime 建檔也用新地址）；Sine Irish Pub 已永久停業（是否從 PENTAGON_BARS 換店待使用者決定）。驗證：tests/test_venue_hours.py、tests/test_frontend.cjs。

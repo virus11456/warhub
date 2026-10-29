@@ -1860,6 +1860,15 @@ async def fetch_pizza(session: aiohttp.ClientSession, previous_shops) -> dict:
     return {"shops": shops, "summary": summary, "events": spike_events(shops)}
 
 
+def stored_venue_hours() -> dict | None:
+    """Opening hours saved by scripts/venue_hours.py (hand-run SerpApi lookup); no request here."""
+    from venue_hours import load
+    data = load()
+    venues = {n: {k: v[k] for k in ("kind", "hours", "permanently_closed") if k in v}
+              for n, v in (data.get("venues") or {}).items() if isinstance(v, dict) and isinstance(v.get("hours"), dict)}
+    return {"fetched_at": data.get("fetched_at"), "timezone": "America/New_York", "venues": venues} if venues else None
+
+
 async def fetch_bars(session: aiohttp.ClientSession) -> dict:
     key = os.environ.get("BESTTIME_API_KEY", "").strip()
     if not key:
@@ -2469,6 +2478,7 @@ async def main():
         "notam_baseline": notam_baseline,
         "nuclear_seismic": nuclear_seismic,
         "bars":          bars,
+        "venue_hours":   stored_venue_hours(),
         "regions":       regions,
         "sources": {
             "pizza":      "https://besttime.app/",

@@ -16,9 +16,9 @@ ET = ZoneInfo("America/New_York")
 PIZZA_VENUES = {
     "We, The Pizza":                     {"name": "We, The Pizza",         "address": "2100 Crystal Dr, Arlington, VA 22202"},
     "Pizzato Pizza":                     {"name": "Pizzato Pizza",         "address": "2632 N Pershing Dr, Arlington, VA 22201"},
-    "Papa Johns Pizza":                  {"name": "Papa Johns Pizza",      "address": "3400 Columbia Pike, Arlington, VA 22204"},
+    "Papa Johns Pizza":                  {"name": "Papa Johns Pizza",      "address": "1014 S Glebe Rd, Arlington, VA 22204"},
     "Domino's Pizza (Pentagon Closest)": {"name": "Domino's Pizza",        "address": "2602 Columbia Pike, Arlington, VA 22204"},
-    "Extreme Pizza":                     {"name": "Extreme Pizza",         "address": "550 14th Rd S, Arlington, VA 22202"},
+    "Extreme Pizza":                     {"name": "Extreme Pizza",         "address": "1419 S Fern St, Arlington, VA 22202"},
     "District Pizza Palace":             {"name": "District Pizza Palace", "address": "2325 S Eads St, Arlington, VA 22202"},
 }
 

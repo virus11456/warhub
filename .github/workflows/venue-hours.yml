@@ -1,0 +1,59 @@
+name: Venue opening hours
+
+# 手動執行：用 SerpApi 查披薩店與酒吧的 Google 營業時間（每家 1 次搜尋，共 10 次）。
+# 排程更新從不呼叫 SerpApi；結果寫入 data/venue_hours.json，網頁依此判斷現在是否營業。
+on:
+  workflow_dispatch:
+    inputs:
+      only:
+        description: '只重查這些店（顯示名稱，以 | 分隔）；留空＝全部 10 家'
+        type: string
+        default: ''
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-data
+  cancel-in-progress: false
+
+jobs:
+  hours:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: scripts/requirements.txt
+
+      - name: Install deps
+        run: pip install -r scripts/requirements.txt
+
+      - name: Look up opening hours
+        env:
+          SERPAPI_API_KEY: ${{ secrets.SERPAPI_API_KEY }}
+          ONLY: ${{ inputs.only }}
+        run: |
+          cd scripts
+          if [ -n "$ONLY" ]; then
+            IFS='|' read -ra names <<< "$ONLY"
+            python venue_hours.py --only "${names[@]}"
+          else
+            python venue_hours.py
+          fi
+
+      - name: Commit hours
+        run: |
+          git config user.name  "warhub-bot"
+          git config user.email "localhost20000@gmail.com"
+          git add data/venue_hours.json
+          git diff --cached --quiet && exit 0
+          git commit -m "data: venue opening hours"
+          for i in 1 2 3; do git pull --rebase -q origin "${GITHUB_REF_NAME}" && git push -q origin "HEAD:${GITHUB_REF_NAME}" && exit 0; sleep $((i*5)); done
+          exit 1
