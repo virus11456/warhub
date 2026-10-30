@@ -23,7 +23,7 @@ import os
 import re
 from translations import cached_titles as translation_cache, update_cache, request_state, translate_groq, english_titles, taiwan_terms
 from scoring import MODEL_VERSION, WEIGHTS, number, risk_off_cluster, market_risk, market_average, aggregate, calculate_wpi
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 try:
@@ -2052,6 +2052,56 @@ def attach_region_headlines(regions: list[dict], news: list[dict]) -> None:
                              "ts": n.get("ts"), "source": n.get("domain")}
 
 
+def region_level(score):
+    if score is None: return "INSUFFICIENT_DATA"
+    if score >= 65: return "CRITICAL"
+    if score >= 45: return "HIGH"
+    if score >= 25: return "ELEVATED"
+    return "WATCH"
+
+
+DISPLAY_WINDOW_HOURS = 6.5
+
+
+def region_display(regions: list[dict], history: list[dict], now: datetime) -> None:
+    """
+    Shown region score = median of this run and the two previous runs (about 6 hours).
+    News intensity only looks at a 2-hour window, so one headline moves a score 15-20 points and back.
+    A median ignores a single-run spike or drop but follows a change that holds for two runs, without
+    shrinking it the way an average would. The run's own score stays in score_raw/level_raw (history,
+    owner alerts). Shown = raw when the airspace confirms (closure or NOTAM ≥ 75), when fewer than two
+    earlier scores exist within 6.5 h, or when this run has no score.
+    """
+    cutoff = now - timedelta(hours=DISPLAY_WINDOW_HOURS)
+    for r in regions:
+        raw = r.get("score")
+        r["score_raw"], r["level_raw"] = raw, r.get("level")
+        earlier = []
+        for h in reversed(history or []):
+            try:
+                ts = datetime.fromisoformat(str(h.get("ts")).replace("Z", "+00:00"))
+            except (TypeError, ValueError, AttributeError):
+                continue
+            v = (h.get("regions") or {}).get(r["key"])
+            if h.get("model_version") == MODEL_VERSION and cutoff <= ts < now and number(v):
+                earlier.append(v)
+            if len(earlier) == 2:
+                break
+        f = r.get("factors") or {}
+        if raw is None:
+            r["display"] = {"method": "latest"}
+            continue
+        if f.get("notam_closure") is True or (number(f.get("notam")) and f["notam"] >= 75):
+            r["display"] = {"method": "airspace"}
+            continue
+        if len(earlier) < 2:
+            r["display"] = {"method": "latest"}
+            continue
+        shown = sorted([raw, *earlier])[1]
+        r["score"], r["level"] = shown, region_level(shown)
+        r["display"] = {"method": "median3", "samples": [earlier[1], earlier[0], raw]}
+
+
 def no_market_excess(relative_score: float) -> float:
     """A relative score (50 = the region's usual level) → how far above usual, 0–100."""
     return max(0.0, min(100.0, (relative_score - 50.0) * 2))
@@ -2124,11 +2174,7 @@ def build_region_risks(polymarket: list[dict], gdelt: dict,
         else:
             score, coverage = aggregate(factors, {"poly": .35, "gdelt": .25, "notam": .15, "firms": .12, "avi": .13}, min_coverage=.60, min_factors=2)
 
-        if score is None: level = "INSUFFICIENT_DATA"
-        elif score >= 65:  level = "CRITICAL"
-        elif score >= 45: level = "HIGH"
-        elif score >= 25: level = "ELEVATED"
-        else:             level = "WATCH"
+        level = region_level(score)
 
         regions_out.append({
             "key": key, "name": cfg["name"], "flag": cfg["flag"],
@@ -2162,7 +2208,8 @@ def update_history(score: dict, pizza_index, regions: list[dict], wiki_score=Non
         "poly": score["polymarket_score"],
         "pizza": pizza_index,
         "wiki": wiki_score,
-        "regions": {r["key"]: r["score"] for r in regions},
+        "regions": {r["key"]: r.get("score_raw", r["score"]) for r in regions},
+        "regions_shown": {r["key"]: r["score"] for r in regions},
         # Preserve the exact contributing factor set; absent metadata stays unknown.
         "score_basis": {
             # Events-file news intensity is a different measurement: keep it a distinct basis key.
@@ -2298,7 +2345,7 @@ def update_daily_metrics(score: dict, pizza_index, pizza_level, firms: dict,
         "avi_uav":   s.get("uav"),
         "avi_c4isr": s.get("c4isr"),
         "seismic":  (nuclear_seismic or {}).get("total_72h"),
-        "regions":  {r["key"]: r.get("score") for r in (regions or [])},
+        "regions":  {r["key"]: r.get("score_raw", r.get("score")) for r in (regions or [])},
     }
     # 經濟避險指標（僅存價格，供長期趨勢；油價戰爭溢價＝布油現價−30日均）
     f = finance or {}
@@ -2580,6 +2627,11 @@ async def main():
                     item[k] = clean_headline(item[k], item.get("domain"))
     regions = build_region_risks(polymarket, gdelt, firms, aviation, notams, gdelt_events)
     attach_region_headlines(regions, news)
+    try:
+        _history_before = json.loads(HISTORY_FILE.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        _history_before = []
+    region_display(regions, _history_before if isinstance(_history_before, list) else [], datetime.now(timezone.utc))
     history = update_history(score, pizza_index, regions,
                              (wikipedia or {}).get("score"), aviation)
     # 軍機機型 24h/7d/30d 歷史變化（資料累積後自動填入）

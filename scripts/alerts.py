@@ -391,6 +391,8 @@ def region_jumps(regions, prev_notify, now):
     pending = dict((prev_notify or {}).get("region_pending") or {})
     levels, jumps = dict(prev_levels), []
     for r in regions or []:
+        if isinstance(r, dict):  # alerts use this run's own score, not the 3-run median shown on the page
+            r = {**r, "level": r.get("level_raw", r.get("level")), "score": r.get("score_raw", r.get("score"))}
         level = r.get("level") if isinstance(r, dict) else None
         if level not in REGION_ORDER:
             continue
