@@ -21,7 +21,7 @@ import json
 import logging
 import os
 import re
-from translations import cached_titles as translation_cache, update_cache, request_state, translate_groq, english_titles
+from translations import cached_titles as translation_cache, update_cache, request_state, translate_groq, english_titles, taiwan_terms
 from scoring import MODEL_VERSION, WEIGHTS, number, risk_off_cluster, market_risk, market_average, aggregate, calculate_wpi
 from datetime import datetime, timezone
 from pathlib import Path
@@ -113,7 +113,7 @@ REGIONS = {
     "taiwan": {
         "name": "台海", "flag": "🇹🇼",
         "poly_kw": ["taiwan", "invade taiwan", "blockade taiwan", "xi jinping"],
-        "poly_search": "taiwan",
+        "poly_search": ["taiwan"],
         "gdelt_q": "(taiwan china) (invasion OR military OR blockade OR war)",
         "firms": ["taiwan"],
         "avi_regions": ["西太平洋"],
@@ -121,7 +121,7 @@ REGIONS = {
     "korea": {
         "name": "朝鮮半島", "flag": "🇰🇵",
         "poly_kw": ["north korea", "kim jong", "dprk", "pyongyang"],
-        "poly_search": "north korea",
+        "poly_search": ["north korea"],
         "gdelt_q": '"north korea" (missile OR nuclear OR war OR attack)',
         "firms": ["korea"],
         "avi_regions": ["西太平洋"],
@@ -129,7 +129,7 @@ REGIONS = {
     "southsea": {
         "name": "南海爭議", "flag": "🌊",
         "poly_kw": ["south china sea", "philippines", "scarborough", "spratly"],
-        "poly_search": "south china sea",
+        "poly_search": ["south china sea", "philippines"],
         "gdelt_q": '"south china sea" (conflict OR military OR clash OR standoff)',
         "firms": [],
         "avi_regions": ["西太平洋"],
@@ -261,16 +261,13 @@ def _parse_outcome_prices(market: dict) -> tuple[float | None, float | None]:
 
 async def _search_region_markets(session: aiohttp.ClientSession, seen_ids: set) -> list[dict]:
     """
-    Region keyword search (Polymarket public-search), one request per region with poly_search.
+    Region keyword search (Polymarket public-search), one request per poly_search keyword.
     Low-volume regional markets (e.g. China x Taiwan) fall outside the top 300 geopolitics markets by
     24h volume, which left Taiwan and Korea scored as if no market existed. A failed search only loses
     that region's extra markets.
     """
     found = []
-    for key, cfg in REGIONS.items():
-        query = cfg.get("poly_search")
-        if not query:
-            continue
+    for query in [q for cfg in REGIONS.values() for q in cfg.get("poly_search") or []]:
         try:
             async with session.get(
                 POLYMARKET_SEARCH, params={"q": query, "limit_per_type": 20, "events_status": "active"},
@@ -904,6 +901,14 @@ def _news_iso(pubdate: str) -> str:
     except Exception:
         return ""
 
+def _taiwan_usage(items):
+    """Taiwan names/terms in machine-made titles (new or cached); Chinese originals stay as written."""
+    for item in items:
+        if item.get("title_zh") and item.get("translation_status") in ("translated", "cached"):
+            fixed = taiwan_terms(item["title_zh"])
+            item.update(title=fixed, title_zh=fixed)
+
+
 async def _translate_titles(session, items, tl="zh-TW", cached_titles=None):
     """Persist Chinese titles; short requests avoid oversized batch URLs.
     Reuse translations for unchanged originals and bound the entire translation stage.
@@ -918,6 +923,7 @@ async def _translate_titles(session, items, tl="zh-TW", cached_titles=None):
               if isinstance(translated, str) and re.search(r"[\u3400-\u9fff]", translated)}
     if os.environ.get('WARHUB_TRANSLATION_PROVIDER') == 'groq' or os.environ.get('GROQ_API_KEY'):
         await translate_groq(session, items, cached)
+        _taiwan_usage(items)
         return
     state = request_state(session)
     async def translate(item):
@@ -963,6 +969,7 @@ async def _translate_titles(session, items, tl="zh-TW", cached_titles=None):
             if not item.get('title_zh'):
                 item.setdefault('translation_error', 'budget_exhausted')
         log.warning("title translation budget reached; completed translations retained")
+    _taiwan_usage(items)
     log.info("Chinese news titles: %s/%s", sum(bool(i.get("title_zh")) for i in items), len(items))
 
 

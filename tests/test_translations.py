@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'scripts'))
-from translations import cached_titles, update_cache, translate_groq, english_titles, CACHE_LIMIT
+from translations import cached_titles, update_cache, translate_groq, english_titles, CACHE_LIMIT, taiwan_terms
 
 class Response:
     def __init__(self, status, rows): self.status, self.rows = status, rows
@@ -30,6 +30,24 @@ class RejectsOne(Session):
         if any('poison' in r['text'] for r in inputs):
             self.calls.append((url, kwargs)); return Response(400, [])
         return super().post(url, **kwargs)
+
+class TaiwanTermsTests(unittest.TestCase):
+    def test_mainland_names_become_taiwan_usage(self):
+        self.assertEqual(taiwan_terms('烏克蘭在特朗普壓力下暫停打擊，普京回應'), '烏克蘭在川普壓力下暫停打擊，普丁回應')
+        self.assertEqual(taiwan_terms('朝鮮試射導彈，沙特阿拉伯與卡塔爾表態'), '北韓試射飛彈，沙烏地阿拉伯與卡達表態')
+    def test_region_and_war_names_keep_their_meaning(self):
+        for text in ('朝鮮半島局勢', '朝鮮戰爭紀念', '南北朝鮮會談', '川普會見普丁', None):
+            self.assertEqual(taiwan_terms(text), text)
+
+    def test_collector_fixes_new_and_cached_titles_but_not_chinese_originals(self):
+        import fetch_data as f
+        items = [{'title': 'Trump says', 'title_zh': '特朗普表示', 'translation_status': 'translated'},
+                 {'title': 'Putin', 'title_zh': '普京', 'translation_status': 'cached'},
+                 {'title': '特朗普原文', 'title_zh': '特朗普原文', 'translation_status': 'original'}]
+        f._taiwan_usage(items)
+        self.assertEqual([i['title_zh'] for i in items], ['川普表示', '普丁', '特朗普原文'])
+        self.assertEqual(items[0]['title'], '川普表示')
+
 
 class CacheTests(unittest.TestCase):
     def test_translations_survive_disappearing_titles_and_sources_stay_separate(self):

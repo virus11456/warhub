@@ -98,7 +98,7 @@ class RegionSearchTests(unittest.IsolatedAsyncioTestCase):
     async def test_region_search_adds_open_conflict_markets_once(self):
         s = Session()
         rows = await f.fetch_polymarket(s)
-        self.assertEqual(sorted(s.queries), ['north korea', 'south china sea', 'taiwan'])
+        self.assertEqual(sorted(s.queries), ['north korea', 'philippines', 'south china sea', 'taiwan'])
         self.assertEqual([r['question'] for r in rows], ['Will Russia invade Ukraine?', 'China x Taiwan military clash before 2027?'])
         taiwan = next(r for r in f.build_region_risks(rows, {}, {'error': 'x'}, {'error': 'x'}) if r['key'] == 'taiwan')
         self.assertEqual(taiwan['factors']['poly'], 5.0)
