@@ -1271,7 +1271,7 @@
 
 </style>
 <link rel="stylesheet" href="/i18n.css?v=20260916b">
-<script src="/i18n.js?v=20261029f" defer></script>
+<script src="/i18n.js?v=20261030a" defer></script>
 <script src="/cross-context.js"></script>
 <script src="/three-scenes.js?v=20261029b" defer></script>
 <script src="/kalshi-markets.js?v=20260923a" defer></script>
@@ -2866,13 +2866,14 @@ function trendArrow(cur, regionKey) {
     if (!Array.isArray(previousBasis) || previousBasis.length !== basis.length ||
         [...previousBasis].sort().some((k, i) => k !== basis[i])) continue;
     const ts = Date.parse(h.ts);
-    const value = regionKey ? h.regions?.[regionKey] : h.combined;
+    // Region cards show the 3-run median; compare it with the median shown then (older entries: their score).
+    const value = regionKey ? (h.regions_shown?.[regionKey] ?? h.regions?.[regionKey]) : h.combined;
     if (!Number.isFinite(ts) || ts >= snapshot || !validScore(value)) continue;
     const diff = Math.abs(ts - target);
     if (diff < bestDiff) { bestDiff = diff; best = h; }
   }
   if (!best || bestDiff > 4 * 3600000) return '';
-  const prev = regionKey ? best.regions[regionKey] : best.combined;
+  const prev = regionKey ? (best.regions_shown?.[regionKey] ?? best.regions[regionKey]) : best.combined;
   const hours = ((snapshot - Date.parse(best.ts)) / 3600000).toFixed(1);
   const title = `與資料時間約 ${hours} 小時前比較：${prev} 分`;
   const d = cur - prev;
@@ -2977,6 +2978,12 @@ function regionSpark(key, color, noMarket) {
     <span>7 天 · 低 ${Math.round(Math.min(...vals))} · 高 ${Math.round(Math.max(...vals))}</span></div>`;
 }
 
+// The big number is the median of the last 3 runs (~6 h); say so and give this run's own score when it differs.
+function regionShownNote(r, observation) {
+  if (observation.provisional || r.display?.method !== 'median3' || !Number.isFinite(r.score_raw)) return '';
+  return Math.round(r.score_raw) === Math.round(r.score) ? ' · 近 3 次中位數' : ` · 近 3 次中位數（本次 ${Math.round(r.score_raw)}）`;
+}
+
 function renderRegions(regions) {
   const board = document.getElementById('region-board');
   if (board) {
@@ -3004,7 +3011,7 @@ function renderRegions(regions) {
           <span style="margin-left:auto;font-family:'Orbitron',monospace;font-size:1.5rem;font-weight:900;color:${st.color}">${(observation.score == null ? '--' : Math.round(observation.score))}</span>
           <span style="font-family:'Share Tech Mono',monospace;font-size:.72rem">${trend}</span>
         </div>
-        <div style="font-family:'Orbitron',monospace;font-size:.8rem;letter-spacing:normal;color:${st.color};margin-bottom:.6rem">${observation.score == null ? '尚無有效計分資料' : observation.provisional ? (observation.count === 1 ? '單一來源觀測' : '暫定觀測') : '多來源觀測'} · ${observation.count}/${r.factors?.no_market ? 2 : 3} 來源${r.factors?.no_market ? ' · 無市場題目' : ''}</div>
+        <div style="font-family:'Orbitron',monospace;font-size:.8rem;letter-spacing:normal;color:${st.color};margin-bottom:.6rem">${observation.score == null ? '尚無有效計分資料' : observation.provisional ? (observation.count === 1 ? '單一來源觀測' : '暫定觀測') : '多來源觀測'} · ${observation.count}/${r.factors?.no_market ? 2 : 3} 來源${r.factors?.no_market ? ' · 無市場題目' : ''}${regionShownNote(r, observation)}</div>
         <div class="kalshi-region-reference" data-kalshi-region="${escapeHtml(r.key)}"></div>
         <div style="display:flex;flex-direction:column;gap:.34rem;font-family:'Share Tech Mono',monospace">
           ${factorRow('市場盤口', f.poly)}
