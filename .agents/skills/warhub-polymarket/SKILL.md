@@ -29,3 +29,5 @@ Kalshi共用篩選準備：scripts/market_selection.py::selected_market_risk抽�
 
 2026-10-29 地區關鍵字補抓（使用者選擇）：主清單只取 geopolitics 標籤 24h 交易量前 300 題，台海、北韓題目交易量小被擠出，台海與朝鮮被當成「沒有市場」計分（台海 0.7）。`_search_region_markets` 對 REGIONS[].poly_search（taiwan、north korea、south china sea）各打一次 Gamma `public-search`（events_status=active，每區最多 20 個事件），只收 active 且未 closed、未重複的市場，再經同一個 `_war_candidate`（排除字→雙邊報價→market_risk）。主清單失敗時仍回空清單沿用舊快照，不用補抓結果頂替；單區搜尋失敗只少那一區。實測加入後台海 27.0（市場 4.5）、朝鮮 32.7（市場 5.5），兩區改用一般有市場公式。驗證：tests/test_firms_markets.py。
 
+2026-10-30 poly_search 改為清單，每個關鍵字一次 public-search：南海唯一題目「China x Philippines military clash before 2027?」掉出前 300 名時，「south china sea」搜不到，南海變成無市場、分數 38→0。南海改為 ["south china sea", "philippines"]（每輪共 4 次搜尋）。驗證：tests/test_firms_markets.py。
+

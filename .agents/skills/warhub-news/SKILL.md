@@ -84,3 +84,6 @@ tests/test_news_sampling.py驗證平衡首頁、50筆上限、去重、來源名
 2026-10-29 標題字尾清理：輸出前 `fetch_data.clean_headline` 處理 news 與 tw_news 的 title／title_zh，移除 RSS／翻譯留下的來源或欄目字尾（例：「…有效」-新聞-台灣國際電台、…｜鏡轉全球｜#鏡新聞、…外海- 國際、"… - Reuters"）。分隔符為 ｜ | - – —，只在字尾等於該則 domain 或像媒體／欄目標籤（#開頭、含新聞／電台／電視／日報／時報／網，或國際、兩岸等）且 ≤14 字時移除，最多 4 層；「俄羅斯-北韓」「Russia-Ukraine」等正文連字號保留。驗證：tests/test_region_jump.py HeadlineCleanupTests。
 
 2026-10-29 翻譯 HTTP 400 不再整輪中止：實測 16:23 一輪新聞 7 則全部 groq_http_400（同輪 Polymarket 52/52 成功），前台整排「中文翻譯暫時無法取得」。Groq 對 json_schema strict 輸出無法通過驗證時回 400（json_validate_failed），屬單批內容問題、非帳號問題，舊程式卻把它當全域失敗停止整輪。`translate_groq` 拆成 `send(batch)`：400 時讀回應前 200 字寫 log（遮蔽 key），回 'rejected'，`batches()` 改逐則重送該批；仍被拒的那則標 translation_error='groq_http_400'，其餘照常翻譯，也不影響後續來源。其他非 200（429 等）仍整輪停止。驗證：tests/test_translations.py。
+
+2026-10-30 台灣用語（使用者選擇）：機器翻譯標題出現「特朗普」「普京」等大陸譯名。`translations.taiwan_terms` 以固定對照表（TW_TERMS：川普、普丁、澤倫斯基、納坦雅胡、哈米尼、馬克宏、飛彈、航艦、影片、網路等）替換，單獨的「朝鮮」改「北韓」（朝鮮半島、朝鮮戰爭、南北朝鮮不動）。`fetch_data._taiwan_usage` 在 `_translate_titles` 兩條路徑（Groq、Google 備援）結束後套用到 translated／cached 標題，所以快取中的舊譯名下一輪就會修正；original（中文來源）不改。Groq 中文提示也加上台灣用語。新增譯名只改 TW_TERMS 並補測試。驗證：tests/test_translations.py::TaiwanTermsTests。
+
